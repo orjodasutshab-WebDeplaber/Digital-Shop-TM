@@ -23,6 +23,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <script src="idb-shim.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+.g-btn{width:100%;padding:11px;border:2px solid #334155;border-radius:12px;background:#1e293b;color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:.2s;font-family:'Hind Siliguri',sans-serif;margin-bottom:12px;}
+.g-btn:hover{border-color:#6366f1;background:#0f172a;}
+.g-btn img{width:20px;height:20px;}
+.or-div{display:flex;align-items:center;gap:10px;margin-bottom:12px;color:#475569;font-size:13px;}
+.or-div::before,.or-div::after{content:'';flex:1;height:1px;background:#334155;}
+</style>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;color:#fff;overflow-x:hidden;}
@@ -233,6 +241,8 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
             <div class="mtitle">লগইন করুন</div><div class="msub">Digital Shop TM-এ ফিরে স্বাগতম</div>
         </div>
         <div class="mbody">
+            <button class="g-btn" onclick="googleSignIn()"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G"> Google দিয়ে লগইন করুন</button>
+            <div class="or-div">অথবা</div>
             <div class="ig"><label class="il" style="color:#2ecc71;">ইউজার আইডি / মোবাইল</label><div class="iw"><i class="fa fa-user" style="color:#27ae60;"></i><input type="text" id="lnId" class="fi" placeholder="আপনার আইডি লিখুন"></div></div>
             <div class="ig"><label class="il" style="color:#2ecc71;">পাসওয়ার্ড</label><div class="iw"><i class="fa fa-lock" style="color:#27ae60;"></i><input type="password" id="lnPass" class="fi" placeholder="পাসওয়ার্ড দিন"></div></div>
             <div class="fgt"><a href="#" onclick="switchM('loginModal','resetModal')">পাসওয়ার্ড ভুলে গেছেন?</a></div>
@@ -252,6 +262,8 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
             <div class="mtitle">নতুন অ্যাকাউন্ট</div><div class="msub">Digital Shop TM-এ আপনার তথ্য দিন</div>
         </div>
         <div class="mbody">
+            <button class="g-btn" onclick="googleSignIn()"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G"> Google দিয়ে সাইন আপ করুন</button>
+            <div class="or-div">অথবা</div>
             <div class="ig"><label class="il" style="color:#a5b4fc;">আপনার নাম</label><div class="iw"><i class="fa fa-user" style="color:#6366f1;"></i><input type="text" id="rgName" class="fi" placeholder="যেমন: Kamal / MD. Halal"></div></div>
             <div class="ig"><label class="il" style="color:#a5b4fc;">মোবাইল নম্বর</label><div class="iw"><i class="fa fa-phone" style="color:#6366f1;"></i><input type="text" id="rgMob" class="fi" placeholder="017XXXXXXXX"></div></div>
             <div class="ig"><label class="il" style="color:#94a3b8;">ইমেইল (ঐচ্ছিক)</label><div class="iw"><i class="fa fa-envelope" style="color:#6366f1;"></i><input type="email" id="rgEmail" class="fi" placeholder="example@mail.com"></div></div>
@@ -433,6 +445,43 @@ function renderLocalBoards(){
             ${it.link?`<div class="lb2-btn-area"><button class="lb2-details-btn" onclick="window.open('${it.link}','_blank')"><i class="fa fa-external-link-alt"></i> বিস্তারিত</button></div>`:''}
         </div>`).join('');
 }
+
+/* GOOGLE SIGN-IN */
+const G_CLIENT_ID='569016323527-0e5o5mn4rs8713fgv132vj80uvl42onk.apps.googleusercontent.com';
+
+function googleSignIn(){
+    if(typeof google==='undefined'){showToast('❌ Google লোড হয়নি, একটু অপেক্ষা করুন');return;}
+    google.accounts.id.initialize({client_id:G_CLIENT_ID,callback:handleGoogleResp,auto_select:false,cancel_on_tap_outside:true});
+    google.accounts.id.prompt(n=>{
+        if(n.isNotDisplayed()||n.isSkippedMoment()){
+            showToast('⚠️ Google popup আসেনি — browser এ popup allow করুন');
+        }
+    });
+}
+
+function handleGoogleResp(response){
+    try{
+        const p=JSON.parse(atob(response.credential.split('.')[1]));
+        const users=JSON.parse(localStorage.getItem(UK))||[];
+        let u=users.find(x=>x.email===p.email||x.googleId===p.sub);
+        if(!u){
+            u={id:'TM'+Date.now(),name:p.name,email:p.email,googleId:p.sub,picture:p.picture,
+               mobile:'',pass:'',role:'user',isUserBlocked:false,loginMethod:'google',createdAt:new Date().toISOString()};
+            users.push(u);
+            localStorage.setItem(UK,JSON.stringify(users));
+        }
+        if(u.isUserBlocked){showToast('🚫 অ্যাকাউন্টটি ব্লক করা আছে।');return;}
+        localStorage.setItem(SK,JSON.stringify(u));
+        showToast('✅ স্বাগতম, '+p.name+'!');
+        setTimeout(()=>window.location.replace(MP),700);
+    }catch(e){showToast('❌ Google Login এ সমস্যা হয়েছে');console.error(e);}
+}
+
+window.addEventListener('load',()=>{
+    if(typeof google!=='undefined'){
+        google.accounts.id.initialize({client_id:G_CLIENT_ID,callback:handleGoogleResp});
+    }
+});
 
 /* INIT */
 (window.TM_READY||Promise.resolve()).then(()=>{renderLB();renderSironam();renderLocalBoards();});

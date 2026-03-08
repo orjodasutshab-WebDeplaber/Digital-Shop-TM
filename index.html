@@ -40,6 +40,14 @@
     ╚══════════════════════════════════════════════════════════════╝
     -->
     <script src="idb-shim.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+    .g-login-btn{width:100%;padding:12px;border:2px solid #334155;border-radius:12px;background:#1e293b;color:#fff;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:.2s;font-family:'Hind Siliguri',sans-serif;margin-bottom:14px;}
+    .g-login-btn:hover{border-color:#6366f1;background:#0f172a;}
+    .g-login-btn img{width:22px;height:22px;}
+    .g-or-div{display:flex;align-items:center;gap:10px;margin-bottom:14px;color:#475569;font-size:13px;}
+    .g-or-div::before,.g-or-div::after{content:'';flex:1;height:1px;background:#334155;}
+    </style>
     <script>
         (window.TM_READY||Promise.resolve()).then(function(){
             if(!localStorage.getItem('TM_SESSION_USER')) window.location.replace('landing.html');
@@ -740,6 +748,8 @@ document.addEventListener('click', function(event) {
                 .login-field::placeholder { color: #64748b !important; opacity: 0.8; }
                 .login-field:focus { border-color: #27ae60; background: rgba(30, 41, 59, 1); box-shadow: 0 0 15px rgba(39, 174, 96, 0.2); }
             </style>
+            <button class="g-login-btn" onclick="googleSignInMain()"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G"> Google দিয়ে লগইন / সাইন আপ</button>
+            <div class="g-or-div">অথবা</div>
             <div class="login-input-group">
                 <label class="login-label" style="color: #2ecc71 !important; font-weight: 800;">ইউজার আইডি / মোবাইল</label>
                 <div class="login-input-wrapper">
@@ -1188,4 +1198,54 @@ document.addEventListener('click', function(event) {
         </div>
     </div>
 </div>
+<script>
+// ============================================================
+// GOOGLE SIGN-IN — index.html
+// ============================================================
+const G_CLIENT_ID_MAIN='569016323527-0e5o5mn4rs8713fgv132vj80uvl42onk.apps.googleusercontent.com';
+
+function googleSignInMain(){
+    if(typeof google==='undefined'){
+        showNotification&&showNotification('Google লোড হয়নি, পেজ refresh করুন','error');
+        return;
+    }
+    google.accounts.id.initialize({client_id:G_CLIENT_ID_MAIN,callback:handleGoogleMain,auto_select:false});
+    google.accounts.id.prompt(n=>{
+        if(n.isNotDisplayed()||n.isSkippedMoment()){
+            showNotification&&showNotification('Google popup block হয়েছে — browser এ allow করুন','warning');
+        }
+    });
+}
+
+function handleGoogleMain(response){
+    try{
+        const p=JSON.parse(atob(response.credential.split('.')[1]));
+        const users=JSON.parse(localStorage.getItem('TM_DB_USERS_V2'))||[];
+        let u=users.find(x=>x.email===p.email||x.googleId===p.sub);
+        if(!u){
+            u={id:'TM'+Date.now(),name:p.name,email:p.email,googleId:p.sub,picture:p.picture,
+               mobile:'',pass:'',role:'user',isUserBlocked:false,loginMethod:'google',createdAt:new Date().toISOString()};
+            users.push(u);
+            localStorage.setItem('TM_DB_USERS_V2',JSON.stringify(users));
+        }
+        if(u.isUserBlocked){
+            showNotification&&showNotification('অ্যাকাউন্টটি ব্লক করা আছে।','error');
+            return;
+        }
+        localStorage.setItem('TM_SESSION_USER',JSON.stringify(u));
+        closeModal&&closeModal('loginModal');
+        showNotification&&showNotification('স্বাগতম, '+p.name+'!','success');
+        setTimeout(()=>window.location.reload(),800);
+    }catch(e){
+        showNotification&&showNotification('Google Login এ সমস্যা হয়েছে','error');
+        console.error(e);
+    }
+}
+
+window.addEventListener('load',function(){
+    if(typeof google!=='undefined'){
+        google.accounts.id.initialize({client_id:G_CLIENT_ID_MAIN,callback:handleGoogleMain});
+    }
+});
+</script>
 </body>
