@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=800">
+<script>
+(function(){
+    function setScale(){
+        var sw = window.screen.width;
+        var dw = 800;
+        if(sw < dw){
+            var scale = sw / dw;
+            var vp = document.querySelector('meta[name=viewport]');
+            if(vp) vp.content = 'width='+dw+',initial-scale='+scale.toFixed(4)+',minimum-scale='+scale.toFixed(4)+',maximum-scale=3,user-scalable=yes';
+        }
+    }
+    setScale();
+    window.addEventListener('resize', setScale);
+})();
+</script>
+<title>Digital Shop TM | স্বাগতম</title>
+<link rel="icon" type="image/x-icon" href="ko.jpeg">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="idb-shim.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;color:#fff;overflow-x:hidden;}
+
+/* NAV */
+.top-nav{position:sticky;top:0;z-index:500;background:rgba(10,15,30,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(99,102,241,.2);padding:12px 26px;display:flex;justify-content:space-between;align-items:center;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand img{width:44px;height:44px;border-radius:11px;border:2px solid #6366f1;object-fit:cover;}
+.brand-name{font-size:18px;font-weight:800;}
+.brand-slogan{font-size:11px;color:#475569;}
+.nav-btns{display:flex;gap:9px;}
+.btn-ln{background:transparent;color:#a5b4fc;border:2px solid #6366f1;padding:8px 18px;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit;display:flex;align-items:center;gap:6px;transition:.2s;}
+.btn-ln:hover{background:rgba(99,102,241,.15);}
+.btn-su{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:none;padding:8px 18px;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit;display:flex;align-items:center;gap:6px;box-shadow:0 4px 16px rgba(99,102,241,.35);transition:.2s;}
+.btn-su:hover{opacity:.88;transform:translateY(-1px);}
+
+/* SECTION */
+.sec{padding:28px 16px;}
+.sec-hd{text-align:center;margin-bottom:18px;}
+.badge{background:rgba(99,102,241,.12);color:#a5b4fc;border:1px solid rgba(99,102,241,.3);padding:5px 15px;border-radius:30px;font-size:12px;font-weight:700;display:inline-block;margin-bottom:8px;}
+.sec-title{font-size:22px;font-weight:800;color:#fff;}
+.sec-sub{color:#475569;font-size:13px;margin-top:5px;}
+
+/* LEADERBOARD */
+.lb-wrap{width:100%;max-width:1500px;margin:0 auto;height:500px;border-radius:20px;overflow:hidden;border:1px solid rgba(99,102,241,.2);box-shadow:0 20px 55px rgba(0,0,0,.6);position:relative;background:#050a14;}
+.lb-slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;}
+.lb-slide.active{opacity:1;}
+.lb-slide img{width:100%;height:100%;object-fit:fill;display:block;}
+.lb-caption{position:absolute;bottom:0;left:0;right:0;padding:13px 22px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-size:16px;font-weight:700;}
+.lb-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;}
+.lb-empty i{font-size:52px;margin-bottom:10px;}
+.lb-arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);color:#fff;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:20px;z-index:10;display:none;align-items:center;justify-content:center;transition:.2s;}
+.lb-arr:hover{background:rgba(99,102,241,.7);}
+#lbPrev{left:13px;}#lbNext{right:13px;}
+.lb-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:10;}
+.lb-dot{height:9px;width:9px;border-radius:5px;background:rgba(255,255,255,.28);cursor:pointer;transition:all .3s;}
+.lb-dot.active{width:22px;background:#6366f1;}
+
+/* SIRONAM */
+.sir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;max-width:1400px;margin:0 auto;}
+.sir-card{border-radius:15px;overflow:hidden;cursor:pointer;position:relative;aspect-ratio:4/3;border:1px solid rgba(99,102,241,.18);transition:all .3s;background:#0f172a;}
+.sir-card:hover{border-color:rgba(99,102,241,.65);transform:translateY(-5px);box-shadow:0 14px 35px rgba(99,102,241,.18);}
+.sir-card img{width:100%;height:100%;object-fit:fill;display:block;transition:transform .4s;}
+.sir-card:hover img{transform:scale(1.06);}
+.sir-no-img{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:44px;background:linear-gradient(135deg,#1e293b,#0f172a);}
+.sir-overlay{position:absolute;bottom:0;left:0;right:0;padding:28px 12px 12px;background:linear-gradient(transparent,rgba(0,0,0,.88));}
+.sir-name{color:#fff;font-size:14px;font-weight:700;}
+.sir-hint{color:rgba(255,255,255,.48);font-size:12px;margin-top:3px;}
+
+/* LOCAL BOARDS */
+.lb2-grid{display:grid;grid-template-columns:repeat(3,500px);gap:18px;max-width:1580px;margin:0 auto;justify-content:center;}
+.lb2-card{width:500px;height:350px;border-radius:16px;overflow:hidden;border:1px solid rgba(99,102,241,.14);position:relative;background:#0a0f1e;transition:all .3s;flex-shrink:0;}
+.lb2-card:hover{border-color:rgba(99,102,241,.45);transform:translateY(-4px);box-shadow:0 14px 38px rgba(0,0,0,.45);}
+.lb2-card img{width:100%;height:100%;object-fit:fill;display:block;}
+.lb2-btn-area{position:absolute;bottom:10px;right:12px;opacity:0;transition:opacity .3s;}
+.lb2-card:hover .lb2-btn-area{opacity:1;}
+.lb2-details-btn{background:rgba(99,102,241,.9);color:#fff;border:none;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(0,0,0,.4);backdrop-filter:blur(6px);}
+.lb2-details-btn:hover{background:#6366f1;}
+.lb2-empty{grid-column:1/-1;text-align:center;padding:48px;color:#1e293b;border:2px dashed #1e293b;border-radius:15px;}
+
+/* CTA */
+.cta-section{padding:16px 16px 50px;display:flex;justify-content:center;}
+.cta-board{width:100%;max-width:1400px;height:390px;border-radius:25px;overflow:hidden;position:relative;box-shadow:0 28px 65px rgba(0,0,0,.55);}
+.cta-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1a0533,#2d1b69,#1e3a8a,#064e3b,#1a0533);}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);}
+.blob1{top:-80px;left:-80px;width:330px;height:330px;background:rgba(99,102,241,.25);animation:bf 6s ease-in-out infinite;}
+.blob2{bottom:-100px;right:-80px;width:370px;height:370px;background:rgba(168,85,247,.2);animation:bf 8s ease-in-out infinite reverse;}
+.blob3{top:50%;left:50%;transform:translate(-50%,-50%);width:270px;height:270px;background:rgba(16,185,129,.1);}
+.cta-inner{position:relative;z-index:5;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;text-align:center;padding:20px;}
+.cta-logo{width:85px;height:85px;border-radius:19px;border:3px solid rgba(255,255,255,.22);object-fit:cover;box-shadow:0 10px 28px rgba(0,0,0,.4);}
+.cta-title{font-size:35px;font-weight:900;text-shadow:0 2px 20px rgba(0,0,0,.4);}
+.cta-sub{color:rgba(255,255,255,.58);font-size:14px;}
+.cta-btn{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;padding:15px 44px;border-radius:50px;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 13px 36px rgba(16,185,129,.4);display:flex;align-items:center;gap:10px;transition:all .3s;}
+.cta-btn:hover{transform:scale(1.05) translateY(-3px);}
+.cta-hint{color:rgba(255,255,255,.3);font-size:12px;}
+
+/* FOOTER */
+.l-footer{background:#070d1a;border-top:1px solid rgba(255,255,255,.05);padding:24px 16px;text-align:center;}
+.l-footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-bottom:13px;}
+.l-footer-links a{color:#1e2d45;text-decoration:none;font-size:12px;transition:.2s;}
+.l-footer-links a:hover{color:#a5b4fc;}
+
+/* === MODALS === */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);z-index:9000;justify-content:center;align-items:center;font-family:inherit;}
+.mo.open{display:flex;}
+.mb{background:#0f172a;border-radius:24px;width:95%;max-width:480px;overflow:hidden;position:relative;animation:si .3s ease;max-height:95vh;overflow-y:auto;}
+
+/* SIRONAM FULL SCREEN MODAL */
+.sir-full{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:99999;overflow-y:auto;font-family:inherit;}
+.sir-full.open{display:block;}
+
+@keyframes si{from{transform:translateY(26px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes bf{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-25px) scale(1.04)}}
+@keyframes gm{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+.mclose{position:absolute;right:18px;top:13px;font-size:27px;color:#475569;cursor:pointer;z-index:10;line-height:1;transition:.2s;}
+.mclose:hover{color:#fff;}
+.mbar{height:5px;width:100%;}
+.mhead{padding:33px 26px 15px;text-align:center;}
+.micon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:25px;}
+.mtitle{color:#fff;font-size:24px;font-weight:800;margin-bottom:4px;}
+.msub{color:#64748b;font-size:13px;}
+.mbody{padding:0 30px 30px;}
+.ig{margin-bottom:15px;}
+.il{display:block;font-size:13px;font-weight:700;margin-bottom:6px;}
+.iw{position:relative;display:flex;align-items:center;}
+.iw i{position:absolute;left:12px;font-size:14px;pointer-events:none;}
+.fi{width:100%;padding:11px 11px 11px 38px;background:rgba(30,41,59,.7);border:1px solid #334155;border-radius:10px;color:#fff;outline:none;font-size:14px;box-sizing:border-box;font-family:inherit;transition:.3s;}
+.fi:focus{border-color:#27ae60;background:#1e293b;}
+.fi::placeholder{color:#475569;}
+.fi-np{width:100%;padding:11px;background:rgba(30,41,59,.7);border:1px solid #334155;border-radius:10px;color:#fff;outline:none;font-size:14px;box-sizing:border-box;font-family:inherit;transition:.3s;}
+.fi-np:focus{border-color:#27ae60;background:#1e293b;}
+.fi-np::placeholder{color:#475569;}
+.bsub{width:100%;padding:13px;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;transition:.3s;}
+.mswitch{text-align:center;margin-top:18px;color:#64748b;font-size:14px;}
+.mswitch a{font-weight:700;text-decoration:none;border-bottom:2px solid;padding-bottom:1px;}
+.fgt{text-align:right;margin-bottom:15px;}
+.fgt a{color:#ef4444;font-size:13px;font-weight:600;text-decoration:none;border-bottom:1px dashed #ef4444;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.ptog{width:38px;height:38px;flex-shrink:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#64748b;font-size:13px;}
+
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 24px;border-radius:50px;font-size:14px;font-weight:600;border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 28px rgba(0,0,0,.4);z-index:9999999;display:none;white-space:nowrap;}
+
+@media(max-width:1580px){.lb2-grid{grid-template-columns:repeat(3,1fr);}.lb2-card{width:100%;}}
+@media(max-width:900px){.lb2-grid{grid-template-columns:repeat(2,1fr);}.lb2-card{height:250px;}}
+@media(max-width:600px){
+    .lb2-grid{grid-template-columns:1fr;}.lb2-card{height:220px;}
+    .cta-board{height:270px;}.lb-wrap{height:210px;}.cta-title{font-size:20px;}
+    .top-nav{padding:10px 13px;}.brand-name{font-size:15px;}
+    .btn-ln,.btn-su{padding:7px 11px;font-size:12px;}.two{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top-nav">
+    <div class="brand">
+        <img src="ko.jpeg" alt="Logo" onerror="this.style.display='none'">
+        <div><div class="brand-name">Digital Shop TM</div><div class="brand-slogan">বিশ্বাস ও আস্থার ডিজিটাল বাজার</div></div>
+    </div>
+    <div class="nav-btns">
+        <button class="btn-ln" onclick="openM('loginModal')"><i class="fa fa-sign-in-alt"></i> লগইন</button>
+        <button class="btn-su" onclick="openM('regModal')"><i class="fa fa-user-plus"></i> সাইন আপ</button>
+    </div>
+</nav>
+
+<!-- LEADERBOARD -->
+<div class="sec" style="padding-top:30px;">
+    
+    <div class="lb-wrap">
+        <div class="lb-empty" id="lbEmpty"><i class="fa fa-images"></i><p style="font-size:14px;font-weight:600;margin-top:8px;">কোনো লিডারবোর্ড নেই</p></div>
+        <div id="lbSlider"></div>
+        <button class="lb-arr" id="lbPrev" onclick="lbMove(-1)">&#8249;</button>
+        <button class="lb-arr" id="lbNext" onclick="lbMove(1)">&#8250;</button>
+        <div class="lb-dots" id="lbDots"></div>
+    </div>
+</div>
+
+<!-- SIRONAM -->
+<div class="sec">
+    <div class="sec-hd">
+        <h2 class="sec-title">🌋 স্পেশাল ক্যাটাগরি</h2>
+        <p class="sec-sub">আমাদের বিশেষভাবে নির্বাচিত পণ্যসমূহ — ক্লিক করুন</p>
+    </div>
+    <div class="sir-grid" id="sironamGrid"></div>
+</div>
+
+<!-- LOCAL BOARDS -->
+<div class="sec">
+    <div class="sec-hd">
+        <h2 class="sec-title">📌 লোকাল বোর্ড</h2>
+        <p class="sec-sub">আমাদের বিশেষ ঘোষণা ও আপডেট</p>
+    </div>
+    <div class="lb2-grid" id="localBoardGrid"></div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+    <div class="cta-board">
+        <div class="cta-bg"></div>
+        <div class="blob blob1"></div><div class="blob blob2"></div><div class="blob blob3"></div>
+        <div class="cta-inner">
+            <img src="ko.jpeg" class="cta-logo" alt="Logo" onerror="this.style.display='none'">
+            <div><div class="cta-title">Digital Shop TM</div><div class="cta-sub">বাংলাদেশের বিশ্বস্ত ডিজিটাল শপিং প্ল্যাটফর্ম</div></div>
+            <button class="cta-btn" onclick="openM('loginModal')"><i class="fa fa-rocket"></i> আপনার যাত্রা শুরু করুন</button>
+            <div class="cta-hint">লগইন করুন এবং হাজারো পণ্য আবিষ্কার করুন</div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="l-footer">
+    <div class="l-footer-links">
+        <a href="#">About Us</a><a href="#">Terms & Conditions</a><a href="#">Privacy Policy</a>
+        <a href="#">Return Policy</a><a href="#">FAQs</a><a href="tel:+8801707498418">📞 +8801707498418</a>
+    </div>
+    <div style="color:#1a2234;font-size:12px;">© 2026 <strong style="color:#2d3748;">Digital Shop TM</strong>. সর্বস্বত্ব সংরক্ষিত।</div>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div class="mo" id="loginModal">
+    <div class="mb" style="border:2px solid #27ae60;box-shadow:0 0 45px rgba(39,174,96,.2);">
+        <div class="mbar" style="background:linear-gradient(90deg,#27ae60,#2ecc71,#27ae60);background-size:200%;animation:gm 3s linear infinite;"></div>
+        <span class="mclose" onclick="closeM('loginModal')">&times;</span>
+        <div class="mhead">
+            <div class="micon" style="background:rgba(39,174,96,.12);border:2px solid rgba(39,174,96,.3);"><i class="fa fa-sign-in-alt" style="color:#27ae60;"></i></div>
+            <div class="mtitle">লগইন করুন</div><div class="msub">Digital Shop TM-এ ফিরে স্বাগতম</div>
+        </div>
+        <div class="mbody">
+            <div class="ig"><label class="il" style="color:#2ecc71;">ইউজার আইডি / মোবাইল</label><div class="iw"><i class="fa fa-user" style="color:#27ae60;"></i><input type="text" id="lnId" class="fi" placeholder="আপনার আইডি লিখুন"></div></div>
+            <div class="ig"><label class="il" style="color:#2ecc71;">পাসওয়ার্ড</label><div class="iw"><i class="fa fa-lock" style="color:#27ae60;"></i><input type="password" id="lnPass" class="fi" placeholder="পাসওয়ার্ড দিন"></div></div>
+            <div class="fgt"><a href="#" onclick="switchM('loginModal','resetModal')">পাসওয়ার্ড ভুলে গেছেন?</a></div>
+            <button class="bsub" onclick="doLogin()" style="background:linear-gradient(135deg,#27ae60,#2ecc71);color:#fff;box-shadow:0 9px 22px rgba(39,174,96,.3);">লগইন <i class="fa fa-sign-in-alt"></i></button>
+            <div class="mswitch">অ্যাকাউন্ট নেই? <a href="#" onclick="switchM('loginModal','regModal')" style="color:#27ae60;border-color:#27ae60;">রেজিস্ট্রেশন করুন</a></div>
+        </div>
+    </div>
+</div>
+
+<!-- REGISTER MODAL -->
+<div class="mo" id="regModal">
+    <div class="mb" style="border:2px solid #6366f1;box-shadow:0 0 45px rgba(99,102,241,.25);">
+        <div class="mbar" style="background:linear-gradient(90deg,#6366f1,#a855f7,#6366f1);background-size:200%;animation:gm 3s linear infinite;"></div>
+        <span class="mclose" onclick="closeM('regModal')">&times;</span>
+        <div class="mhead">
+            <div class="micon" style="background:rgba(99,102,241,.12);border:2px solid rgba(99,102,241,.3);"><i class="fa fa-user-plus" style="color:#6366f1;"></i></div>
+            <div class="mtitle">নতুন অ্যাকাউন্ট</div><div class="msub">Digital Shop TM-এ আপনার তথ্য দিন</div>
+        </div>
+        <div class="mbody">
+            <div class="ig"><label class="il" style="color:#a5b4fc;">আপনার নাম</label><div class="iw"><i class="fa fa-user" style="color:#6366f1;"></i><input type="text" id="rgName" class="fi" placeholder="যেমন: Kamal / MD. Halal"></div></div>
+            <div class="ig"><label class="il" style="color:#a5b4fc;">মোবাইল নম্বর</label><div class="iw"><i class="fa fa-phone" style="color:#6366f1;"></i><input type="text" id="rgMob" class="fi" placeholder="017XXXXXXXX"></div></div>
+            <div class="ig"><label class="il" style="color:#94a3b8;">ইমেইল (ঐচ্ছিক)</label><div class="iw"><i class="fa fa-envelope" style="color:#6366f1;"></i><input type="email" id="rgEmail" class="fi" placeholder="example@mail.com"></div></div>
+            <div class="two">
+                <div class="ig"><label class="il" style="color:#94a3b8;">পাসওয়ার্ড</label><div style="display:flex;gap:6px;"><input type="password" id="rgPass" class="fi-np" placeholder="••••••••" style="flex:1;"><div class="ptog" onclick="tp('rgPass',this)"><i class="fa fa-eye-slash"></i></div></div></div>
+                <div class="ig"><label class="il" style="color:#94a3b8;">নিশ্চিত করুন</label><div style="display:flex;gap:6px;"><input type="password" id="rgConf" class="fi-np" placeholder="আবার লিখুন" style="flex:1;"><div class="ptog" onclick="tp('rgConf',this)"><i class="fa fa-eye-slash"></i></div></div></div>
+            </div>
+            <button class="bsub" onclick="doRegister()" style="background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;box-shadow:0 9px 22px rgba(99,102,241,.3);margin-top:7px;">রেজিস্ট্রেশন সম্পন্ন করুন <i class="fa fa-arrow-right"></i></button>
+            <div class="mswitch">অ্যাকাউন্ট আছে? <a href="#" onclick="switchM('regModal','loginModal')" style="color:#a5b4fc;border-color:#6366f1;">লগইন করুন</a></div>
+        </div>
+    </div>
+</div>
+
+<!-- RESET MODAL -->
+<div class="mo" id="resetModal">
+    <div class="mb" style="border:2px solid #ef4444;box-shadow:0 0 45px rgba(239,68,68,.18);">
+        <div class="mbar" style="background:linear-gradient(90deg,#ef4444,#b91c1c,#ef4444);background-size:200%;animation:gm 3s linear infinite;"></div>
+        <span class="mclose" onclick="closeM('resetModal')">&times;</span>
+        <div class="mhead">
+            <div class="micon" style="background:rgba(239,68,68,.12);border:2px solid rgba(239,68,68,.3);"><i class="fa fa-shield-alt" style="color:#ef4444;"></i></div>
+            <div class="mtitle">পাসওয়ার্ড রিসেট</div><div class="msub">এডমিন কোড দিয়ে পাসওয়ার্ড পরিবর্তন করুন</div>
+        </div>
+        <div class="mbody">
+            <div class="ig"><label class="il" style="color:#fca5a5;">ইউজার আইডি / মোবাইল</label><div class="iw"><i class="fa fa-user" style="color:#ef4444;"></i><input type="text" id="rstId" class="fi" placeholder="আপনার আইডি লিখুন"></div></div>
+            <div class="ig"><label class="il" style="color:#fca5a5;">ইউজার নেম</label><div class="iw"><i class="fa fa-id-card" style="color:#ef4444;"></i><input type="text" id="rstName" class="fi" placeholder="আপনার নাম লিখুন"></div></div>
+            <div class="ig"><label class="il" style="color:#fca5a5;">এডমিন কোড</label><div class="iw"><i class="fa fa-key" style="color:#ef4444;"></i><input type="text" id="rstCode" class="fi" placeholder="এডমিনের কাছ থেকে নিন"></div></div>
+            <div class="ig"><label class="il" style="color:#fca5a5;">নতুন পাসওয়ার্ড</label><div class="iw"><i class="fa fa-lock" style="color:#ef4444;"></i><input type="password" id="rstPass" class="fi" placeholder="••••••••"></div></div>
+            <button class="bsub" onclick="doReset()" style="background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;box-shadow:0 9px 22px rgba(239,68,68,.28);"><i class="fa fa-sync-alt"></i> পাসওয়ার্ড আপডেট করুন</button>
+            <div class="mswitch"><a href="#" onclick="switchM('resetModal','loginModal')" style="color:#94a3b8;border-color:#334155;">← লগইনে ফিরুন</a></div>
+        </div>
+    </div>
+</div>
+
+<!-- SIRONAM FULLSCREEN -->
+<div class="sir-full" id="sirFull">
+    <div style="position:sticky;top:0;background:#111827;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;z-index:10;">
+        <h2 id="sirFullTitle" style="color:#6366f1;margin:0;font-size:17px;font-weight:800;"></h2>
+        <div style="display:flex;gap:9px;align-items:center;flex-grow:1;justify-content:flex-end;">
+            <input type="text" id="spSearch" oninput="spFilter()" placeholder="পণ্য খুঁজুন..." style="width:100%;max-width:230px;padding:7px 12px;border-radius:28px;border:1px solid #374151;background:#0f172a;color:#fff;outline:none;font-family:'Hind Siliguri',sans-serif;font-size:13px;">
+            <button onclick="closeM('sirFull')" style="background:#ef4444;color:#fff;border:none;padding:7px 15px;border-radius:28px;cursor:pointer;font-weight:700;font-family:'Hind Siliguri',sans-serif;font-size:13px;white-space:nowrap;">✕ বন্ধ</button>
+        </div>
+    </div>
+    <!-- Deli Ad -->
+    <div id="sirDeliAd" style="display:none;width:95%;max-width:1500px;height:400px;margin:16px auto;border-radius:14px;overflow:hidden;border:1px solid #334155;"></div>
+    <!-- Products -->
+    <div style="padding:16px;">
+        <div id="spGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:13px;max-width:1400px;margin:0 auto;"></div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SK='TM_SESSION_USER',UK='TM_DB_USERS_V2',LBK='TM_LOGIN_LEADERBOARDS',
+      SIK='sironam_list',PKK='TM_DB_PRODUCTS_V2',DELIK='deli_ads',
+      LOCLK='TM_LOCAL_BOARDS',
+      AID='DigitalShopOrjo',APW='Orjo@1010',APH='01822963824',MP='index.html';
+
+(window.TM_READY||Promise.resolve()).then(()=>{if(localStorage.getItem(SK))window.location.replace(MP);});
+
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+function switchM(a,b){closeM(a);openM(b);}
+document.addEventListener('click',e=>{
+    ['loginModal','regModal','resetModal'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el&&el.classList.contains('open')&&e.target===el)closeM(id);
+    });
+});
+
+function showToast(msg,d=2800){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',d);}
+function tp(id,btn){const i=document.getElementById(id),ic=btn.querySelector('i');i.type=i.type==='password'?'text':'password';ic.className=i.type==='password'?'fa fa-eye-slash':'fa fa-eye';}
+
+function doLogin(){
+    const uid=document.getElementById('lnId').value.trim(),pw=document.getElementById('lnPass').value.trim();
+    if(!uid||!pw){showToast('❌ আইডি এবং পাসওয়ার্ড দিন');return;}
+    const users=JSON.parse(localStorage.getItem(UK))||[];
+    if((uid===AID||uid===APH)&&pw===APW){localStorage.setItem(SK,JSON.stringify({id:AID,name:'Admin',role:'admin',mobile:APH}));showToast('✅ স্বাগতম Admin!');setTimeout(()=>window.location.replace(MP),600);return;}
+    const u=users.find(u=>(u.id===uid||u.mobile===uid)&&u.pass===pw);
+    if(!u){showToast('❌ ভুল আইডি অথবা পাসওয়ার্ড!');return;}
+    if(u.isUserBlocked){showToast('🚫 অ্যাকাউন্টটি ব্লক করা আছে।');return;}
+    localStorage.setItem(SK,JSON.stringify(u));showToast(`✅ স্বাগতম, ${u.name}!`);setTimeout(()=>window.location.replace(MP),600);
+}
+function doRegister(){
+    const name=document.getElementById('rgName').value.trim(),mob=document.getElementById('rgMob').value.trim(),
+          email=document.getElementById('rgEmail').value.trim(),pw=document.getElementById('rgPass').value.trim(),cf=document.getElementById('rgConf').value.trim();
+    if(!name||!mob||!pw){showToast('❌ নাম, মোবাইল ও পাসওয়ার্ড দিন');return;}
+    if(pw!==cf){showToast('❌ পাসওয়ার্ড মিলছে না!');return;}
+    if(mob.length<11){showToast('❌ সঠিক মোবাইল নম্বর দিন');return;}
+    const users=JSON.parse(localStorage.getItem(UK))||[];
+    if(users.find(u=>u.mobile===mob)){showToast('❌ এই মোবাইলে আগেই অ্যাকাউন্ট আছে!');return;}
+    const nu={id:'TM'+Date.now(),name,mobile:mob,email,pass:pw,role:'user',isUserBlocked:false,createdAt:new Date().toISOString()};
+    users.push(nu);localStorage.setItem(UK,JSON.stringify(users));localStorage.setItem(SK,JSON.stringify(nu));
+    showToast(`✅ স্বাগতম ${name}!`);setTimeout(()=>window.location.replace(MP),800);
+}
+function doReset(){
+    const uid=document.getElementById('rstId').value.trim(),uname=document.getElementById('rstName').value.trim(),
+          code=document.getElementById('rstCode').value.trim(),np=document.getElementById('rstPass').value.trim();
+    if(!uid||!uname||!code||!np){showToast('❌ সব ঘর পূরণ করুন');return;}
+    const stored=localStorage.getItem('TM_ADMIN_RESET_CODE')||'TMRESET2026';
+    if(code!==stored){showToast('❌ ভুল এডমিন কোড!');return;}
+    const users=JSON.parse(localStorage.getItem(UK))||[];
+    const idx=users.findIndex(u=>(u.id===uid||u.mobile===uid)&&u.name===uname);
+    if(idx===-1){showToast('❌ ইউজার খুঁজে পাওয়া যায়নি!');return;}
+    users[idx].pass=np;localStorage.setItem(UK,JSON.stringify(users));
+    showToast('✅ পাসওয়ার্ড আপডেট হয়েছে!');setTimeout(()=>switchM('resetModal','loginModal'),1500);
+}
+
+/* LEADERBOARD */
+let lbI=0,lbT=null;
+function renderLB(){
+    const items=JSON.parse(localStorage.getItem(LBK))||[];
+    const sl=document.getElementById('lbSlider'),em=document.getElementById('lbEmpty'),
+          dt=document.getElementById('lbDots'),pv=document.getElementById('lbPrev'),nx=document.getElementById('lbNext');
+    if(!items.length){em.style.display='flex';return;}
+    em.style.display='none';lbI=0;
+    sl.innerHTML=items.map((it,i)=>`<div class="lb-slide ${i===0?'active':''}" data-i="${i}"><img src="${it.img}" alt="" onerror="this.parentElement.style.background='#111'">${it.desc?`<div class="lb-caption">${it.desc}</div>`:''}</div>`).join('');
+    dt.innerHTML=items.map((_,i)=>`<div class="lb-dot ${i===0?'active':''}" onclick="lbGo(${i})"></div>`).join('');
+    if(items.length>1){pv.style.display=nx.style.display='flex';if(lbT)clearInterval(lbT);lbT=setInterval(()=>lbMove(1),4500);}
+}
+function lbMove(d){const s=document.querySelectorAll('.lb-slide');if(!s.length)return;s[lbI].classList.remove('active');lbI=(lbI+d+s.length)%s.length;s[lbI].classList.add('active');updDots();}
+function lbGo(i){const s=document.querySelectorAll('.lb-slide');if(!s.length)return;s[lbI].classList.remove('active');lbI=i;s[lbI].classList.add('active');updDots();}
+function updDots(){document.querySelectorAll('.lb-dot').forEach((d,i)=>d.classList.toggle('active',i===lbI));}
+
+/* SIRONAM */
+function renderSironam(){
+    const list=JSON.parse(localStorage.getItem(SIK))||[];
+    const g=document.getElementById('sironamGrid');
+    if(!list.length){g.innerHTML=`<div style="text-align:center;color:#1e293b;grid-column:1/-1;padding:40px;border:2px dashed #1e293b;border-radius:14px;"><i class="fa fa-layer-group" style="font-size:36px;display:block;margin-bottom:10px;"></i><p>কোনো স্পেশাল ক্যাটাগরি নেই</p></div>`;return;}
+    g.innerHTML=list.map(s=>`
+        <div class="sir-card" onclick="openSir('${s.id}','${s.name.replace(/'/g,"\\'")}')">
+            ${s.img?`<img src="${s.img}" alt="${s.name}" onerror="this.parentElement.style.background='#111';this.style.display='none'">`:`<div class="sir-no-img">🌟</div>`}
+            <div class="sir-overlay"><div class="sir-name">${s.name}</div><div class="sir-hint"><i class="fa fa-eye" style="margin-right:4px;"></i>পণ্য দেখুন</div></div>
+        </div>`).join('');
+}
+
+function openSir(sid,title){
+    document.getElementById('sirFullTitle').textContent=title;
+    // Deli Ad
+    const ads=JSON.parse(localStorage.getItem(DELIK))||[];
+    const ad=ads.find(a=>String(a.sironamId)===String(sid));
+    const adBox=document.getElementById('sirDeliAd');
+    if(ad&&ad.img){adBox.style.display='block';adBox.innerHTML=`<a href="${ad.link||'#'}" target="_blank" style="display:block;width:100%;height:100%;"><img src="${ad.img}" style="width:100%;height:100%;object-fit:cover;"></a>`;}
+    else{adBox.style.display='none';}
+    // Products
+    const prods=JSON.parse(localStorage.getItem(PKK))||[];
+    const tagged=prods.filter(p=>String(p.sironamTag)===String(sid));
+    document.getElementById('spGrid').innerHTML=tagged.length===0
+        ?`<div style="grid-column:1/-1;text-align:center;padding:55px;color:#334155;"><i class="fa fa-box-open" style="font-size:44px;display:block;margin-bottom:12px;"></i><p>এই ক্যাটাগরিতে কোনো পণ্য নেই</p></div>`
+        :tagged.map(p=>`
+            <div class="sp-card" style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;transition:.3s;" onmouseover="this.style.borderColor='#6366f1';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#334155';this.style.transform='none'">
+                <div style="height:175px;overflow:hidden;background:#0f172a;"><img src="${p.images?.[0]||p.img||''}" alt="${p.name||''}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"></div>
+                <div style="padding:11px;">
+                    <div style="color:#fff;font-size:13px;font-weight:700;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" data-name="${(p.name||'').toLowerCase()}">${p.name||'পণ্য'}</div>
+                    <div style="color:#10b981;font-size:15px;font-weight:800;margin-bottom:8px;">৳${p.price||0}</div>
+                    <button onclick="closeM('sirFull');openM('loginModal');" style="width:100%;padding:8px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:12px;font-family:'Hind Siliguri',sans-serif;"><i class="fa fa-sign-in-alt"></i> অর্ডার করতে লগইন করুন</button>
+                </div>
+            </div>`).join('');
+    document.getElementById('spSearch').value='';
+    openM('sirFull');
+    // scroll to top of modal
+    document.getElementById('sirFull').scrollTop=0;
+}
+function spFilter(){
+    const q=(document.getElementById('spSearch')?.value||'').toLowerCase();
+    document.querySelectorAll('#spGrid .sp-card').forEach(c=>{
+        const n=c.querySelector('[data-name]');c.style.display=(!n||n.dataset.name.includes(q))?'':'none';
+    });
+}
+
+/* LOCAL BOARDS */
+function renderLocalBoards(){
+    const items=JSON.parse(localStorage.getItem(LOCLK))||[];
+    const g=document.getElementById('localBoardGrid');
+    if(!items.length){g.innerHTML=`<div class="lb2-empty"><i class="fa fa-images" style="font-size:36px;display:block;margin-bottom:10px;"></i><p>কোনো লোকাল বোর্ড নেই</p></div>`;return;}
+    g.innerHTML=items.map(it=>`
+        <div class="lb2-card">
+            <img src="${it.img}" alt="" onerror="this.style.display='none';this.parentElement.style.background='#1e293b'">
+            ${it.link?`<div class="lb2-btn-area"><button class="lb2-details-btn" onclick="window.open('${it.link}','_blank')"><i class="fa fa-external-link-alt"></i> বিস্তারিত</button></div>`:''}
+        </div>`).join('');
+}
+
+/* INIT */
+(window.TM_READY||Promise.resolve()).then(()=>{renderLB();renderSironam();renderLocalBoards();});
+</script>
+</body>
+</html>

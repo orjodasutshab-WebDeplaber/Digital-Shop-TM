@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=800">
+    <script>
+    // মোবাইলে পিসির মতো দেখানোর জন্য — screen width অনুযায়ী scale করে
+    (function(){
+        function setScale(){
+            var sw = window.screen.width;
+            var dw = 800; // desktop reference width
+            if(sw < dw){
+                var scale = sw / dw;
+                var vp = document.querySelector('meta[name=viewport]');
+                if(vp) vp.content = 'width='+dw+',initial-scale='+scale.toFixed(4)+',minimum-scale='+scale.toFixed(4)+',maximum-scale=3,user-scalable=yes';
+            }
+        }
+        setScale();
+        window.addEventListener('resize', setScale);
+    })();
+    </script>
+    <title>Digital Shop TM | Premium Business Portal</title>
+    <link rel="icon" type="image/x-icon" href="ko.jpeg">
+    
+    <link rel="stylesheet" href="do.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  IndexedDB Migration Shim                                    ║
+    ║  Must load BEFORE app.js.                                    ║
+    ║  Overrides window.localStorage with an IndexedDB-backed     ║
+    ║  in-memory cache — no changes required in app.js.           ║
+    ╚══════════════════════════════════════════════════════════════╝
+    -->
+    <script src="idb-shim.js"></script>
+    <script>
+        (window.TM_READY||Promise.resolve()).then(function(){
+            if(!localStorage.getItem('TM_SESSION_USER')) window.location.replace('landing.html');
+        });
+    </script>
+    
+</head>
+
+<body class="light-theme" id="mainBody">
+
+    <header class="site-header" id="topHeader">
+        <div class="header-wrapper">
+            
+            <div class="brand-section">
+                <div class="logo-frame">
+                    <img src="ko.jpeg" alt="Digital Shop TM Logo" class="brand-logo" id="siteLogo">
+                </div>
+                <div class="brand-details">
+                    <h1 class="company-name">Digital Shop TM</h1>
+                    <p class="company-slogan">বিশ্বাস ও আস্থার ডিজিটাল বাজার</p>
+                </div>
+            </div>
+
+             <div class="header-search-box">
+                  <div class="search-wrapper">
+                   <i class="fa fa-search"></i>
+                   <input type="text" id="productSearchInput" onkeyup="searchProducts()" placeholder="পণ্য খুঁজুন...">
+                  </div>
+             </div>
+
+
+
+
+             
+            
+ <div class="user-controls" style="font-family: 'Hind Siliguri', sans-serif;">
+    
+    <div id="authButtonsGroup" class="auth-buttons" style="display: flex; gap: 10px; align-items: center;">
+        
+
+         <button class="btn-login" onclick="openModal('loginModal')" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: #fff; border: none; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.3s; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); display: flex; align-items: center; gap: 6px;">
+            <i class="fa fa-sign-in-alt"></i> লগইন
+        </button>
+        
+        <button class="btn btn-register" onclick="openModal('registerModal')" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: #fff; border: none; padding: 8px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.3s; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); display: flex; align-items: center; gap: 6px;">
+            <i class="fa fa-user-plus"></i> সাইন আপ
+        </button>
+           
+    </div>
+
+    <div id="userProfileGroup" class="user-profile-area hidden" style="position: relative;">
+        
+        <div class="profile-trigger" onclick="toggleUserDropdown()" style="display: flex; align-items: center; gap: 10px; background: #1e293b; padding: 5px 12px; border-radius: 50px; cursor: pointer; border: 1px solid #334155;">
+            <div style="text-align: right; line-height: 1.2;">
+                <span style="font-size: 9px; color: #94a3b8; display: block;">হ্যালো,</span>
+                <span id="headerUserName" style="font-size: 13px; color: #fff; font-weight: 600;">User</span>
+            </div>
+            <div id="headerUserImageWrapper" style="width: 35px; height: 35px; border-radius: 50%; background: #334155; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 2px solid #6366f1;">
+                <i id="headerUserPlaceholder" class="fa fa-user" style="color: #94a3b8; font-size: 18px;"></i>
+                <img id="headerUserImage" src="" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+
+        <div id="userDropdownMenu" style="display: none; position: absolute; right: 0; top: 55px; width: 260px; background: #0f172a; border-radius: 15px; border: 1px solid #334155; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 99999;">
+            
+            <div style="padding: 20px; text-align: center; border-bottom: 1px solid #334155;">
+                <div style="position: relative; display: inline-block;">
+                    <div id="dropdownImageWrapper" style="width: 80px; height: 80px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #6366f1;">
+                        <i id="dropdownUserPlaceholder" class="fa fa-user" style="color: #94a3b8; font-size: 40px;"></i>
+                        <img id="dropdownAvatar" src="" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <label for="avatarUpload" style="position: absolute; bottom: 0; right: 0; background: #6366f1; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #0f172a;">
+                        <i class="fa fa-camera" style="color: white; font-size: 12px;"></i>
+                    </label>
+                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;" onchange="handleImageUpload(this)">
+                </div>
+                <h4 style="color: #fff; margin: 10px 0 0 0; font-size: 16px;">আমার অ্যাকাউন্ট</h4>
+            </div>
+
+            <ul style="list-style: none; padding: 10px; margin: 0;">
+                <style>
+                    .dp-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: #94a3b8; cursor: pointer; border-radius: 10px; transition: 0.2s; font-size: 14px; }
+                    .dp-item:hover { background: #1e293b; color: #fff; }
+                    .dp-item i { color: #6366f1; width: 18px; text-align: center; }
+                    .btn-register:hover { opacity: 0.9; transform: translateY(-1px); }
+                </style>
+                <li class="dp-item" onclick="openModal('resetPasswordModal')"><i class="fa fa-key"></i> পাসওয়ার্ড পরিবর্তন</li>
+                <li class="dp-item" onclick="openModal('resetUsernameModal')"><i class="fa fa-user-edit"></i> ইউজারনেম পরিবর্তন</li>
+                <li class="dp-item" onclick="toggleThemeMode()"><i class="fa fa-moon"></i> নাইট মোড (অন/অফ)</li>
+                <li class="dp-item" onclick="openModal('addressModal')"><i class="fa fa-map-marker-alt"></i> নতুন এড্রেস সেভ</li>
+                <li class="dp-item" onclick="openHelpModal()"><i class="fa fa-headset"></i> হেল্প(সরাসরি)</li>
+                <li class="dp-item" onclick="openDiscountModule()" style="display: flex; align-items: center; justify-content: space-between; position: relative; cursor: pointer;">
+                <div>
+                 <i class="fa fa-ticket-alt"></i> 
+                 <span>ডিসকাউন্ট কোড ও কার্ড</span>
+                 </div>
+    
+                 <span id="discount-notif-dot" style="display: none; width: 10px; height: 10px;      background: #ff4757; border-radius: 50%; box-shadow: 0 0 8px #ff4757; margin-left: 10px;"></span>
+                </li>
+                <li class="dp-item" onclick="openModal('orderTrackingModal')"><i class="fa fa-box-open"></i> ভিউ অর্ডার (ট্র্যাকিং)</li>
+                <li class="dp-item" onclick="openUserOrders()"><i class="fa fa-shopping-bag"></i> আমার অর্ডার</li>
+
+                <li class="dp-item" onclick="openUserCart()">
+                <i class="fa fa-shopping-cart"></i> ইউর কার্ট
+                 </li>
+                 
+                 <li class="dp-item" onclick="openUserReturnList()">
+                   <i class="fa fa-shipping-fast"></i> ইউর রিটার্ন অর্ডার
+                   </li>
+
+            </ul>
+                                                       
+            <div style="padding: 10px; border-top: 1px solid #334155;">
+                <button onclick="performLogout()" style="width: 100%; padding: 10px; background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i class="fa fa-sign-out-alt"></i> লগআউট
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ড্রপডাউন টগল করার জন্য পরিষ্কার ফাংশন
+function toggleUserDropdown() {
+    const menu = document.getElementById('userDropdownMenu');
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+}
+
+// ইমেজ আপলোড হ্যান্ডলার
+function handleImageUpload(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const imageData = e.target.result;
+            
+            // হেডার ইমেজ সেট করা
+            const headerImg = document.getElementById('headerUserImage');
+            const headerPlaceholder = document.getElementById('headerUserPlaceholder');
+            headerImg.src = imageData;
+            headerImg.style.display = 'block';
+            headerPlaceholder.style.display = 'none';
+
+            // ড্রপডাউন ইমেজ সেট করা
+            const dropImg = document.getElementById('dropdownAvatar');
+            const dropPlaceholder = document.getElementById('dropdownUserPlaceholder');
+            dropImg.src = imageData;
+            dropImg.style.display = 'block';
+            dropPlaceholder.style.display = 'none';
+
+            // IndexedDB-এ সেভ (idb-shim.js এর মাধ্যমে localStorage override ব্যবহার করে)
+            localStorage.setItem('user_profile_pic', imageData);
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// পেজ লোড হলে সেভ করা ছবি আছে কি না দেখা
+// TM_READY নিশ্চিত করে যে IndexedDB cache আগে hydrate হয়েছে
+window.addEventListener('load', () => {
+    (window.TM_READY || Promise.resolve()).then(() => {
+        const savedPic = localStorage.getItem('user_profile_pic');
+        if (savedPic) {
+            // হেডার
+            document.getElementById('headerUserImage').src = savedPic;
+            document.getElementById('headerUserImage').style.display = 'block';
+            document.getElementById('headerUserPlaceholder').style.display = 'none';
+            // ড্রপডাউন
+            document.getElementById('dropdownAvatar').src = savedPic;
+            document.getElementById('dropdownAvatar').style.display = 'block';
+            document.getElementById('dropdownUserPlaceholder').style.display = 'none';
+        }
+    });
+});
+
+// মেনুর বাইরে ক্লিক করলে বন্ধ হবে
+document.addEventListener('click', function(event) {
+    const isClickInside = document.getElementById('userProfileGroup').contains(event.target);
+    if (!isClickInside) {
+        document.getElementById('userDropdownMenu').style.display = 'none';
+    }
+});
+</script>
+
+            </div>
+        </div>
+    </header>
+<nav class="main-navigation" id="categoryNav" style="padding: 15px 10px;">
+    <div style="
+        background: #0f172a; 
+        border-radius: 20px; 
+        padding: 10px; 
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    ">
+        <div class="nav-container scroll-custom" style="
+            display: flex; 
+            gap: 12px; 
+            overflow-x: auto; 
+            scrollbar-width: none;
+            padding: 2px;
+        ">
+            <button class="nav-item active" onclick="filterProducts('All', this)">
+                <div class="nav-icon"><i class="fa fa-th-large"></i></div>
+                <span class="nav-text">সকল সার্ভিস</span>
+            </button>
+
+            <button class="nav-item" onclick="filterProducts('Men', this)">
+                <div class="nav-icon"><i class="fa fa-tshirt"></i></div>
+                <span class="nav-text">Men Fashion</span>
+            </button>
+
+            <button class="nav-item" onclick="filterProducts('Women', this)">
+                <div class="nav-icon"><i class="fa fa-female"></i></div>
+                <span class="nav-text">Women Wear</span>
+            </button>
+
+            <button class="nav-item" onclick="filterProducts('Electronics', this)">
+                <div class="nav-icon"><i class="fa fa-mobile-alt"></i></div>
+                <span class="nav-text">Electronics</span>
+            </button>
+
+            <button class="nav-item" onclick="filterProducts('Shoes', this)">
+                <div class="nav-icon"><i class="fa fa-shoe-prints"></i></div>
+                <span class="nav-text">Footwear</span>
+            </button>
+
+            <button class="nav-item" onclick="filterProducts('Household', this)">
+                <div class="nav-icon"><i class="fa fa-home"></i></div>
+                <span class="nav-text">Household</span>
+            </button>
+
+
+             <button class="nav-item" onclick="filterProducts('SKIN CARE & BEAUTY', this)">
+                <div class="nav-icon"><i class="fa fa-pump-soap"></i></div>
+                <span class="nav-text">SKIN CARE & BEAUTY</span>
+            </button>
+            
+             <button class="nav-item" onclick="filterProducts('Digital Products', this)">
+                <div class="nav-icon"><i class="fa fa-laptop"></i></div>
+                <span class="nav-text">Digital Products</span>
+            </button>
+
+             <button class="nav-item" onclick="filterProducts('Child Fashion', this)">
+                <div class="nav-icon"><i class="fa fa-child"></i></div>
+                <span class="nav-text">Child Fashion</span>
+            </button>
+            <button class="nav-item" onclick="filterProducts('Toy', this)">
+                <div class="nav-icon"><i class="fa fa-robot"></i></div>
+                <span class="nav-text">Toy</span>
+            </button>
+            <button class="nav-item" onclick="filterProducts('Vehicel', this)">
+                <div class="nav-icon"><i class="fa fa-car"></i></div>
+                <span class="nav-text">Vehicel</span>
+            </button>
+            <button class="nav-item" onclick="filterProducts('Furniture', this)">
+                <div class="nav-icon"><i class="fa fa-couch"></i></div>
+                <span class="nav-text">Furniture</span>
+            </button>
+            <button class="nav-item" onclick="filterProducts('Book', this)">
+                <div class="nav-icon"><i class="fa fa-book"></i></div>
+                <span class="nav-text">Book</span>
+            </button>
+            <button class="nav-item" onclick="filterProducts('Sport', this)">
+                <div class="nav-icon"><i class="fa fa-basketball"></i></div>
+                <span class="nav-text">Sport</span>
+            </button>
+            <button class="nav-item" onclick="filterProducts('Gift Card', this)">
+                <div class="nav-icon"><i class="fa fa-gift"></i></div>
+                <span class="nav-text">Gift Card</span>
+            </button>
+            <button class="nav-item" onclick="filterProducts('Game Topup', this)">
+                <div class="nav-icon"><i class="fa fa-gamepad"></i></div>
+                <span class="nav-text">Game Topup</span>
+            </button>
+            <button class="nav-item" onclick="filterProducts('Medicine', this)">
+                <div class="nav-icon"><i class="fa fa-pills"></i></div>
+                <span class="nav-text">Medicine</span>
+            </button>
+            <button class="nav-item" onclick="filterProducts('Watches', this)">
+                <div class="nav-icon"><i class="fa fa-clock"></i></div>
+                <span class="nav-text">Watches</span>
+            </button>
+            <button class="nav-item" onclick="filterProducts('Musical Instruments', this)">
+                <div class="nav-icon"><i class="fa fa-guitar"></i></div>
+                <span class="nav-text">Musical Instruments</span>
+            </button>
+           
+              
+            <button class="nav-item" onclick="filterProducts('Others', this)">
+                <div class="nav-icon"><i class="fa fa-ellipsis-h"></i></div>
+                <span class="nav-text">অন্যান্য</span>
+            </button>
+        </div>
+    </div>
+
+    <style>
+        .nav-container::-webkit-scrollbar { display: none; }
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            min-width: 140px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .nav-icon {
+            font-size: 16px;
+            color: #6366f1;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-text {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            border: none;
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .nav-item.active .nav-icon, 
+        .nav-item.active .nav-text {
+            color: #ffffff;
+        }
+    </style>
+</nav>
+
+<section id="leaderboardAdArea">
+    </section>
+<main class="main-content-area" style="background: #0f172a; padding: 20px 0;">
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 15px; flex-wrap: wrap; gap: 10px;">
+            
+            <div class="section-title" style="margin: 0;">
+                <h2 style="color: #fff; margin: 0; font-family: 'Hind Siliguri', sans-serif;">আমাদের জনপ্রিয় পণ্যসমূহ</h2>
+            </div>
+
+            <div style="position: relative; display: inline-block; font-family: 'Hind Siliguri', sans-serif;">
+                <button id="filterBtn" onclick="toggleFilterMenu()" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; padding: 10px 22px; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2); transition: 0.3s;">
+                    <i class="fa fa-sliders-h"></i> ফিল্টার করুন
+                </button>
+
+                <div id="filterMenu" style="position: absolute; right: 0; top: 55px; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; width: 260px; border-radius: 20px; display: none; z-index: 1000; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); transform-origin: top right; animation: scaleUp 0.2s ease-out;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%;"></div>
+                            <h4 style="margin: 0; color: #fff; font-size: 15px; font-weight: 600; letter-spacing: 0.5px;">অ্যাডভান্সড ফিল্টার</h4>
+                        </div>
+                        <button onclick="toggleFilterMenu(false)" style="background: rgba(255,255,255,0.05); border: none; color: #94a3b8; cursor: pointer; font-size: 18px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</button>
+                    </div>
+                    
+                    <label style="color:#94a3b8; font-size:12px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px;">মূল্য সীমা (৳)</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <input type="number" id="minPrice" placeholder="মিন" style="width:50%; background: rgba(15, 23, 42, 0.6); color:#fff; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:10px; font-size:13px; outline: none; transition: 0.3s;" onfocus="this.style.borderColor='#6366f1'">
+                        <input type="number" id="maxPrice" placeholder="ম্যাক্স" style="width:50%; background: rgba(15, 23, 42, 0.6); color:#fff; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:10px; font-size:13px; outline: none; transition: 0.3s;" onfocus="this.style.borderColor='#6366f1'">
+                    </div>
+
+                    <label style="color:#94a3b8; font-size:12px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px;">সাজানো (Sorting)</label>
+                    <div style="position: relative; margin-bottom: 25px;">
+                        <select id="priceSort" style="width:100%; background: rgba(15, 23, 42, 0.6); color:#fff; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:10px; font-size:13px; outline: none; cursor: pointer; appearance: none;">
+                            <option value="none">ডিফল্ট ভিউ</option>
+                            <option value="low">কম থেকে বেশি মূল্য ↓</option>
+                            <option value="high">বেশি থেকে কম মূল্য ↑</option>
+                        </select>
+                        <i class="fa fa-chevron-down" style="position: absolute; right: 12px; top: 12px; color: #64748b; pointer-events: none; font-size: 10px;"></i>
+                    </div>
+
+                    <button onclick="applyAdvancedFilter()" style="width:100%; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color:white; border:none; padding:12px; border-radius:12px; cursor:pointer; font-weight:800; font-size:14px; margin-bottom: 12px; box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.2); transition: 0.3s;">
+                        ফিল্টার সেট করুন
+                    </button>
+                    
+                    <button onclick="resetFilters()" style="width:100%; background:none; color:#64748b; border:none; cursor:pointer; font-size:12px; font-weight: 600; text-decoration: none; transition: 0.3s;" onmouseover="this.style.color='#fff'">
+                        <i class="fa fa-undo"></i> রিসেট অল
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="productDisplayArea" class="products-grid scroll-custom">
+            <div class="loading-spinner">
+                <i class="fa fa-spinner fa-spin"></i> পণ্য লোড হচ্ছে...
+            </div>
+        </div>
+    </div>
+    <div id="loadMoreContainer" style="text-align: center; margin-top: 40px; margin-bottom: 20px;">
+    <button id="loadMoreBtn" onclick="loadMoreProducts()" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; padding: 12px 30px; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; font-family: 'Hind Siliguri', sans-serif; transition: 0.3s; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);">
+        আরো দেখুন <i class="fa fa-chevron-down" style="margin-left: 8px; font-size: 12px;"></i>
+    </button>
+</div>
+
+    <style>
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        #filterBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
+        }
+        #filterBtn:active { transform: scale(0.95); }
+        
+        @media (max-width: 480px) {
+            .section-title h2 { font-size: 18px; }
+            #filterBtn { padding: 8px 15px; font-size: 13px; }
+        }
+    </style>
+     
+<div class="load-more-section">
+    <div id="beli-board-left" class="beli-board"></div>
+
+    <div id="loadMoreContainer">
+        </div>
+
+    <div id="beli-board-right" class="beli-board"></div>
+</div>
+<div class="special-category-container">
+    <h2 class="special-category-title">
+        <span class="emoji-left">🌋</span>
+        আপনার স্পেশাল ক্যাটাগরির পণ্য
+        <span class="emoji-right">🌋</span>
+    </h2>
+    
+</div>
+<div id="sironam-portal-display" class="sironam-grid-container"></div>
+
+</main>
+<div id="aboutUsModal" style="display:none; position:fixed; z-index:90999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.98); overflow-y:auto; font-family:'Segoe UI', Roboto, sans-serif;">
+    <div style="background:#0f172a; color:#e2e8f0; margin:1% auto; padding:60px 40px; border-radius:10px; width:95%; max-width:1100px; position:relative; border:1px solid #1e293b; box-shadow: 0 0 50px rgba(16, 185, 129, 0.2);">
+        
+        <span onclick="closeAboutModal()" style="position:fixed; right:50px; top:30px; font-size:45px; cursor:pointer; color:#ef4444; font-weight:bold; z-index:10000;">&times;</span>
+
+        <div style="text-align:center; margin-bottom:60px;">
+            <img src="ko.jpeg" alt="Digital Shop TM" style="max-height:100px; margin-bottom:20px;">
+            <h1 style="color:#10b981; font-size:50px; margin:0; text-transform:uppercase; letter-spacing:2px;">Digital Shop TM</h1>
+            <div style="width:150px; height:4px; background:#10b981; margin:20px auto;"></div>
+            <p style="font-size:22px; color:#94a3b8;">Elevating Your Digital Shopping Experience To The Next Level</p>
+        </div>
+
+        <section style="margin-bottom:60px;">
+            <h2 style="color:#f8fafc; font-size:32px; border-bottom:2px solid #334155; padding-bottom:10px; margin-bottom:25px;">আমরা কে? (Who We Are)</h2>
+            <p style="font-size:18px; line-height:2; text-align:justify;">
+                <strong>Digital Shop TM</strong> হলো বাংলাদেশের একটি গর্বিত এবং উদীয়মান প্রযুক্তি-চালিত ই-কমার্স স্টার্টআপ। আমাদের যাত্রা শুরু হয়েছে একটি সহজ কিন্তু শক্তিশালী দৃষ্টিভঙ্গি নিয়ে—বাংলাদেশের প্রতিটি নাগরিকের কাছে সাশ্রয়ী মূল্যে, শতভাগ আসল পণ্য এবং বিশ্বমানের সেবা পৌঁছে দেওয়া।
+                <br><br>
+                আমরা গর্বের সাথে জানাই যে, আমাদের সমস্ত অপারেশন সম্পূর্ণ স্বচ্ছ এবং আধুনিক প্রযুক্তি দ্বারা নিয়ন্ত্রিত।
+            </p>
+        </section>
+
+        <section style="margin-bottom:60px; background:#1e293b; padding:40px; border-radius:20px;">
+            <h2 style="color:#fbbf24; font-size:32px; margin-bottom:25px;">আমাদের ইনভেন্টরি ও পূর্ণ নিয়ন্ত্রণ (End-to-End Control)</h2>
+            <p style="font-size:18px; line-height:2;">
+                Digital Shop TM-এর সবচেয়ে বড় স্বাতন্ত্র্য হলো আমাদের নিজস্ব ইনভেন্টরি ম্যানেজমেন্ট।
+            </p>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:30px; margin-top:30px;">
+                <div style="background:#0f172a; padding:25px; border-radius:15px; border:1px solid #10b981;">
+                    <h3 style="color:#10b981;">১০০% অথেনটিসিটি চেক</h3>
+                    <p>আমাদের প্রতিটি পণ্য আমাদের বিশেষজ্ঞ দল দ্বারা নিবিড়ভাবে পরীক্ষা করা হয়।</p>
+                </div>
+                <div style="background:#0f172a; padding:25px; border-radius:15px; border:1px solid #10b981;">
+                    <h3 style="color:#10b981;">মূল্য নিয়ন্ত্রণ</h3>
+                    <p>সরাসরি উৎস থেকে পণ্য সংগ্রহের কারণে আমরা মধ্যস্বত্বভোগীদের খরচ বাদ দিতে পারি।</p>
+                </div>
+                <div style="background:#0f172a; padding:25px; border-radius:15px; border:1px solid #10b981;">
+                    <h3 style="color:#10b981;">নিজস্ব প্যাকেজিং</h3>
+                    <p>আমরা ব্যবহার করি উন্নত মানের প্যাকেজিং ম্যাটেরিয়াল।</p>
+                </div>
+                <div style="background:#0f172a; padding:25px; border-radius:15px; border:1px solid #10b981;">
+                    <h3 style="color:#10b981;">তক্ষণিক প্রসেসিং</h3>
+                    <p>অর্ডার কনফার্ম হওয়ার ১০ মিনিটের মধ্যে প্যাকিং প্রসেস শুরু হয়ে যায়।</p>
+                </div>
+            </div>
+        </section>
+
+        <section style="text-align:center; background: linear-gradient(145deg, #10b981, #059669); padding:60px; border-radius:20px; color:white;">
+            <h2 style="font-size:35px; margin-bottom:20px;">আমাদের যাত্রায় যোগ দিন</h2>
+            <button onclick="closeAboutModal()" style="background:#0f172a; color:white; border:none; padding:20px 50px; border-radius:50px; cursor:pointer; font-weight:bold; font-size:20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">START SHOPPING NOW</button>
+        </section>
+
+        <div style="margin-top:60px; text-align:center; border-top:1px solid #1e293b; padding-top:40px; color:#64748b; font-size:14px;">
+            <p style="font-size:18px; color:#e2e8f0; margin-bottom:10px;">Digital Shop TM Ltd.</p>
+            <p>Trade License Number: TRAD/DNCC/010711/2026</p>
+            <p>Head Office: Khawja Manzil,Beside police box,Bahaddarhat, Chattogram, Bangladesh</p>
+            <p>Hotline: <strong>+8801707498418</strong> | Email:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="87e3eee0eef3e6eba9f4efe8f7a9f3a9eab0b0c7e0eae6eeeba9e4e8ea">[email&#160;protected]</a></p>
+            <p style="margin-top:30px;">© 2026 Digital Shop TM. সর্বস্বত্ব সংরক্ষিত। | Developed by: Digital Shop TM Team</p>
+        </div>
+
+    </div>
+</div>
+
+<div id="termsModal" style="display:none; position:fixed; z-index:90999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.95); overflow-y:auto; font-family:'Segoe UI', Tahoma, sans-serif;">
+    <div style="background:#ffffff; color:#333; margin:2% auto; padding:40px; border-radius:12px; width:95%; max-width:1000px; position:relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <span onclick="closeTermsModal()" style="position:absolute; right:20px; top:15px; font-size:35px; cursor:pointer; color:#888;">&times;</span>
+        <div style="border-bottom: 2px solid #10b981; padding-bottom: 20px; margin-bottom: 30px; text-align: center;">
+            <h1 style="color:#10b981; margin:0;">Terms & Conditions</h1>
+            <p style="color:#666; font-size:14px;">সর্বশেষ আপডেট: মার্চ ২০২৬</p>
+        </div>
+        <div style="max-height: 70vh; overflow-y: auto; padding-right: 15px; text-align: justify; line-height: 1.6; font-size: 15px; color: #444;">
+            <h3 style="color:#000;">1. INTRODUCTION</h3>
+            <p>Welcome to <strong>Digital Shop TM</strong>. By accessing our site, you agree to comply with these terms and conditions. Digital Shop TM is a registered e-commerce concern operating under <strong>Trade License number: TRAD/DS/00107/2026</strong>.</p>
+            <h3 style="color:#000; margin-top:25px;">2. CONDITIONS OF USE</h3>
+            <h4 style="color:#10b981;">YOUR ACCOUNT</h4>
+            <p>To access certain services, you may need to create an account. You are responsible for maintaining the confidentiality of your account and password. Users must be 18 years or older.</p>
+            <h3 style="color:#000; margin-top:25px;">4. GOVERNING LAW</h3>
+            <p>These terms and conditions are governed by and construed in accordance with the laws of <strong>The People's Republic of Bangladesh</strong>.</p>
+            <h3 style="color:#000; margin-top:25px;">5. CONTACT US</h3>
+            <p><strong>Phone:</strong> +8801707498418<br><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="35464045455a474175515c525c415459465d5a4541581b565a58">[email&#160;protected]</a></p>
+        </div>
+        <div style="text-align:center; margin-top:30px;">
+            <button onclick="closeTermsModal()" style="background:#10b981; color:white; border:none; padding:12px 35px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px;">I AGREE</button>
+        </div>
+    </div>
+</div>
+
+<div id="privacyModal" style="display:none; position:fixed; z-index:90999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.95); overflow-y:auto; font-family:'Segoe UI', sans-serif;">
+    <div style="background:#ffffff; color:#333; margin:2% auto; padding:40px; border-radius:15px; width:95%; max-width:1000px; position:relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+        <span onclick="closePrivacyModal()" style="position:absolute; right:20px; top:15px; font-size:35px; cursor:pointer; color:#888;">&times;</span>
+        <div style="border-bottom: 2px solid #10b981; padding-bottom: 20px; margin-bottom: 30px; text-align: center;">
+            <h1 style="color:#10b981; margin:0;">Privacy Policy</h1>
+        </div>
+        <div style="max-height: 70vh; overflow-y: auto; padding-right: 15px; text-align: justify; line-height: 1.8; font-size: 15px; color: #444;">
+            <p>Welcome to <strong>Digital Shop TM</strong>! We respect your privacy and want to protect your personal information.</p>
+            <h3 style="color:#000; border-left: 4px solid #10b981; padding-left: 10px;">1. DATA PROTECTION AND PRIVACY</h3>
+            <p>Data protection is a matter of trust and your privacy is important to us.</p>
+            <h3 style="color:#000; border-left: 4px solid #10b981; padding-left: 10px;">6. YOUR RIGHTS</h3>
+            <p>You have the right to seek access to your personal information and request correction. Email: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="92e1e7e2e2fde0e6d2f6fbf5fbe6f3fee1fafde2e6ffbcf1fdff">[email&#160;protected]</a></strong>.</p>
+        </div>
+        <div style="text-align:center; margin-top:30px;">
+            <button onclick="closePrivacyModal()" style="background:#10b981; color:white; border:none; padding:12px 40px; border-radius:8px; cursor:pointer; font-weight:bold; font-size:16px; text-transform: uppercase;">Accept & Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="returnModal" style="display:none; position:fixed; z-index:90999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.96); overflow-y:auto; font-family:'Segoe UI', Tahoma, sans-serif;">
+    <div style="background:#ffffff; color:#333; margin:2% auto; padding:40px; border-radius:12px; width:95%; max-width:1000px; position:relative; box-shadow: 0 15px 50px rgba(0,0,0,0.6);">
+        <span onclick="closeReturnPolicyModal()" style="position:absolute; right:20px; top:15px; font-size:35px; cursor:pointer; color:#888;">&times;</span>
+        <div style="border-bottom: 2px solid #e11d48; padding-bottom: 20px; margin-bottom: 30px; text-align: center;">
+            <h1 style="color:#e11d48; margin:0;">Return and Refund Policy</h1>
+        </div>
+        <div style="max-height: 70vh; overflow-y: auto; padding-right: 15px; text-align: justify; line-height: 1.7; font-size: 15px; color: #333;">
+            <h2 style="background:#fef2f2; color:#e11d48; padding:10px; border-radius:5px; font-size:20px;">1. RETURN POLICY</h2>
+            <p>Delivery timeline: <strong>Inside Dhaka:</strong> 1-5 days. <strong>Outside Dhaka:</strong> 3-7 days.</p>
+            <h2 style="background:#f0f9ff; color:#0284c7; padding:10px; border-radius:5px; font-size:20px; margin-top:30px;">2. REFUND POLICY</h2>
+            <p>রিফান্ড প্রসেস শুরু হয় যখন আপনার রিটার্ন করা পণ্যটি আমাদের ওয়্যারহাউসে পৌঁছে গুণগত মান যাচাইয়ে উত্তীর্ণ হয়।</p>
+            <p style="margin-top:20px;">Hotline: <strong>+8801707498418</strong> | Email: <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="384b4d4848574a4c785c515f514c59544b5057484c55165b5755">[email&#160;protected]</a></strong></p>
+        </div>
+        <div style="text-align:center; margin-top:30px;">
+            <button onclick="closeReturnPolicyModal()" style="background:#e11d48; color:white; border:none; padding:12px 40px; border-radius:8px; cursor:pointer; font-weight:bold;">বন্ধ করুন</button>
+        </div>
+    </div>
+</div>
+
+<div id="faqModal" style="display:none; position:fixed; z-index:90999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.96); overflow-y:auto; font-family:'Segoe UI', Tahoma, sans-serif;">
+    <div style="background:#f8fafc; color:#334155; margin:2% auto; padding:40px; border-radius:15px; width:95%; max-width:900px; position:relative; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+        <span onclick="closeFaqModal()" style="position:absolute; right:20px; top:15px; font-size:35px; cursor:pointer; color:#64748b;">&times;</span>
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color:#10b981; margin:0; font-size:32px;">সচরাচর জিজ্ঞাসিত প্রশ্নাবলী (FAQs)</h1>
+        </div>
+        <div style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
+            <details style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:10px; padding:15px; cursor:pointer;">
+                <summary style="font-weight:bold; color:#1e293b; outline:none;">Q. সাইটটি কীভাবে কাজ করে?</summary>
+                <p style="margin-top:10px; color:#475569; border-top:1px solid #f1f5f9; padding-top:10px;">আপনি আমাদের সাইটে পণ্য ব্রাউজ করতে পারেন এবং Place Order-এ ক্লিক করুন।</p>
+            </details>
+            <details style="background:#fff; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:10px; padding:15px; cursor:pointer;">
+                <summary style="font-weight:bold; color:#1e293b; outline:none;">Q. রিফান্ড পলিসি কী?</summary>
+                <p style="margin-top:10px; color:#475569; border-top:1px solid #f1f5f9; padding-top:10px;">আমরা সাধারণত ৭ দিনের রিটার্ন বা রিফান্ড পলিসি অফার করি।</p>
+            </details>
+        </div>
+        <div style="text-align:center; margin-top:30px;">
+            <button onclick="closeFaqModal()" style="background:#10b981; color:white; border:none; padding:12px 30px; border-radius:8px; cursor:pointer; font-weight:bold;">বুঝতে পেরেছি</button>
+        </div>
+    </div>
+</div>
+
+<div id="customerCareModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.98); overflow-y:auto; font-family:'Segoe UI', sans-serif;">
+    <div style="background:#0f172a; color:#e2e8f0; margin:2% auto; padding:40px; border-radius:15px; width:95%; max-width:900px; position:relative; border:1px solid #1e293b;">
+        
+        <span onclick="closeCustomerCareModal()" style="position:absolute; right:20px; top:15px; font-size:35px; cursor:pointer; color:#ef4444;">&times;</span>
+
+        <h2 style="text-align:center; color:#10b981; margin-bottom:30px;">Digital Shop TM গ্রাহক সেবা</h2>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 40px; border-bottom: 1px solid #1e293b; padding-bottom: 30px;">
+            <button onclick="openAboutModal()" style="background:#1e293b; color:white; border:1px solid #334155; padding:10px 15px; border-radius:5px; cursor:pointer;">About Us</button>
+            <button onclick="openTermsModal()" style="background:#1e293b; color:white; border:1px solid #334155; padding:10px 15px; border-radius:5px; cursor:pointer;">Terms & Conditions</button>
+            <button onclick="openPrivacyModal()" style="background:#1e293b; color:white; border:1px solid #334155; padding:10px 15px; border-radius:5px; cursor:pointer;">Privacy Policy</button>
+            <button onclick="openRaturnModal()" style="background:#1e293b; color:white; border:1px solid #334155; padding:10px 15px; border-radius:5px; cursor:pointer;">Return Policy</button>
+        </div>
+
+        <div style="text-align:center;">
+            <h3 style="color:#fbbf24;">আমাদের হাব ঠিকানা (Hub Locations)</h3>
+            <p style="color:#94a3b8; font-size:14px; margin-bottom:20px;">আপনার জেলা নির্বাচন করে হাবের ঠিকানা দেখুন</p>
+            
+            <select id="districtSelect" onchange="showHubDetails()" style="width:100%; max-width:400px; padding:12px; border-radius:8px; background:#1e293b; color:white; border:1px solid #10b981; font-size:16px; margin-bottom:20px; cursor:pointer;">
+                <option value="">-- জেলা নির্বাচন করুন --</option>
+                <option value="chittagong">চট্টগ্রাম (Chattogram)</option>
+                <option value="coxsbazar">কক্সবাজার (Cox's Bazar)</option>
+                <option value="rangamati">রাঙ্গামাটি (Rangamati)</option>
+                <option value="others">ঢাকা (Dhaka)</option>
+                <option value="others">সিলেট (Sylhet)</option>
+                <option value="others">রাজশাহী (Rajshahi)</option>
+                <option value="others">খুলনা (Khulna)</option>
+                <option value="others">বরিশাল (Barishal)</option>
+                <option value="others">রংপুর (Rangpur)</option>
+                <option value="others">ময়মনসিংহ (Mymensingh)</option>
+            </select>
+
+            <div id="hubDetailsBox" style="margin-top:20px; padding:25px; border-radius:10px; background:#020617; border:1px dashed #334155; min-height:100px; line-height:1.8;">
+                <p style="color:#64748b;">জেলা সিলেক্ট করলে এখানে বিস্তারিত দেখা যাবে।</p>
+            </div>
+        </div>
+
+        <div style="text-align:center; margin-top:40px;">
+            <p style="font-size:13px; color:#94a3b8;">যেকোনো প্রয়োজনে ইমেইল করুন: <br> <a href="/cdn-cgi/l/email-protection#c8aca1afa1bca9a4e6bba0a7b8e6bce6a5ffff88afa5a9a1a4e6aba7a5" style="color:#10b981; text-decoration:none;"><span class="__cf_email__" data-cfemail="385c515f514c5954164b505748164c16550f0f785f55595154165b5755">[email&#160;protected]</span></a></p>
+            <button onclick="closeCustomerCareModal()" style="margin-top:20px; background:#10b981; color:white; border:none; padding:10px 30px; border-radius:5px; cursor:pointer;">বন্ধ করুন</button>
+        </div>
+    </div>
+</div>
+   <footer style="background: #111827; color: #d1d5db; padding: 50px 20px 20px; border-top: 1px solid #374151; font-family: sans-serif;">
+    <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;">
+        <div>
+            <h2 style="color: #10b981; margin-bottom: 15px;">Digital Shop TM</h2>
+            <p style="font-size: 14px; line-height: 1.6;">আপনার বিশ্বস্ত অনলাইন শপ।</p>
+        </div>
+        <div>
+            <h3 style="color: white; font-size: 18px; margin-bottom: 20px;">COMPANY</h3>
+            <ul style="list-style: none; padding: 0; font-size: 14px; line-height: 2.5;">
+                <li><a href="javascript:void(0)" onclick="openAboutModal()" style="color: #9ca3af; text-decoration: none;">About Us</a></li>
+                <li><a href="javascript:void(0)" onclick="openTermsModal()" style="color: #9ca3af; text-decoration: none;">Terms & Conditions</a></li>
+                <li><a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: #9ca3af; text-decoration: none;">Privacy Policy</a></li>
+                <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color: #9ca3af; text-decoration: none;">Cancellation & Return Policy</a></li>
+                <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color: #9ca3af; text-decoration: none;">FAQs</a></li>
+            </ul>
+        </div>
+        <div>
+            <h3 style="color: white; font-size: 18px; margin-bottom: 20px;">QUICK HELP</h3>
+            <ul style="list-style: none; padding: 0; font-size: 14px; line-height: 2.5;">
+                <li><a href="javascript:void(0)" onclick="openCustomerCareModal()" style="color: #9ca3af; text-decoration: none;">গ্রাহক সেবা</a></li>
+                <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color: #9ca3af; text-decoration: none;">কিভাবে কিনবেন</a></li>
+                <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color: #9ca3af; text-decoration: none;">রিটার্ন ও রিফান্ড</a></li>
+                <li><a href="tel:+8801707498418" style="color: #9ca3af; text-decoration: none;">যোগাযোগ: +8801707498418</a></li>
+            </ul>
+            <p style="margin-top: 15px; font-size: 14px;">Hotline: +8801707498418</p>
+        </div>
+        <div>
+            <h3 style="color: white; font-size: 18px; margin-bottom: 20px;">VERIFIED BY</h3>
+            <div style="margin-bottom: 15px;">
+                <p style="font-size: 12px; margin-bottom: 5px;">DBID ID: 437361334</p>
+                <p style="font-size: 12px;">Registration ID: 304903094</p>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" style="height: 35px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" style="height: 35px;">
+            </div>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 30px; font-size: 13px; color: #6b7280;">
+        <hr style="border: 0; border-top: 1px solid #374151; margin-bottom: 20px;">
+        <p>© 2026 <strong>Digital Shop TM</strong>. সর্বস্বত্ব সংরক্ষিত।</p>
+        <p style="margin-top: 5px;">Developed by: <span style="color: #10b981;">Digital Shop TM Team</span></p>
+    </div>
+</footer>
+
+<div id="loginModal" class="modal-overlay" style="font-family: 'Hind Siliguri', sans-serif; backdrop-filter: blur(10px); background: rgba(0,0,0,0.85);">
+    <div class="modal-box" style="background: #0f172a; border-radius: 30px; border: 2px solid #27ae60; box-shadow: 0 0 50px rgba(39, 174, 96, 0.3); overflow: hidden; position: relative; width: 95%; max-width: 550px; margin: 20px auto; animation: modalSlideIn 0.4s ease-out;">
+        <div style="height: 6px; width: 100%; background: linear-gradient(90deg, #27ae60, #2ecc71, #27ae60); background-size: 200% 100%; animation: gradientMove 3s linear infinite;"></div>
+        <span class="close-btn" onclick="closeModal('loginModal')" style="position: absolute; right: 25px; top: 20px; color: #94a3b8; font-size: 32px; cursor: pointer; transition: 0.3s; z-index: 10;">&times;</span>
+        <div class="modal-header" style="padding: 40px 30px 20px; text-align: center;">
+            <div style="background: rgba(39, 174, 96, 0.15); width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; border: 2px solid rgba(39, 174, 96, 0.4);">
+                <i class="fa fa-sign-in-alt" style="color: #27ae60; font-size: 30px;"></i>
+            </div>
+            <h3 style="color: #fff; margin: 0; font-size: 30px; font-weight: 800;">লগইন করুন</h3>
+            <p style="color: #94a3b8; font-size: 14px; margin-top: 5px;">Digital Shop TM-এ ফিরে স্বাগতম</p>
+        </div>
+        <div class="modal-body" style="padding: 0 40px 40px;">
+            <style>
+                .login-input-group { margin-bottom: 20px; }
+                .login-label { color: #cbd5e1; display: block; margin-bottom: 8px; font-size: 20px; font-weight: 600; padding-left: 5px; }
+                .login-input-wrapper { position: relative; display: flex; align-items: center; }
+                .login-input-wrapper i { position: absolute; left: 15px; color: #27ae60; font-size: 16px; pointer-events: none; z-index: 5; }
+                .login-field { width: 100%; background: rgba(30, 41, 59, 0.7); border: 1px solid #334155; padding: 14px 15px 14px 45px !important; border-radius: 12px; color: #ffffff !important; outline: none; transition: 0.4s; font-size: 15px; box-sizing: border-box; }
+                .login-field::placeholder { color: #64748b !important; opacity: 0.8; }
+                .login-field:focus { border-color: #27ae60; background: rgba(30, 41, 59, 1); box-shadow: 0 0 15px rgba(39, 174, 96, 0.2); }
+            </style>
+            <div class="login-input-group">
+                <label class="login-label" style="color: #2ecc71 !important; font-weight: 800;">ইউজার আইডি / মোবাইল</label>
+                <div class="login-input-wrapper">
+                    <i class="fa fa-user"></i>
+                    <input type="text" id="loginInputId" class="login-field" placeholder="আপনার আইডি লিখুন">
+                </div>
+            </div>
+            <div class="login-input-group" style="margin-bottom: 10px;">
+                <label class="login-label" style="color: #2ecc71 !important; font-weight: 800;">পাসওয়ার্ড</label>
+                <div class="login-input-wrapper">
+                    <i class="fa fa-lock"></i>
+                    <input type="password" id="loginInputPass" class="login-field" placeholder="পাসওয়ার্ড দিন">
+                </div>
+            </div>
+            <div style="text-align: right; margin-bottom: 20px;">
+                <a href="javascript:void(0)" onclick="closeModal('loginModal'); document.getElementById('resetPasswordModal').style.setProperty('display', 'flex', 'important');" style="color: #ef4444; font-size: 13px; text-decoration: none; font-weight: 600; border-bottom: 1px dashed #ef4444;">পাসওয়ার্ড ভুলে গেছেন?</a>
+            </div>
+            <button onclick="submitLogin()" style="width: 100%; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: 800; font-size: 18px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(39, 174, 96, 0.3); display: flex; align-items: center; justify-content: center; gap: 10px;">
+                লগইন <i class="fa fa-sign-in-alt"></i>
+            </button>
+            <div style="text-align: center; margin-top: 25px; color: #94a3b8; font-size: 15px;">
+                অ্যাকাউন্ট নেই? <a href="#" onclick="switchModal('loginModal', 'registerModal')" style="color: #27ae60; text-decoration: none; font-weight: 700; border-bottom: 2px solid #27ae60; padding-bottom: 2px;">রেজিস্ট্রেশন করুন</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="registerModal" class="modal-overlay" style="font-family: 'Hind Siliguri', sans-serif; backdrop-filter: blur(10px); background: rgba(0,0,0,0.85);">
+    <div class="modal-box" style="background: #0f172a; border-radius: 30px; border: 2px solid #6366f1; box-shadow: 0 0 50px rgba(99, 102, 241, 0.4); overflow: hidden; position: relative; width: 95%; max-width: 550px; margin: 20px auto; animation: modalSlideIn 0.4s ease-out;">
+        <div style="height: 6px; width: 100%; background: linear-gradient(90deg, #6366f1, #a855f7, #6366f1); background-size: 200% 100%; animation: gradientMove 3s linear infinite;"></div>
+        <span class="close-btn" onclick="closeModal('registerModal')" style="position: absolute; right: 25px; top: 20px; color: #94a3b8; font-size: 32px; cursor: pointer; transition: 0.3s; z-index: 10;">&times;</span>
+        <div class="modal-header" style="padding: 40px 30px 20px; text-align: center;">
+            <div style="background: rgba(99, 102, 241, 0.15); width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; border: 2px solid rgba(99, 102, 241, 0.4);">
+                <i class="fa fa-user-plus" style="color: #6366f1; font-size: 30px;"></i>
+            </div>
+            <h3 style="color: #fff; margin: 0; font-size: 30px; font-weight: 800;">নতুন অ্যাকাউন্ট</h3>
+            <p style="color: #94a3b8; font-size: 15px; margin-top: 5px;">Digital Shop TM-এ আপনার তথ্য দিন</p>
+        </div>
+        <div class="modal-body" style="padding: 0 45px 45px;">
+            <style>
+                .reg-input-group { margin-bottom: 18px; }
+                .reg-label { color: #cbd5e1; display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; padding-left: 5px; }
+                .input-wrapper { position: relative; display: flex; align-items: center; }
+                .input-wrapper i { position: absolute; left: 15px; color: #6366f1; font-size: 16px; pointer-events: none; }
+                .reg-field { width: 100%; background: rgba(30, 41, 59, 0.7); border: 1px solid #334155; padding: 14px 15px 14px 45px; border-radius: 12px; color: #fff; outline: none; transition: 0.4s; font-size: 15px; box-sizing: border-box; }
+                .reg-field:focus { border-color: #6366f1 !important; background: rgba(30, 41, 59, 1) !important; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+                .reg-field::placeholder { color: #64748b !important; opacity: 0.8; }
+                @keyframes modalSlideIn { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+            </style>
+            <div class="reg-input-group">
+                <label class="reg-label" style="color: #6366f1 !important; font-weight: 800;">আপনার নাম</label>
+                <div class="input-wrapper">
+                    <i class="fa fa-user"></i>
+                    <input type="text" id="regName" class="reg-field" placeholder="যেমন: Orjo / Kamal / MD. Halal">
+                </div>
+            </div>
+            <div class="reg-input-group">
+                <label class="reg-label" style="color: #6366f1 !important; font-weight: 800;">মোবাইল নম্বর</label>
+                <div class="input-wrapper">
+                    <i class="fa fa-phone"></i>
+                    <input type="text" id="regMobile" class="reg-field" placeholder="017XXXXXXXX">
+                </div>
+            </div>
+            <div class="reg-input-group">
+                <label class="reg-label">ইমেইল অ্যাড্রেস</label>
+                <div class="input-wrapper">
+                    <i class="fa fa-envelope"></i>
+                    <input type="email" id="regEmail" class="reg-field" placeholder="example@mail.com">
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="reg-input-group">
+                    <label class="reg-label">পাসওয়ার্ড</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <div class="input-wrapper" style="flex: 1;">
+                            <input type="password" id="regPass" class="reg-field" placeholder="••••••••" style="width: 100%;">
+                        </div>
+                        <div onclick="toggleRegPass('regPass', this.querySelector('i'))" style="width: 42px; height: 42px; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">
+                            <i class="fa fa-eye-slash" style="color: #64748b; font-size: 16px;"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="reg-input-group">
+                    <label class="reg-label">নিশ্চিত করুন</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <div class="input-wrapper" style="flex: 1;">
+                            <input type="password" id="regPassConfirm" class="reg-field" placeholder="আবার লিখুন" style="width: 100%;">
+                        </div>
+                        <div onclick="toggleRegPass('regPassConfirm', this.querySelector('i'))" style="width: 42px; height: 42px; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">
+                            <i class="fa fa-eye-slash" style="color: #64748b; font-size: 16px;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button onclick="submitRegistration()" style="width: 100%; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: 800; font-size: 17px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4); margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                রেজিস্ট্রেশন সম্পন্ন করুন <i class="fa fa-arrow-right"></i>
+            </button>
+            <div style="text-align: center; margin-top: 25px; color: #94a3b8; font-size: 15px;">
+                আগেই অ্যাকাউন্ট আছে? <a href="#" onclick="switchModal('registerModal', 'loginModal')" style="color: #fff; text-decoration: none; font-weight: 700; border-bottom: 2px solid #6366f1;">লগইন করুন</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="checkoutModal" class="modal-overlay" style="display: none; z-index: 9876599999 !important;">
+    <div class="modal-box medium-modal" style="max-height: 90vh; overflow-y: auto; padding: 20px; background-color: #ffffff !important; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); position: relative;">
+        <span class="close-btn" onclick="closeModal('checkoutModal')" style="color: #333; font-size: 28px; cursor: pointer; position: absolute; right: 20px; top: 10px;">&times;</span>
+        <div id="checkoutStep1" class="checkout-step-container">
+            <div class="modal-header" style="text-align: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 20px; padding-bottom: 10px;">
+                <h3 style="color: #27ae60; margin: 0;">অর্ডার কনফার্মেশন (ধাপ ১/২)</h3>
+                <p style="color: #000; font-size: 14px; margin-top: 5px; font-weight: 500;">দয়া করে আপনার সঠিক ঠিকানা দিন</p>
+            </div>
+            <div class="checkout-summary" id="checkoutSummaryBox" style="max-height: 100px; overflow-y: auto; padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 20px; border: 1px solid #dee2e6; color: #000 !important; font-weight: 600;"></div>
+            <div class="modal-body">
+                <div class="payment-method-selector" style="margin-bottom: 20px; padding: 15px; background: #f0f2f5; border-radius: 8px; border: 1px solid #ced4da;">
+                    <p style="margin-bottom: 12px; font-weight: bold; color: #000; text-align: center;">পেমেন্ট পদ্ধতি:</p>
+                    <div style="display: flex; gap: 10px; justify-content: center; align-items: center;">
+                        <label style="cursor: pointer; display: flex; align-items: center; justify-content: center; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #aaa; flex: 1; color: #000; font-weight: bold; font-size: 13px; white-space: nowrap;">
+                            <input type="radio" name="payMethod" value="Payment" checked onclick="updatePaymentInfo()" style="margin-right: 6px; accent-color: #27ae60;">
+                            <span>💳 অনলাইন পেমেন্ট</span>
+                        </label>
+                        <label style="cursor: pointer; display: flex; align-items: center; justify-content: center; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #aaa; flex: 1; color: #000; font-weight: bold; font-size: 13px; white-space: nowrap;">
+                            <input type="radio" name="payMethod" value="COD" id="codOption" onclick="updatePaymentInfo()" style="margin-right: 6px; accent-color: #27ae60;">
+                            <span>🚚 ক্যাশ অন ডেলিভারি</span>
+                        </label>
+                    </div>
+                    <div id="codInfoMessage" style="margin-top: 10px; text-align: center; min-height: 20px;"></div>
+                </div>
+                <div id="discount-section" style="margin-bottom: 20px; padding: 15px; background: #fff5f8; border-radius: 12px; border: 2px dashed #ec4899;">
+                    <label style="display: block; font-weight: 800; color: #be185d; margin-bottom: 8px; font-size: 14px;"><i class="fa fa-ticket-alt"></i> প্রোমো বা ডিসকাউন্ট কার্ড ব্যবহার করুন</label>
+                    <select id="order-discount-card" onchange="applyDiscountLogic()" style="width: 100%; padding: 12px; border: 1px solid #ec4899; border-radius: 8px; color: #000; background: #fff; font-size: 14px; font-weight: 600; outline: none;">
+                        <option value="none" data-amount="0">কোনো কার্ড সিলেক্ট নেই</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px; text-align: left;">
+                    <label style="display: block; font-weight: bold; color: #000 !important; margin-bottom: 5px;">গ্রাহকের নাম</label>
+                    <input type="text" id="orderName" placeholder="নাম লিখুন" style="width: 100%; padding: 12px; border: 1px solid #333; border-radius: 6px; color: #000 !important; background: #fff !important; font-size: 16px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 15px; text-align: left;">
+                    <label style="display: block; font-weight: bold; color: #000 !important; margin-bottom: 5px;">যোগাযোগ নম্বর</label>
+                    <input type="text" id="orderPhone" placeholder="মোবাইল নম্বর" style="width: 100%; padding: 12px; border: 1px solid #333; border-radius: 6px; color: #000 !important; background: #fff !important; font-size: 16px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 25px; text-align: left; background: #f8fafc; padding: 18px; border-radius: 20px; border: 1px solid #e2e8f0;">
+                    <label style="display: block; font-weight: 800; color: #1e293b; font-size: 16px; margin-bottom: 12px;"><i class="fa fa-truck" style="color: #3498db; margin-right: 5px;"></i> ডেলিভারি ঠিকানা</label>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div id="savedAddrBox" style="padding: 15px; border: 2px solid #3498db; border-radius: 12px; background: #fff; display: block;">
+                            <span style="font-size: 12px; font-weight: bold; color: #3498db; background: #ebf8ff; padding: 2px 8px; border-radius: 5px;">সেভ করা ঠিকানা</span>
+                            <p id="displaySavedAddr" style="margin: 8px 0 0 0; color: #1e293b; font-size: 13px; line-height: 1.5;">লোডিং... (ঠিকানা না থাকলে 'নতুন ঠিকানা' ব্যবহার করুন)</p>
+                        </div>
+                        <button onclick="openAddressModalForOrder()" type="button" style="width: 100%; background: #fff; color: #64748b; border: 2px dashed #cbd5e1; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 13px;">
+                            <i class="fa fa-plus-circle"></i> নতুন ঠিকানা দিয়ে অর্ডার করুন
+                        </button>
+                    </div>
+                    <input type="hidden" id="orderAddress" name="orderAddress">
+                </div>
+                <button class="btn-success" onclick="goToPaymentStep()" style="width: 100%; padding: 15px; background: #27ae60; color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer;">পরবর্তী ধাপ (কনফার্ম করুন)</button>
+            </div>
+        </div>
+        <div id="checkoutStep2" class="checkout-step-container hidden" style="display: none;">
+            <div class="modal-header" style="text-align: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 20px; padding-bottom: 10px;">
+                <h3 style="color: #27ae60; margin: 0;">পেমেন্ট সম্পন্ন করুন (ধাপ ২/২)</h3>
+            </div>
+            <div class="payment-details" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; text-align: center; color: #000 !important;">
+                <p style="font-weight: bold; margin-bottom: 5px;">নগদ (সেন্ড মানি): 01329885689</p>
+                <p style="font-weight: bold;">বিকাশ (সেন্ড মানি): 01*********</p>
+                <p style="color: #d35400; font-size: 13px; margin-top: 10px; font-weight: bold; border: 1px dashed #d35400; padding: 5px;">⚠️ টাকা পাঠিয়ে নিচে TrxID দিন</p>
+            </div>
+            <div class="form-group" style="text-align: left;">
+                <label style="color: #000 !important; font-weight: bold; display: block; margin-bottom: 5px;">Transaction ID (TrxID)</label>
+                <input type="text" id="paymentTrxID" placeholder="যেমন: 8N7A6D5..." style="width: 100%; padding: 12px; border: 1px solid #333; border-radius: 6px; color: #000 !important; background: #fff !important;">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="backToStep1()" style="flex:1; padding: 12px; background: #95a5a6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">পেছনে যান</button>
+                <button onclick="confirmFinalOrder(false)" style="flex:2; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">অর্ডার নিশ্চিত করুন</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="adminPanelModal" class="modal-overlay">
+    <div class="modal-box fullscreen-modal">
+        <div class="admin-top-bar">
+            <div class="admin-brand"><i class="fa fa-user-shield"></i> Admin Panel (DigitalShopOrjo)</div>
+            <button class="close-admin-btn" onclick="closeModal('adminPanelModal')">বন্ধ করুন &times;</button>
+        </div>
+        <div class="admin-layout-wrapper">
+            <aside class="admin-sidebar">
+                <div class="sidebar-menu">
+                    <button class="menu-btn active" onclick="loadAdminTab('publish')"><i class="fa fa-upload"></i> পণ্য পাবলিশ (Multiple Img)</button>
+                    <button class="menu-btn" onclick="loadAdminTab('ads')"><i class="fa fa-ad"></i> বিজ্ঞাপন ম্যানেজমেন্ট</button>
+                    <button class="menu-btn" onclick="loadAdminTab('orders')"><i class="fa fa-list-alt"></i> পেন্ডিং অর্ডারস (✅/❌)</button>
+                    <button class="menu-btn" onclick="loadAdminTab('users')"><i class="fa fa-users-cog"></i> ইউজার ডিটেইলস (Pass Reset)</button>
+                    <button class="menu-btn" onclick="loadAdminTab('discount-mgmt', event)"><i class="fa fa-percentage"></i> ডিসকাউন্ট ও রিকোয়েস্ট</button>
+                    <button class="menu-btn" onclick="loadAdminTab('returns')"><i class="fa fa-undo-alt"></i> রিটার্ন ইউজার পার্সেল</button>
+                    <button class="menu-btn" onclick="openProductLimitModal()"><i class="fa fa-layer-group"></i> পণ্য লোড ম্যানেজমেন্ট</button>
+                    <button class="menu-btn" onclick="openLastPortalParcel()"><i class="fa fa-layer-group"></i> লাস্ট পোর্টাল পার্সেল</button>
+                    <button class="menu-btn" onclick="loadAdminTab('notices', event)">
+                          <i class="fa fa-bell"></i> নোটিশ বোর্ড
+                     </button>
+                    <button class="menu-btn" onclick="loadAdminTab('storage', event)">💾 চেক মেমোরি</button>
+                    <button class="menu-btn" onclick="loadAdminTab('local-board', event)">📌 লোকাল বোর্ড পাবলিশ</button>
+                    <button class="menu-btn" onclick="loadAdminTab('login-leaderboard', event)"><i class="fa fa-trophy"></i> লগইন লিডারবোর্ড</button>
+                    <button class="menu-btn" onclick="loadAdminTab('sub-admin', event)" style="background:linear-gradient(135deg,rgba(245,158,11,.15),rgba(217,119,6,.1));border-color:rgba(245,158,11,.4);color:#fbbf24;"><i class="fa fa-user-shield"></i> নতুন এডমিন যুক্ত করুন</button>
+                    <h2>Thanks</h2>
+                </div>
+            </aside>
+            <section class="admin-content-view scroll-custom" id="adminMainContainer">
+                <div class="admin-welcome-msg">
+                    <h2>স্বাগতম অ্যাডমিন!</h2>
+                    <p>বাম পাশের মেনু থেকে আপনার কাজ নির্বাচন করুন।</p>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<div id="resetPasswordModal" class="modal-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999999; justify-content: center; align-items: center; backdrop-filter: blur(8px); font-family: 'Hind Siliguri', sans-serif;">
+    <div class="modal-box" style="background: #1e293b; color: #fff; border-radius: 24px; padding: 30px; width: 90%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); position: relative; border: 1px solid rgba(255,255,255,0.1);">
+        <span class="close-btn" onclick="document.getElementById('resetPasswordModal').style.setProperty('display', 'none', 'important');" style="position: absolute; right: 20px; top: 15px; cursor: pointer; font-size: 24px; color: #64748b;">
+            <i class="fa fa-times"></i>
+        </span>
+        <div style="text-align: center; margin-bottom: 25px;">
+            <div style="width: 60px; height: 60px; background: rgba(231, 76, 60, 0.15); color: #e74c3c; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 25px;"><i class="fa fa-shield-alt"></i></div>
+            <h3 style="color: #fff; margin: 0; font-size: 22px; font-weight: 700;">পাসওয়ার্ড রিসেট</h3>
+        </div>
+        <div class="modal-body">
+            <div style="margin-bottom: 15px;">
+                <label style="color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px;">ইউজার আইডি</label>
+                <div style="position: relative;">
+                    <i class="fa fa-fingerprint" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                    <input type="text" id="resetUserId" placeholder="আপনার আইডি লিখুন" style="width: 100%; padding: 12px 12px 12px 40px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: #fff; outline: none; box-sizing: border-box;">
+                </div>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px;">ইউজার নেম</label>
+                <div style="position: relative;">
+                    <i class="fa fa-user" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                    <input type="text" id="resetUserName" placeholder="আপনার নাম লিখুন" style="width: 100%; padding: 12px 12px 12px 40px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: #fff; outline: none; box-sizing: border-box;">
+                </div>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="color: #fca5a5; font-weight: 700; display: block; margin-bottom: 8px; font-size: 14px;">এডমিন কোড (প্রয়োজনীয়)</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="resetAdminCode" placeholder="কোড দিন" style="flex: 1; padding: 12px; background: #0f172a; border: 2px solid #ef4444; border-radius: 12px; color: #fff; font-weight: 600; outline: none;">
+                    <button type="button" onclick="var m = document.getElementById('helpModal'); if(m){ m.style.setProperty('display', 'flex', 'important'); m.style.visibility='visible'; m.style.opacity='1'; m.style.zIndex='999999999'; }" style="background: #10b981; color: white; border: none; padding: 0 15px; border-radius: 12px; cursor: pointer; font-size: 12px; font-weight: 800; white-space: nowrap;">Get Code</button>
+                </div>
+            </div>
+            <div style="margin-bottom: 25px;">
+                <label style="color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px;">নতুন পাসওয়ার্ড</label>
+                <div style="position: relative;">
+                    <i class="fa fa-lock" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                    <input type="password" id="resetNewPass" placeholder="••••••••" style="width: 100%; padding: 12px 12px 12px 40px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: #fff; outline: none; box-sizing: border-box;">
+                </div>
+            </div>
+            <button onclick="submitPasswordReset()" style="width: 100%; background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; border: none; padding: 15px; border-radius: 14px; cursor: pointer; font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fa fa-sync-alt"></i> পাসওয়ার্ড আপডেট করুন
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="resetUsernameModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); z-index: 999999; justify-content: center; align-items: center; backdrop-filter: blur(10px); font-family: 'Hind Siliguri', sans-serif;">
+    <div class="modal-box small-modal" style="background: #1e293b; color: #fff; border-radius: 28px; padding: 30px; width: 90%; max-width: 360px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); position: relative; border: 1px solid rgba(255,255,255,0.08);">
+        <span class="close-btn" onclick="closeModal('resetUsernameModal')" style="position: absolute; right: 20px; top: 20px; cursor: pointer; font-size: 20px; color: #94a3b8;"><i class="fa fa-times"></i></span>
+        <div style="text-align: center; margin-bottom: 25px;">
+            <div style="width: 55px; height: 55px; background: linear-gradient(135deg, #6366f1, #4338ca); color: #fff; border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 22px;"><i class="fa fa-user-edit"></i></div>
+            <h3 style="margin: 0; font-size: 20px; font-weight: 700; color: #fff;">নাম পরিবর্তন করুন</h3>
+        </div>
+        <div class="modal-body">
+            <div style="position: relative; margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; color: #6366f1; margin-bottom: 8px; font-weight: 700; margin-left: 5px;">নতুন ইউজারনেম</label>
+                <div style="position: relative;">
+                    <i class="fa fa-signature" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 14px;"></i>
+                    <input type="text" id="newUsernameInput" placeholder="উদা: আরিয়ান হোসাইন" style="width: 100%; padding: 14px 14px 14px 45px; background: #0f172a; border: 1px solid #334155; border-radius: 15px; color: #fff; outline: none; box-sizing: border-box; font-size: 14px;">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="updateUsername()" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; border-radius: 15px; font-weight: 700; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i class="fa fa-check-circle"></i> সেভ করুন
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="addressModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999999999999!important; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+    <div class="modal-box" style="background: #1e293b; color: #fff; border-radius: 20px; padding: 25px; width: 95%; max-width: 500px; border: 1px solid rgba(255,255,255,0.1);">
+        <span class="close-btn" onclick="closeModal('addressModal')" style="float: right; cursor: pointer; color: #94a3b8; font-size: 28px; line-height: 0.5;">&times;</span>
+        <h3 style="text-align: center; color: #3498db; margin-bottom: 20px; font-size: 22px;">📍 ঠিকানা সেট করুন</h3>
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 15px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="addrName" placeholder="আপনার নাম" class="addr-input">
+                <input type="number" id="addrMobile" placeholder="মোবাইল নম্বর" class="addr-input">
+            </div>
+            <select id="addrDivision" onchange="updateDistricts()" class="addr-input" style="background: #0f172a;">
+                <option value="">বিভাগ সিলেক্ট করুন</option>
+                <option value="Dhaka">ঢাকা (Dhaka)</option>
+                <option value="Chittagong">চট্টগ্রাম (Chittagong)</option>
+                <option value="Rajshahi">রাজশাহী (Rajshahi)</option>
+                <option value="Khulna">খুলনা (Khulna)</option>
+                <option value="Barisal">বরিশাল (Barisal)</option>
+                <option value="Sylhet">সিলেট (Sylhet)</option>
+                <option value="Rangpur">রংপুর (Rangpur)</option>
+                <option value="Mymensingh">ময়মনসিংহ (Mymensingh)</option>
+            </select>
+            <select id="addrDistrict" onchange="updateUpazilas()" class="addr-input" style="background: #0f172a;"><option value="">জেলা সিলেক্ট করুন</option></select>
+            <select id="addrUpazila" class="addr-input" style="background: #0f172a;"><option value="">উপজেলা/থানা সিলেক্ট করুন</option></select>
+            <textarea id="addrDetails" rows="3" placeholder="বিস্তারিত ঠিকানা (যেমন: গ্রাম, পাড়া, হাউজ নং, রোড নং...)" class="addr-input" style="resize: none;"></textarea>
+            <button class="btn-primary" onclick="saveAddressToProfile()" style="background: #3498db; color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px;">সেভ করুন</button>
+        </div>
+    </div>
+</div>
+<style>
+    .addr-input { width: 100%; padding: 10px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; outline: none; box-sizing: border-box; }
+    .addr-input:focus { border-color: #3498db; }
+</style>
+
+<div id="orderTrackingModal" class="modal-overlay">
+    <div class="modal-box medium-modal">
+        <span class="close-btn" onclick="closeModal('orderTrackingModal')">&times;</span>
+        <h3>আপনার অর্ডার সমূহ</h3>
+        <div class="modal-body">
+            <div id="userOrderHistoryList" class="order-list-container scroll-custom">
+                <p class="text-center">লোড হচ্ছে...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- app.js is loaded AFTER idb-shim.js (idb-shim.js is in <head>).
+         The shim overrides window.localStorage before any app code runs. -->
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="app.js"></script>
+
+<div id="imageLightbox" class="modal-overlay" onclick="closeLightbox()">
+    <span class="close-btn" style="color: rgb(9, 9, 9); top: 20px; right: 30px;">&times;</span>
+    <img id="lightboxImg" src="" style="max-width: 90%; max-height: 90vh; border-radius: 10px; box-shadow: 0 0 20px rgba(255,255,255,0.2);">
+</div>
+
+<div id="helpModal" class="modal-overlay" style="display: none; position: fixed; z-index: 999999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); justify-content: center; align-items: center; font-family: 'Hind Siliguri', sans-serif;">
+    <div class="modal-box" style="background: #ffffff; width: 92%; max-width: 420px; padding: 0; border-radius: 25px; text-align: center; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);">
+        <div style="background: linear-gradient(135deg, #1a237e, #3949ab); padding: 30px 20px; position: relative;">
+            <span class="close-btn" onclick="closeModal('helpModal')" style="position: absolute; right: 20px; top: 15px; cursor: pointer; font-size: 30px; color: rgba(255,255,255,0.7);">&times;</span>
+            <div style="width: 70px; height: 70px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 30px; color: white;"><i class="fa fa-headset"></i></div>
+            <h3 style="color: white; margin: 0; font-size: 19px; line-height: 1.5; font-weight: 700;">এডমিনের সাথে যোগাযোগ করে আপনার প্রোমো কোড সংগ্রহ করুন</h3>
+        </div>
+        <div style="padding: 25px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <a href="https://wa.me/8801822963824" target="_blank" style="background: #25D366; color: white; padding: 12px; text-decoration: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; font-size: 14px;"><i class="fab fa-whatsapp" style="font-size: 18px;"></i> WhatsApp</a>
+                <a href="tel:01707498418" style="background: #3498db; color: white; padding: 12px; text-decoration: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; font-size: 14px;"><i class="fa fa-phone-alt"></i> Call Now</a>
+                <a href="https://t.me/+8801822791052" target="_blank" style="background: #0088cc; color: white; padding: 12px; text-decoration: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; font-size: 14px;"><i class="fab fa-telegram-plane"></i> Telegram</a>
+                <a href="https://web.facebook.com/digitalshopt.mbd" target="_blank" style="background: #1877F2; color: white; padding: 12px; text-decoration: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; font-size: 14px;"><i class="fab fa-facebook-f"></i> Facebook</a>
+                <a href="/cdn-cgi/l/email-protection#c8aca1afa1bca9a4e6bba0a7b8e6bce6a5ffff88afa5a9a1a4e6aba7a5" style="background: linear-gradient(135deg, #ea4335, #c5221f); color: white; padding: 14px; text-decoration: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; font-size: 15px; grid-column: span 2;"><i class="fa fa-envelope"></i> Contact via Email</a>
+            </div>
+        </div>
+        <div style="background: #f8fafc; padding: 15px; border-top: 1px solid #f1f5f9; font-size: 11px; color: #94a3b8; letter-spacing: 0.5px;">Digital Shop TM Support Team is Always Ready</div>
+    </div>
+</div>
+
+<div id="floatingHelpline" style="position: fixed; bottom: 85px; right: 25px; z-index: 999; cursor: pointer; transition: 0.3s;" onclick="openHelpModal()">
+    <div style="position: relative; width: 65px; height: 65px; background: linear-gradient(135deg, #cbff10 0%, #c0f20d 100%); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 10px 25px rgba(39, 174, 96, 0.4); border: 2px solid rgba(255, 255, 255, 0.2); animation: pulse-green 2s infinite;">
+        <i class="fa fa-headset" style="color: white; font-size: 20px; margin-bottom: 2px;"></i>
+        <span style="color: white; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Help</span>
+        <style>
+            @keyframes pulse-green {
+                0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(205, 238, 19, 0.7); }
+                70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(39, 174, 96, 0); }
+                100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(39, 174, 96, 0); }
+            }
+            #floatingHelpline:hover { transform: translateY(-5px) scale(1.1); }
+        </style>
+    </div>
+</div>
+
+<div id="discountModal" class="modal-overlay" style="display:none; backdrop-filter: blur(8px); background: rgba(0,0,0,0.6);">
+    <div class="modal-box medium-modal" style="background: #ffffff; color: #333; border-radius: 25px; padding: 0; box-shadow: 0 25px 50px rgba(0,0,0,0.4); max-width: 420px; width: 95%; margin: auto; position: relative; overflow: hidden; font-family: 'Hind Siliguri', sans-serif;">
+        <div style="background: linear-gradient(135deg, #27ae60, #2ecc71); padding: 25px 15px; text-align: center; position: relative;">
+            <span class="close-btn" onclick="closeModal('discountModal')" style="color: white; font-size: 28px; cursor: pointer; position: absolute; right: 20px; top: 15px;">&times;</span>
+            <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 25px; color: white;"><i class="fa fa-ticket-alt"></i></div>
+            <h3 style="color: white; margin: 0; font-size: 22px; font-weight: 700;">My Discount Wallet</h3>
+        </div>
+        <div class="modal-body" style="padding: 25px;">
+            <div style="background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                <label style="display: block; font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase;">প্রোমো কোড ক্লেইম করুন</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="promo-input-box" placeholder="যেমন: SAVE50" style="flex: 1; padding: 12px 15px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 15px; outline: none; font-weight: 600; text-transform: uppercase;">
+                    <button onclick="claimPublicDiscount()" style="background: #1a237e; color: white; border: none; padding: 0 20px; border-radius: 12px; font-weight: bold; cursor: pointer;">ক্লেইম</button>
+                </div>
+            </div>
+            <button onclick="requestForCode()" id="reqBtn" style="width: 100%; background: linear-gradient(135deg, #8e44ad, #6c5ce7); color: white; padding: 14px; border: none; border-radius: 15px; font-weight: 700; margin-bottom: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 16px;">
+                <i class="fa fa-paper-plane"></i> Request For Special Code
+            </button>
+            <div id="userCardList" style="display: grid; grid-template-columns: 1fr; gap: 12px; max-height: 250px; overflow-y: auto; padding: 5px;">
+                <div id="noCardMsg" style="text-align:center; padding:30px 15px; background: #fdfdfd; border: 2px dashed #e2e8f0; border-radius: 15px;">
+                    <i class="fa fa-folder-open" style="font-size: 30px; color: #cbd5e1; margin-bottom: 10px; display: block;"></i>
+                    <p style="color:#94a3b8; font-size:13px; margin: 0;">আপনার কাছে বর্তমানে কোনো অ্যাক্টিভ ডিসকাউন্ট কার্ড নেই।</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="request-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999999999; backdrop-filter: blur(5px);">
+    <div style="background:white; width:90%; max-width:500px; margin:50px auto; border-radius:24px; position:relative; overflow:hidden;">
+        <div style="background: linear-gradient(135deg, #FF512F 0%, #DD2476 100%); padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin:0; font-size: 20px;"><i class="fa fa-list"></i> রিকোয়েস্ট লিস্ট</h3>
+            <span onclick="closeRequestModal()" style="cursor:pointer; font-size:24px;">&times;</span>
+        </div>
+        <div id="request-list-body" style="padding: 20px; max-height: 400px; overflow-y: auto; background: #f8fafc;"></div>
+        <div style="padding: 15px; border-top: 1px solid #eee; text-align: center; background: white;">
+            <button id="global-block-btn" onclick="toggleGlobalRequestBlock()" style="width: 100%; padding: 12px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer;">লোড হচ্ছে...</button>
+        </div>
+    </div>
+</div>
+
+<div id="userReturnListModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box" style="background:#121212; color:#fff; padding:20px; border-radius:15px; width:95%; max-width:500px; max-height:85vh; overflow-y:auto; border: 1px solid #333;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 1px solid #333; padding-bottom:10px;">
+            <h3 style="margin:0; color:#e74c3c;"><i class="fa fa-shipping-fast"></i> আপনার রিটার্নসমূহ</h3>
+            <span onclick="closeModal('userReturnListModal')" style="cursor:pointer; font-size:24px;">&times;</span>
+        </div>
+        <div id="userReturnListContent"></div>
+    </div>
+</div>
+<div id="productLimitModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.9); z-index:200000000; backdrop-filter: blur(5px);">
+    <div style="background:#1e293b; width:90%; max-width:950px; margin:50px auto; border-radius:20px; border: 1px solid rgba(255,255,255,0.1); overflow:hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+        
+        <div style="padding:20px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color:white; display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-family:'Hind Siliguri', sans-serif; font-size:18px;">পণ্য লোড কন্ট্রোল</h3>
+            <span onclick="closeProductLimitModal()" style="cursor:pointer; font-size:24px;">&times;</span>
+        </div>
+
+        <div style="padding:25px;">
+            <div id="limitInputsList" style="max-height: 300px; overflow-y: auto; padding-right: 5px;">
+                <div class="limit-box" style="margin-bottom:15px; background:rgba(255,255,255,0.05); padding:15px; border-radius:12px;">
+                    <label style="color:#94a3b8; font-size:12px; font-weight:700; display:block; margin-bottom:8px; text-transform:uppercase;">ধাপ ১: শুরুতে কয়টি দেখাবে?</label>
+                    <input type="number" class="limit-val" value="35" style="width:100%; background:#0f172a; border:1px solid #334155; color:#fff; padding:10px; border-radius:8px; outline:none;">
+                </div>
+            </div>
+
+            <button onclick="addNewLimitStep()" style="width:100%; background:rgba(99, 102, 241, 0.1); color:#818cf8; border:2px dashed #6366f1; padding:10px; border-radius:12px; cursor:pointer; font-weight:600; margin-top:10px; transition:0.3s;">
+                <i class="fa fa-plus-circle"></i> নতুন ধাপ যোগ করুন
+            </button>
+
+            <div style="margin-top:30px; display:flex; gap:10px;">
+                <button onclick="saveProductLimits()" style="flex:2; background:#22c55e; color:white; border:none; padding:12px; border-radius:12px; cursor:pointer; font-weight:bold; font-family:'Hind Siliguri', sans-serif;">সেভ সেটিংস</button>
+                <button onclick="closeProductLimitModal()" style="flex:1; background:#334155; color:white; border:none; padding:12px; border-radius:12px; cursor:pointer;">বন্ধ</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
