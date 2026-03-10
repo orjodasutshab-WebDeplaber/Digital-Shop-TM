@@ -93,44 +93,40 @@ window.onload = function() {
 
     console.log("✅ System Ready!");
 
-    // ── Firebase sync শেষে সব কিছু reload করি ──
+    // Firebase sync শেষে সব reload
     window.addEventListener('fb-sync-done', function() {
-        // Products
         const fp = localStorage.getItem(DB_KEYS.PRODUCTS);
-        if (fp) { appState.products = JSON.parse(fp); }
-        // Users
+        if (fp) { try { appState.products = JSON.parse(fp); } catch(e){} }
+
         const fu = localStorage.getItem(DB_KEYS.USERS);
-        if (fu) { appState.users = JSON.parse(fu); }
-        // Orders
+        if (fu) { try { const u = JSON.parse(fu); appState.users = u.filter(x => x.id && x.name); } catch(e){} }
+
         const fo = localStorage.getItem(DB_KEYS.ORDERS);
-        if (fo) { appState.orders = JSON.parse(fo); }
-        // Special requests
+        if (fo) { try { appState.orders = JSON.parse(fo); } catch(e){} }
+
         const fr = localStorage.getItem('special_requests');
-        if (fr) { appState.specialRequests = JSON.parse(fr); }
-        // Returns
-        const fret = localStorage.getItem(DB_KEYS.RETURNS || 'TM_DB_RETURNS_V2');
-        if (fret) { appState.returns = JSON.parse(fret); }
-        // Reports
+        if (fr) { try { appState.specialRequests = JSON.parse(fr); } catch(e){} }
+
+        const fret = localStorage.getItem('TM_DB_RETURNS_V2');
+        if (fret) { try { appState.returns = JSON.parse(fret); } catch(e){} }
+
         const frep = localStorage.getItem('tm_reports');
-        if (frep) { appState.reports = JSON.parse(frep); }
-        // Product limits
+        if (frep) { try { appState.reports = JSON.parse(frep); } catch(e){} }
+
         const fl = localStorage.getItem(DB_KEYS.PRODUCT_LIMITS);
-        if (fl) { appState.productLoadSequence = JSON.parse(fl); }
+        if (fl) { try { appState.productLoadSequence = JSON.parse(fl); } catch(e){} }
 
-        // UI পুনরায় render করি
-        if (typeof renderProductGrid === 'function') {
-            renderProductGrid(appState.products);
-        }
-        if (typeof startAdBoard === 'function') {
-            startAdBoard();
-        }
+        // Product grid re-render
+        if (typeof renderProductGrid === 'function') renderProductGrid(appState.products);
 
-        // Share URL check
-        const urlParams = new URLSearchParams(window.location.search);
-        const sharedId = urlParams.get('id');
-        if (sharedId) setTimeout(() => openProductDetails(sharedId), 300);
+        // Ad board re-render
+        if (typeof startAdBoard === 'function') startAdBoard();
 
-        console.log('[App] Reloaded after Firebase sync. Users:', appState.users.length, 'Products:', appState.products.length, 'Orders:', appState.orders.length);
+        // Share link
+        const sp = new URLSearchParams(window.location.search).get('id');
+        if (sp) setTimeout(() => { if(typeof openProductDetails==='function') openProductDetails(sp); }, 400);
+
+        console.log('[App] FB sync done — Users:', appState.users.length, 'Products:', appState.products.length, 'Orders:', appState.orders.length);
     }, { once: true });
 
 };
@@ -1444,6 +1440,9 @@ function changeOrderStatus(index, newStatus) {
 }
 
 function renderAdminUsers(container) {
+    // incomplete users বাদ দিই (Firebase থেকে আসা partial docs)
+    appState.users = appState.users.filter(u => u.id && u.name);
+
     // --- পুরনো ইউজারদের জন্য ব্লক ফিল্ডগুলো নিশ্চিত করা ---
     appState.users.forEach(u => {
         if (u.isUserBlocked === undefined) u.isUserBlocked = false;
@@ -1545,7 +1544,7 @@ function buildUserCards(users) {
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div style="display: flex; gap: 12px; align-items: center;">
                     <div style="width: 45px; height: 45px; background: ${u.role === 'admin' ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #3498db, #1e40af)'}; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                        ${u.name.charAt(0).toUpperCase()}
+                        ${(u.name || 'U').charAt(0).toUpperCase()}
                     </div>
                     <div>
                         <strong style="font-size: 16px; color: #fff; display: block; font-weight: 700;">${u.name}</strong>
@@ -2402,15 +2401,6 @@ function saveAddressToProfile() {
     try {
         // ৪. LocalStorage-এ সেভ করা
         localStorage.setItem(_addrKey(), JSON.stringify(addressObj));
-
-        // Users array তে address save করি — Firebase sync হবে
-        if (appState.currentUser && appState.currentUser.id) {
-            const uIdx = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
-            if (uIdx !== -1) {
-                appState.users[uIdx].savedAddress = addressObj;
-                localStorage.setItem(DB_KEYS.USERS, JSON.stringify(appState.users));
-            }
-        }
         
         // ৫. তাৎক্ষণিকভাবে UI আপডেট করা (রিফ্রেশ ছাড়া)
         const formatted = `${name}, ${mobile}, ${details}, ${upazila}, ${district}, ${division}`;
@@ -2444,21 +2434,13 @@ function saveAddressToProfile() {
 }
 // চেকআউট পেজে ডাটা লোড করার ফাংশন
 function loadSavedAddressToCheckout() {
-    let savedData = localStorage.getItem(_addrKey());
-
-    // localStorage এ না থাকলে users array থেকে নিই
-    if (!savedData && appState.currentUser) {
-        const user = appState.users.find(u => String(u.id) === String(appState.currentUser.id));
-        if (user && user.savedAddress) {
-            savedData = JSON.stringify(user.savedAddress);
-            localStorage.setItem(_addrKey(), savedData); // cache করি
-        }
-    }
-
+    const savedData = localStorage.getItem(_addrKey());
     const targetTextarea = document.getElementById('orderAddress');
+
     if (savedData && targetTextarea) {
         const addr = JSON.parse(savedData);
         const formatted = `নাম: ${addr.name}\nমোবাইল: ${addr.mobile}\nঠিকানা: ${addr.details}, ${addr.upazila}, ${addr.district}, ${addr.division}`;
+        
         targetTextarea.value = formatted;
     }
 }
@@ -3235,7 +3217,7 @@ function renderStorageMonitor(container) {
  * এটি কাস্টমারের প্রোফাইল ট্যাবে দেখাবে।
  */
 function renderCustomerOrders(container) {
-    const myOrders = appState.orders.filter(o => (appState.currentUser.mobile && o.customerPhone === appState.currentUser.mobile) || (appState.currentUser.id && String(o.userId) === String(appState.currentUser.id)));
+    const myOrders = appState.orders.filter(o => o.customerPhone === appState.currentUser.mobile);
     
     // মেইন লেআউটকে ছোট এবং মাঝখানে নিয়ে আসা হয়েছে
     let html = `
@@ -3349,7 +3331,7 @@ function openUserOrders() {
             return;
         }
 
-        const myOrders = appState.orders.filter(o => (appState.currentUser.mobile && String(o.customerPhone) === String(appState.currentUser.mobile)) || (appState.currentUser.id && String(o.userId) === String(appState.currentUser.id)));
+        const myOrders = appState.orders.filter(o => String(o.customerPhone) === String(appState.currentUser.mobile));
 
         if (myOrders.length === 0) {
             dataArea.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:30px;"><h3>কোনো অর্ডার পাওয়া যায়নি!</h3></div>`;
@@ -4233,16 +4215,8 @@ function openProductDetails(productId) {
         localStorage.setItem('tm_reports', JSON.stringify(appState.reports));
     }
 
-    // ৫. সম্পর্কিত পণ্য ফিল্টার — নাম, ট্যাগ, ক্যাটাগরি
-    const _iTags = Array.isArray(item.tags) ? item.tags.map(t=>String(t).toLowerCase()) : (item.tags ? String(item.tags).toLowerCase().split(',').map(t=>t.trim()) : []);
-    const _iWords = item.title.toLowerCase().split(' ').filter(w=>w.length>2);
-    const relatedProducts = appState.products.filter(p => {
-        if (String(p.id) === String(item.id)) return false;
-        if (p.category && item.category && p.category === item.category) return true;
-        const pTags = Array.isArray(p.tags) ? p.tags.map(t=>String(t).toLowerCase()) : (p.tags ? String(p.tags).toLowerCase().split(',').map(t=>t.trim()) : []);
-        if (_iTags.some(t=>pTags.includes(t))) return true;
-        return _iWords.some(w=>p.title.toLowerCase().split(' ').includes(w));
-    }).slice(0, 6);
+    // ৫. সম্পর্কিত পণ্য ফিল্টার
+    const relatedProducts = appState.products.filter(p => p.id !== item.id && (p.category === item.category || item.title.includes(p.title.split(' ')[0]))).slice(0, 6);
 
     // ৬. অ্যাডমিন চেক (আপনার সিস্টেমের লজিক অনুযায়ী)
     const isAdminUser = (typeof isAdmin === 'function') ? isAdmin() : false;

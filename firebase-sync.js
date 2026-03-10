@@ -141,7 +141,18 @@ async function pullFromCloud(lsKey) {
     } else {
       const arr = await pullArray(colName);
       if (arr && arr.length > 0) {
-        setLocal(lsKey, arr);
+        // Users এর ক্ষেত্রে — শুধু valid users নিই (id ও name আছে)
+        if (lsKey === 'TM_DB_USERS_V2') {
+          const validUsers = arr.filter(u => u.id && u.name);
+          if (validUsers.length > 0) {
+            setLocal(lsKey, validUsers);
+          } else {
+            console.warn('[FB] Users pull skipped — no valid users found');
+            return;
+          }
+        } else {
+          setLocal(lsKey, arr);
+        }
       }
     }
     console.log('[FB] ↓ Pulled:', lsKey);
