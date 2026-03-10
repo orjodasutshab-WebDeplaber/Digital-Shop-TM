@@ -171,10 +171,30 @@ function overrideSetItem() {
   localStorage._fbOrigSet = orig;
   localStorage.setItem = function(key, value) {
     orig(key, value);
-    if (!_pulling && KEY_MAP[key]) {
-      if (!window._fbTimers) window._fbTimers = {};
+    if (_pulling) return; // Firebase pull চলছে, push করব না
+    if (!window._fbTimers) window._fbTimers = {};
+
+    // ১. Known keys → Firebase push
+    if (KEY_MAP[key]) {
       clearTimeout(window._fbTimers[key]);
       window._fbTimers[key] = setTimeout(() => window.pushToCloud(key), 600);
+    }
+
+    // ২. Address keys → users collection এ merge
+    if (key.startsWith('digital_shop_user_address_')) {
+      const userId = key.replace('digital_shop_user_address_', '');
+      if (userId && userId !== 'guest') {
+        clearTimeout(window._fbTimers[key]);
+        window._fbTimers[key] = setTimeout(async () => {
+          try {
+            const addrData = JSON.parse(value);
+            await db.collection('users').doc(userId).set(
+              { savedAddress: addrData }, { merge: true }
+            );
+            console.log('[FB] Address saved for user:', userId);
+          } catch(e) { console.warn('[FB] address save err:', e.message); }
+        }, 600);
+      }
     }
   };
   console.log('[FB] setItem override ready');
@@ -257,31 +277,4 @@ window.FB_READY = tmReady.then(async () => {
   startListeners();
 });
 
-})();
-
-// ──────────────────────────────────────────
-// Address sync — user এর address Firebase users collection এ save করি
-// ──────────────────────────────────────────
-(function() {
-  const origOverride = localStorage.setItem;
-  localStorage.setItem = function(key, value) {
-    origOverride.call(localStorage, key, value);
-    // Address key detect করি: digital_shop_user_address_USERID
-    if (!_pulling && key.startsWith('digital_shop_user_address_')) {
-      const userId = key.replace('digital_shop_user_address_', '');
-      if (userId && userId !== 'guest') {
-        if (!window._fbTimers) window._fbTimers = {};
-        clearTimeout(window._fbTimers[key]);
-        window._fbTimers[key] = setTimeout(async () => {
-          try {
-            const addrData = JSON.parse(value);
-            await db.collection('users').doc(userId).set(
-              { savedAddress: addrData }, { merge: true }
-            );
-            console.log('[FB] Address saved for user:', userId);
-          } catch(e) { console.warn('[FB] address save err:', e.message); }
-        }, 600);
-      }
-    }
-  };
 })();
