@@ -93,6 +93,25 @@ window.onload = function() {
 
     console.log("✅ System Ready!");
 
+    // Share link থেকে পণ্য details খুলি
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedId = urlParams.get('id');
+    if (sharedId) {
+        // Firebase sync শেষের পর খুলি
+        const tryOpen = () => {
+            const found = appState.products.find(p => String(p.id) === String(sharedId));
+            if (found) {
+                setTimeout(() => openProductDetails(sharedId), 300);
+            } else {
+                // Firebase sync শেষ হলে আবার চেষ্টা করি
+                window.addEventListener('fb-sync-done', () => {
+                    setTimeout(() => openProductDetails(sharedId), 300);
+                }, { once: true });
+            }
+        };
+        tryOpen();
+    }
+
 };
 // পেজ লোড হওয়ার সাথে সাথে চেক করবে ইউজার লগইন কি না
 window.addEventListener('load', function() {
@@ -176,6 +195,32 @@ function loadDatabase() {
 
     console.log("✅ Digital Shop TM: লোড হওয়া লিমিট সিকুয়েন্স:", appState.productLoadSequence);
     console.log("✅ Digital Shop TM: সকল ডাটা (রিকোয়েস্টসহ) লোড হয়েছে!");
+
+    // Firebase sync শেষে appState reload করি
+    window.addEventListener('fb-sync-done', function() {
+        // Products
+        const fp = localStorage.getItem(DB_KEYS.PRODUCTS);
+        if (fp) { appState.products = JSON.parse(fp); renderProductGrid(appState.products); }
+        // Orders
+        const fo = localStorage.getItem(DB_KEYS.ORDERS);
+        if (fo) appState.orders = JSON.parse(fo);
+        // Users
+        const fu = localStorage.getItem(DB_KEYS.USERS);
+        if (fu) appState.users = JSON.parse(fu);
+        // Requests
+        const fr = localStorage.getItem('special_requests');
+        if (fr) appState.specialRequests = JSON.parse(fr);
+        // Returns
+        const fret = localStorage.getItem(DB_KEYS.RETURNS || 'TM_DB_RETURNS_V2');
+        if (fret) appState.returns = JSON.parse(fret);
+        // Reports
+        const frep = localStorage.getItem('tm_reports');
+        if (frep) appState.reports = JSON.parse(frep);
+        // Product limits
+        const fl = localStorage.getItem(DB_KEYS.PRODUCT_LIMITS);
+        if (fl) appState.productLoadSequence = JSON.parse(fl);
+        console.log('[FB] appState reloaded after sync');
+    }, { once: true });
 
     // নোটিফিকেশন ডট চেক
     if (appState.currentUser && appState.currentUser.hasUnreadDiscount === true) {
@@ -2448,7 +2493,8 @@ document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclic
     }
 
     var myOrders = appState.orders.filter(function(order) {
-        return order.userId === appState.currentUser.id;
+        return String(order.userId) === String(appState.currentUser.id) ||
+               (appState.currentUser.mobile && String(order.customerPhone) === String(appState.currentUser.mobile));
     });
 
     if(myOrders.length === 0) {
@@ -3178,7 +3224,10 @@ function renderStorageMonitor(container) {
  * এটি কাস্টমারের প্রোফাইল ট্যাবে দেখাবে।
  */
 function renderCustomerOrders(container) {
-    const myOrders = appState.orders.filter(o => o.customerPhone === appState.currentUser.mobile);
+    const myOrders = appState.orders.filter(o => 
+        (appState.currentUser.mobile && o.customerPhone === appState.currentUser.mobile) ||
+        (appState.currentUser.id && String(o.userId) === String(appState.currentUser.id))
+    );
     
     // মেইন লেআউটকে ছোট এবং মাঝখানে নিয়ে আসা হয়েছে
     let html = `
@@ -3292,7 +3341,10 @@ function openUserOrders() {
             return;
         }
 
-        const myOrders = appState.orders.filter(o => String(o.customerPhone) === String(appState.currentUser.mobile));
+        const myOrders = appState.orders.filter(o => 
+            (appState.currentUser.mobile && String(o.customerPhone) === String(appState.currentUser.mobile)) ||
+            (appState.currentUser.id && String(o.userId) === String(appState.currentUser.id))
+        );
 
         if (myOrders.length === 0) {
             dataArea.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:30px;"><h3>কোনো অর্ডার পাওয়া যায়নি!</h3></div>`;
@@ -4176,8 +4228,24 @@ function openProductDetails(productId) {
         localStorage.setItem('tm_reports', JSON.stringify(appState.reports));
     }
 
-    // ৫. সম্পর্কিত পণ্য ফিল্টার
-    const relatedProducts = appState.products.filter(p => p.id !== item.id && (p.category === item.category || item.title.includes(p.title.split(' ')[0]))).slice(0, 6);
+    // ৫. সম্পর্কিত পণ্য ফিল্টার — নাম, ট্যাগ, ক্যাটাগরি দিয়ে
+    const itemTags = Array.isArray(item.tags) ? item.tags.map(t => t.toLowerCase()) : 
+                     (item.tags ? item.tags.toLowerCase().split(',').map(t => t.trim()) : []);
+    const itemWords = item.title.toLowerCase().split(' ').filter(w => w.length > 2);
+    
+    const relatedProducts = appState.products.filter(p => {
+        if (p.id === item.id) return false;
+        // ক্যাটাগরি মিলে?
+        if (p.category && item.category && p.category === item.category) return true;
+        // ট্যাগ মিলে?
+        const pTags = Array.isArray(p.tags) ? p.tags.map(t => t.toLowerCase()) :
+                      (p.tags ? p.tags.toLowerCase().split(',').map(t => t.trim()) : []);
+        if (itemTags.some(t => pTags.includes(t))) return true;
+        // নামের শব্দ মিলে?
+        const pWords = p.title.toLowerCase().split(' ');
+        if (itemWords.some(w => pWords.includes(w))) return true;
+        return false;
+    }).slice(0, 6);
 
     // ৬. অ্যাডমিন চেক (আপনার সিস্টেমের লজিক অনুযায়ী)
     const isAdminUser = (typeof isAdmin === 'function') ? isAdmin() : false;
@@ -4515,7 +4583,16 @@ function reportProduct(id) {
         // ২. ডাটা সেভ করা
         savedReports.push(newReport);
         appState.reports = savedReports; 
-        localStorage.setItem('tm_reports', JSON.stringify(savedReports)); 
+        localStorage.setItem('tm_reports', JSON.stringify(savedReports));
+        
+        // Firebase sync নিশ্চিত করি
+        if (window._fbTimers) {
+            clearTimeout(window._fbTimers['tm_reports']);
+        }
+        // তাৎক্ষণিক push করি (debounce বাদ দিয়ে)
+        if (typeof pushToCloud === 'function') {
+            pushToCloud('tm_reports');
+        }
         
         alert("✅ রিপোর্ট জমা হয়েছে!");
 
