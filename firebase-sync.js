@@ -58,15 +58,17 @@ function setLocal(key, value) {
   _pulling = true;
   try {
     const str = JSON.stringify(value);
-    // idb-shim এর internal cache সরাসরি update
+    // ১. idb-shim এর TM_CACHE সরাসরি update (getItem এখনই কাজ করবে)
     if (window._TM_CACHE) {
       window._TM_CACHE[key] = str;
     }
-    // IDB তেও save করি (idb-shim এর _origSetItem বা raw setItem)
-    const origFn = localStorage._fbOrigSet || Object.getOwnPropertyDescriptor(window, 'localStorage');
-    // window._TMDB দিয়ে IDB তে সরাসরি save করি
+    // ২. IDB তেও persist করি
     if (window._TMDB) {
       window._TMDB.set(key, str).catch(()=>{});
+    }
+    // ৩. _fbOrigSet দিয়ে idb-shim setItem call করি (push ছাড়া)
+    if (localStorage._fbOrigSet) {
+      localStorage._fbOrigSet(key, str);
     }
   } finally {
     _pulling = false;

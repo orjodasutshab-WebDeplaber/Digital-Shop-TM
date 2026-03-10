@@ -93,35 +93,45 @@ window.onload = function() {
 
     console.log("✅ System Ready!");
 
-    // Firebase sync শেষে appState পুনরায় লোড করি
+    // ── Firebase sync শেষে সব কিছু reload করি ──
     window.addEventListener('fb-sync-done', function() {
+        // Products
         const fp = localStorage.getItem(DB_KEYS.PRODUCTS);
-        if (fp) { appState.products = JSON.parse(fp); if(typeof renderProductGrid==='function') renderProductGrid(appState.products); }
-        const fo = localStorage.getItem(DB_KEYS.ORDERS);
-        if (fo) appState.orders = JSON.parse(fo);
+        if (fp) { appState.products = JSON.parse(fp); }
+        // Users
         const fu = localStorage.getItem(DB_KEYS.USERS);
-        if (fu) appState.users = JSON.parse(fu);
+        if (fu) { appState.users = JSON.parse(fu); }
+        // Orders
+        const fo = localStorage.getItem(DB_KEYS.ORDERS);
+        if (fo) { appState.orders = JSON.parse(fo); }
+        // Special requests
         const fr = localStorage.getItem('special_requests');
-        if (fr) appState.specialRequests = JSON.parse(fr);
+        if (fr) { appState.specialRequests = JSON.parse(fr); }
+        // Returns
         const fret = localStorage.getItem(DB_KEYS.RETURNS || 'TM_DB_RETURNS_V2');
-        if (fret) appState.returns = JSON.parse(fret);
+        if (fret) { appState.returns = JSON.parse(fret); }
+        // Reports
         const frep = localStorage.getItem('tm_reports');
-        if (frep) appState.reports = JSON.parse(frep);
+        if (frep) { appState.reports = JSON.parse(frep); }
+        // Product limits
         const fl = localStorage.getItem(DB_KEYS.PRODUCT_LIMITS);
-        if (fl) appState.productLoadSequence = JSON.parse(fl);
+        if (fl) { appState.productLoadSequence = JSON.parse(fl); }
+
+        // UI পুনরায় render করি
+        if (typeof renderProductGrid === 'function') {
+            renderProductGrid(appState.products);
+        }
+        if (typeof startAdBoard === 'function') {
+            startAdBoard();
+        }
+
         // Share URL check
         const urlParams = new URLSearchParams(window.location.search);
         const sharedId = urlParams.get('id');
         if (sharedId) setTimeout(() => openProductDetails(sharedId), 300);
-        console.log('[FB] appState reloaded after sync');
-    }, { once: true });
 
-    // Share URL — sync আগে থেকেই products থাকলে খুলি
-    const _urlParams = new URLSearchParams(window.location.search);
-    const _sharedId = _urlParams.get('id');
-    if (_sharedId && appState.products.length > 0) {
-        setTimeout(() => openProductDetails(_sharedId), 500);
-    }
+        console.log('[App] Reloaded after Firebase sync. Users:', appState.users.length, 'Products:', appState.products.length, 'Orders:', appState.orders.length);
+    }, { once: true });
 
 };
 // পেজ লোড হওয়ার সাথে সাথে চেক করবে ইউজার লগইন কি না
@@ -2392,12 +2402,12 @@ function saveAddressToProfile() {
     try {
         // ৪. LocalStorage-এ সেভ করা
         localStorage.setItem(_addrKey(), JSON.stringify(addressObj));
-        
-        // Firebase users collection এও save করি
+
+        // Users array তে address save করি — Firebase sync হবে
         if (appState.currentUser && appState.currentUser.id) {
-            const userIdx = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
-            if (userIdx !== -1) {
-                appState.users[userIdx].savedAddress = addressObj;
+            const uIdx = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
+            if (uIdx !== -1) {
+                appState.users[uIdx].savedAddress = addressObj;
                 localStorage.setItem(DB_KEYS.USERS, JSON.stringify(appState.users));
             }
         }
@@ -2434,24 +2444,22 @@ function saveAddressToProfile() {
 }
 // চেকআউট পেজে ডাটা লোড করার ফাংশন
 function loadSavedAddressToCheckout() {
-    const savedData = localStorage.getItem(_addrKey());
-    const targetTextarea = document.getElementById('orderAddress');
+    let savedData = localStorage.getItem(_addrKey());
 
+    // localStorage এ না থাকলে users array থেকে নিই
+    if (!savedData && appState.currentUser) {
+        const user = appState.users.find(u => String(u.id) === String(appState.currentUser.id));
+        if (user && user.savedAddress) {
+            savedData = JSON.stringify(user.savedAddress);
+            localStorage.setItem(_addrKey(), savedData); // cache করি
+        }
+    }
+
+    const targetTextarea = document.getElementById('orderAddress');
     if (savedData && targetTextarea) {
         const addr = JSON.parse(savedData);
         const formatted = `নাম: ${addr.name}\nমোবাইল: ${addr.mobile}\nঠিকানা: ${addr.details}, ${addr.upazila}, ${addr.district}, ${addr.division}`;
         targetTextarea.value = formatted;
-        return;
-    }
-    // Firebase users থেকে address load করার চেষ্টা
-    if (!savedData && appState.currentUser) {
-        const user = appState.users.find(u => String(u.id) === String(appState.currentUser.id));
-        if (user && user.savedAddress && targetTextarea) {
-            const addr = user.savedAddress;
-            localStorage.setItem(_addrKey(), JSON.stringify(addr));
-            const formatted = `নাম: ${addr.name}\nমোবাইল: ${addr.mobile}\nঠিকানা: ${addr.details}, ${addr.upazila}, ${addr.district}, ${addr.division}`;
-            targetTextarea.value = formatted;
-        }
     }
 }
 
@@ -4233,9 +4241,7 @@ function openProductDetails(productId) {
         if (p.category && item.category && p.category === item.category) return true;
         const pTags = Array.isArray(p.tags) ? p.tags.map(t=>String(t).toLowerCase()) : (p.tags ? String(p.tags).toLowerCase().split(',').map(t=>t.trim()) : []);
         if (_iTags.some(t=>pTags.includes(t))) return true;
-        const pWords = p.title.toLowerCase().split(' ');
-        if (_iWords.some(w=>pWords.includes(w))) return true;
-        return false;
+        return _iWords.some(w=>p.title.toLowerCase().split(' ').includes(w));
     }).slice(0, 6);
 
     // ৬. অ্যাডমিন চেক (আপনার সিস্টেমের লজিক অনুযায়ী)
