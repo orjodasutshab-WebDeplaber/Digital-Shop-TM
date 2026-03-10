@@ -1,13 +1,9 @@
 // ============================================================
-// firebase-sync.js — Digital Shop TM v4.0
-// compat SDK ব্যবহার করে — synchronous, module নয়
+// firebase-sync.js — Digital Shop TM v5.0
+// compat SDK — idb-shim এর সাথে সঠিকভাবে কাজ করে
 // ============================================================
-
 (function() {
 'use strict';
-
-// Firebase compat SDK head এ load হওয়া দরকার
-// index.html এ আগে থেকেই load হয়েছে
 
 const firebaseConfig = {
   apiKey: "AIzaSyCRJ6kN1nvr1RxKdIiBnxWVJGXm6U2kRr0",
@@ -15,17 +11,13 @@ const firebaseConfig = {
   projectId: "digitalshoptm-2008",
   storageBucket: "digitalshoptm-2008.firebasestorage.app",
   messagingSenderId: "627378095856",
-  appId: "1:627378095856:web:b705f4f75e0512646ca435",
-  measurementId: "G-1LJR9JQL0V"
+  appId: "1:627378095856:web:b705f4f75e0512646ca435"
 };
 
-// Firebase already initialized check
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-let _pulling = false;
+let _pulling = false; // pull চলছে — push করব না
 
 const KEY_MAP = {
   'TM_DB_PRODUCTS_V2'    : 'products',
@@ -49,84 +41,58 @@ const KEY_MAP = {
 
 const SINGLE_DOC_KEYS = new Set(['tm_reports','all_discounts','global_discounts']);
 
-function sanitize(obj) {
-  try { return JSON.parse(JSON.stringify(obj)); } catch(e) { return obj; }
-}
-
-// idb-shim এর TM_CACHE সরাসরি update করি
+// idb-shim এর tmStorage.setItem সরাসরি call করি
+// এতে TM_CACHE আপডেট হয় + IDB তে save হয়
+// কিন্তু আমাদের override trigger হয় না (loop নেই)
 function setLocal(key, value) {
   _pulling = true;
   try {
     const str = JSON.stringify(value);
-    // ১. idb-shim এর TM_CACHE সরাসরি update (getItem এখনই কাজ করবে)
-    if (window._TM_CACHE) {
-      window._TM_CACHE[key] = str;
-    }
-    // ২. IDB তেও persist করি
-    if (window._TMDB) {
-      window._TMDB.set(key, str).catch(()=>{});
-    }
-    // ৩. _fbOrigSet দিয়ে idb-shim setItem call করি (push ছাড়া)
-    if (localStorage._fbOrigSet) {
-      localStorage._fbOrigSet(key, str);
-    }
+    // idb-shim এর TM_CACHE সরাসরি
+    if (window._TM_CACHE) window._TM_CACHE[key] = str;
+    // IDB তে persist
+    if (window._TMDB) window._TMDB.set(key, str).catch(()=>{});
   } finally {
     _pulling = false;
   }
 }
 
-// ──────────────────────────────────────────
-// PUSH array to Firestore
-// ──────────────────────────────────────────
+// ── PUSH array to Firestore ──
 async function pushArray(colName, arr) {
   try {
-    const snap = await db.collection(colName).get();
-    const batch = db.batch();
-    snap.docs.forEach(d => batch.delete(d.ref));
+    if (!arr || arr.length === 0) return;
     const CHUNK = 400;
     for (let i = 0; i < arr.length; i += CHUNK) {
       const b = db.batch();
       arr.slice(i, i + CHUNK).forEach((item, j) => {
         const id = item.id ? String(item.id) : String(i + j);
-        b.set(db.collection(colName).doc(id), sanitize(item));
+        const clean = JSON.parse(JSON.stringify(item));
+        b.set(db.collection(colName).doc(id), clean);
       });
       await b.commit();
     }
-    if (snap.docs.length > 0) await batch.commit();
   } catch(e) { console.warn('[FB] pushArray err:', colName, e.message); }
 }
 
-async function pullArray(colName) {
-  try {
-    const snap = await db.collection(colName).get();
-    return snap.docs.map(d => d.data());
-  } catch(e) { return null; }
-}
-
-// ──────────────────────────────────────────
-// PUSH
-// ──────────────────────────────────────────
+// ── PUSH single key to Firestore ──
 window.pushToCloud = async function(lsKey) {
   const colName = KEY_MAP[lsKey];
   if (!colName) return;
-  const raw = localStorage.getItem(lsKey);
+  const raw = window._TM_CACHE ? window._TM_CACHE[lsKey] : localStorage.getItem(lsKey);
   if (!raw) return;
   try {
     const data = JSON.parse(raw);
-    if (!SINGLE_DOC_KEYS.has(lsKey) && Array.isArray(data)) {
-      await pushArray(colName, data);
-    } else {
-      const payload = Array.isArray(data) ? { _arr: sanitize(data) }
-        : (data && typeof data === 'object' ? sanitize(data) : { value: data });
+    if (SINGLE_DOC_KEYS.has(lsKey)) {
+      const payload = Array.isArray(data) ? {_arr: data} : (typeof data==='object' ? data : {value: data});
       await db.collection(colName).doc('data').set(payload);
+    } else if (Array.isArray(data)) {
+      await pushArray(colName, data);
     }
-    console.log('[FB] ↑ Pushed:', lsKey);
+    console.log('[FB] ↑ Pushed:', lsKey, Array.isArray(data) ? data.length + ' items' : '');
   } catch(e) { console.warn('[FB] push err:', lsKey, e.message); }
 };
 
-// ──────────────────────────────────────────
-// PULL
-// ──────────────────────────────────────────
+// ── PULL from Firestore ──
 async function pullFromCloud(lsKey) {
   const colName = KEY_MAP[lsKey];
   if (!colName) return;
@@ -139,29 +105,22 @@ async function pullFromCloud(lsKey) {
         setLocal(lsKey, val);
       }
     } else {
-      const arr = await pullArray(colName);
-      if (arr && arr.length > 0) {
-        // Users এর ক্ষেত্রে — শুধু valid users নিই (id ও name আছে)
+      const snap = await db.collection(colName).get();
+      if (!snap.empty) {
+        let arr = snap.docs.map(d => d.data());
+        // Users: শুধু valid (id + name আছে) নিই
         if (lsKey === 'TM_DB_USERS_V2') {
-          const validUsers = arr.filter(u => u.id && u.name);
-          if (validUsers.length > 0) {
-            setLocal(lsKey, validUsers);
-          } else {
-            console.warn('[FB] Users pull skipped — no valid users found');
-            return;
-          }
-        } else {
-          setLocal(lsKey, arr);
+          arr = arr.filter(u => u.id && u.name);
+          if (arr.length === 0) { console.warn('[FB] Users: no valid users, skipping'); return; }
         }
+        setLocal(lsKey, arr);
       }
     }
     console.log('[FB] ↓ Pulled:', lsKey);
   } catch(e) { console.warn('[FB] pull err:', lsKey, e.message); }
 }
 
-// ──────────────────────────────────────────
-// SYNC ALL
-// ──────────────────────────────────────────
+// ── SYNC ALL ──
 async function syncAllFromCloud() {
   console.log('[FB] Syncing all from cloud...');
   const priority = [
@@ -176,24 +135,73 @@ async function syncAllFromCloud() {
   window.dispatchEvent(new CustomEvent('fb-sync-done'));
 }
 
-// ──────────────────────────────────────────
-// localStorage.setItem override
-// ──────────────────────────────────────────
+// ── Real-time listeners ──
+function startListeners() {
+  db.collection('products').onSnapshot(snap => {
+    if (_pulling) return;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('TM_DB_PRODUCTS_V2', arr);
+    if (window.appState) window.appState.products = arr;
+  });
+  db.collection('users').onSnapshot(snap => {
+    if (_pulling) return;
+    const arr = snap.docs.map(d => d.data()).filter(u => u.id && u.name);
+    if (arr.length === 0) return;
+    setLocal('TM_DB_USERS_V2', arr);
+    if (window.appState) window.appState.users = arr;
+  });
+  db.collection('orders').onSnapshot(snap => {
+    if (_pulling) return;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('TM_DB_ORDERS_V2', arr);
+    if (window.appState) window.appState.orders = arr;
+  });
+  db.collection('ads').onSnapshot(snap => {
+    if (_pulling) return;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('TM_DB_ADS_V2', arr);
+    if (window.appState) window.appState.ads = arr;
+    if (typeof startAdBoard === 'function') setTimeout(startAdBoard, 300);
+  });
+  db.collection('deli_ads').onSnapshot(snap => {
+    if (_pulling) return;
+    setLocal('deli_ads', snap.docs.map(d => d.data()));
+  });
+  db.collection('special_requests').onSnapshot(snap => {
+    if (_pulling) return;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('special_requests', arr);
+    if (window.appState) window.appState.specialRequests = arr;
+  });
+  db.collection('returns').onSnapshot(snap => {
+    if (_pulling) return;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('TM_DB_RETURNS_V2', arr);
+    if (window.appState) window.appState.returns = arr;
+  });
+  console.log('[FB] Real-time listeners started');
+}
+
+// ── localStorage.setItem override ──
+// idb-shim এর tmStorage object টাকে wrap করি
 function overrideSetItem() {
-  const orig = localStorage.setItem.bind(localStorage);
-  localStorage._fbOrigSet = orig;
+  // idb-shim এর setItem save করি
+  const origSetItem = localStorage.setItem.bind(localStorage);
+  
   localStorage.setItem = function(key, value) {
-    orig(key, value);
-    if (_pulling) return; // Firebase pull চলছে, push করব না
+    // আগে idb-shim এর setItem call করি (TM_CACHE + IDB update)
+    origSetItem(key, value);
+    
+    if (_pulling) return; // pull চলছে — push করব না
     if (!window._fbTimers) window._fbTimers = {};
 
-    // ১. Known keys → Firebase push
+    // ১. Known DB keys → Firebase push
     if (KEY_MAP[key]) {
       clearTimeout(window._fbTimers[key]);
-      window._fbTimers[key] = setTimeout(() => window.pushToCloud(key), 600);
+      window._fbTimers[key] = setTimeout(() => window.pushToCloud(key), 800);
     }
 
-    // ২. Address keys → users collection এ merge
+    // ২. Address keys → users doc এ merge
     if (key.startsWith('digital_shop_user_address_')) {
       const userId = key.replace('digital_shop_user_address_', '');
       if (userId && userId !== 'guest') {
@@ -201,89 +209,22 @@ function overrideSetItem() {
         window._fbTimers[key] = setTimeout(async () => {
           try {
             const addrData = JSON.parse(value);
-            await db.collection('users').doc(userId).set(
+            // users collection এ ঐ user এর doc এ savedAddress merge করি
+            await db.collection('users').doc(String(userId)).set(
               { savedAddress: addrData }, { merge: true }
             );
             console.log('[FB] Address saved for user:', userId);
           } catch(e) { console.warn('[FB] address save err:', e.message); }
-        }, 600);
+        }, 800);
       }
     }
   };
   console.log('[FB] setItem override ready');
 }
 
-// ──────────────────────────────────────────
-// Real-time listeners
-// ──────────────────────────────────────────
-function startListeners() {
-  // Products
-  db.collection('products').onSnapshot(snap => {
-    const products = snap.docs.map(d => d.data());
-    setLocal('TM_DB_PRODUCTS_V2', products);
-    if (window.appState) { window.appState.products = products; }
-  });
-
-  // Users
-  db.collection('users').onSnapshot(snap => {
-    const users = snap.docs.map(d => d.data());
-    setLocal('TM_DB_USERS_V2', users);
-    if (window.appState) window.appState.users = users;
-  });
-
-  // Orders
-  db.collection('orders').onSnapshot(snap => {
-    const orders = snap.docs.map(d => d.data());
-    setLocal('TM_DB_ORDERS_V2', orders);
-    if (window.appState) window.appState.orders = orders;
-  });
-
-  // Ads
-  db.collection('ads').onSnapshot(snap => {
-    const ads = snap.docs.map(d => d.data());
-    setLocal('TM_DB_ADS_V2', ads);
-    if (window.appState) window.appState.ads = ads;
-  });
-
-  // Deli ads
-  db.collection('deli_ads').onSnapshot(snap => {
-    const dads = snap.docs.map(d => d.data());
-    setLocal('deli_ads', dads);
-  });
-
-  // Special requests
-  db.collection('special_requests').onSnapshot(snap => {
-    const reqs = snap.docs.map(d => d.data());
-    setLocal('special_requests', reqs);
-    if (window.appState) window.appState.specialRequests = reqs;
-  });
-
-  // Returns
-  db.collection('returns').onSnapshot(snap => {
-    const returns = snap.docs.map(d => d.data());
-    setLocal('TM_DB_RETURNS_V2', returns);
-    if (window.appState) window.appState.returns = returns;
-  });
-
-  console.log('[FB] Real-time listeners started');
-}
-
-// ──────────────────────────────────────────
-// Address save — TM_USER_ADDRESS_ prefix key handle
-// ──────────────────────────────────────────
-(function patchAddressSave() {
-  // address key গুলো TM_USER_ADDRESS_userId format এ থাকে
-  // এগুলো Firebase এ save করতে হবে
-  const origSet = localStorage.setItem.bind(localStorage);
-  window._addressOrigSet = origSet;
-})();
-
-// ──────────────────────────────────────────
-// Init
-// ──────────────────────────────────────────
+// ── Init ──
 overrideSetItem();
 
-// TM_READY (idb-shim hydration) শেষে sync শুরু করি
 const tmReady = window.TM_READY || Promise.resolve();
 window.FB_READY = tmReady.then(async () => {
   await syncAllFromCloud();
