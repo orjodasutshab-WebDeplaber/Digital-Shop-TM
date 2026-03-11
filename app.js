@@ -93,28 +93,39 @@ window.onload = function() {
 
     console.log("✅ System Ready!");
 
-    // ── Firebase sync শেষে UI reload ──
+    // Firebase sync শেষে সব reload
     window.addEventListener('fb-sync-done', function() {
-        // Products
-        try { const v=localStorage.getItem('TM_DB_PRODUCTS_V2'); if(v){appState.products=JSON.parse(v); if(typeof renderProductGrid==='function') renderProductGrid(appState.products);} } catch(e){}
-        // Users (valid only)
-        try { const v=localStorage.getItem('TM_DB_USERS_V2'); if(v){const u=JSON.parse(v); appState.users=u.filter(x=>x.id&&x.name);} } catch(e){}
-        // Orders
-        try { const v=localStorage.getItem('TM_DB_ORDERS_V2'); if(v) appState.orders=JSON.parse(v); } catch(e){}
-        // Requests
-        try { const v=localStorage.getItem('special_requests'); if(v) appState.specialRequests=JSON.parse(v); } catch(e){}
-        // Returns
-        try { const v=localStorage.getItem('TM_DB_RETURNS_V2'); if(v) appState.returns=JSON.parse(v); } catch(e){}
-        // Reports
-        try { const v=localStorage.getItem('tm_reports'); if(v) appState.reports=JSON.parse(v); } catch(e){}
-        // Product limits
-        try { const v=localStorage.getItem('TM_DB_PRODUCT_LIMITS'); if(v) appState.productLoadSequence=JSON.parse(v); } catch(e){}
-        // Ads board
-        if (typeof startAdBoard==='function') startAdBoard();
-        // Share URL
-        try { const id=new URLSearchParams(location.search).get('id'); if(id) setTimeout(()=>{if(typeof openProductDetails==='function') openProductDetails(id);},400); } catch(e){}
-        console.log('[App] FB sync done — Users:',appState.users.length,'Products:',appState.products.length,'Orders:',appState.orders.length);
-    }, {once:true});
+        try {
+            const fp = localStorage.getItem(DB_KEYS.PRODUCTS);
+            if (fp) appState.products = JSON.parse(fp);
+
+            const fu = localStorage.getItem(DB_KEYS.USERS);
+            if (fu) { const u = JSON.parse(fu); appState.users = u.filter(x => x.id && x.name); }
+
+            const fo = localStorage.getItem(DB_KEYS.ORDERS);
+            if (fo) appState.orders = JSON.parse(fo);
+
+            const fr = localStorage.getItem('special_requests');
+            if (fr) appState.specialRequests = JSON.parse(fr);
+
+            const fret = localStorage.getItem('TM_DB_RETURNS_V2');
+            if (fret) appState.returns = JSON.parse(fret);
+
+            const frep = localStorage.getItem('tm_reports');
+            if (frep) appState.reports = JSON.parse(frep);
+
+            const fl = localStorage.getItem(DB_KEYS.PRODUCT_LIMITS);
+            if (fl) appState.productLoadSequence = JSON.parse(fl);
+
+            if (typeof renderProductGrid === 'function') renderProductGrid(appState.products);
+            if (typeof startAdBoard === 'function') startAdBoard();
+
+            const sp = new URLSearchParams(window.location.search).get('id');
+            if (sp) setTimeout(() => { if(typeof openProductDetails==='function') openProductDetails(sp); }, 400);
+
+            console.log('[App] FB sync — Users:', appState.users.length, 'Products:', appState.products.length, 'Orders:', appState.orders.length);
+        } catch(e) { console.warn('[App] fb-sync-done error:', e.message); }
+    }, { once: true });
 
 };
 // পেজ লোড হওয়ার সাথে সাথে চেক করবে ইউজার লগইন কি না
@@ -1429,8 +1440,6 @@ function changeOrderStatus(index, newStatus) {
 function renderAdminUsers(container) {
     // incomplete users বাদ দিই
     appState.users = appState.users.filter(u => u.id && u.name);
-    // incomplete users বাদ দিই
-    appState.users = appState.users.filter(u => u.id && u.name);
     // --- পুরনো ইউজারদের জন্য ব্লক ফিল্ডগুলো নিশ্চিত করা ---
     appState.users.forEach(u => {
         if (u.isUserBlocked === undefined) u.isUserBlocked = false;
@@ -2390,11 +2399,11 @@ function saveAddressToProfile() {
         // ৪. LocalStorage-এ সেভ করা
         localStorage.setItem(_addrKey(), JSON.stringify(addressObj));
 
-        // users array তেও save করি — Firebase এ sync হবে
+        // Users array তে address save → Firebase sync হবে
         if (appState.currentUser && appState.currentUser.id) {
-            const ui = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
-            if (ui !== -1) {
-                appState.users[ui].savedAddress = addressObj;
+            const uIdx = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
+            if (uIdx !== -1) {
+                appState.users[uIdx].savedAddress = addressObj;
                 localStorage.setItem(DB_KEYS.USERS, JSON.stringify(appState.users));
             }
         }
@@ -2433,7 +2442,7 @@ function saveAddressToProfile() {
 function loadSavedAddressToCheckout() {
     let savedData = localStorage.getItem(_addrKey());
 
-    // localStorage এ না থাকলে users array থেকে চেক করি
+    // localStorage এ না থাকলে users array থেকে নিই
     if (!savedData && appState.currentUser) {
         const user = appState.users.find(u => String(u.id) === String(appState.currentUser.id));
         if (user && user.savedAddress) {
@@ -2444,11 +2453,9 @@ function loadSavedAddressToCheckout() {
 
     const targetTextarea = document.getElementById('orderAddress');
     if (savedData && targetTextarea) {
-        try {
-            const addr = JSON.parse(savedData);
-            const formatted = `নাম: ${addr.name}\nমোবাইল: ${addr.mobile}\nঠিকানা: ${addr.details}, ${addr.upazila}, ${addr.district}, ${addr.division}`;
-            targetTextarea.value = formatted;
-        } catch(e) {}
+        const addr = JSON.parse(savedData);
+        const formatted = `নাম: ${addr.name}\nমোবাইল: ${addr.mobile}\nঠিকানা: ${addr.details}, ${addr.upazila}, ${addr.district}, ${addr.division}`;
+        targetTextarea.value = formatted;
     }
 }
 
@@ -4223,13 +4230,13 @@ function openProductDetails(productId) {
     }
 
     // ৫. সম্পর্কিত পণ্য ফিল্টার
-    const _iTags = Array.isArray(item.tags) ? item.tags.map(t=>String(t).toLowerCase()) : [];
+    const _iTags = Array.isArray(item.tags) ? item.tags.map(t=>String(t).toLowerCase()) : (item.tags ? String(item.tags).toLowerCase().split(',').map(t=>t.trim()) : []);
     const _iWords = item.title.toLowerCase().split(' ').filter(w=>w.length>2);
     const relatedProducts = appState.products.filter(p => {
         if (String(p.id) === String(item.id)) return false;
         if (p.category && item.category && p.category === item.category) return true;
-        const pTags = Array.isArray(p.tags) ? p.tags.map(t=>String(t).toLowerCase()) : [];
-        if (_iTags.length && _iTags.some(t=>pTags.includes(t))) return true;
+        const pTags = Array.isArray(p.tags) ? p.tags.map(t=>String(t).toLowerCase()) : (p.tags ? String(p.tags).toLowerCase().split(',').map(t=>t.trim()) : []);
+        if (_iTags.some(t=>pTags.includes(t))) return true;
         return _iWords.some(w=>p.title.toLowerCase().split(' ').includes(w));
     }).slice(0, 6);
 
