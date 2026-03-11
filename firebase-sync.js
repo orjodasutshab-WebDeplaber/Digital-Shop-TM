@@ -38,7 +38,7 @@ const KEY_MAP = {
 };
 
 // Single doc keys (not array)
-const SINGLE_DOC = new Set(['tm_reports','all_discounts','global_discounts']);
+const SINGLE_DOC = new Set(['tm_reports','all_discounts','global_discounts','TM_DB_PRODUCT_LIMITS']);
 
 // ── State ────────────────────────────────────────────────────
 let db = null;
@@ -80,8 +80,8 @@ window.pushToCloud = async function(lsKey) {
   if (!db) return;
   const col = KEY_MAP[lsKey];
   if (!col) return;
-  // সরাসরি localStorage থেকে নিই — cache এ না থাকলেও কাজ করবে
-  const raw = localStorage.getItem(lsKey) || (window._TM_CACHE && window._TM_CACHE[lsKey]);
+  // _TM_CACHE কে priority দিই — idb-shim এখানে data রাখে
+  const raw = (window._TM_CACHE && window._TM_CACHE[lsKey]) || localStorage.getItem(lsKey);
   if (!raw) { console.warn('[FB] pushToCloud: no data for', lsKey); return; }
   try {
     const data = JSON.parse(raw);
@@ -98,6 +98,9 @@ window.pushToCloud = async function(lsKey) {
         });
         await b.commit();
       }
+    } else if (typeof data === 'object') {
+      // object হলে single doc হিসেবে save করি
+      await db.collection(col).doc('data').set(data);
     }
     console.log('[FB] ↑ Pushed:', lsKey, Array.isArray(data) ? data.length+' items' : '');
   } catch(e) { console.warn('[FB] push err:', lsKey, e.message); }
@@ -247,6 +250,21 @@ function startListeners() {
     _pulling = true;
     setLocal('deli_ads', snap.docs.map(d => d.data()));
     _pulling = false;
+  });
+
+  // পণ্য লোড লিমিট listener
+  db.collection('product_limits').doc('data').onSnapshot(snap => {
+    if (snap.exists) {
+      const d = snap.data();
+      const arr = d._arr !== undefined ? d._arr : (Array.isArray(d) ? d : null);
+      if (arr) {
+        _pulling = true;
+        setLocal('TM_DB_PRODUCT_LIMITS', arr);
+        _pulling = false;
+        if (window.appState) window.appState.productLoadSequence = arr;
+        console.log('[FB] ↻ Product limits updated:', arr);
+      }
+    }
   });
 
   // বেলি বোর্ড listeners
