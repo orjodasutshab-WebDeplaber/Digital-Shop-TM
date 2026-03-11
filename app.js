@@ -2881,6 +2881,7 @@ function masterPublishAd() {
     const ads = JSON.parse(localStorage.getItem(DB_KEYS.ADS)) || [];
     ads.push({ id: Date.now(), title, img, link });
     localStorage.setItem(DB_KEYS.ADS, JSON.stringify(ads));
+    if(typeof window.pushToCloud==='function') window.pushToCloud('TM_DB_ADS_V2');
     
     alert("বিজ্ঞাপন সফলভাবে পাবলিশ হয়েছে!");
     renderAdminAds(document.getElementById('adminMainContainer'));
@@ -2891,6 +2892,7 @@ function masterDeleteAd(id) {
     if(confirm("আপনি কি এটি ডিলিট করতে চান?")) {
         let ads = JSON.parse(localStorage.getItem(DB_KEYS.ADS)) || [];
         ads = ads.filter(a => a.id !== id);
+        if(typeof window.pushToCloud==='function') window.pushToCloud('TM_DB_ADS_V2');
         localStorage.setItem(DB_KEYS.ADS, JSON.stringify(ads));
         renderAdminAds(document.getElementById('adminMainContainer'));
     }
@@ -7729,6 +7731,7 @@ function publishDeliAd(id) {
     if(!img || !link) return alert("সব তথ্য দিন");
     deliAds.push({ id: Date.now(), sironamId: id, img, link });
     localStorage.setItem('deli_ads', JSON.stringify(deliAds));
+    if(typeof window.pushToCloud==='function') window.pushToCloud('deli_ads');
     document.getElementById('deliAdList').innerHTML = renderDeliAds(id);
 }
 
@@ -7744,6 +7747,7 @@ function renderDeliAds(id) {
 function deleteDeliAd(adId, sironamId) {
     deliAds = deliAds.filter(a => a.id !== adId);
     localStorage.setItem('deli_ads', JSON.stringify(deliAds));
+    if(typeof window.pushToCloud==='function') window.pushToCloud('deli_ads');
     document.getElementById('deliAdList').innerHTML = renderDeliAds(sironamId);
 }
 // About Us পপ-আপ ওপেন করার ফাংশন
