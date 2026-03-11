@@ -359,6 +359,8 @@ function doRegister(){
     if(users.find(u=>u.mobile===mob)){showToast('❌ এই মোবাইলে আগেই অ্যাকাউন্ট আছে!');return;}
     const nu={id:'TM'+Date.now(),name,mobile:mob,email,pass:pw,role:'user',isUserBlocked:false,createdAt:new Date().toISOString()};
     users.push(nu);localStorage.setItem(UK,JSON.stringify(users));localStorage.setItem(SK,JSON.stringify(nu));
+    // Firebase এ push করি
+    setTimeout(()=>{ if(typeof window.pushToCloud==='function') window.pushToCloud('TM_DB_USERS_V2'); }, 1000);
     showToast(`✅ স্বাগতম ${name}!`);setTimeout(()=>window.location.replace(MP),800);
 }
 function doReset(){
@@ -471,6 +473,8 @@ function handleGoogleResp(response){
                mobile:'',pass:'',role:'user',isUserBlocked:false,loginMethod:'google',createdAt:new Date().toISOString()};
             users.push(u);
             localStorage.setItem(UK,JSON.stringify(users));
+            // Firebase এ push করি
+            setTimeout(()=>{ if(typeof window.pushToCloud==='function') window.pushToCloud('TM_DB_USERS_V2'); }, 1000);
         }
         if(u.isUserBlocked){showToast('🚫 অ্যাকাউন্টটি ব্লক করা আছে।');return;}
         localStorage.setItem(SK,JSON.stringify(u));

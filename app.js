@@ -333,6 +333,10 @@ function submitRegistration() {
     // ৫. ডাটা সেভ এবং মডাল চেঞ্জ
     appState.users.push(newUser);
     saveData(DB_KEYS.USERS, appState.users);
+    // Firebase এ সাথে সাথে push করি
+    if (typeof window.pushToCloud === 'function') {
+        window.pushToCloud('TM_DB_USERS_V2');
+    }
 
     alert(`✅ অভিনন্দন ${name}! আপনার রেজিস্ট্রেশন সফল হয়েছে। এখন লগইন করুন।`);
     
