@@ -120,6 +120,10 @@ window.onload = function() {
             if (typeof renderProductGrid === 'function') renderProductGrid(appState.products);
             if (typeof startAdBoard === 'function') startAdBoard();
 
+            // বেলি বোর্ড reload
+            if (typeof _reloadBeliData === 'function') _reloadBeliData();
+            if (typeof refreshBeliDisplay === 'function') refreshBeliDisplay();
+
             const sp = new URLSearchParams(window.location.search).get('id');
             if (sp) setTimeout(() => { if(typeof openProductDetails==='function') openProductDetails(sp); }, 400);
 
@@ -7357,6 +7361,18 @@ function publishBeliBoard(side) {
     beliBoardData[side].push({ id: Date.now(), img, target });
     localStorage.setItem(`beli_${side}`, JSON.stringify(beliBoardData[side]));
     
+    // সরাসরি Firebase এ save
+    if (typeof firebase !== 'undefined') {
+        const col = 'beli_' + side;
+        const batch = firebase.firestore().batch();
+        beliBoardData[side].forEach(item => {
+            batch.set(firebase.firestore().collection(col).doc(String(item.id)), item);
+        });
+        batch.commit()
+            .then(() => console.log('[FB] ✅ BeliBoard saved:', col))
+            .catch(e => console.warn('[FB] beli save err:', e.message));
+    }
+    
     document.getElementById('beliList').innerHTML = renderBeliList(side);
     document.getElementById('beliImgUrl').value = '';
     document.getElementById('beliTargetUrl').value = '';
@@ -7378,6 +7394,13 @@ function renderBeliList(side) {
 function deleteBeliItem(side, id) {
     beliBoardData[side] = beliBoardData[side].filter(item => item.id !== id);
     localStorage.setItem(`beli_${side}`, JSON.stringify(beliBoardData[side]));
+    
+    // Firebase থেকেও delete করি
+    if (typeof firebase !== 'undefined') {
+        firebase.firestore().collection('beli_'+side).doc(String(id)).delete()
+            .catch(e => console.warn('[FB] beli delete err:', e.message));
+    }
+    
     document.getElementById('beliList').innerHTML = renderBeliList(side);
     refreshBeliDisplay();
 }

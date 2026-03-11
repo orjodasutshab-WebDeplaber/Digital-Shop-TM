@@ -27,6 +27,8 @@ const KEY_MAP = {
   'TM_LOCAL_BOARDS':      'local_boards',
   'sironam_list':         'sironam',
   'deli_ads':             'deli_ads',
+  'beli_left':            'beli_left',
+  'beli_right':           'beli_right',
   'TM_SUB_ADMINS':        'sub_admins',
   'special_requests':     'special_requests',
   'TM_DB_PRODUCT_LIMITS': 'product_limits',
@@ -56,15 +58,21 @@ function initFB() {
 
 // ── setLocal: TM_CACHE তে সরাসরি লিখি (idb-shim bypass) ─────
 function setLocal(key, val) {
+  _pulling = true;
   try {
     const str = typeof val === 'string' ? val : JSON.stringify(val);
-    // idb-shim cache সরাসরি
+    // ১. idb-shim cache সরাসরি update
     if (window._TM_CACHE) window._TM_CACHE[key] = str;
-    // IDB persist
+    // ২. IDB persist
     if (window._TMDB && typeof window._TMDB.set === 'function') {
       window._TMDB.set(key, str).catch(()=>{});
     }
+    // ৩. actual localStorage এও save — getItem() সবসময় কাজ করবে
+    if (localStorage._fbOrigSet) {
+      localStorage._fbOrigSet(key, str);
+    }
   } catch(e) {}
+  finally { _pulling = false; }
 }
 
 // ── Push one key to Firestore ────────────────────────────────
@@ -72,15 +80,15 @@ window.pushToCloud = async function(lsKey) {
   if (!db) return;
   const col = KEY_MAP[lsKey];
   if (!col) return;
-  const raw = window._TM_CACHE ? window._TM_CACHE[lsKey] : localStorage.getItem(lsKey);
-  if (!raw) return;
+  // সরাসরি localStorage থেকে নিই — cache এ না থাকলেও কাজ করবে
+  const raw = localStorage.getItem(lsKey) || (window._TM_CACHE && window._TM_CACHE[lsKey]);
+  if (!raw) { console.warn('[FB] pushToCloud: no data for', lsKey); return; }
   try {
     const data = JSON.parse(raw);
     if (SINGLE_DOC.has(lsKey)) {
       const payload = Array.isArray(data) ? {_arr: data} : (typeof data==='object' ? data : {value: data});
       await db.collection(col).doc('data').set(payload);
     } else if (Array.isArray(data)) {
-      // batch write
       const CHUNK = 400;
       for (let i = 0; i < data.length; i += CHUNK) {
         const b = db.batch();
@@ -91,7 +99,7 @@ window.pushToCloud = async function(lsKey) {
         await b.commit();
       }
     }
-    console.log('[FB] ↑ Pushed:', lsKey, Array.isArray(data) ? data.length+'items' : '');
+    console.log('[FB] ↑ Pushed:', lsKey, Array.isArray(data) ? data.length+' items' : '');
   } catch(e) { console.warn('[FB] push err:', lsKey, e.message); }
 };
 
@@ -239,6 +247,22 @@ function startListeners() {
     _pulling = true;
     setLocal('deli_ads', snap.docs.map(d => d.data()));
     _pulling = false;
+  });
+
+  // বেলি বোর্ড listeners
+  ['beli_left', 'beli_right'].forEach(key => {
+    db.collection(key).onSnapshot(snap => {
+      const data = snap.docs.map(d => d.data());
+      _pulling = true;
+      setLocal(key, data);
+      _pulling = false;
+      // app এ reload করি
+      if (window.beliBoardData) {
+        const side = key.replace('beli_', '');
+        window.beliBoardData[side] = data;
+      }
+      if (typeof window.refreshBeliDisplay === 'function') window.refreshBeliDisplay();
+    });
   });
 
   console.log('[FB] Listeners started');
