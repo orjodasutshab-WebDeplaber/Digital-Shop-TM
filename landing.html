@@ -25,7 +25,7 @@
 <script src="idb-shim.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <style>
 .g-btn{width:100%;padding:11px;border:2px solid #334155;border-radius:12px;background:#1e293b;color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:.2s;font-family:'Hind Siliguri',sans-serif;margin-bottom:12px;}
 .g-btn:hover{border-color:#6366f1;background:#0f172a;}
@@ -482,13 +482,60 @@ function renderLocalBoards(){
 const G_CLIENT_ID='569016323527-0e5o5mn4rs8713fgv132vj80uvl42onk.apps.googleusercontent.com';
 
 function googleSignIn(){
-    if(typeof google==='undefined'){showToast('❌ Google লোড হয়নি, একটু অপেক্ষা করুন');return;}
-    google.accounts.id.initialize({client_id:G_CLIENT_ID,callback:handleGoogleResp,auto_select:false,cancel_on_tap_outside:true});
-    google.accounts.id.prompt(n=>{
-        if(n.isNotDisplayed()||n.isSkippedMoment()){
-            showToast('⚠️ Google popup আসেনি — browser এ popup allow করুন');
-        }
-    });
+    // Firebase config
+    const cfg={apiKey:"AIzaSyCRJ6kN1nvr1RxKdIiBnxWVJGXm6U2kRr0",authDomain:"digitalshoptm-2008.firebaseapp.com",projectId:"digitalshoptm-2008"};
+    // Firebase app already initialized by firebase-sync — reuse or init
+    let app;
+    try{ app=firebase.app(); }catch(e){ app=firebase.initializeApp(cfg); }
+    const auth=firebase.auth(app);
+    auth.languageCode='bn';
+    const provider=new firebase.auth.GoogleAuthProvider();
+    provider.addScope('email');
+    provider.addScope('profile');
+
+    showToast('⏳ Google লগইন হচ্ছে...');
+
+    auth.signInWithPopup(provider)
+        .then(result=>{
+            const gUser=result.user;
+            const users=JSON.parse(localStorage.getItem(UK))||[];
+            let u=users.find(x=>x.email===gUser.email||x.googleId===gUser.uid);
+            if(!u){
+                u={id:'TM'+Date.now(),name:gUser.displayName,email:gUser.email,
+                   googleId:gUser.uid,picture:gUser.photoURL||'',
+                   mobile:'',pass:'',role:'user',
+                   isUserBlocked:false,isOrderBlocked:false,isCodBlocked:false,isDiscountBlocked:false,
+                   loginMethod:'google',createdAt:new Date().toISOString()};
+                users.push(u);
+                localStorage.setItem(UK,JSON.stringify(users));
+                // Firebase এ save করার পর redirect
+                (window.FB_READY||Promise.resolve()).then(async()=>{
+                    await window.saveUserToFirebase(u);
+                    _doGoogleLogin(u,gUser.displayName);
+                });
+                return;
+            }
+            _doGoogleLogin(u,gUser.displayName);
+        })
+        .catch(err=>{
+            if(err.code==='auth/popup-blocked'){
+                showToast('⚠️ Popup block হয়েছে! Browser এর address bar এ popup allow করুন');
+            } else if(err.code==='auth/popup-closed-by-user'){
+                showToast('ℹ️ লগইন বাতিল করা হয়েছে');
+            } else if(err.code==='auth/cancelled-popup-request'){
+                // চুপ থাকি — user আবার click করবে
+            } else {
+                showToast('❌ Google লগইন সমস্যা: '+err.message);
+                console.error('[Google]',err);
+            }
+        });
+}
+
+function _doGoogleLogin(u, name){
+    if(u.isUserBlocked){showToast('🚫 অ্যাকাউন্টটি ব্লক করা আছে।');return;}
+    localStorage.setItem(SK,JSON.stringify(u));
+    showToast('✅ স্বাগতম, '+name+'!');
+    setTimeout(()=>window.location.replace(MP),700);
 }
 
 function handleGoogleResp(response){
@@ -501,13 +548,13 @@ function handleGoogleResp(response){
                mobile:'',pass:'',role:'user',isUserBlocked:false,isOrderBlocked:false,isCodBlocked:false,isDiscountBlocked:false,loginMethod:'google',createdAt:new Date().toISOString()};
             users.push(u);
             localStorage.setItem(UK,JSON.stringify(users));
-            // Firebase এ সরাসরি save
-            (window.FB_READY||Promise.resolve()).then(()=>window.saveUserToFirebase(u));
+            (window.FB_READY||Promise.resolve()).then(async()=>{
+                await window.saveUserToFirebase(u);
+                _doGoogleLogin(u,p.name);
+            });
+            return;
         }
-        if(u.isUserBlocked){showToast('🚫 অ্যাকাউন্টটি ব্লক করা আছে।');return;}
-        localStorage.setItem(SK,JSON.stringify(u));
-        showToast('✅ স্বাগতম, '+p.name+'!');
-        setTimeout(()=>window.location.replace(MP),700);
+        _doGoogleLogin(u,p.name);
     }catch(e){showToast('❌ Google Login এ সমস্যা হয়েছে');console.error(e);}
 }
 
