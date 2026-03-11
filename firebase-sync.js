@@ -256,4 +256,15 @@ if (!initFB()) {
   });
 }
 
+// ── Global: যেকোনো জায়গা থেকে একজন user সরাসরি Firestore এ save করা যাবে ──
+window.saveUserToFirebase = async function(userObj) {
+  try {
+    if (!userObj || !userObj.id) { console.warn('[FB] saveUserToFirebase: invalid user'); return; }
+    await db.collection('users').doc(String(userObj.id)).set(userObj);
+    console.log('[FB] ✅ User saved to Firebase:', userObj.id);
+  } catch(e) {
+    console.error('[FB] ❌ saveUserToFirebase error:', e.message);
+  }
+};
+
 })();
