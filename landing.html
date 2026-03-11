@@ -384,9 +384,12 @@ function doRegister(){
     users.push(nu);
     localStorage.setItem(UK,JSON.stringify(users));
     localStorage.setItem(SK,JSON.stringify(nu));
-    // Firebase এ সরাসরি save
-    (window.FB_READY||Promise.resolve()).then(()=>window.saveUserToFirebase(nu));
-    showToast(`✅ স্বাগতম ${name}!`);setTimeout(()=>window.location.replace(MP),800);
+    showToast(`✅ স্বাগতম ${name}! সেভ হচ্ছে...`);
+    // Firebase এ save করার পর redirect
+    (window.FB_READY||Promise.resolve()).then(async ()=>{
+        await window.saveUserToFirebase(nu);
+        window.location.replace(MP);
+    });
 }
 function doReset(){
     const uid=document.getElementById('rstId').value.trim(),uname=document.getElementById('rstName').value.trim(),
