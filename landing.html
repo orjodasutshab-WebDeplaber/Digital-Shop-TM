@@ -342,12 +342,35 @@ function tp(id,btn){const i=document.getElementById(id),ic=btn.querySelector('i'
 function doLogin(){
     const uid=document.getElementById('lnId').value.trim(),pw=document.getElementById('lnPass').value.trim();
     if(!uid||!pw){showToast('❌ আইডি এবং পাসওয়ার্ড দিন');return;}
-    const users=JSON.parse(localStorage.getItem(UK))||[];
+    // Admin check
     if((uid===AID||uid===APH)&&pw===APW){localStorage.setItem(SK,JSON.stringify({id:AID,name:'Admin',role:'admin',mobile:APH}));showToast('✅ স্বাগতম Admin!');setTimeout(()=>window.location.replace(MP),600);return;}
+    // localStorage থেকে check
+    const users=JSON.parse(localStorage.getItem(UK))||[];
     const u=users.find(u=>(u.id===uid||u.mobile===uid)&&u.pass===pw);
-    if(!u){showToast('❌ ভুল আইডি অথবা পাসওয়ার্ড!');return;}
-    if(u.isUserBlocked){showToast('🚫 অ্যাকাউন্টটি ব্লক করা আছে।');return;}
-    localStorage.setItem(SK,JSON.stringify(u));showToast(`✅ স্বাগতম, ${u.name}!`);setTimeout(()=>window.location.replace(MP),600);
+    if(u){
+        if(u.isUserBlocked){showToast('🚫 অ্যাকাউন্টটি ব্লক করা আছে।');return;}
+        localStorage.setItem(SK,JSON.stringify(u));showToast(`✅ স্বাগতম, ${u.name}!`);setTimeout(()=>window.location.replace(MP),600);
+        return;
+    }
+    // localStorage এ নেই — Firebase থেকে check করি
+    showToast('⏳ যাচাই করা হচ্ছে...');
+    (window.FB_READY||Promise.resolve()).then(async ()=>{
+        try{
+            const snap = await firebase.firestore().collection('users').get();
+            const fbUsers = snap.docs.map(d=>d.data());
+            // localStorage এ save করি
+            if(fbUsers.length>0){
+                const merged = fbUsers.filter(u=>u.id&&u.name);
+                localStorage.setItem(UK, JSON.stringify(merged));
+            }
+            const fu = fbUsers.find(u=>(u.id===uid||u.mobile===uid)&&u.pass===pw);
+            if(!fu){showToast('❌ ভুল আইডি অথবা পাসওয়ার্ড!');return;}
+            if(fu.isUserBlocked){showToast('🚫 অ্যাকাউন্টটি ব্লক করা আছে।');return;}
+            localStorage.setItem(SK,JSON.stringify(fu));
+            showToast(`✅ স্বাগতম, ${fu.name}!`);
+            setTimeout(()=>window.location.replace(MP),600);
+        }catch(e){showToast('❌ সংযোগ সমস্যা, আবার চেষ্টা করুন');console.error(e);}
+    });
 }
 function doRegister(){
     const name=document.getElementById('rgName').value.trim(),mob=document.getElementById('rgMob').value.trim(),
