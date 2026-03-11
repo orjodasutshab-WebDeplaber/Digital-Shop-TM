@@ -93,41 +93,28 @@ window.onload = function() {
 
     console.log("✅ System Ready!");
 
-    // Firebase sync শেষে appState reload + UI re-render
+    // ── Firebase sync শেষে UI reload ──
     window.addEventListener('fb-sync-done', function() {
-        try {
-            const fp = window._TM_CACHE && window._TM_CACHE['TM_DB_PRODUCTS_V2'];
-            if (fp) appState.products = JSON.parse(fp);
-
-            const fu = window._TM_CACHE && window._TM_CACHE['TM_DB_USERS_V2'];
-            if (fu) { const u = JSON.parse(fu); appState.users = u.filter(x => x.id && x.name); }
-
-            const fo = window._TM_CACHE && window._TM_CACHE['TM_DB_ORDERS_V2'];
-            if (fo) appState.orders = JSON.parse(fo);
-
-            const fr = window._TM_CACHE && window._TM_CACHE['special_requests'];
-            if (fr) appState.specialRequests = JSON.parse(fr);
-
-            const fret = window._TM_CACHE && window._TM_CACHE['TM_DB_RETURNS_V2'];
-            if (fret) appState.returns = JSON.parse(fret);
-
-            const frep = window._TM_CACHE && window._TM_CACHE['tm_reports'];
-            if (frep) appState.reports = JSON.parse(frep);
-
-            const fl = window._TM_CACHE && window._TM_CACHE['TM_DB_PRODUCT_LIMITS'];
-            if (fl) appState.productLoadSequence = JSON.parse(fl);
-
-            // UI re-render
-            if (typeof renderProductGrid === 'function') renderProductGrid(appState.products);
-            if (typeof startAdBoard === 'function') startAdBoard();
-
-            // Share link
-            const sp = new URLSearchParams(window.location.search).get('id');
-            if (sp && typeof openProductDetails === 'function') setTimeout(() => openProductDetails(sp), 400);
-
-            console.log('[App] FB sync done — Users:', appState.users.length, 'Products:', appState.products.length, 'Orders:', appState.orders.length);
-        } catch(e) { console.warn('[App] fb-sync-done error:', e.message); }
-    }, { once: true });
+        // Products
+        try { const v=localStorage.getItem('TM_DB_PRODUCTS_V2'); if(v){appState.products=JSON.parse(v); if(typeof renderProductGrid==='function') renderProductGrid(appState.products);} } catch(e){}
+        // Users (valid only)
+        try { const v=localStorage.getItem('TM_DB_USERS_V2'); if(v){const u=JSON.parse(v); appState.users=u.filter(x=>x.id&&x.name);} } catch(e){}
+        // Orders
+        try { const v=localStorage.getItem('TM_DB_ORDERS_V2'); if(v) appState.orders=JSON.parse(v); } catch(e){}
+        // Requests
+        try { const v=localStorage.getItem('special_requests'); if(v) appState.specialRequests=JSON.parse(v); } catch(e){}
+        // Returns
+        try { const v=localStorage.getItem('TM_DB_RETURNS_V2'); if(v) appState.returns=JSON.parse(v); } catch(e){}
+        // Reports
+        try { const v=localStorage.getItem('tm_reports'); if(v) appState.reports=JSON.parse(v); } catch(e){}
+        // Product limits
+        try { const v=localStorage.getItem('TM_DB_PRODUCT_LIMITS'); if(v) appState.productLoadSequence=JSON.parse(v); } catch(e){}
+        // Ads board
+        if (typeof startAdBoard==='function') startAdBoard();
+        // Share URL
+        try { const id=new URLSearchParams(location.search).get('id'); if(id) setTimeout(()=>{if(typeof openProductDetails==='function') openProductDetails(id);},400); } catch(e){}
+        console.log('[App] FB sync done — Users:',appState.users.length,'Products:',appState.products.length,'Orders:',appState.orders.length);
+    }, {once:true});
 
 };
 // পেজ লোড হওয়ার সাথে সাথে চেক করবে ইউজার লগইন কি না
@@ -1442,6 +1429,8 @@ function changeOrderStatus(index, newStatus) {
 function renderAdminUsers(container) {
     // incomplete users বাদ দিই
     appState.users = appState.users.filter(u => u.id && u.name);
+    // incomplete users বাদ দিই
+    appState.users = appState.users.filter(u => u.id && u.name);
     // --- পুরনো ইউজারদের জন্য ব্লক ফিল্ডগুলো নিশ্চিত করা ---
     appState.users.forEach(u => {
         if (u.isUserBlocked === undefined) u.isUserBlocked = false;
@@ -1543,7 +1532,7 @@ function buildUserCards(users) {
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div style="display: flex; gap: 12px; align-items: center;">
                     <div style="width: 45px; height: 45px; background: ${u.role === 'admin' ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #3498db, #1e40af)'}; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                        ${(u.name||"U").charAt(0).toUpperCase()}
+                        ${(u.name||'U').charAt(0).toUpperCase()}
                     </div>
                     <div>
                         <strong style="font-size: 16px; color: #fff; display: block; font-weight: 700;">${u.name}</strong>
@@ -2401,16 +2390,16 @@ function saveAddressToProfile() {
         // ৪. LocalStorage-এ সেভ করা
         localStorage.setItem(_addrKey(), JSON.stringify(addressObj));
 
-        // users array তেও update — Firebase push হবে
+        // users array তেও save করি — Firebase এ sync হবে
         if (appState.currentUser && appState.currentUser.id) {
-            const uIdx = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
-            if (uIdx !== -1) {
-                appState.users[uIdx].savedAddress = addressObj;
+            const ui = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
+            if (ui !== -1) {
+                appState.users[ui].savedAddress = addressObj;
                 localStorage.setItem(DB_KEYS.USERS, JSON.stringify(appState.users));
             }
         }
-
-        // ৫. তাৎক্ষণিকভাবে UI আপডেট করা (রিফ্রেশ ছাড়া)
+        
+        // ৫. তাৎক্ষণিকভাবে UI আপডেট করা (রিফ্রেশ ছাড়া)
         const formatted = `${name}, ${mobile}, ${details}, ${upazila}, ${district}, ${division}`;
         
         // চেকআউট পেজের ডিসপ্লে বক্স আপডেট
@@ -2442,14 +2431,24 @@ function saveAddressToProfile() {
 }
 // চেকআউট পেজে ডাটা লোড করার ফাংশন
 function loadSavedAddressToCheckout() {
-    const savedData = localStorage.getItem(_addrKey());
-    const targetTextarea = document.getElementById('orderAddress');
+    let savedData = localStorage.getItem(_addrKey());
 
+    // localStorage এ না থাকলে users array থেকে চেক করি
+    if (!savedData && appState.currentUser) {
+        const user = appState.users.find(u => String(u.id) === String(appState.currentUser.id));
+        if (user && user.savedAddress) {
+            savedData = JSON.stringify(user.savedAddress);
+            localStorage.setItem(_addrKey(), savedData);
+        }
+    }
+
+    const targetTextarea = document.getElementById('orderAddress');
     if (savedData && targetTextarea) {
-        const addr = JSON.parse(savedData);
-        const formatted = `নাম: ${addr.name}\nমোবাইল: ${addr.mobile}\nঠিকানা: ${addr.details}, ${addr.upazila}, ${addr.district}, ${addr.division}`;
-        
-        targetTextarea.value = formatted;
+        try {
+            const addr = JSON.parse(savedData);
+            const formatted = `নাম: ${addr.name}\nমোবাইল: ${addr.mobile}\nঠিকানা: ${addr.details}, ${addr.upazila}, ${addr.district}, ${addr.division}`;
+            targetTextarea.value = formatted;
+        } catch(e) {}
     }
 }
 
