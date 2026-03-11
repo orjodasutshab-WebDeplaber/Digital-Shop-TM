@@ -380,10 +380,16 @@ function doRegister(){
     if(mob.length<11){showToast('❌ সঠিক মোবাইল নম্বর দিন');return;}
     const users=JSON.parse(localStorage.getItem(UK))||[];
     if(users.find(u=>u.mobile===mob)){showToast('❌ এই মোবাইলে আগেই অ্যাকাউন্ট আছে!');return;}
-    const nu={id:'TM'+Date.now(),name,mobile:mob,email,pass:pw,role:'user',isUserBlocked:false,createdAt:new Date().toISOString()};
-    users.push(nu);localStorage.setItem(UK,JSON.stringify(users));localStorage.setItem(SK,JSON.stringify(nu));
-    // Firebase এ push করি
-    setTimeout(()=>{ if(typeof window.pushToCloud==='function') window.pushToCloud('TM_DB_USERS_V2'); }, 1000);
+    const nu={id:'TM'+Date.now(),name,mobile:mob,email,pass:pw,role:'user',isUserBlocked:false,isOrderBlocked:false,isCodBlocked:false,isDiscountBlocked:false,createdAt:new Date().toISOString()};
+    users.push(nu);
+    localStorage.setItem(UK,JSON.stringify(users));
+    localStorage.setItem(SK,JSON.stringify(nu));
+    // সরাসরি Firestore এ save করি
+    try{
+        firebase.firestore().collection('users').doc(nu.id).set(nu)
+            .then(()=>console.log('[FB] New user saved:',nu.id))
+            .catch(e=>console.warn('[FB] user save err:',e.message));
+    }catch(e){ console.warn('[FB] firestore not ready:', e.message); }
     showToast(`✅ স্বাগতম ${name}!`);setTimeout(()=>window.location.replace(MP),800);
 }
 function doReset(){
@@ -493,11 +499,15 @@ function handleGoogleResp(response){
         let u=users.find(x=>x.email===p.email||x.googleId===p.sub);
         if(!u){
             u={id:'TM'+Date.now(),name:p.name,email:p.email,googleId:p.sub,picture:p.picture,
-               mobile:'',pass:'',role:'user',isUserBlocked:false,loginMethod:'google',createdAt:new Date().toISOString()};
+               mobile:'',pass:'',role:'user',isUserBlocked:false,isOrderBlocked:false,isCodBlocked:false,isDiscountBlocked:false,loginMethod:'google',createdAt:new Date().toISOString()};
             users.push(u);
             localStorage.setItem(UK,JSON.stringify(users));
-            // Firebase এ push করি
-            setTimeout(()=>{ if(typeof window.pushToCloud==='function') window.pushToCloud('TM_DB_USERS_V2'); }, 1000);
+            // সরাসরি Firestore এ save করি
+            try{
+                firebase.firestore().collection('users').doc(u.id).set(u)
+                    .then(()=>console.log('[FB] Google user saved:',u.id))
+                    .catch(e=>console.warn('[FB] google user save err:',e.message));
+            }catch(e){ console.warn('[FB] firestore not ready:', e.message); }
         }
         if(u.isUserBlocked){showToast('🚫 অ্যাকাউন্টটি ব্লক করা আছে।');return;}
         localStorage.setItem(SK,JSON.stringify(u));
