@@ -115,7 +115,10 @@ window.onload = function() {
             if (frep) appState.reports = JSON.parse(frep);
 
             const fl = localStorage.getItem(DB_KEYS.PRODUCT_LIMITS);
-            if (fl) appState.productLoadSequence = JSON.parse(fl);
+            if (fl) {
+                const parsed = JSON.parse(fl);
+                appState.productLoadSequence = Array.isArray(parsed) ? parsed : (parsed._arr || [35, 50]);
+            }
 
             if (typeof renderProductGrid === 'function') renderProductGrid(appState.products);
             if (typeof startAdBoard === 'function') startAdBoard();
@@ -210,7 +213,13 @@ function loadDatabase() {
     appState.globalDiscounts = storedGlobalDiscounts ? JSON.parse(storedGlobalDiscounts) : [];
     
     const savedLimits = localStorage.getItem(DB_KEYS.PRODUCT_LIMITS);
-    appState.productLoadSequence = savedLimits ? JSON.parse(savedLimits) : [35, 50];
+    if (savedLimits) {
+        const parsed = JSON.parse(savedLimits);
+        // Firebase থেকে আসলে {_arr: [...]} format এ থাকে
+        appState.productLoadSequence = Array.isArray(parsed) ? parsed : (parsed._arr || [35, 50]);
+    } else {
+        appState.productLoadSequence = [35, 50];
+    }
 
     console.log("✅ Digital Shop TM: লোড হওয়া লিমিট সিকুয়েন্স:", appState.productLoadSequence);
     console.log("✅ Digital Shop TM: সকল ডাটা (রিকোয়েস্টসহ) লোড হয়েছে!");
@@ -7166,6 +7175,13 @@ function saveProductLimits() {
 
     // ২. LocalStorage-এ সেভ করা (আপনার জিজ্ঞাসিত সেই লাইনটি এখানে)
     localStorage.setItem(DB_KEYS.PRODUCT_LIMITS, JSON.stringify(limitsArray));
+    // সরাসরি Firebase এ save
+    if(typeof firebase!=='undefined') {
+        firebase.firestore().collection('product_limits').doc('data')
+            .set({_arr: limitsArray})
+            .then(()=>console.log('[FB] Product limits saved'))
+            .catch(e=>console.warn('[FB] limits err:',e.message));
+    }
 
     // ৩. অ্যাপ স্টেট আপডেট করা যাতে সাথে সাথে কাজ করে
     appState.productLoadSequence = limitsArray;
@@ -7222,6 +7238,7 @@ function saveNewLoadLimits() {
     
     // ২. LocalStorage এ সেভ
     localStorage.setItem(DB_KEYS.PRODUCT_LIMITS, JSON.stringify(newSeq));
+    if(typeof window.pushToCloud==='function') window.pushToCloud('TM_DB_PRODUCT_LIMITS');
 
     alert("✅ লোড লিমিট সফলভাবে আপডেট হয়েছে!");
     document.getElementById('limitModal').remove();
