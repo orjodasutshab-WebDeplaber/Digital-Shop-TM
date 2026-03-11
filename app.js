@@ -7168,29 +7168,21 @@ function addNewLimitStep() {
     container.appendChild(newStep);
 }
 
+
 function saveProductLimits() {
-    // ১. পপ-আপের সব কটি ইনপুট বক্স থেকে নাম্বারগুলো সংগ্রহ করা
     const inputs = document.querySelectorAll('.limit-val');
     let limitsArray = Array.from(inputs).map(input => parseInt(input.value) || 0);
-
-    // ২. LocalStorage-এ সেভ করা (আপনার জিজ্ঞাসিত সেই লাইনটি এখানে)
     localStorage.setItem(DB_KEYS.PRODUCT_LIMITS, JSON.stringify(limitsArray));
-    // সরাসরি Firebase এ save
+    appState.productLoadSequence = limitsArray;
+    const doReload = () => { closeProductLimitModal(); location.reload(); };
     if(typeof firebase!=='undefined') {
         firebase.firestore().collection('product_limits').doc('data')
             .set({_arr: limitsArray})
-            .then(()=>console.log('[FB] Product limits saved'))
-            .catch(e=>console.warn('[FB] limits err:',e.message));
+            .then(()=>{ console.log('[FB] ✅ Product limits saved'); alert("✅ সফলভাবে সেভ হয়েছে!"); doReload(); })
+            .catch(e=>{ console.warn('[FB] limits err:',e.message); alert("✅ সেভ হয়েছে!"); doReload(); });
+    } else {
+        alert("✅ সফলভাবে সেভ হয়েছে!"); doReload();
     }
-
-    // ৩. অ্যাপ স্টেট আপডেট করা যাতে সাথে সাথে কাজ করে
-    appState.productLoadSequence = limitsArray;
-
-    alert("✅ সফলভাবে সেভ হয়েছে!");
-    closeProductLimitModal();
-    
-    // পেজ রিফ্রেশ দেওয়া যাতে নতুন লিমিট অনুযায়ী পণ্য শো করে
-    location.reload(); 
 }
 
 // এই ফাংশনটি অ্যাডমিন প্যানেলের কোনো বাটনের ক্লিকের সাথে যুক্ত করুন
