@@ -8025,10 +8025,10 @@ function showNoticeBoardPopup() {
             @keyframes nbFadeIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
             @keyframes nbFadeOut { from{opacity:1;transform:scale(1)} to{opacity:0;transform:scale(0.9)} }
         </style>
-        <div style="background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:18px; padding:28px; max-width:720px; width:90%; position:relative; box-shadow:0 20px 60px rgba(233,30,140,0.3); border:1px solid rgba(233,30,140,0.3); text-align:center;">
+        <div style="background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:18px; padding:28px; max-width:970px; width:90%; position:relative; box-shadow:0 20px 60px rgba(233,30,140,0.3); border:1px solid rgba(233,30,140,0.3); text-align:center;">
             <button onclick="closeNoticeBoardPopup()" style="position:absolute; top:12px; right:14px; background:rgba(255,255,255,0.1); border:none; color:#fff; font-size:20px; width:34px; height:34px; border-radius:50%; cursor:pointer; line-height:1;">✕</button>
             <div style="display:inline-block; background:linear-gradient(135deg,#e91e8c,#9c27b0); color:#fff; font-size:13px; font-weight:700; padding:5px 14px; border-radius:20px; margin-bottom:14px;">📢 নোটিশ</div>
-            ${n.img ? `<img src="${n.img}" style="width:100%; max-height:200px; object-fit:cover; border-radius:10px; margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
+            ${n.img ? `<img src="${n.img}" style="width:100%; max-height:350px; object-fit:cover; border-radius:10px; margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
             <h3 style="color:#fff; font-size:18px; margin:0 0 20px 0; line-height:1.5;">${n.title}</h3>
             <div style="display:flex; gap:10px; justify-content:center;">
                 <button onclick="closeNoticeBoardPopup()" style="background:rgba(255,255,255,0.1); color:#ccc; border:1px solid #444; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:14px;">এড়িয়ে যান</button>
