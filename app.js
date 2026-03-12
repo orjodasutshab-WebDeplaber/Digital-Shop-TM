@@ -1582,7 +1582,7 @@ function buildUserCards(users) {
                   <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin:    0;">
 
                    <div class="user-actions" style="display: flex; gap: 6px; flex-wrap: wrap;">
-                  ${u.role !== 'admin' ? `
+                  ${u.role !== 'admin' && appState.currentUser && appState.currentUser.role === 'admin' ? `
                     <button onclick="changeAdminCode('${u.id}')" class="u-action-btn" style="background: #f39c12;" title="Change Admin Code">
                         <i class="fa fa-key"></i> Code
                     </button>
@@ -8413,9 +8413,14 @@ function grantPermission(idx, key) {
     if (!list[idx].permissions.includes(key)) list[idx].permissions.push(key);
     saveSubAdmins(list);
     _syncSubAdminToUsers(list[idx]);
+    // যদি এই sub-admin এখন logged in থাকে তাহলে appState ও live update করি
+    if (appState.currentUser && appState.currentUser.id === list[idx].id) {
+        appState.currentUser.permissions = list[idx].permissions;
+        _applySubAdminSidebar(list[idx].permissions);
+    }
+    if (typeof window.pushToCloud === 'function') window.pushToCloud('TM_DB_USERS_V2');
     showToast('✅ পারমিশন দেওয়া হয়েছে!');
-    openSubAdminPermissions(idx); // re-render modal
-    // sidebar list refresh
+    openSubAdminPermissions(idx);
     const c = document.getElementById('adminMainContainer');
     if (c && c.querySelector('#saList')) renderSubAdminManager(c);
 }
@@ -8426,6 +8431,12 @@ function revokePermission(idx, key) {
     list[idx].permissions = (list[idx].permissions||[]).filter(p => p !== key);
     saveSubAdmins(list);
     _syncSubAdminToUsers(list[idx]);
+    // যদি এই sub-admin এখন logged in থাকে তাহলে appState ও live update করি
+    if (appState.currentUser && appState.currentUser.id === list[idx].id) {
+        appState.currentUser.permissions = list[idx].permissions;
+        _applySubAdminSidebar(list[idx].permissions);
+    }
+    if (typeof window.pushToCloud === 'function') window.pushToCloud('TM_DB_USERS_V2');
     showToast('🚫 পারমিশন বাতিল হয়েছে');
     openSubAdminPermissions(idx);
     const c = document.getElementById('adminMainContainer');
