@@ -1465,11 +1465,17 @@ function renderAdminUsers(container) {
         if (u.isDiscountBlocked === undefined) u.isDiscountBlocked = false;
     });
 
+    // Sub-admin হলে শুধু normal user দেখাবে, admin/sub_admin লুকাবে
+    const isSubAdmin = appState.currentUser && appState.currentUser.role === 'sub_admin';
+    const visibleUsers = isSubAdmin
+        ? appState.users.filter(u => u.role !== 'admin' && u.role !== 'sub_admin')
+        : appState.users;
+
     // ১. মেইন লেআউট, সার্চবার এবং ফিল্টার বাটন তৈরি
     let html = `
         <div style="padding:10px; background:#111; border-radius:10px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h3>ইউজার লিস্ট (<span id="countUsers">${appState.users.length}</span>)</h3>
+                <h3>ইউজার লিস্ট (<span id="countUsers">${visibleUsers.length}</span>)</h3>
                 
                 <div style="display: flex; gap: 5px;">
                     <button onclick="filterBlockedUsers(false)" class="filter-btn-custom active-filter" id="btnAll">সবাই</button>
@@ -1506,7 +1512,7 @@ function renderAdminUsers(container) {
             <div id="userGridDisplay" class="user-list-grid">`;
 
     // ইউজার লিস্ট তৈরি করা
-    html += buildUserCards(appState.users);
+    html += buildUserCards(visibleUsers);
     
     html += `</div></div>`;
     container.innerHTML = html;
@@ -1529,13 +1535,14 @@ function filterBlockedUsers(onlyBlocked) {
         btnBlocked.classList.remove('active-filter');
     }
 
+    const isSubAdmin = appState.currentUser && appState.currentUser.role === 'sub_admin';
     let list;
     if (onlyBlocked) {
-        // যাদের যেকোনো একটি ফিল্ড ব্লক আছে তাদের দেখাবে
         list = appState.users.filter(u => u.isUserBlocked || u.isOrderBlocked || u.isCodBlocked || u.isDiscountBlocked);
     } else {
         list = appState.users;
     }
+    if (isSubAdmin) list = list.filter(u => u.role !== 'admin' && u.role !== 'sub_admin');
 
     display.innerHTML = buildUserCards(list);
     document.getElementById('countUsers').innerText = list.length;
@@ -1582,7 +1589,7 @@ function buildUserCards(users) {
                   <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin:    0;">
 
                    <div class="user-actions" style="display: flex; gap: 6px; flex-wrap: wrap;">
-                  ${(u.role !== 'admin' && u.role !== 'sub_admin') ? `
+                  ${u.role !== 'admin' ? `
                     <button onclick="changeAdminCode('${u.id}')" class="u-action-btn" style="background: #f39c12;" title="Change Admin Code">
                         <i class="fa fa-key"></i> Code
                     </button>
@@ -2225,21 +2232,35 @@ function updateUpazilas() {
 
 // ৩. সার্চ ফিল্টার করার মূল জাভাস্ক্রিপ্ট লজিক
 function handleUserSearch() {
-    const query = document.getElementById('userSearchField').value.toLowerCase();
-    const grid = document.getElementById('userGridDisplay');
-    const counter = document.getElementById('countUsers');
-
-    // নাম বা মোবাইল নম্বরের সাথে মিলিয়ে ফিল্টার করা
-    const filtered = appState.users.filter(u => {
+    const query = document.getElementById("userSearchField").value.toLowerCase();
+    const grid = document.getElementById("userGridDisplay");
+    const counter = document.getElementById("countUsers");
+    const isSubAdmin = appState.currentUser && appState.currentUser.role === "sub_admin";
+    let filtered = appState.users.filter(u => {
         const userName = (u.name || "").toLowerCase();
         const userMobile = (u.mobile || "").toLowerCase();
         return userName.includes(query) || userMobile.includes(query);
     });
-
-    // স্ক্রিনে ডাটা আপডেট করা
+    if (isSubAdmin) filtered = filtered.filter(u => u.role !== "admin" && u.role !== "sub_admin");
     grid.innerHTML = buildUserCards(filtered);
     counter.innerText = filtered.length;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // --- নতুন অ্যাডমিন ফাংশনসমূহ ---
 
 // ১. মোবাইল নম্বর পরিবর্তন
