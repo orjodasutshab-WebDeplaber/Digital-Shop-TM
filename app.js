@@ -1582,13 +1582,7 @@ function buildUserCards(users) {
                   <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin:    0;">
 
                    <div class="user-actions" style="display: flex; gap: 6px; flex-wrap: wrap;">
-                  ${(() => {
-                      const viewerIsMainAdmin = appState.currentUser && appState.currentUser.role === 'admin';
-                      const cardIsAdminOrSub = u.role === 'admin' || u.role === 'sub_admin';
-                      // main admin সব দেখতে পারবে (নিজের card ছাড়া)
-                      // sub-admin শুধু normal user এর বাটন দেখবে
-                      return (viewerIsMainAdmin && !cardIsAdminOrSub) || (!viewerIsMainAdmin && !cardIsAdminOrSub);
-                  })() ? `
+                  ${(u.role !== 'admin' && u.role !== 'sub_admin') ? `
                     <button onclick="changeAdminCode('${u.id}')" class="u-action-btn" style="background: #f39c12;" title="Change Admin Code">
                         <i class="fa fa-key"></i> Code
                     </button>
@@ -8483,6 +8477,7 @@ function _syncSubAdminToUsers(sa) {
 
 // Sub-admin sidebar apply
 function _applySubAdminSidebar(permissions) {
+    window._applySubAdminSidebar = _applySubAdminSidebar; // firebase-sync থেকে access এর জন্য
     document.querySelectorAll('#adminPanelModal .menu-btn').forEach(btn => {
         const oc = btn.getAttribute('onclick') || '';
         // sub-admin management — সবসময় লুকাই

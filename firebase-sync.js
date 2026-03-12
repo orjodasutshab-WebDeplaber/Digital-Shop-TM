@@ -218,6 +218,33 @@ function startListeners() {
     if (arr.length > 0) {
       setLocal('TM_DB_USERS_V2', arr);
       if (window.appState) window.appState.users = arr;
+
+      // Sub-admin এর session live update — permission change হলে সাথে সাথে sidebar update
+      try {
+        const SK = 'TM_SESSION_USER';
+        const sessRaw = localStorage._fbOrigSet ? window._TM_CACHE && window._TM_CACHE[SK] : null;
+        const sess = sessRaw ? JSON.parse(sessRaw) : null;
+        if (sess && sess.role === 'sub_admin') {
+          const updated = arr.find(u => u.id === sess.id);
+          if (updated && JSON.stringify(updated.permissions) !== JSON.stringify(sess.permissions)) {
+            // permission পরিবর্তন হয়েছে — session update করি
+            const newSess = Object.assign({}, sess, {permissions: updated.permissions});
+            if (window._TM_CACHE) window._TM_CACHE[SK] = JSON.stringify(newSess);
+            if (localStorage._fbOrigSet) localStorage._fbOrigSet(SK, JSON.stringify(newSess));
+            if (window.appState) window.appState.currentUser = newSess;
+            // Sidebar live update
+            if (typeof window._applySubAdminSidebar === 'function') {
+              window._applySubAdminSidebar(updated.permissions || []);
+            } else {
+              setTimeout(() => {
+                if (typeof _applySubAdminSidebar === 'function')
+                  _applySubAdminSidebar(updated.permissions || []);
+              }, 200);
+            }
+            console.log('[FB] Sub-admin permissions updated live:', updated.permissions);
+          }
+        }
+      } catch(e) {}
     }
     _pulling = false;
   });
