@@ -1582,7 +1582,13 @@ function buildUserCards(users) {
                   <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.05); margin:    0;">
 
                    <div class="user-actions" style="display: flex; gap: 6px; flex-wrap: wrap;">
-                  ${u.role !== 'admin' && appState.currentUser && appState.currentUser.role === 'admin' ? `
+                  ${(() => {
+                      const viewerIsMainAdmin = appState.currentUser && appState.currentUser.role === 'admin';
+                      const cardIsAdminOrSub = u.role === 'admin' || u.role === 'sub_admin';
+                      // main admin সব দেখতে পারবে (নিজের card ছাড়া)
+                      // sub-admin শুধু normal user এর বাটন দেখবে
+                      return (viewerIsMainAdmin && !cardIsAdminOrSub) || (!viewerIsMainAdmin && !cardIsAdminOrSub);
+                  })() ? `
                     <button onclick="changeAdminCode('${u.id}')" class="u-action-btn" style="background: #f39c12;" title="Change Admin Code">
                         <i class="fa fa-key"></i> Code
                     </button>
@@ -8451,6 +8457,7 @@ function _syncSubAdminToUsers(sa) {
         users[idx].permissions = sa.permissions;
         users[idx].role = 'sub_admin';
         localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users));
+        appState.users = users;
     }
     // যদি এই sub-admin এখন logged in থাকে তাহলে session ও update করি
     try {
@@ -8458,6 +8465,18 @@ function _syncSubAdminToUsers(sa) {
         if (sess && sess.id === sa.id) {
             sess.permissions = sa.permissions;
             localStorage.setItem(DB_KEYS.SESSION, JSON.stringify(sess));
+            appState.currentUser = sess;
+            _applySubAdminSidebar(sa.permissions);
+        }
+    } catch(e) {}
+    // Firebase এ সরাসরি sub-admin document update করি
+    // যাতে sub-admin এর browser real-time listener থেকে live পায়
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('users').doc(sa.id).update({
+                permissions: sa.permissions,
+                role: 'sub_admin'
+            }).catch(()=>{});
         }
     } catch(e) {}
 }
