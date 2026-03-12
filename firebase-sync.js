@@ -219,6 +219,33 @@ function startListeners() {
       setLocal('TM_DB_USERS_V2', arr);
       if (window.appState) window.appState.users = arr;
 
+      // Current user এর saved address update করি
+      try {
+        const sess = window._TM_CACHE && window._TM_CACHE['TM_SESSION_USER'];
+        if (sess) {
+          const cu = JSON.parse(sess);
+          const updated = arr.find(u => u.id === cu.id);
+          if (updated && updated.savedAddress) {
+            const addrKey = 'digital_shop_user_address_' + cu.id;
+            const existing = window._TM_CACHE && window._TM_CACHE[addrKey];
+            if (!existing) {
+              // localStorage এ না থাকলে Firebase থেকে cache করি
+              const addrStr = JSON.stringify(updated.savedAddress);
+              if (window._TM_CACHE) window._TM_CACHE[addrKey] = addrStr;
+              if (localStorage._fbOrigSet) localStorage._fbOrigSet(addrKey, addrStr);
+            }
+          }
+        }
+      } catch(e) {}
+
+      // Checkout open থাকলে address refresh করি
+      if (typeof window._loadCheckoutSavedAddr === 'function') {
+        const checkoutModal = document.getElementById('checkoutModal');
+        if (checkoutModal && checkoutModal.style.display !== 'none') {
+          window._loadCheckoutSavedAddr();
+        }
+      }
+
       // Sub-admin এর session live update — permission change হলে সাথে সাথে sidebar update
       try {
         const SK = 'TM_SESSION_USER';

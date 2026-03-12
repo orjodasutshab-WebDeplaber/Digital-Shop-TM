@@ -140,7 +140,7 @@
                 <li class="dp-item" onclick="openModal('resetPasswordModal')"><i class="fa fa-key"></i> পাসওয়ার্ড পরিবর্তন</li>
                 <li class="dp-item" onclick="openModal('resetUsernameModal')"><i class="fa fa-user-edit"></i> ইউজারনেম পরিবর্তন</li>
                 <li class="dp-item" onclick="toggleThemeMode()"><i class="fa fa-moon"></i> নাইট মোড (অন/অফ)</li>
-                <li class="dp-item" onclick="openAddressModalWithData()"><i class="fa fa-map-marker-alt"></i> নতুন এড্রেস সেভ</li>
+                <li class="dp-item" onclick="openModal('addressModal')"><i class="fa fa-map-marker-alt"></i> নতুন এড্রেস সেভ</li>
                 <li class="dp-item" onclick="openHelpModal()"><i class="fa fa-headset"></i> হেল্প(সরাসরি)</li>
                 <li class="dp-item" onclick="openDiscountModule()" style="display: flex; align-items: center; justify-content: space-between; position: relative; cursor: pointer;">
                 <div>
@@ -898,11 +898,38 @@ document.addEventListener('click', function(event) {
                 <div class="form-group" style="margin-bottom: 25px; text-align: left; background: #f8fafc; padding: 18px; border-radius: 20px; border: 1px solid #e2e8f0;">
                     <label style="display: block; font-weight: 800; color: #1e293b; font-size: 16px; margin-bottom: 12px;"><i class="fa fa-truck" style="color: #3498db; margin-right: 5px;"></i> ডেলিভারি ঠিকানা</label>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <div id="savedAddrBox" style="padding: 15px; border: 2px solid #3498db; border-radius: 12px; background: #fff; display: block;">
-                            <span style="font-size: 12px; font-weight: bold; color: #3498db; background: #ebf8ff; padding: 2px 8px; border-radius: 5px;">সেভ করা ঠিকানা</span>
-                            <p id="displaySavedAddr" style="margin: 8px 0 0 0; color: #1e293b; font-size: 13px; line-height: 1.5;">লোডিং... (ঠিকানা না থাকলে 'নতুন ঠিকানা' ব্যবহার করুন)</p>
+
+                        <!-- সেভ করা ঠিকানা box -->
+                        <div id="savedAddrBox" style="padding: 15px; border: 2px solid #3498db; border-radius: 12px; background: #fff; cursor: pointer;" onclick="selectSavedAddress(this)">
+                            <span style="font-size: 12px; font-weight: bold; color: #3498db; background: #ebf8ff; padding: 2px 8px; border-radius: 5px;">✔ সেভ করা ঠিকানা</span>
+                            <p id="displaySavedAddr" style="margin: 8px 0 0 0; color: #1e293b; font-size: 13px; line-height: 1.5;">লোড হচ্ছে...</p>
                         </div>
-                        <button onclick="openAddressModalForOrder()" type="button" style="width: 100%; background: #fff; color: #64748b; border: 2px dashed #cbd5e1; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 13px;">
+
+                        <!-- নতুন ঠিকানা লেখার section (default লুকানো) -->
+                        <div id="newAddrInputBox" style="display:none; border: 2px dashed #e67e22; border-radius: 12px; padding: 14px; background: #fffbf5;">
+                            <span style="font-size: 12px; font-weight: bold; color: #e67e22; background: #fff3cd; padding: 2px 8px; border-radius: 5px;">✏️ নতুন ঠিকানা</span>
+                            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+                                <input type="text" id="newAddrName" placeholder="নাম" style="padding:8px; border:1px solid #ccc; border-radius:6px; font-size:13px;">
+                                <input type="text" id="newAddrMobile" placeholder="মোবাইল" style="padding:8px; border:1px solid #ccc; border-radius:6px; font-size:13px;">
+                            </div>
+                            <select id="newAddrDivision" onchange="updateNewAddrDistricts()" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; margin-top:8px; font-size:13px; background:#fff;">
+                                <option value="">বিভাগ সিলেক্ট করুন</option>
+                                <option value="Dhaka">ঢাকা</option><option value="Chittagong">চট্টগ্রাম</option>
+                                <option value="Rajshahi">রাজশাহী</option><option value="Khulna">খুলনা</option>
+                                <option value="Barisal">বরিশাল</option><option value="Sylhet">সিলেট</option>
+                                <option value="Rangpur">রংপুর</option><option value="Mymensingh">ময়মনসিংহ</option>
+                            </select>
+                            <select id="newAddrDistrict" onchange="updateNewAddrUpazilas()" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; margin-top:8px; font-size:13px; background:#fff;"><option value="">জেলা সিলেক্ট করুন</option></select>
+                            <select id="newAddrUpazila" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; margin-top:8px; font-size:13px; background:#fff;"><option value="">উপজেলা সিলেক্ট করুন</option></select>
+                            <textarea id="newAddrDetails" placeholder="বিস্তারিত ঠিকানা (পাড়া, হাউজ নং...)" rows="2" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px; margin-top:8px; font-size:13px; resize:none; box-sizing:border-box;"></textarea>
+                            <div style="display:flex; gap:8px; margin-top:10px;">
+                                <button onclick="applyNewAddrInCheckout()" type="button" style="flex:2; background:#e67e22; color:#fff; border:none; padding:10px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:13px;">✔ এই ঠিকানায় অর্ডার করুন</button>
+                                <button onclick="cancelNewAddr()" type="button" style="flex:1; background:#eee; color:#555; border:none; padding:10px; border-radius:8px; cursor:pointer; font-size:13px;">বাতিল</button>
+                            </div>
+                        </div>
+
+                        <!-- নতুন ঠিকানা toggle বাটন -->
+                        <button id="toggleNewAddrBtn" onclick="toggleNewAddrInput()" type="button" style="width: 100%; background: #fff; color: #64748b; border: 2px dashed #cbd5e1; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 13px;">
                             <i class="fa fa-plus-circle"></i> নতুন ঠিকানা দিয়ে অর্ডার করুন
                         </button>
                     </div>
@@ -1060,16 +1087,6 @@ document.addEventListener('click', function(event) {
             <select id="addrUpazila" class="addr-input" style="background: #0f172a;"><option value="">উপজেলা/থানা সিলেক্ট করুন</option></select>
             <textarea id="addrDetails" rows="3" placeholder="বিস্তারিত ঠিকানা (যেমন: গ্রাম, পাড়া, হাউজ নং, রোড নং...)" class="addr-input" style="resize: none;"></textarea>
             <button class="btn-primary" onclick="saveAddressToProfile()" style="background: #3498db; color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px;">সেভ করুন</button>
-            
-            <!-- সেভ করা এড্রেস এখানে দেখাবে -->
-            <div id="addrModalSavedBox" style="display:none; background:#0f172a; border:1px solid #1e40af; border-radius:12px; padding:12px 15px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <span style="color:#60a5fa; font-size:13px; font-weight:bold;"><i class="fa fa-map-marker-alt"></i> সেভ করা ঠিকানা</span>
-                    <span onclick="deleteSavedAddress()" style="color:#ef4444; font-size:11px; cursor:pointer; padding:3px 8px; border:1px solid #ef4444; border-radius:5px;">✕ মুছুন</span>
-                </div>
-                <div id="addrModalSavedText" style="color:#cbd5e1; font-size:13px; line-height:1.7;"></div>
-                <div id="addrModalExpiry" style="color:#64748b; font-size:11px; margin-top:5px;"></div>
-            </div>
         </div>
     </div>
 </div>

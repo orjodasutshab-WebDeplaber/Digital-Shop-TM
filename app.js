@@ -693,6 +693,9 @@ function initiateCheckout(productId) {
     const savedAddr = localStorage.getItem(_addrKey()); // ✅ user-specific
     if(savedAddr && orderAddressInput) orderAddressInput.value = savedAddr;
 
+    // ডেলিভারি ঠিকানা section refresh
+    setTimeout(() => _loadCheckoutSavedAddr(), 300);
+
     // ৫. স্টেপ রিসেট
     const step1 = document.getElementById('checkoutStep1');
     const step2 = document.getElementById('checkoutStep2');
@@ -2434,87 +2437,49 @@ function saveAddressToProfile() {
     };
 
     try {
-        addressObj.expiry = Date.now() + (30 * 24 * 60 * 60 * 1000);
+        // ৪. LocalStorage-এ সেভ করা
         localStorage.setItem(_addrKey(), JSON.stringify(addressObj));
 
+        // Users array তে address save → Firebase sync হবে
         if (appState.currentUser && appState.currentUser.id) {
             const uIdx = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
             if (uIdx !== -1) {
                 appState.users[uIdx].savedAddress = addressObj;
                 localStorage.setItem(DB_KEYS.USERS, JSON.stringify(appState.users));
             }
-            try {
-                if (typeof firebase !== 'undefined' && firebase.firestore) {
-                    firebase.firestore().collection('users')
-                        .doc(String(appState.currentUser.id))
-                        .set({ savedAddress: addressObj }, { merge: true })
-                        .catch(e => console.warn('[FB] addr err:', e.message));
-                }
-            } catch(e) {}
         }
-
-        const formatted = `${addressObj.name}, ${addressObj.mobile}, ${addressObj.details}, ${addressObj.upazila}, ${addressObj.district}, ${addressObj.division}`;
+        
+        // ৫. তাৎক্ষণিকভাবে UI আপডেট করা (রিফ্রেশ ছাড়া)
+        const formatted = `${name}, ${mobile}, ${details}, ${upazila}, ${district}, ${division}`;
+        
+        // চেকআউট পেজের ডিসপ্লে বক্স আপডেট
         const displayBox = document.getElementById('displaySavedAddr');
         if (displayBox) {
             displayBox.innerHTML = `<b style="color:#3498db;">[সেভ করা]:</b> ${formatted}`;
-            if (document.getElementById('savedAddrBox')) document.getElementById('savedAddrBox').style.borderColor = "#3498db";
+            // বক্সের বর্ডার নীল করে দেওয়া (সেভ করা বোঝাতে)
+            if (document.getElementById('savedAddrBox')) {
+                document.getElementById('savedAddrBox').style.borderColor = "#3498db";
+            }
         }
-        const orderInput = document.getElementById('orderAddress');
-        if (orderInput) orderInput.value = formatted;
 
-        _showSavedAddrInModal(addressObj);
-        alert("\u2705 \u09a0\u09bf\u0995\u09be\u09a8\u09be \u09b8\u09c7\u09ad \u09b9\u09af\u09bc\u09c7\u099b\u09c7!");
+        // অর্ডারের গোপন বা দৃশ্যমান ইনপুট আপডেট (যাতে অর্ডারের সাথে ডাটা যায়)
+        const orderInput = document.getElementById('orderAddress');
+        if (orderInput) {
+            // যদি এটি textarea হয় তবে ভ্যালু সেট হবে
+            orderInput.value = formatted;
+        }
+        
+        alert("✅ ঠিকানা প্রোফাইলে সেভ এবং আপডেট করা হয়েছে!");
+        
+        // ৬. মোডাল বন্ধ করা
         closeModal('addressModal');
+        
     } catch (error) {
         console.error("Save Error:", error);
-        alert("\u274c \u09b8\u09c7\u09ad \u09b8\u09ae\u09b8\u09cd\u09af\u09be!");
+        alert("❌ সেভ করার সময় সমস্যা হয়েছে। আবার চেষ্টা করুন।");
     }
 }
-
-function _showSavedAddrInModal(addr) {
-    const box = document.getElementById('addrModalSavedBox');
-    const textEl = document.getElementById('addrModalSavedText');
-    const expiryEl = document.getElementById('addrModalExpiry');
-    if (!box || !textEl) return;
-    if (!addr) { box.style.display = 'none'; return; }
-    if (addr.expiry && Date.now() > addr.expiry) { _deleteSavedAddressData(); box.style.display = 'none'; return; }
-    const daysLeft = addr.expiry ? Math.ceil((addr.expiry - Date.now()) / (24*60*60*1000)) : 30;
-    textEl.innerHTML = `<b style="color:#fff;">${addr.name}</b> | ${addr.mobile}<br>${addr.details ? addr.details+', ' : ''}${addr.upazila}, ${addr.district}, ${addr.division}`;
-    if (expiryEl) expiryEl.textContent = `\u23f3 ${daysLeft} \u09a6\u09bf\u09a8 \u09aa\u09b0 \u09ae\u09c1\u099b\u09c7 \u09af\u09be\u09ac\u09c7`;
-    box.style.display = 'block';
-}
-
-function deleteSavedAddress() {
-    if (!confirm('\u09b8\u09c7\u09ad \u09a0\u09bf\u0995\u09be\u09a8\u09be \u09ae\u09c1\u099b\u09be\u09ac\u09c7\u09a8?')) return;
-    _deleteSavedAddressData();
-    const box = document.getElementById('addrModalSavedBox');
-    if (box) box.style.display = 'none';
-}
-
-function _deleteSavedAddressData() {
-    localStorage.removeItem(_addrKey());
-    if (appState.currentUser && appState.currentUser.id) {
-        const uIdx = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
-        if (uIdx !== -1) { delete appState.users[uIdx].savedAddress; localStorage.setItem(DB_KEYS.USERS, JSON.stringify(appState.users)); }
-        try {
-            if (typeof firebase !== 'undefined' && firebase.firestore) {
-                firebase.firestore().collection('users').doc(String(appState.currentUser.id))
-                    .update({ savedAddress: firebase.firestore.FieldValue.delete() }).catch(()=>{});
-            }
-        } catch(e) {}
-    }
-}
-
-function openAddressModalWithData() {
-    openModal('addressModal');
-    setTimeout(() => {
-        const raw = localStorage.getItem(_addrKey());
-        if (raw) { try { _showSavedAddrInModal(JSON.parse(raw)); } catch(e) {} return; }
-        const user = appState.users.find(u => appState.currentUser && String(u.id) === String(appState.currentUser.id));
-        if (user && user.savedAddress) _showSavedAddrInModal(user.savedAddress);
-    }, 150);
-}
-
+// চেকআউট পেজে ডাটা লোড করার ফাংশন
 function loadSavedAddressToCheckout() {
     let savedData = localStorage.getItem(_addrKey());
 
@@ -7043,6 +7008,164 @@ function removeFromCart(productId) {
     openUserCart();
     // মেনু ব্যাজ আপডেট করা (যদি ফাংশনটি থাকে)
     if(typeof updateCartBadge === "function") updateCartBadge();
+}
+
+
+// ══════════════════════════════════════════════════
+// CHECKOUT ADDRESS SYSTEM — নতুন & উন্নত
+// ══════════════════════════════════════════════════
+
+// Checkout খোলার সময় saved address load করা
+function _loadCheckoutSavedAddr() {
+    const displayEl = document.getElementById('displaySavedAddr');
+    const savedAddrBox = document.getElementById('savedAddrBox');
+    const orderInput = document.getElementById('orderAddress');
+    if (!displayEl) return;
+
+    // ১. localStorage থেকে চেষ্টা
+    let addrRaw = localStorage.getItem(_addrKey());
+
+    // ২. না পেলে users array থেকে চেষ্টা
+    if (!addrRaw && appState.currentUser) {
+        const user = appState.users.find(u => String(u.id) === String(appState.currentUser.id));
+        if (user && user.savedAddress) {
+            addrRaw = JSON.stringify(user.savedAddress);
+            localStorage.setItem(_addrKey(), addrRaw); // cache করি
+        }
+    }
+
+    if (addrRaw) {
+        try {
+            const addr = JSON.parse(addrRaw);
+            // expiry check
+            if (addr.expiry && Date.now() > addr.expiry) {
+                displayEl.innerHTML = '<span style="color:#94a3b8;">সেভ করা ঠিকানার মেয়াদ শেষ। নতুন ঠিকানা দিন।</span>';
+                if (savedAddrBox) savedAddrBox.style.borderColor = '#e2e8f0';
+                return;
+            }
+            const formatted = `${addr.name}, ${addr.mobile}` +
+                (addr.details ? `, ${addr.details}` : '') +
+                `, ${addr.upazila}, ${addr.district}, ${addr.division}`;
+            displayEl.innerHTML = `<b style="color:#1e293b;">${addr.name}</b> | ${addr.mobile}<br>` +
+                `${addr.details ? addr.details+', ' : ''}${addr.upazila}, ${addr.district}, ${addr.division}`;
+            if (orderInput) orderInput.value = formatted;
+            if (savedAddrBox) {
+                savedAddrBox.style.borderColor = '#3498db';
+                savedAddrBox.style.background = '#f0f9ff';
+            }
+            console.log('[Addr] Saved address loaded to checkout');
+        } catch(e) {}
+    } else {
+        displayEl.innerHTML = '<span style="color:#94a3b8;">কোনো সেভ করা ঠিকানা পাওয়া যায়নি।</span>';
+        if (savedAddrBox) savedAddrBox.style.borderColor = '#e2e8f0';
+        if (orderInput) orderInput.value = '';
+    }
+}
+
+// সেভ করা ঠিকানা select করলে
+function selectSavedAddress(el) {
+    const orderInput = document.getElementById('orderAddress');
+    const addrRaw = localStorage.getItem(_addrKey());
+    if (!addrRaw) return;
+    try {
+        const addr = JSON.parse(addrRaw);
+        const formatted = `${addr.name}, ${addr.mobile}` +
+            (addr.details ? `, ${addr.details}` : '') +
+            `, ${addr.upazila}, ${addr.district}, ${addr.division}`;
+        if (orderInput) orderInput.value = formatted;
+        // highlight
+        el.style.borderColor = '#3498db';
+        el.style.background = '#f0f9ff';
+        // নতুন ঠিকানা hide করি
+        cancelNewAddr();
+    } catch(e) {}
+}
+
+// নতুন ঠিকানা toggle
+function toggleNewAddrInput() {
+    const box = document.getElementById('newAddrInputBox');
+    const btn = document.getElementById('toggleNewAddrBtn');
+    if (!box) return;
+    const isOpen = box.style.display !== 'none';
+    if (isOpen) {
+        box.style.display = 'none';
+        if (btn) btn.innerHTML = '<i class="fa fa-plus-circle"></i> নতুন ঠিকানা দিয়ে অর্ডার করুন';
+        // saved address ফিরিয়ে দিই
+        _loadCheckoutSavedAddr();
+    } else {
+        box.style.display = 'block';
+        if (btn) btn.innerHTML = '<i class="fa fa-times-circle"></i> বাতিল';
+        // saved addr box dim করি
+        const savedBox = document.getElementById('savedAddrBox');
+        if (savedBox) { savedBox.style.borderColor = '#e2e8f0'; savedBox.style.background = '#fff'; }
+        const orderInput = document.getElementById('orderAddress');
+        if (orderInput) orderInput.value = '';
+    }
+}
+
+function cancelNewAddr() {
+    const box = document.getElementById('newAddrInputBox');
+    const btn = document.getElementById('toggleNewAddrBtn');
+    if (box) box.style.display = 'none';
+    if (btn) btn.innerHTML = '<i class="fa fa-plus-circle"></i> নতুন ঠিকানা দিয়ে অর্ডার করুন';
+}
+
+// নতুন ঠিকানা checkout এ apply করা
+function applyNewAddrInCheckout() {
+    const name = (document.getElementById('newAddrName')?.value || '').trim();
+    const mobile = (document.getElementById('newAddrMobile')?.value || '').trim();
+    const division = document.getElementById('newAddrDivision')?.value || '';
+    const district = document.getElementById('newAddrDistrict')?.value || '';
+    const upazila = document.getElementById('newAddrUpazila')?.value || '';
+    const details = (document.getElementById('newAddrDetails')?.value || '').trim();
+
+    if (!name || !mobile || !district) {
+        alert('\u274c \u09a8\u09be\u09ae, \u09ae\u09cb\u09ac\u09be\u0987\u09b2 \u098f\u09ac\u0982 \u099c\u09c7\u09b2\u09be \u09a6\u09bf\u09a8!');
+        return;
+    }
+
+    const formatted = `${name}, ${mobile}${details ? ', '+details : ''}${upazila ? ', '+upazila : ''}, ${district}${division ? ', '+division : ''}`;
+    const orderInput = document.getElementById('orderAddress');
+    if (orderInput) orderInput.value = formatted;
+
+    // saved addr box এ নতুন ঠিকানা দেখাই
+    const displayEl = document.getElementById('displaySavedAddr');
+    const savedBox = document.getElementById('savedAddrBox');
+    if (displayEl) displayEl.innerHTML = `<b style="color:#e67e22;">\u09a8\u09a4\u09c1\u09a8:</b> ${formatted}`;
+    if (savedBox) { savedBox.style.borderColor = '#e67e22'; savedBox.style.background = '#fffbf5'; }
+
+    // new addr box বন্ধ করি
+    cancelNewAddr();
+    alert('\u2705 \u09a0\u09bf\u0995\u09be\u09a8\u09be \u09b8\u09c7\u099f \u09b9\u09af\u09bc\u09c7\u099b\u09c7!');
+}
+
+// নতুন ঠিকানার জেলা select
+function updateNewAddrDistricts() {
+    const div = document.getElementById('newAddrDivision')?.value;
+    const distSel = document.getElementById('newAddrDistrict');
+    const upSel = document.getElementById('newAddrUpazila');
+    if (!distSel) return;
+    distSel.innerHTML = '<option value="">জেলা সিলেক্ট করুন</option>';
+    if (upSel) upSel.innerHTML = '<option value="">উপজেলা সিলেক্ট করুন</option>';
+    if (div && typeof bdData !== 'undefined' && bdData[div]) {
+        Object.keys(bdData[div]).forEach(d => {
+            distSel.innerHTML += `<option value="${d}">${d}</option>`;
+        });
+    }
+}
+
+// নতুন ঠিকানার উপজেলা select
+function updateNewAddrUpazilas() {
+    const div = document.getElementById('newAddrDivision')?.value;
+    const dist = document.getElementById('newAddrDistrict')?.value;
+    const upSel = document.getElementById('newAddrUpazila');
+    if (!upSel) return;
+    upSel.innerHTML = '<option value="">উপজেলা সিলেক্ট করুন</option>';
+    if (div && dist && typeof bdData !== 'undefined' && bdData[div]?.[dist]) {
+        bdData[div][dist].forEach(u => {
+            upSel.innerHTML += `<option value="${u}">${u}</option>`;
+        });
+    }
 }
 
 // ১. স্টোরেজ কি নিশ্চিত করা
