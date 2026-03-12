@@ -1430,23 +1430,27 @@ function saveAdminNote(index) {
 
 function deleteAdminNote(index) {
     if(confirm("আপনি কি এই নোটটি ডিলিট করতে চান?")) {
+        const order = appState.orders[index];
         delete appState.orders[index].adminNote;
         saveData(DB_KEYS.ORDERS, appState.orders);
+        if (order) {
+            try {
+                if (typeof firebase !== 'undefined' && firebase.firestore) {
+                    firebase.firestore().collection('orders').doc(String(order.id))
+                        .set(appState.orders[index]).catch(()=>{});
+                }
+            } catch(e) {}
+        }
         loadAdminTab('orders');
     }
 }
 function adminDeleteOrder(orderId) {
-    if(confirm("আপনি কি নিশ্চিতভাবে এই অর্ডারটি ডিলিট করতে চান? এটি ইউজারের প্রোফাইল থেকেও মুছে যাবে।")) {
-        // মেইন অর্ডার লিস্ট থেকে ওই আইডি বাদ দেওয়া
+    if(confirm("আপনি কি নিশ্চিতভাবে এই অর্ডারটি ডিলিট করতে চান?")) {
         appState.orders = appState.orders.filter(order => order.id !== orderId);
-        
-        // ডাটাবেস আপডেট (LocalStorage)
         saveData(DB_KEYS.ORDERS, appState.orders);
-        
-        // অ্যাডমিন প্যানেল রিফ্রেশ
+        _fbDelete('orders', orderId);
         loadAdminTab('orders');
-        
-        alert("✅ অর্ডারটি সফলভাবে ডিলিট করা হয়েছে।");
+        alert("✅ অর্ডারটি সফলভাবে ডিলিট করা হয়েছে।");
     }
 }
 
@@ -1829,20 +1833,22 @@ function adminViewOrderDetails(orderId) {
 // ট্র্যাকিং হিস্টোরি ডিলিট করার ফাংশন
 function deleteHistoryItem(orderId, index) {
     if (!confirm("আপনি কি এই হিস্টোরিটি মুছে ফেলতে চান?")) return;
-
     const orderIndex = appState.orders.findIndex(o => o.id === orderId);
     if (orderIndex === -1) return;
-
     appState.orders[orderIndex].adm_history.splice(index, 1);
-    
-    // যদি সব হিস্টোরি ডিলিট হয়ে যায়, বর্তমান স্ট্যাটাস ডিফল্ট করে দিন
     if (appState.orders[orderIndex].adm_history.length > 0) {
         appState.orders[orderIndex].status = appState.orders[orderIndex].adm_history[0].status;
     }
-
     saveData(DB_KEYS.ORDERS, appState.orders);
+    // order document update (partial delete — পুরো order update করি)
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('orders').doc(String(orderId))
+                .set(appState.orders[orderIndex]).catch(()=>{});
+        }
+    } catch(e) {}
     document.getElementById('adminOrderModal').remove();
-    adminViewOrderDetails(orderId); // রিফ্রেশ
+    adminViewOrderDetails(orderId);
 }
 
 // অ্যাডমিন যখন ইউজারকে কমেন্ট/রিপ্লাই করবে
@@ -2284,11 +2290,12 @@ function adminChangeMobile(userId) {
 
 // ২. ইউজার ডিলিট করা
 function adminDeleteUser(userId) {
-    if (confirm("আপনি কি নিশ্চিতভাবে এই ইউজারকে ডিলিট করতে চান? এই কাজ আর ফেরত আনা যাবে না!")) {
+    if (confirm("আপনি কি নিশ্চিতভাবে এই ইউজারকে ডিলিট করতে চান?")) {
         appState.users = appState.users.filter(u => u.id !== userId);
         saveData(DB_KEYS.USERS, appState.users);
-        loadAdminTab('users'); // লিস্ট রিফ্রেশ
-        alert("🗑️ ইউজার সফলভাবে রিমুভ করা হয়েছে।");
+        _fbDelete('users', userId);
+        loadAdminTab('users');
+        alert("🗑️ ইউজার সফলভাবে রিমুভ করা হয়েছে।");
     }
 }
 
@@ -2308,6 +2315,7 @@ function adminDeleteProduct(id) {
     if(confirm("আপনি কি এই পণ্যটি ডিলিট করতে চান?")) {
         appState.products = appState.products.filter(p => p.id !== id);
         saveData(DB_KEYS.PRODUCTS, appState.products);
+        _fbDelete('products', id);
         renderProductGrid(appState.products);
     }
 }
@@ -2608,18 +2616,11 @@ document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclic
 
 // অর্ডার ডিলিট করার জন্য নতুন ফাংশন
 function cancelUserOrder(orderId) {
-    if (confirm("আপনি কি নিশ্চিত যে আপনি এই অর্ডারটি চিরতরে ডিলিট করতে চান?")) {
-        // ডাটাবেজ থেকে ফিল্টার করে ডিলিট করা
-        appState.orders = appState.orders.filter(function(o) {
-            return o.id !== orderId;
-        });
-        
-        // লোকাল স্টোরেজে সেভ করা
+    if (confirm("আপনি কি নিশ্চিত যে আপনি এই অর্ডারটি ডিলিট করতে চান?")) {
+        appState.orders = appState.orders.filter(function(o) { return o.id !== orderId; });
         saveData(DB_KEYS.ORDERS, appState.orders);
-        
-        // ভিউ আপডেট করা (আবার ট্র্যাকিং ওপেন করে রিফ্রেশ করা)
+        _fbDelete('orders', orderId);
         document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").click();
-        
         alert("অর্ডারটি সফলভাবে ডিলিট করা হয়েছে।");
     }
 }
@@ -2929,8 +2930,8 @@ function masterDeleteAd(id) {
     if(confirm("আপনি কি এটি ডিলিট করতে চান?")) {
         let ads = JSON.parse(localStorage.getItem(DB_KEYS.ADS)) || [];
         ads = ads.filter(a => a.id !== id);
-        if(typeof window.pushToCloud==='function') window.pushToCloud('TM_DB_ADS_V2');
         localStorage.setItem(DB_KEYS.ADS, JSON.stringify(ads));
+        _fbDelete('ads', id);
         renderAdminAds(document.getElementById('adminMainContainer'));
     }
 }
@@ -4138,6 +4139,7 @@ function deleteReturnRecord(retId) {
     if(confirm("আপনি কি নিশ্চিতভাবে এই রিটার্ন রেকর্ডটি ডিলিট করতে চান?")) {
         appState.returns = appState.returns.filter(r => r.id !== retId);
         saveData(DB_KEYS.RETURNS, appState.returns);
+        _fbDelete('returns', retId);
         document.getElementById('adminRetModal').remove();
         renderAdminReturnList();
     }
@@ -4214,21 +4216,21 @@ window.quickUpdateStatus = function(retId, newStatus) {
 };
 window.deleteStatusHistory = function(retId, index) {
     const RETURN_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.RETURNS) ? DB_KEYS.RETURNS : 'returns';
-    
-    // ইনডেক্স ধরে স্পেসিফিক হিস্ট্রি মোছা
     const retIndex = appState.returns.findIndex(r => r.id === retId);
     if (retIndex !== -1) {
         appState.returns[retIndex].statusHistory.splice(index, 1);
-        
-        // সেভ করা
         localStorage.setItem(RETURN_KEY, JSON.stringify(appState.returns));
-        
-        // রিফ্রেশ ভিউ
+        // Firebase এ return document update
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                firebase.firestore().collection('returns').doc(String(retId))
+                    .set(appState.returns[retIndex]).catch(()=>{});
+            }
+        } catch(e) {}
         document.getElementById('adminRetModal').remove();
         openAdminReturnDetail(retId);
     }
 };
-
 
 
 
@@ -4420,25 +4422,13 @@ function openProductDetails(productId) {
     modal.style.display = 'flex';
 }
 
-window.deleteReportRecord = function(reportId, prodId) {
-    if (confirm("আপনি কি নিশ্চিত যে এই রিপোর্টটি ডিলিট করতে চান?")) {
-        // ১. লোকাল স্টোরেজ থেকে ডাটা ফিল্টার করা
-        let reports = JSON.parse(localStorage.getItem('tm_reports') || '[]');
-        reports = reports.filter(r => r.id !== reportId);
-        
-        // ২. আপডেট করা ডাটা সেভ করা
-        localStorage.setItem('tm_reports', JSON.stringify(reports));
-        appState.reports = reports;
-        
-        alert("✅ রিপোর্টটি সফলভাবে মুছে ফেলা হয়েছে।");
-        
-        // ৩. মোডাল রি-রেন্ডার করা
-        openProductDetails(prodId);
-    }
+window.deleteReport = function(reportId) {
+    if (!confirm("আপনি কি এই রিপোর্টটি ডিলিট করতে চান?")) return;
+    appState.reports = appState.reports.filter(r => r.id !== reportId);
+    localStorage.setItem('tm_reports', JSON.stringify(appState.reports));
+    _fbDelete('reports', reportId);
+    alert("রিপোর্ট ডিলিট করা হয়েছে।");
 };
-function toggleProductLike(productId) {
-    // ১. প্রোডাক্ট খুঁজে বের করা
-    const item = appState.products.find(p => p.id === productId);
     if (!item) return;
 
     // ২. ইউজার আইডি (লগইন না থাকলে GUEST)
@@ -5998,6 +5988,21 @@ function createNewGiftCard() {
 }
 function deleteGiftCard(cardId) {
     if(!confirm("নিশ্চিত ডিলিট করবেন? ইউজারদের প্রোফাইল থেকেও মুছে যাবে।")) return;
+    if(appState.globalDiscounts) {
+        appState.globalDiscounts = appState.globalDiscounts.filter(c => c.cardId !== cardId);
+        saveData(DB_KEYS.GLOBAL_DISCOUNTS, appState.globalDiscounts);
+        _fbDelete('global_discounts', cardId);
+    }
+    if(appState.users && appState.users.length > 0) {
+        appState.users.forEach(user => {
+            if(user.myDiscounts) user.myDiscounts = user.myDiscounts.filter(d => d.parentCardId !== cardId);
+        });
+        saveData(DB_KEYS.USERS, appState.users);
+    }
+    if(typeof renderAdminGiftCards === 'function') renderAdminGiftCards();
+    if(typeof renderUserGiftCards === 'function') renderUserGiftCards();
+}
+    if(!confirm("নিশ্চিত ডিলিট করবেন? ইউজারদের প্রোফাইল থেকেও মুছে যাবে।")) return;
 
     // ১. মেইন কার্ড লিস্ট থেকে ডিলিট করা
     if(appState.globalDiscounts) {
@@ -6195,6 +6200,7 @@ function deleteAdminCard(cardId) {
     if (confirm("আপনি কি নিশ্চিতভাবে এই কার্ডটি ডিলিট করতে চান?")) {
         appState.globalDiscounts = appState.globalDiscounts.filter(c => c.id !== cardId);
         saveData(DB_KEYS.GLOBAL_DISCOUNTS, appState.globalDiscounts);
+        _fbDelete('global_discounts', cardId);
         renderAdminCards();
     }
 }
@@ -6469,47 +6475,28 @@ function renderDraftCardsInModal() {
 
 function deleteDraftCard(cardId) {
     if(!confirm("আপনি কি নিশ্চিতভাবে এই ড্রাফট কার্ডটি ডিলিট করতে চান?")) return;
-
-    // ১. মেইন লিস্ট থেকে ড্রাফট কার্ডটি রিমুভ করা
     if(appState.globalDiscounts) {
         appState.globalDiscounts = appState.globalDiscounts.filter(c => (c.id !== cardId && c.cardId !== cardId));
         saveData(DB_KEYS.GLOBAL_DISCOUNTS, appState.globalDiscounts);
+        _fbDelete('global_discounts', cardId);
     }
-
-    // ২. UI রিফ্রেশ করা (আসল সমাধান এখানে)
-    // ড্রাফট লিস্টের জন্য আপনার renderDraftCards ফাংশনটি কল করতে হবে
-    if (typeof renderDraftCards === 'function') {
-        renderDraftCards(); 
-    }
-
+    if (typeof renderDraftCards === 'function') renderDraftCards();
     alert("✅ ড্রাফট কার্ডটি ডিলিট করা হয়েছে!");
 }
 function deleteActiveCard(cardId) {
-    if(!confirm("সতর্কবার্তা: এটি ডিলিট করলে সব ইউজারের ওয়ালেট থেকেও মুছে যাবে। নিশ্চিত তো?")) return;
-
-    // ১. মেইন কার্ড লিস্ট থেকে ডিলিট করা
+    if(!confirm("সতর্কবার্তা: ডিলিট করলে সব ইউজারের ওয়ালেট থেকেও মুছে যাবে। নিশ্চিত?")) return;
     if(appState.globalDiscounts) {
         appState.globalDiscounts = appState.globalDiscounts.filter(c => (c.id !== cardId && c.cardId !== cardId));
         saveData(DB_KEYS.GLOBAL_DISCOUNTS, appState.globalDiscounts);
+        _fbDelete('global_discounts', cardId);
     }
-
-    // ২. সকল ইউজারের প্রোফাইল/ওয়ালেট থেকে রিমুভ করা
     if(appState.users) {
         appState.users.forEach(user => {
-            if(user.myDiscounts) {
-                user.myDiscounts = user.myDiscounts.filter(d => (d.id !== cardId && d.cardId !== cardId));
-            }
+            if(user.myDiscounts) user.myDiscounts = user.myDiscounts.filter(d => (d.id !== cardId && d.cardId !== cardId));
         });
         saveData(DB_KEYS.USERS, appState.users);
     }
-
-    // ৩. UI রিফ্রেশ করা (আসল সমাধান এখানে)
-    // আমরা সরাসরি আপনার ওই রেন্ডার ফাংশনটিকে কল করছি যাতে রিফ্রেশ না লাগে
-    if (typeof renderActiveAdminCards === 'function') {
-        renderActiveAdminCards(); 
-    }
-
-    alert("✅ একটিভ কার্ডটি সফলভাবে মুছে ফেলা হয়েছে!");
+    if (typeof renderActiveAdminCards === 'function') renderActiveAdminCards();
 }
 
 
@@ -6575,20 +6562,10 @@ function renderRequestList() {
 }
 function deleteSingleRequest(reqId) {
     if (!confirm("আপনি কি এই রিকোয়েস্টটি ডিলিট করতে চান?")) return;
-
-    // ১. মেমোরি (appState) থেকে ডিলিট
     appState.specialRequests = appState.specialRequests.filter(r => r.reqId !== reqId);
-
-    // ২. লোকাল স্টোরেজে নতুন লিস্ট সেভ করা (সরাসরি নাম ব্যবহার করা হয়েছে)
     saveData('special_requests', appState.specialRequests);
-    
-    // ৩. রিফ্রেশ ছাড়াই UI আপডেট করা
-    if (typeof renderRequestList === 'function') {
-        renderRequestList();
-    }
-
-    // ঐচ্ছিক: ইউজারকে একটি কনফার্মেশন মেসেজ দেওয়া
-    console.log("✅ রিকোয়েস্ট ডিলিট করা হয়েছে এবং স্টোরেজ আপডেট হয়েছে।");
+    _fbDelete('special_requests', reqId);
+    if (typeof renderRequestList === 'function') renderRequestList();
 }
 // ৫. গ্লোবাল ব্লক ফাংশন
 function toggleGlobalRequestBlock() {
