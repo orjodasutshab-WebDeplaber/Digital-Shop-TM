@@ -376,6 +376,8 @@ function checkSession() {
         if (appState.currentUser.role === 'admin' || appState.currentUser.role === 'sub_admin') {
             createFloatingAdminButton();
         }
+        // Dropdown এ saved address দেখাই
+        setTimeout(() => loadSavedAddrIntoDropdown(), 500);
     }
 }
 
@@ -2408,7 +2410,6 @@ function filterUpazilas() {
 // ✅ ADDRESS_STORAGE_KEY এখন user-specific _addrKey() ব্যবহার করে
 
 function saveAddressToProfile() {
-    // HTML থেকে ভ্যালুগুলো সংগ্রহ করা
     const name = document.getElementById('addrName').value.trim();
     const mobile = document.getElementById('addrMobile').value.trim();
     const division = document.getElementById('addrDivision').value;
@@ -2416,67 +2417,124 @@ function saveAddressToProfile() {
     const upazila = document.getElementById('addrUpazila').value;
     const details = document.getElementById('addrDetails').value.trim();
 
-    // ২. সঠিক ভ্যালিডেশন
     if (!name || !mobile || !division || !district || !upazila) {
-        alert("❌ নাম, মোবাইল, বিভাগ, জেলা এবং উপজেলা অবশ্যই দিতে হবে।");
+        alert("\u274c \u09a8\u09be\u09ae, \u09ae\u09cb\u09ac\u09be\u0987\u09b2, \u09ac\u09bf\u09ad\u09be\u0997, \u099c\u09c7\u09b2\u09be \u098f\u09ac\u0982 \u0989\u09aa\u099c\u09c7\u09b2\u09be \u0985\u09ac\u09b6\u09cd\u09af\u0987 \u09a6\u09bf\u09a4\u09c7 \u09b9\u09ac\u09c7\u0964");
         return;
     }
 
-    // ৩. ডাটা অবজেক্ট তৈরি
     const addressObj = {
-        name: name,
-        mobile: mobile,
-        division: division,
-        district: district,
-        upazila: upazila,
-        details: details,
-        timestamp: new Date().getTime()
+        name: name, mobile: mobile, division: division,
+        district: district, upazila: upazila, details: details,
+        timestamp: Date.now(),
+        expiry: Date.now() + (30 * 24 * 60 * 60 * 1000)
     };
 
     try {
-        // ৪. LocalStorage-এ সেভ করা
         localStorage.setItem(_addrKey(), JSON.stringify(addressObj));
 
-        // Users array তে address save → Firebase sync হবে
         if (appState.currentUser && appState.currentUser.id) {
             const uIdx = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
             if (uIdx !== -1) {
                 appState.users[uIdx].savedAddress = addressObj;
                 localStorage.setItem(DB_KEYS.USERS, JSON.stringify(appState.users));
             }
-        }
-        
-        // ৫. তাৎক্ষণিকভাবে UI আপডেট করা (রিফ্রেশ ছাড়া)
-        const formatted = `${name}, ${mobile}, ${details}, ${upazila}, ${district}, ${division}`;
-        
-        // চেকআউট পেজের ডিসপ্লে বক্স আপডেট
-        const displayBox = document.getElementById('displaySavedAddr');
-        if (displayBox) {
-            displayBox.innerHTML = `<b style="color:#3498db;">[সেভ করা]:</b> ${formatted}`;
-            // বক্সের বর্ডার নীল করে দেওয়া (সেভ করা বোঝাতে)
-            if (document.getElementById('savedAddrBox')) {
-                document.getElementById('savedAddrBox').style.borderColor = "#3498db";
-            }
+            try {
+                if (typeof firebase !== 'undefined' && firebase.firestore) {
+                    firebase.firestore().collection('users')
+                        .doc(String(appState.currentUser.id))
+                        .set({ savedAddress: addressObj }, { merge: true })
+                        .then(() => console.log('[FB] Address saved to user:', appState.currentUser.id))
+                        .catch(e => console.warn('[FB] addr err:', e.message));
+                }
+            } catch(e) {}
         }
 
-        // অর্ডারের গোপন বা দৃশ্যমান ইনপুট আপডেট (যাতে অর্ডারের সাথে ডাটা যায়)
-        const orderInput = document.getElementById('orderAddress');
-        if (orderInput) {
-            // যদি এটি textarea হয় তবে ভ্যালু সেট হবে
-            orderInput.value = formatted;
+        const formatted = `${name}, ${mobile}, ${details}, ${upazila}, ${district}, ${division}`;
+        const displayBox = document.getElementById('displaySavedAddr');
+        if (displayBox) {
+            displayBox.innerHTML = `<b style="color:#3498db;">[\u09b8\u09c7\u09ad \u0995\u09b0\u09be]:</b> ${formatted}`;
+            if (document.getElementById('savedAddrBox')) document.getElementById('savedAddrBox').style.borderColor = "#3498db";
         }
-        
-        alert("✅ ঠিকানা প্রোফাইলে সেভ এবং আপডেট করা হয়েছে!");
-        
-        // ৬. মোডাল বন্ধ করা
+        _updateSavedAddrDropdown(addressObj);
+        const orderInput = document.getElementById('orderAddress');
+        if (orderInput) orderInput.value = formatted;
+
+        alert("\u2705 \u09a0\u09bf\u0995\u09be\u09a8\u09be \u09aa\u09cd\u09b0\u09cb\u09ab\u09be\u0987\u09b2\u09c7 \u09b8\u09c7\u09ad \u098f\u09ac\u0982 \u0986\u09aa\u09a1\u09c7\u099f \u0995\u09b0\u09be \u09b9\u09af\u09bc\u09c7\u099b\u09c7!");
         closeModal('addressModal');
-        
     } catch (error) {
         console.error("Save Error:", error);
-        alert("❌ সেভ করার সময় সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+        alert("\u274c \u09b8\u09c7\u09ad \u0995\u09b0\u09be\u09b0 \u09b8\u09ae\u09af\u09bc \u09b8\u09ae\u09b8\u09cd\u09af\u09be \u09b9\u09af\u09bc\u09c7\u099b\u09c7\u0964");
     }
 }
-// চেকআউট পেজে ডাটা লোড করার ফাংশন
+
+
+// ── Saved Address Dropdown helpers ──────────────────────────────
+function _updateSavedAddrDropdown(addr) {
+    const item = document.getElementById('savedAddrDropdownItem');
+    const textEl = document.getElementById('savedAddrDropdownText');
+    const expiryEl = document.getElementById('savedAddrExpiry');
+    if (!item || !textEl) return;
+
+    if (!addr) { item.style.display = 'none'; return; }
+
+    // ৩০ দিন expiry check
+    if (addr.expiry && Date.now() > addr.expiry) {
+        _deleteSavedAddressData();
+        item.style.display = 'none';
+        return;
+    }
+
+    const daysLeft = addr.expiry ? Math.ceil((addr.expiry - Date.now()) / (24*60*60*1000)) : 30;
+    textEl.innerHTML = `<b>${addr.name}</b> | ${addr.mobile}<br>${addr.details ? addr.details+', ' : ''}${addr.upazila}, ${addr.district}, ${addr.division}`;
+    if (expiryEl) expiryEl.textContent = `⏳ ${daysLeft} দিন পর মুছে যাবে`;
+    item.style.display = 'block';
+}
+
+function deleteSavedAddress() {
+    if (!confirm('সেভ করা ঠিকানা মুছে ফেলবেন?')) return;
+    _deleteSavedAddressData();
+    const item = document.getElementById('savedAddrDropdownItem');
+    if (item) item.style.display = 'none';
+    alert('✅ ঠিকানা মুছে ফেলা হয়েছে।');
+}
+
+function _deleteSavedAddressData() {
+    localStorage.removeItem(_addrKey());
+    if (appState.currentUser && appState.currentUser.id) {
+        const uIdx = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
+        if (uIdx !== -1) {
+            delete appState.users[uIdx].savedAddress;
+            localStorage.setItem(DB_KEYS.USERS, JSON.stringify(appState.users));
+        }
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                firebase.firestore().collection('users')
+                    .doc(String(appState.currentUser.id))
+                    .update({ savedAddress: firebase.firestore.FieldValue.delete() })
+                    .catch(() => {});
+            }
+        } catch(e) {}
+    }
+}
+
+function loadSavedAddrIntoDropdown() {
+    if (!appState.currentUser) return;
+    // expiry check করে dropdown এ দেখাই
+    const raw = localStorage.getItem(_addrKey());
+    if (!raw) {
+        // users array থেকেও চেক করি
+        const user = appState.users.find(u => String(u.id) === String(appState.currentUser.id));
+        if (user && user.savedAddress) {
+            _updateSavedAddrDropdown(user.savedAddress);
+        }
+        return;
+    }
+    try {
+        const addr = JSON.parse(raw);
+        _updateSavedAddrDropdown(addr);
+    } catch(e) {}
+}
+
 function loadSavedAddressToCheckout() {
     let savedData = localStorage.getItem(_addrKey());
 
