@@ -376,8 +376,6 @@ function checkSession() {
         if (appState.currentUser.role === 'admin' || appState.currentUser.role === 'sub_admin') {
             createFloatingAdminButton();
         }
-        // Dropdown এ saved address দেখাই
-        setTimeout(() => loadSavedAddrIntoDropdown(), 500);
     }
 }
 
@@ -2410,6 +2408,7 @@ function filterUpazilas() {
 // ✅ ADDRESS_STORAGE_KEY এখন user-specific _addrKey() ব্যবহার করে
 
 function saveAddressToProfile() {
+    // HTML থেকে ভ্যালুগুলো সংগ্রহ করা
     const name = document.getElementById('addrName').value.trim();
     const mobile = document.getElementById('addrMobile').value.trim();
     const division = document.getElementById('addrDivision').value;
@@ -2417,19 +2416,25 @@ function saveAddressToProfile() {
     const upazila = document.getElementById('addrUpazila').value;
     const details = document.getElementById('addrDetails').value.trim();
 
+    // ২. সঠিক ভ্যালিডেশন
     if (!name || !mobile || !division || !district || !upazila) {
-        alert("\u274c \u09a8\u09be\u09ae, \u09ae\u09cb\u09ac\u09be\u0987\u09b2, \u09ac\u09bf\u09ad\u09be\u0997, \u099c\u09c7\u09b2\u09be \u098f\u09ac\u0982 \u0989\u09aa\u099c\u09c7\u09b2\u09be \u0985\u09ac\u09b6\u09cd\u09af\u0987 \u09a6\u09bf\u09a4\u09c7 \u09b9\u09ac\u09c7\u0964");
+        alert("❌ নাম, মোবাইল, বিভাগ, জেলা এবং উপজেলা অবশ্যই দিতে হবে।");
         return;
     }
 
+    // ৩. ডাটা অবজেক্ট তৈরি
     const addressObj = {
-        name: name, mobile: mobile, division: division,
-        district: district, upazila: upazila, details: details,
-        timestamp: Date.now(),
-        expiry: Date.now() + (30 * 24 * 60 * 60 * 1000)
+        name: name,
+        mobile: mobile,
+        division: division,
+        district: district,
+        upazila: upazila,
+        details: details,
+        timestamp: new Date().getTime()
     };
 
     try {
+        addressObj.expiry = Date.now() + (30 * 24 * 60 * 60 * 1000);
         localStorage.setItem(_addrKey(), JSON.stringify(addressObj));
 
         if (appState.currentUser && appState.currentUser.id) {
@@ -2443,96 +2448,71 @@ function saveAddressToProfile() {
                     firebase.firestore().collection('users')
                         .doc(String(appState.currentUser.id))
                         .set({ savedAddress: addressObj }, { merge: true })
-                        .then(() => console.log('[FB] Address saved to user:', appState.currentUser.id))
                         .catch(e => console.warn('[FB] addr err:', e.message));
                 }
             } catch(e) {}
         }
 
-        const formatted = `${name}, ${mobile}, ${details}, ${upazila}, ${district}, ${division}`;
+        const formatted = `${addressObj.name}, ${addressObj.mobile}, ${addressObj.details}, ${addressObj.upazila}, ${addressObj.district}, ${addressObj.division}`;
         const displayBox = document.getElementById('displaySavedAddr');
         if (displayBox) {
-            displayBox.innerHTML = `<b style="color:#3498db;">[\u09b8\u09c7\u09ad \u0995\u09b0\u09be]:</b> ${formatted}`;
+            displayBox.innerHTML = `<b style="color:#3498db;">[সেভ করা]:</b> ${formatted}`;
             if (document.getElementById('savedAddrBox')) document.getElementById('savedAddrBox').style.borderColor = "#3498db";
         }
-        _updateSavedAddrDropdown(addressObj);
         const orderInput = document.getElementById('orderAddress');
         if (orderInput) orderInput.value = formatted;
 
-        alert("\u2705 \u09a0\u09bf\u0995\u09be\u09a8\u09be \u09aa\u09cd\u09b0\u09cb\u09ab\u09be\u0987\u09b2\u09c7 \u09b8\u09c7\u09ad \u098f\u09ac\u0982 \u0986\u09aa\u09a1\u09c7\u099f \u0995\u09b0\u09be \u09b9\u09af\u09bc\u09c7\u099b\u09c7!");
+        _showSavedAddrInModal(addressObj);
+        alert("\u2705 \u09a0\u09bf\u0995\u09be\u09a8\u09be \u09b8\u09c7\u09ad \u09b9\u09af\u09bc\u09c7\u099b\u09c7!");
         closeModal('addressModal');
     } catch (error) {
         console.error("Save Error:", error);
-        alert("\u274c \u09b8\u09c7\u09ad \u0995\u09b0\u09be\u09b0 \u09b8\u09ae\u09af\u09bc \u09b8\u09ae\u09b8\u09cd\u09af\u09be \u09b9\u09af\u09bc\u09c7\u099b\u09c7\u0964");
+        alert("\u274c \u09b8\u09c7\u09ad \u09b8\u09ae\u09b8\u09cd\u09af\u09be!");
     }
 }
 
-
-// ── Saved Address Dropdown helpers ──────────────────────────────
-function _updateSavedAddrDropdown(addr) {
-    const item = document.getElementById('savedAddrDropdownItem');
-    const textEl = document.getElementById('savedAddrDropdownText');
-    const expiryEl = document.getElementById('savedAddrExpiry');
-    if (!item || !textEl) return;
-
-    if (!addr) { item.style.display = 'none'; return; }
-
-    // ৩০ দিন expiry check
-    if (addr.expiry && Date.now() > addr.expiry) {
-        _deleteSavedAddressData();
-        item.style.display = 'none';
-        return;
-    }
-
+function _showSavedAddrInModal(addr) {
+    const box = document.getElementById('addrModalSavedBox');
+    const textEl = document.getElementById('addrModalSavedText');
+    const expiryEl = document.getElementById('addrModalExpiry');
+    if (!box || !textEl) return;
+    if (!addr) { box.style.display = 'none'; return; }
+    if (addr.expiry && Date.now() > addr.expiry) { _deleteSavedAddressData(); box.style.display = 'none'; return; }
     const daysLeft = addr.expiry ? Math.ceil((addr.expiry - Date.now()) / (24*60*60*1000)) : 30;
-    textEl.innerHTML = `<b>${addr.name}</b> | ${addr.mobile}<br>${addr.details ? addr.details+', ' : ''}${addr.upazila}, ${addr.district}, ${addr.division}`;
-    if (expiryEl) expiryEl.textContent = `⏳ ${daysLeft} দিন পর মুছে যাবে`;
-    item.style.display = 'block';
+    textEl.innerHTML = `<b style="color:#fff;">${addr.name}</b> | ${addr.mobile}<br>${addr.details ? addr.details+', ' : ''}${addr.upazila}, ${addr.district}, ${addr.division}`;
+    if (expiryEl) expiryEl.textContent = `\u23f3 ${daysLeft} \u09a6\u09bf\u09a8 \u09aa\u09b0 \u09ae\u09c1\u099b\u09c7 \u09af\u09be\u09ac\u09c7`;
+    box.style.display = 'block';
 }
 
 function deleteSavedAddress() {
-    if (!confirm('সেভ করা ঠিকানা মুছে ফেলবেন?')) return;
+    if (!confirm('\u09b8\u09c7\u09ad \u09a0\u09bf\u0995\u09be\u09a8\u09be \u09ae\u09c1\u099b\u09be\u09ac\u09c7\u09a8?')) return;
     _deleteSavedAddressData();
-    const item = document.getElementById('savedAddrDropdownItem');
-    if (item) item.style.display = 'none';
-    alert('✅ ঠিকানা মুছে ফেলা হয়েছে।');
+    const box = document.getElementById('addrModalSavedBox');
+    if (box) box.style.display = 'none';
 }
 
 function _deleteSavedAddressData() {
     localStorage.removeItem(_addrKey());
     if (appState.currentUser && appState.currentUser.id) {
         const uIdx = appState.users.findIndex(u => String(u.id) === String(appState.currentUser.id));
-        if (uIdx !== -1) {
-            delete appState.users[uIdx].savedAddress;
-            localStorage.setItem(DB_KEYS.USERS, JSON.stringify(appState.users));
-        }
+        if (uIdx !== -1) { delete appState.users[uIdx].savedAddress; localStorage.setItem(DB_KEYS.USERS, JSON.stringify(appState.users)); }
         try {
             if (typeof firebase !== 'undefined' && firebase.firestore) {
-                firebase.firestore().collection('users')
-                    .doc(String(appState.currentUser.id))
-                    .update({ savedAddress: firebase.firestore.FieldValue.delete() })
-                    .catch(() => {});
+                firebase.firestore().collection('users').doc(String(appState.currentUser.id))
+                    .update({ savedAddress: firebase.firestore.FieldValue.delete() }).catch(()=>{});
             }
         } catch(e) {}
     }
 }
 
-function loadSavedAddrIntoDropdown() {
-    if (!appState.currentUser) return;
-    // expiry check করে dropdown এ দেখাই
-    const raw = localStorage.getItem(_addrKey());
-    if (!raw) {
-        // users array থেকেও চেক করি
-        const user = appState.users.find(u => String(u.id) === String(appState.currentUser.id));
-        if (user && user.savedAddress) {
-            _updateSavedAddrDropdown(user.savedAddress);
-        }
-        return;
-    }
-    try {
-        const addr = JSON.parse(raw);
-        _updateSavedAddrDropdown(addr);
-    } catch(e) {}
+function openAddressModalWithData() {
+    openModal('addressModal');
+    setTimeout(() => {
+        const raw = localStorage.getItem(_addrKey());
+        if (raw) { try { _showSavedAddrInModal(JSON.parse(raw)); } catch(e) {} return; }
+        const user = appState.users.find(u => appState.currentUser && String(u.id) === String(appState.currentUser.id));
+        if (user && user.savedAddress) _showSavedAddrInModal(user.savedAddress);
+    }, 150);
 }
 
 function loadSavedAddressToCheckout() {

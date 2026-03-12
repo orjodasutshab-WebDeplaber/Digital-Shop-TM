@@ -140,18 +140,7 @@
                 <li class="dp-item" onclick="openModal('resetPasswordModal')"><i class="fa fa-key"></i> পাসওয়ার্ড পরিবর্তন</li>
                 <li class="dp-item" onclick="openModal('resetUsernameModal')"><i class="fa fa-user-edit"></i> ইউজারনেম পরিবর্তন</li>
                 <li class="dp-item" onclick="toggleThemeMode()"><i class="fa fa-moon"></i> নাইট মোড (অন/অফ)</li>
-                <li class="dp-item" onclick="openModal('addressModal')"><i class="fa fa-map-marker-alt"></i> নতুন এড্রেস সেভ</li>
-                <!-- সেভ করা এড্রেস দেখাবে এখানে -->
-                <li id="savedAddrDropdownItem" style="display:none; padding: 8px 15px;">
-                    <div style="background: #0f172a; border: 1px solid #1e40af; border-radius: 10px; padding: 10px 12px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                            <span style="color:#60a5fa; font-size:12px; font-weight:bold;"><i class="fa fa-map-marker-alt" style="color:#60a5fa;"></i> সেভ করা এড্রেস</span>
-                            <span onclick="deleteSavedAddress()" style="color:#ef4444; font-size:11px; cursor:pointer; padding:2px 6px; border:1px solid #ef4444; border-radius:4px;">✕ মুছুন</span>
-                        </div>
-                        <div id="savedAddrDropdownText" style="color:#cbd5e1; font-size:12px; line-height:1.5;"></div>
-                        <div id="savedAddrExpiry" style="color:#94a3b8; font-size:10px; margin-top:4px;"></div>
-                    </div>
-                </li>
+                <li class="dp-item" onclick="openAddressModalWithData()"><i class="fa fa-map-marker-alt"></i> নতুন এড্রেস সেভ</li>
                 <li class="dp-item" onclick="openHelpModal()"><i class="fa fa-headset"></i> হেল্প(সরাসরি)</li>
                 <li class="dp-item" onclick="openDiscountModule()" style="display: flex; align-items: center; justify-content: space-between; position: relative; cursor: pointer;">
                 <div>
@@ -1071,6 +1060,16 @@ document.addEventListener('click', function(event) {
             <select id="addrUpazila" class="addr-input" style="background: #0f172a;"><option value="">উপজেলা/থানা সিলেক্ট করুন</option></select>
             <textarea id="addrDetails" rows="3" placeholder="বিস্তারিত ঠিকানা (যেমন: গ্রাম, পাড়া, হাউজ নং, রোড নং...)" class="addr-input" style="resize: none;"></textarea>
             <button class="btn-primary" onclick="saveAddressToProfile()" style="background: #3498db; color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 16px;">সেভ করুন</button>
+            
+            <!-- সেভ করা এড্রেস এখানে দেখাবে -->
+            <div id="addrModalSavedBox" style="display:none; background:#0f172a; border:1px solid #1e40af; border-radius:12px; padding:12px 15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <span style="color:#60a5fa; font-size:13px; font-weight:bold;"><i class="fa fa-map-marker-alt"></i> সেভ করা ঠিকানা</span>
+                    <span onclick="deleteSavedAddress()" style="color:#ef4444; font-size:11px; cursor:pointer; padding:3px 8px; border:1px solid #ef4444; border-radius:5px;">✕ মুছুন</span>
+                </div>
+                <div id="addrModalSavedText" style="color:#cbd5e1; font-size:13px; line-height:1.7;"></div>
+                <div id="addrModalExpiry" style="color:#64748b; font-size:11px; margin-top:5px;"></div>
+            </div>
         </div>
     </div>
 </div>
