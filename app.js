@@ -2616,21 +2616,18 @@ document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclic
 
 // অর্ডার ডিলিট করার জন্য নতুন ফাংশন
 function cancelUserOrder(orderId) {
-    if (confirm("আপনি কি নিশ্চিত যে আপনি এই অর্ডারটি ডিলিট করতে চান?")) {
-        // ১. appState থেকে বাদ
-        appState.orders = appState.orders.filter(function(o) { return o.id !== orderId; });
-        // ২. localStorage সেভ
+    if (confirm("আপনি কি নিশ্চিত যে আপনি এই অর্ডারটি চিরতরে ডিলিট করতে চান?")) {
+        // ডাটাবেজ থেকে ফিল্টার করে ডিলিট করা
+        appState.orders = appState.orders.filter(function(o) {
+            return o.id !== orderId;
+        });
+        
+        // লোকাল স্টোরেজে সেভ করা
         saveData(DB_KEYS.ORDERS, appState.orders);
-        // ৩. Firebase থেকে delete
-        try {
-            if (typeof firebase !== 'undefined' && firebase.firestore) {
-                firebase.firestore().collection('orders').doc(String(orderId)).delete()
-                    .then(() => console.log('[FB] User order deleted:', orderId))
-                    .catch(e => console.warn('[FB] user order delete err:', e.message));
-            }
-        } catch(e) {}
-        // ৪. UI refresh
+        
+        // ভিউ আপডেট করা (আবার ট্র্যাকিং ওপেন করে রিফ্রেশ করা)
         document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").click();
+        
         alert("অর্ডারটি সফলভাবে ডিলিট করা হয়েছে।");
     }
 }
@@ -3414,29 +3411,18 @@ function openUserOrders() {
 
         myOrders.reverse().forEach(order => {
             const isDelivered = (order.status === 'Delivered' || order.status === 'ডেলিভারি সম্পন্ন');
+            
+            // --- নতুন লজিক: চেক করা হচ্ছে এই অর্ডারের বিপরীতে কোনো রিটার্ন রিকোয়েস্ট অলরেডি আছে কি না ---
             const hasRequestedReturn = allReturns.some(ret => String(ret.orderId) === String(order.id));
-
-            // পণ্যের ছবি বের করা
-            let oImg = '';
-            const oProd = appState.products.find(p => String(p.id) === String(order.productId));
-            if (oProd) {
-                const imgs = Array.isArray(oProd.images) ? oProd.images : [oProd.images || oProd.image];
-                oImg = imgs[0] || '';
-            }
-            if (!oImg) oImg = order.productImage || order.image || 'https://placehold.co/60x60?text=IMG';
 
             html += `
                 <div class="user-order-card" style="background: #1e293b; border: 1px solid #334155; border-radius: 15px; padding: 18px; margin-bottom: 15px; color: #fff;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <img src="${oImg}" onerror="this.src='https://placehold.co/60x60?text=IMG'" style="width:60px; height:60px; border-radius:10px; object-fit:cover; border:2px solid #334155; background:#0f172a; flex-shrink:0;">
-                            <div>
-                                <span style="font-size: 10px; color: #94a3b8; font-weight: bold;">ID: #${order.id}</span>
-                                <h4 style="margin: 5px 0; color: #f8fafc; font-size: 15px;">${order.productName}</h4>
-                                <span style="font-size:11px; color:#94a3b8;">পরিমাণ: ${order.orderQty || 1} পিস</span>
-                            </div>
+                        <div>
+                            <span style="font-size: 10px; color: #94a3b8; font-weight: bold;">ID: #${order.id}</span>
+                            <h4 style="margin: 5px 0; color: #f8fafc; font-size: 15px;">${order.productName}</h4>
                         </div>
-                        <span style="background: ${isDelivered ? 'rgba(39, 174, 96, 0.2)' : 'rgba(243, 156, 18, 0.2)'}; color: ${isDelivered ? '#2ecc71' : '#f39c12'}; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; white-space:nowrap;">
+                        <span style="background: ${isDelivered ? 'rgba(39, 174, 96, 0.2)' : 'rgba(243, 156, 18, 0.2)'}; color: ${isDelivered ? '#2ecc71' : '#f39c12'}; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold;">
                             ${order.status}
                         </span>
                     </div>
@@ -3637,11 +3623,11 @@ function submitReturnRequest(orderId) {
         alert("❌ সঠিক ১১ ডিজিটের মোবাইল নাম্বার দিন!"); return;
     }
 
-    if (typeof appState === 'undefined') { alert("⚠️ সিস্টেম এরর: appState খুঁজে পাওয়া যায়নি!"); return; }
+    if (typeof appState === 'undefined') { alert("⚠️ সিস্টেম এরর!"); return; }
     if (!appState.returns) appState.returns = [];
 
     const returnData = {
-        id: 'RET' + Math.floor(Math.random() * 1000000),
+        id: 'RET' + Date.now() + Math.floor(Math.random() * 1000),
         orderId: orderId,
         userId: (appState.currentUser && appState.currentUser.id) ? appState.currentUser.id : 'GUEST-' + Date.now(),
         userName: (appState.currentUser && appState.currentUser.name) ? appState.currentUser.name : 'Unknown User',
@@ -3667,42 +3653,46 @@ function submitReturnRequest(orderId) {
         appState.orders[orderIndex].returnStatus = 'পেন্ডিং';
     }
 
+    // ── localStorage সেভ ──
+    const RETURN_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.RETURNS) ? DB_KEYS.RETURNS : 'TM_DB_RETURNS_V2';
+    const ORDER_KEY  = (typeof DB_KEYS !== 'undefined' && DB_KEYS.ORDERS)  ? DB_KEYS.ORDERS  : 'TM_DB_ORDERS_V2';
     try {
-        const RETURN_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.RETURNS) ? DB_KEYS.RETURNS : 'TM_DB_RETURNS_V2';
-        const ORDER_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.ORDERS) ? DB_KEYS.ORDERS : 'TM_DB_ORDERS_V2';
-
         if (typeof saveData === 'function') {
-            saveData(ORDER_KEY, appState.orders);
             saveData(RETURN_KEY, appState.returns);
+            saveData(ORDER_KEY, appState.orders);
         } else {
-            localStorage.setItem(ORDER_KEY, JSON.stringify(appState.orders));
             localStorage.setItem(RETURN_KEY, JSON.stringify(appState.returns));
+            localStorage.setItem(ORDER_KEY,  JSON.stringify(appState.orders));
         }
+    } catch(e) {}
 
-        // ── Firebase এ সরাসরি push ──
-        try {
-            if (typeof firebase !== 'undefined' && firebase.firestore) {
-                const fdb = firebase.firestore();
-                // Return document save
-                fdb.collection('returns').doc(String(returnData.id)).set(returnData)
-                    .then(() => console.log('[FB] ✅ Return saved:', returnData.id))
-                    .catch(e => console.warn('[FB] return save err:', e.message));
-                // Order document update (isReturned flag)
-                if (orderIndex !== -1) {
-                    fdb.collection('orders').doc(String(orderId)).set(appState.orders[orderIndex])
-                        .catch(e => console.warn('[FB] order update err:', e.message));
-                }
-            }
-        } catch(fe) { console.warn('[FB] return firebase err:', fe); }
+    // ── Firebase এ সরাসরি save — reload এর আগেই await করি ──
+    const modal = document.getElementById('returnModal');
+    if (modal) modal.remove();
 
-        alert("✅ আপনার রিটার্ন রিকোয়েস্ট সফলভাবে জমা হয়েছে।");
-        const modal = document.getElementById('returnModal');
-        if(modal) modal.remove();
-        setTimeout(() => { location.reload(); }, 500);
+    function _doReload() { setTimeout(() => location.reload(), 300); }
 
-    } catch (error) {
-        console.error("Return Submission Error:", error);
-        alert("⚠️ ডাটা সেভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+    if (typeof firebase !== 'undefined' && firebase.firestore) {
+        const fdb = firebase.firestore();
+        const retSave   = fdb.collection('returns').doc(String(returnData.id)).set(returnData);
+        const orderSave = (orderIndex !== -1)
+            ? fdb.collection('orders').doc(String(orderId)).set(appState.orders[orderIndex])
+            : Promise.resolve();
+
+        Promise.all([retSave, orderSave])
+            .then(() => {
+                console.log('[FB] ✅ Return + Order saved to Firebase:', returnData.id);
+                alert("✅ রিটার্ন রিকোয়েস্ট সফলভাবে জমা হয়েছে।");
+                _doReload();
+            })
+            .catch(e => {
+                console.warn('[FB] return save err:', e.message);
+                alert("✅ রিটার্ন জমা হয়েছে (অফলাইন মোড)।");
+                _doReload();
+            });
+    } else {
+        alert("✅ রিটার্ন রিকোয়েস্ট জমা হয়েছে।");
+        _doReload();
     }
 }
 // এডমিন প্যানেলে রিটার্ন লিস্ট দেখানোর সঠিক ফাংশন
