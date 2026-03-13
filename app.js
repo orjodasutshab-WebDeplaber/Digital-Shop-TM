@@ -2616,18 +2616,21 @@ document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclic
 
 // অর্ডার ডিলিট করার জন্য নতুন ফাংশন
 function cancelUserOrder(orderId) {
-    if (confirm("আপনি কি নিশ্চিত যে আপনি এই অর্ডারটি চিরতরে ডিলিট করতে চান?")) {
-        // ডাটাবেজ থেকে ফিল্টার করে ডিলিট করা
-        appState.orders = appState.orders.filter(function(o) {
-            return o.id !== orderId;
-        });
-        
-        // লোকাল স্টোরেজে সেভ করা
+    if (confirm("আপনি কি নিশ্চিত যে আপনি এই অর্ডারটি ডিলিট করতে চান?")) {
+        // ১. appState থেকে বাদ
+        appState.orders = appState.orders.filter(function(o) { return o.id !== orderId; });
+        // ২. localStorage সেভ
         saveData(DB_KEYS.ORDERS, appState.orders);
-        
-        // ভিউ আপডেট করা (আবার ট্র্যাকিং ওপেন করে রিফ্রেশ করা)
+        // ৩. Firebase থেকে delete
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                firebase.firestore().collection('orders').doc(String(orderId)).delete()
+                    .then(() => console.log('[FB] User order deleted:', orderId))
+                    .catch(e => console.warn('[FB] user order delete err:', e.message));
+            }
+        } catch(e) {}
+        // ৪. UI refresh
         document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").click();
-        
         alert("অর্ডারটি সফলভাবে ডিলিট করা হয়েছে।");
     }
 }
@@ -3411,18 +3414,29 @@ function openUserOrders() {
 
         myOrders.reverse().forEach(order => {
             const isDelivered = (order.status === 'Delivered' || order.status === 'ডেলিভারি সম্পন্ন');
-            
-            // --- নতুন লজিক: চেক করা হচ্ছে এই অর্ডারের বিপরীতে কোনো রিটার্ন রিকোয়েস্ট অলরেডি আছে কি না ---
             const hasRequestedReturn = allReturns.some(ret => String(ret.orderId) === String(order.id));
+
+            // পণ্যের ছবি বের করা
+            let oImg = '';
+            const oProd = appState.products.find(p => String(p.id) === String(order.productId));
+            if (oProd) {
+                const imgs = Array.isArray(oProd.images) ? oProd.images : [oProd.images || oProd.image];
+                oImg = imgs[0] || '';
+            }
+            if (!oImg) oImg = order.productImage || order.image || 'https://placehold.co/60x60?text=IMG';
 
             html += `
                 <div class="user-order-card" style="background: #1e293b; border: 1px solid #334155; border-radius: 15px; padding: 18px; margin-bottom: 15px; color: #fff;">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                        <div>
-                            <span style="font-size: 10px; color: #94a3b8; font-weight: bold;">ID: #${order.id}</span>
-                            <h4 style="margin: 5px 0; color: #f8fafc; font-size: 15px;">${order.productName}</h4>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <img src="${oImg}" onerror="this.src='https://placehold.co/60x60?text=IMG'" style="width:60px; height:60px; border-radius:10px; object-fit:cover; border:2px solid #334155; background:#0f172a; flex-shrink:0;">
+                            <div>
+                                <span style="font-size: 10px; color: #94a3b8; font-weight: bold;">ID: #${order.id}</span>
+                                <h4 style="margin: 5px 0; color: #f8fafc; font-size: 15px;">${order.productName}</h4>
+                                <span style="font-size:11px; color:#94a3b8;">পরিমাণ: ${order.orderQty || 1} পিস</span>
+                            </div>
                         </div>
-                        <span style="background: ${isDelivered ? 'rgba(39, 174, 96, 0.2)' : 'rgba(243, 156, 18, 0.2)'}; color: ${isDelivered ? '#2ecc71' : '#f39c12'}; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold;">
+                        <span style="background: ${isDelivered ? 'rgba(39, 174, 96, 0.2)' : 'rgba(243, 156, 18, 0.2)'}; color: ${isDelivered ? '#2ecc71' : '#f39c12'}; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold; white-space:nowrap;">
                             ${order.status}
                         </span>
                     </div>
@@ -3599,10 +3613,8 @@ window.toggleRefundFields = function() {
     }
 };
 function submitReturnRequest(orderId) {
-    // ১. চেক করা যে অর্ডার আইডি আছে কিনা
     if (!orderId) return alert("❌ অর্ডার রেফারেন্স পাওয়া যায়নি!");
 
-    // ২. ফিল্ডগুলো থেকে ডাটা নেওয়া
     const reasonElem = document.getElementById('returnReason');
     const methodElem = document.getElementById('refundMethod');
     const payTypeElem = document.getElementById('paymentType');
@@ -3613,66 +3625,41 @@ function submitReturnRequest(orderId) {
     const payType = payTypeElem ? payTypeElem.value : 'Mobile Banking';
     const payNum = payNumElem ? payNumElem.value.trim() : '';
 
-    // --- ৩. মাল্টিপল ইমেজ লিঙ্ক সংগ্রহ করা (নতুন অংশ) ---
     const imageInputs = document.querySelectorAll('.return-image-url');
     const imageUrls = [];
     imageInputs.forEach(input => {
-        if (input.value.trim() !== "") {
-            imageUrls.push(input.value.trim());
-        }
+        if (input.value.trim() !== "") imageUrls.push(input.value.trim());
     });
 
-    // ৪. ভ্যালিডেশন চেক
-    if (!reason) {
-        alert("❌ দয়া করে রিটার্নের কারণ লিখুন!");
-        return;
-    }
-    
-    if (imageUrls.length === 0) {
-        alert("❌ অন্তত একটি ছবির লিঙ্ক প্রদান করুন!");
-        return;
-    }
-    
-    if (method === 'payment') {
-        if (!payNum || payNum.length < 11) {
-            alert("❌ সঠিক ১১ ডিজিটের মোবাইল নাম্বার দিন!");
-            return;
-        }
+    if (!reason) { alert("❌ দয়া করে রিটার্নের কারণ লিখুন!"); return; }
+    if (imageUrls.length === 0) { alert("❌ অন্তত একটি ছবির লিঙ্ক প্রদান করুন!"); return; }
+    if (method === 'payment' && (!payNum || payNum.length < 11)) {
+        alert("❌ সঠিক ১১ ডিজিটের মোবাইল নাম্বার দিন!"); return;
     }
 
-    // ৫. গ্লোবাল স্টেট চেক ও তৈরি
-    if (typeof appState === 'undefined') {
-        alert("⚠️ সিস্টেম এরর: appState খুঁজে পাওয়া যায়নি!");
-        return;
-    }
-    
-    // রিটার্ন লিস্ট না থাকলে তৈরি করে নেওয়া
+    if (typeof appState === 'undefined') { alert("⚠️ সিস্টেম এরর: appState খুঁজে পাওয়া যায়নি!"); return; }
     if (!appState.returns) appState.returns = [];
 
-    // ৬. ডাটা অবজেক্ট তৈরি (অ্যাডমিন প্যানেলের সাথে মিল রেখে)
     const returnData = {
-        id: 'RET' + Math.floor(Math.random() * 1000000), // ইউনিক আইডি
+        id: 'RET' + Math.floor(Math.random() * 1000000),
         orderId: orderId,
         userId: (appState.currentUser && appState.currentUser.id) ? appState.currentUser.id : 'GUEST-' + Date.now(),
         userName: (appState.currentUser && appState.currentUser.name) ? appState.currentUser.name : 'Unknown User',
         reason: reason,
-        // এখানে একটি স্ট্রিং এর বদলে এখন পুরো লিস্ট (Array) সেভ হচ্ছে
-        images: imageUrls, 
-        image: imageUrls[0], // ব্যাকওয়ার্ড কম্প্যাটিবিলিটির জন্য প্রথম ছবিটা আলাদা রাখা হলো
+        images: imageUrls,
+        image: imageUrls[0],
         refundMethod: method,
         paymentDetails: method === 'payment' ? `${payType}: ${payNum}` : 'Voucher Request',
         status: 'পেন্ডিং',
         statusHistory: [
             { text: 'রিটার্ন রিকোয়েস্ট জমা দেওয়া হয়েছে', time: new Date().toLocaleString('bn-BD') }
         ],
-        messages: [], 
-        date: new Date().toLocaleString('bn-BD') 
+        messages: [],
+        date: new Date().toLocaleString('bn-BD')
     };
 
-    // ৭. স্টেট আপডেট এবং অর্ডার মার্ক করা
     appState.returns.push(returnData);
-    
-    // অর্ডারের ভেতর রিটার্ন ইনফো আপডেট
+
     const orderIndex = appState.orders.findIndex(o => String(o.id) === String(orderId));
     if (orderIndex !== -1) {
         appState.orders[orderIndex].isReturned = true;
@@ -3680,11 +3667,10 @@ function submitReturnRequest(orderId) {
         appState.orders[orderIndex].returnStatus = 'পেন্ডিং';
     }
 
-    // ৮. লোকাল স্টোরেজে সেভ করা
     try {
-        const RETURN_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.RETURNS) ? DB_KEYS.RETURNS : 'returns';
-        const ORDER_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.ORDERS) ? DB_KEYS.ORDERS : 'orders';
-        
+        const RETURN_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.RETURNS) ? DB_KEYS.RETURNS : 'TM_DB_RETURNS_V2';
+        const ORDER_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.ORDERS) ? DB_KEYS.ORDERS : 'TM_DB_ORDERS_V2';
+
         if (typeof saveData === 'function') {
             saveData(ORDER_KEY, appState.orders);
             saveData(RETURN_KEY, appState.returns);
@@ -3692,18 +3678,28 @@ function submitReturnRequest(orderId) {
             localStorage.setItem(ORDER_KEY, JSON.stringify(appState.orders));
             localStorage.setItem(RETURN_KEY, JSON.stringify(appState.returns));
         }
-        
+
+        // ── Firebase এ সরাসরি push ──
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                const fdb = firebase.firestore();
+                // Return document save
+                fdb.collection('returns').doc(String(returnData.id)).set(returnData)
+                    .then(() => console.log('[FB] ✅ Return saved:', returnData.id))
+                    .catch(e => console.warn('[FB] return save err:', e.message));
+                // Order document update (isReturned flag)
+                if (orderIndex !== -1) {
+                    fdb.collection('orders').doc(String(orderId)).set(appState.orders[orderIndex])
+                        .catch(e => console.warn('[FB] order update err:', e.message));
+                }
+            }
+        } catch(fe) { console.warn('[FB] return firebase err:', fe); }
+
         alert("✅ আপনার রিটার্ন রিকোয়েস্ট সফলভাবে জমা হয়েছে।");
-        
-        // মোডাল বন্ধ করা
         const modal = document.getElementById('returnModal');
         if(modal) modal.remove();
-        
-        // পেজ রিফ্রেশ (যাতে UI আপডেট হয়)
-        setTimeout(() => {
-            location.reload();
-        }, 500);
-        
+        setTimeout(() => { location.reload(); }, 500);
+
     } catch (error) {
         console.error("Return Submission Error:", error);
         alert("⚠️ ডাটা সেভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
