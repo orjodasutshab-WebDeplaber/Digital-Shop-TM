@@ -1436,17 +1436,25 @@ function deleteAdminNote(index) {
     }
 }
 function adminDeleteOrder(orderId) {
-    if(confirm("আপনি কি নিশ্চিতভাবে এই অর্ডারটি ডিলিট করতে চান? এটি ইউজারের প্রোফাইল থেকেও মুছে যাবে।")) {
-        // মেইন অর্ডার লিস্ট থেকে ওই আইডি বাদ দেওয়া
+    if(confirm("আপনি কি নিশ্চিতভাবে এই অর্ডারটি ডিলিট করতে চান?")) {
+        // ১. appState থেকে বাদ দেওয়া
         appState.orders = appState.orders.filter(order => order.id !== orderId);
         
-        // ডাটাবেস আপডেট (LocalStorage)
+        // ২. localStorage আপডেট
         saveData(DB_KEYS.ORDERS, appState.orders);
         
-        // অ্যাডমিন প্যানেল রিফ্রেশ
-        loadAdminTab('orders');
+        // ৩. Firebase থেকেও ডিলিট
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                firebase.firestore().collection('orders').doc(String(orderId)).delete()
+                    .then(() => console.log('[FB] Order deleted:', orderId))
+                    .catch(e => console.warn('[FB] order delete err:', e.message));
+            }
+        } catch(e) {}
         
-        alert("✅ অর্ডারটি সফলভাবে ডিলিট করা হয়েছে।");
+        // ৪. অ্যাডমিন প্যানেল রিফ্রেশ
+        loadAdminTab('orders');
+        alert("✅ অর্ডারটি সফলভাবে ডিলিট করা হয়েছে।");
     }
 }
 
