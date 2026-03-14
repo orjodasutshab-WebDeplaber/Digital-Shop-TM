@@ -8386,33 +8386,91 @@ function showNoticeBoardPopup() {
     const today = new Date().toISOString().slice(0, 10);
     const lastShown = localStorage.getItem('TM_NOTICE_LAST_SHOWN');
     if (lastShown === today) return;
-    const n = notices[0];
+
+    let currentIdx = 0;
     localStorage.setItem('TM_NOTICE_LAST_SHOWN', today);
+
+    function renderNoticeContent(n) {
+        return `
+            <!-- ছবি -->
+            ${n.img ? `<div style="width:100%; border-radius:12px; overflow:hidden; margin-bottom:18px; max-height:260px;">
+                <img src="${n.img}" style="width:100%; height:260px; object-fit:cover; display:block;" onerror="this.parentElement.style.display='none'">
+            </div>` : ''}
+
+            <!-- Badge + Title -->
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                <span style="background:#f0f9ff; color:#0369a1; font-size:11px; font-weight:700; padding:4px 12px; border-radius:20px; border:1px solid #bae6fd; white-space:nowrap;">📢 নোটিশ</span>
+                <h3 style="color:#0f172a; font-size:16px; font-weight:800; margin:0; line-height:1.4; flex:1;">${n.title}</h3>
+            </div>
+
+            <!-- বিস্তারিত text -->
+            ${n.detail ? `<div style="background:#f8fafc; border-left:4px solid #3b82f6; border-radius:0 10px 10px 0; padding:12px 16px; margin-bottom:18px;">
+                <p style="color:#334155; font-size:13px; line-height:1.8; margin:0; white-space:pre-wrap;">${n.detail}</p>
+            </div>` : ''}
+        `;
+    }
+
     const popup = document.createElement('div');
     popup.id = 'noticeBoardPopup';
     popup.style.cssText = `
-        position:fixed; inset:0; background:rgba(0,0,0,0.75);
-        backdrop-filter:blur(6px); z-index:999999999;
+        position:fixed; inset:0; background:rgba(15,23,42,0.6);
+        backdrop-filter:blur(8px); z-index:999999999;
         display:flex; align-items:center; justify-content:center;
-        animation:nbFadeIn 0.4s ease;
+        padding:16px; animation:nbFadeIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
     `;
+
     popup.innerHTML = `
         <style>
-            @keyframes nbFadeIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
-            @keyframes nbFadeOut { from{opacity:1;transform:scale(1)} to{opacity:0;transform:scale(0.9)} }
+            @keyframes nbFadeIn  { from{opacity:0;transform:scale(0.92)} to{opacity:1;transform:scale(1)} }
+            @keyframes nbFadeOut { from{opacity:1;transform:scale(1)} to{opacity:0;transform:scale(0.92)} }
         </style>
-        <div style="background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:18px; padding:28px; max-width:970px; width:90%; position:relative; box-shadow:0 20px 60px rgba(233,30,140,0.3); border:1px solid rgba(233,30,140,0.3); text-align:center;">
-            <button onclick="closeNoticeBoardPopup()" style="position:absolute; top:12px; right:14px; background:rgba(255,255,255,0.1); border:none; color:#fff; font-size:20px; width:34px; height:34px; border-radius:50%; cursor:pointer; line-height:1;">✕</button>
-            <div style="display:inline-block; background:linear-gradient(135deg,#e91e8c,#9c27b0); color:#fff; font-size:13px; font-weight:700; padding:5px 14px; border-radius:20px; margin-bottom:14px;">📢 নোটিশ</div>
-            ${n.img ? `<img src="${n.img}" style="width:100%; max-height:420px; object-fit:cover; border-radius:10px; margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
-            <h3 style="color:#fff; font-size:18px; margin:0 0 20px 0; line-height:1.5;">${n.title}</h3>
-            <div style="display:flex; gap:10px; justify-content:center;">
-                <button onclick="closeNoticeBoardPopup()" style="background:rgba(255,255,255,0.1); color:#ccc; border:1px solid #444; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:14px;">এড়িয়ে যান</button>
-                ${n.detail ? `<button onclick="window.open('${n.detail}','_blank'); closeNoticeBoardPopup();" style="background:linear-gradient(135deg,#e91e8c,#9c27b0); color:#fff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:14px; font-weight:700;">বিস্তারিত দেখুন</button>` : ''}
+        <div id="nbCard" style="
+            background:#ffffff; border-radius:20px; width:100%; max-width:460px;
+            box-shadow:0 24px 64px rgba(0,0,0,0.18); overflow:hidden;
+            border:1px solid #e2e8f0; position:relative; max-height:90vh; display:flex; flex-direction:column;">
+
+            <!-- Header bar -->
+            <div style="background:#1e293b; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:8px; height:8px; background:#22c55e; border-radius:50%; box-shadow:0 0 6px #22c55e;"></div>
+                    <span style="color:#f1f5f9; font-size:13px; font-weight:700; letter-spacing:0.5px;">Digital Shop TM — নোটিশ</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    ${notices.length > 1 ? `<span id="nbCounter" style="color:#94a3b8; font-size:11px; font-weight:600;">১/${notices.length}</span>` : ''}
+                    <button onclick="closeNoticeBoardPopup()" style="background:rgba(255,255,255,0.1); border:none; color:#94a3b8; width:28px; height:28px; border-radius:8px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; line-height:1;">✕</button>
+                </div>
+            </div>
+
+            <!-- Body — scroll করা যাবে -->
+            <div id="nbBody" style="padding:20px; overflow-y:auto; flex:1;">
+                ${renderNoticeContent(notices[0])}
+            </div>
+
+            <!-- Footer buttons -->
+            <div style="padding:14px 20px; border-top:1px solid #f1f5f9; display:flex; gap:10px; justify-content:flex-end; flex-shrink:0; background:#fff;">
+                ${notices.length > 1 ? `
+                <button id="nbPrev" onclick="nbNavigate(-1)" style="background:#f1f5f9; color:#64748b; border:none; padding:9px 16px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; display:none;">‹ আগের</button>
+                <button id="nbNext" onclick="nbNavigate(1)" style="background:#3b82f6; color:#fff; border:none; padding:9px 16px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600;">পরের ›</button>
+                ` : ''}
+                <button onclick="closeNoticeBoardPopup()" style="background:#0f172a; color:#fff; border:none; padding:9px 20px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:700;">ঠিক আছে</button>
             </div>
         </div>
     `;
     document.body.appendChild(popup);
+
+    // Next/Prev navigation
+    window.nbNavigate = function(dir) {
+        currentIdx += dir;
+        if (currentIdx < 0) currentIdx = 0;
+        if (currentIdx >= notices.length) currentIdx = notices.length - 1;
+        document.getElementById('nbBody').innerHTML = renderNoticeContent(notices[currentIdx]);
+        const counter = document.getElementById('nbCounter');
+        if (counter) counter.textContent = (currentIdx+1) + '/' + notices.length;
+        const prev = document.getElementById('nbPrev');
+        const next = document.getElementById('nbNext');
+        if (prev) prev.style.display = currentIdx > 0 ? 'block' : 'none';
+        if (next) next.style.display = currentIdx < notices.length-1 ? 'block' : 'none';
+    };
 }
 
 function closeNoticeBoardPopup() {
