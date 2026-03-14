@@ -5438,6 +5438,15 @@ function requestForCode() {
     saveData('special_requests', appState.specialRequests);
     saveData(DB_KEYS.USERS, appState.users);
 
+    // Firebase এ সরাসরি reqId দিয়ে save — সঠিক document ID নিশ্চিত
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('special_requests').doc(String(newRequest.reqId)).set(newRequest)
+                .then(() => console.log('[FB] ✅ Request saved:', newRequest.reqId))
+                .catch(e => console.warn('[FB] request save err:', e.message));
+        }
+    } catch(e) {}
+
     alert("✅ রিকোয়েস্ট পাঠানো হয়েছে!");
 }
 // কার্ড রেন্ডার করার ফাংশন কল (মোডাল ওপেন হলে)

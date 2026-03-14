@@ -93,7 +93,7 @@ window.pushToCloud = async function(lsKey) {
       for (let i = 0; i < data.length; i += CHUNK) {
         const b = db.batch();
         data.slice(i, i+CHUNK).forEach((item, j) => {
-          const id = item.id ? String(item.id) : String(i+j);
+          const id = item.id ? String(item.id) : (item.reqId ? String(item.reqId) : (item.cardId ? String(item.cardId) : String(i+j)));
           b.set(db.collection(col).doc(id), JSON.parse(JSON.stringify(item)));
         });
         await b.commit();
