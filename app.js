@@ -8392,6 +8392,77 @@ function showNoticeBoardPopup() {
 
     function renderNoticeContent(n) {
         return `
+            ${n.img ? `<img src="${n.img}" style="width:100%; max-height:420px; object-fit:cover; border-radius:10px; margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
+            <div style="display:inline-block; background:linear-gradient(135deg,#e91e8c,#9c27b0); color:#fff; font-size:13px; font-weight:700; padding:5px 14px; border-radius:20px; margin-bottom:14px;">📢 নোটিশ</div>
+            <h3 style="color:#fff; font-size:18px; margin:0 0 12px 0; line-height:1.5;">${n.title}</h3>
+            ${n.detail ? `<p style="color:#cbd5e1; font-size:13px; line-height:1.8; margin:0 0 18px 0; white-space:pre-wrap;">${n.detail}</p>` : ''}
+        `;
+    }
+
+    const popup = document.createElement('div');
+    popup.id = 'noticeBoardPopup';
+    popup.style.cssText = `
+        position:fixed; inset:0; background:rgba(0,0,0,0.75);
+        backdrop-filter:blur(6px); z-index:999999999;
+        display:flex; align-items:center; justify-content:center;
+        animation:nbFadeIn 0.4s ease; padding:16px;
+    `;
+    popup.innerHTML = `
+        <style>
+            @keyframes nbFadeIn  { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+            @keyframes nbFadeOut { from{opacity:1;transform:scale(1)} to{opacity:0;transform:scale(0.9)} }
+        </style>
+        <div style="background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:18px; padding:28px;
+                    max-width:820px; width:100%; position:relative;
+                    box-shadow:0 20px 60px rgba(233,30,140,0.3);
+                    border:1px solid rgba(233,30,140,0.3); text-align:center;
+                    max-height:90vh; overflow-y:auto;">
+
+            <!-- Close button -->
+            <button onclick="closeNoticeBoardPopup()" style="position:absolute; top:12px; right:14px; background:rgba(255,255,255,0.1); border:none; color:#fff; font-size:20px; width:34px; height:34px; border-radius:50%; cursor:pointer; line-height:1;">✕</button>
+
+            <!-- Counter (একাধিক notice থাকলে) -->
+            ${notices.length > 1 ? `<div style="position:absolute; top:14px; left:16px; color:#94a3b8; font-size:11px; font-weight:600;" id="nbCounter">১/${notices.length}</div>` : ''}
+
+            <!-- Content -->
+            <div id="nbBody">${renderNoticeContent(notices[0])}</div>
+
+            <!-- Buttons -->
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                ${notices.length > 1 ? `
+                <button id="nbPrev" onclick="nbNavigate(-1)" style="background:rgba(255,255,255,0.1); color:#ccc; border:1px solid #444; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:14px; display:none;">‹ আগের</button>
+                <button id="nbNext" onclick="nbNavigate(1)" style="background:linear-gradient(135deg,#e91e8c,#9c27b0); color:#fff; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:14px; font-weight:700;">পরের ›</button>
+                ` : ''}
+                <button onclick="closeNoticeBoardPopup()" style="background:rgba(255,255,255,0.1); color:#ccc; border:1px solid #444; padding:10px 20px; border-radius:8px; cursor:pointer; font-size:14px;">এড়িয়ে যান</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(popup);
+
+    window.nbNavigate = function(dir) {
+        currentIdx += dir;
+        if (currentIdx < 0) currentIdx = 0;
+        if (currentIdx >= notices.length) currentIdx = notices.length - 1;
+        document.getElementById('nbBody').innerHTML = renderNoticeContent(notices[currentIdx]);
+        const counter = document.getElementById('nbCounter');
+        if (counter) counter.textContent = (currentIdx+1) + '/' + notices.length;
+        const prev = document.getElementById('nbPrev');
+        const next = document.getElementById('nbNext');
+        if (prev) prev.style.display = currentIdx > 0 ? 'inline-block' : 'none';
+        if (next) next.style.display = currentIdx < notices.length-1 ? 'inline-block' : 'none';
+    };
+}
+    const notices = JSON.parse(localStorage.getItem('TM_DB_NOTICES_V1') || '[]');
+    if (!notices.length) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const lastShown = localStorage.getItem('TM_NOTICE_LAST_SHOWN');
+    if (lastShown === today) return;
+
+    let currentIdx = 0;
+    localStorage.setItem('TM_NOTICE_LAST_SHOWN', today);
+
+    function renderNoticeContent(n) {
+        return `
             <!-- ছবি -->
             ${n.img ? `<div style="width:100%; border-radius:12px; overflow:hidden; margin-bottom:18px; max-height:260px;">
                 <img src="${n.img}" style="width:100%; height:260px; object-fit:cover; display:block;" onerror="this.parentElement.style.display='none'">
