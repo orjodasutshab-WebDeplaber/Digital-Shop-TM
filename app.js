@@ -3492,28 +3492,47 @@ function openReturnModal(orderId) {
                 
                 <div style="margin-bottom:20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <label style="font-size:13px; font-weight:700; color:#334155;">প্রমাণস্বরূপ ছবির লিঙ্ক</label>
+                        <label style="font-size:13px; font-weight:700; color:#334155;">প্রমাণস্বরূপ ছবি</label>
                         <button onclick="addNewImageInput()" style="font-size:11px; color:#3b82f6; border:1px solid #3b82f6; background:#eff6ff; padding:6px 12px; border-radius:10px; cursor:pointer; font-weight:700;">
-                            <i class="fa fa-plus-circle"></i> নতুন ছবি যোগ করুন
+                            <i class="fa fa-plus-circle"></i> আরো ছবি যোগ করুন
                         </button>
                     </div>
 
                     <div id="imageInputsContainer">
-                        <div class="img-input-group" style="margin-bottom:12px;">
-                            <input type="url" class="return-image-url" placeholder="ছবির ডিরেক্ট লিঙ্ক দিন..." 
-                                style="width:100%; padding:12px 15px; border:2px solid #f1f5f9; border-radius:16px; outline:none; font-size:12px; background:#f8fafc; box-sizing: border-box;"
+                        <div class="img-input-group" style="margin-bottom:14px; background:#f8fafc; border:2px solid #e2e8f0; border-radius:16px; padding:14px;">
+                            
+                            <!-- ফাইল আপলোড বাটন -->
+                            <div style="margin-bottom:10px;">
+                                <label style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:10px 16px; border-radius:12px; cursor:pointer; font-size:13px; font-weight:700; text-align:center;">
+                                    <i class="fa fa-upload"></i> ফাইল থেকে ছবি আপলোড করুন
+                                    <input type="file" accept="image/*" class="return-img-file" style="display:none;" onchange="uploadReturnImageFile(this)">
+                                </label>
+                                <div class="img-upload-status" style="display:none; margin-top:8px; font-size:12px; color:#6366f1; font-weight:600; text-align:center;">
+                                    <i class="fa fa-spinner fa-spin"></i> আপলোড হচ্ছে...
+                                </div>
+                            </div>
+
+                            <!-- OR divider -->
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                                <div style="flex:1; height:1px; background:#e2e8f0;"></div>
+                                <span style="font-size:11px; color:#94a3b8; font-weight:600;">অথবা লিংক দিন</span>
+                                <div style="flex:1; height:1px; background:#e2e8f0;"></div>
+                            </div>
+
+                            <!-- লিংক input -->
+                            <input type="url" class="return-image-url" placeholder="ছবির ডিরেক্ট লিংক দিন..." 
+                                style="width:100%; padding:11px 14px; border:2px solid #e2e8f0; border-radius:12px; outline:none; font-size:12px; background:#fff; box-sizing:border-box;"
                                 oninput="previewSingleImage(this)">
+
+                            <!-- Preview -->
                             <div class="single-preview" style="margin-top:10px; display:none;">
-                                <div style="width:70px; height:70px; border-radius:14px; overflow:hidden; border:2px solid #e2e8f0;">
+                                <div style="width:80px; height:80px; border-radius:12px; overflow:hidden; border:2px solid #6366f1;">
                                     <img src="" style="width:100%; height:100%; object-fit:cover;">
                                 </div>
+                                <span class="preview-ok" style="display:block; font-size:11px; color:#10b981; font-weight:700; margin-top:4px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <a href="https://postimages.org/" target="_blank" style="display:inline-block; font-size:11px; color:#64748b; text-decoration:none; font-weight:600;">
-                        <i class="fa fa-link"></i> লিঙ্ক তৈরি করতে এখানে ক্লিক করুন
-                    </a>
                 </div>
 
                 <div style="margin-bottom:20px;">
@@ -3557,26 +3576,41 @@ window.addNewImageInput = function() {
     const container = document.getElementById('imageInputsContainer');
     const div = document.createElement('div');
     div.className = 'img-input-group';
-    div.style.cssText = "margin-bottom:12px; position:relative;";
+    div.style.cssText = "margin-bottom:14px; background:#f8fafc; border:2px solid #e2e8f0; border-radius:16px; padding:14px; position:relative;";
     div.innerHTML = `
-        <input type="url" class="return-image-url" placeholder="আরেকটি ছবির লিঙ্ক দিন..." 
-            style="width:100%; padding:12px 15px; border:2px solid #f1f5f9; border-radius:16px; outline:none; font-size:12px; background:#f8fafc; box-sizing: border-box;"
+        <button onclick="this.parentElement.remove()" style="position:absolute; right:10px; top:10px; background:#fee2e2; border:none; color:#ef4444; width:24px; height:24px; border-radius:50%; cursor:pointer; z-index:1;">&times;</button>
+        <label style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:10px 16px; border-radius:12px; cursor:pointer; font-size:13px; font-weight:700; margin-bottom:10px;">
+            <i class="fa fa-upload"></i> ফাইল থেকে আপলোড
+            <input type="file" accept="image/*" class="return-img-file" style="display:none;" onchange="uploadReturnImageFile(this)">
+        </label>
+        <div class="img-upload-status" style="display:none; font-size:12px; color:#6366f1; font-weight:600; text-align:center; margin-bottom:8px;">
+            <i class="fa fa-spinner fa-spin"></i> আপলোড হচ্ছে...
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+            <div style="flex:1; height:1px; background:#e2e8f0;"></div>
+            <span style="font-size:11px; color:#94a3b8; font-weight:600;">অথবা লিংক</span>
+            <div style="flex:1; height:1px; background:#e2e8f0;"></div>
+        </div>
+        <input type="url" class="return-image-url" placeholder="ছবির লিংক দিন..." 
+            style="width:100%; padding:11px 14px; border:2px solid #e2e8f0; border-radius:12px; outline:none; font-size:12px; background:#fff; box-sizing:border-box;"
             oninput="previewSingleImage(this)">
         <div class="single-preview" style="margin-top:10px; display:none;">
-            <div style="width:70px; height:70px; border-radius:14px; overflow:hidden; border:2px solid #e2e8f0;">
+            <div style="width:80px; height:80px; border-radius:12px; overflow:hidden; border:2px solid #6366f1;">
                 <img src="" style="width:100%; height:100%; object-fit:cover;">
             </div>
+            <span style="display:block; font-size:11px; color:#10b981; font-weight:700; margin-top:4px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
         </div>
-        <button onclick="this.parentElement.remove()" style="position:absolute; right:10px; top:10px; background:#fee2e2; border:none; color:#ef4444; width:24px; height:24px; border-radius:50%; cursor:pointer;">&times;</button>
     `;
     container.appendChild(div);
 };
 
 window.previewSingleImage = function(input) {
-    const previewDiv = input.parentElement.querySelector('.single-preview');
+    const group = input.closest('.img-input-group') || input.parentElement;
+    const previewDiv = group.querySelector('.single-preview');
+    if (!previewDiv) return;
     const img = previewDiv.querySelector('img');
     const url = input.value.trim();
-    if (url && (url.startsWith('http') || url.includes('postimg'))) {
+    if (url && url.startsWith('http')) {
         img.src = url;
         previewDiv.style.display = 'block';
         img.onerror = () => previewDiv.style.display = 'none';
@@ -3585,7 +3619,82 @@ window.previewSingleImage = function(input) {
     }
 };
 
-// এই ফাংশনটি নিশ্চিতভাবে গ্লোবাল স্কোপে রাখুন
+// ImgBB তে ফাইল আপলোড করে URL return করে
+window.uploadReturnImageFile = async function(fileInput) {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    // ৫MB limit
+    if (file.size > 5 * 1024 * 1024) {
+        alert("❌ ছবির size সর্বোচ্চ ৫MB হতে পারবে!");
+        fileInput.value = '';
+        return;
+    }
+
+    const group = fileInput.closest('.img-input-group');
+    const statusDiv = group.querySelector('.img-upload-status');
+    const urlInput = group.querySelector('.return-image-url');
+    const previewDiv = group.querySelector('.single-preview');
+    const previewImg = previewDiv ? previewDiv.querySelector('img') : null;
+
+    // Loading দেখাও
+    if (statusDiv) { statusDiv.style.display = 'block'; statusDiv.innerHTML = '<i class="fa fa-spinner fa-spin"></i> আপলোড হচ্ছে...'; }
+
+    try {
+        // Base64 convert
+        const base64 = await new Promise((res, rej) => {
+            const reader = new FileReader();
+            reader.onload = e => res(e.target.result.split(',')[1]);
+            reader.onerror = rej;
+            reader.readAsDataURL(file);
+        });
+
+        // ImgBB API call
+        const formData = new FormData();
+        formData.append('key',  + IMGBB_KEY + r);
+        formData.append('image', base64);
+
+        const resp = await fetch('https://api.imgbb.com/1/upload', {
+            method: 'POST',
+            body: formData
+        });
+        const json = await resp.json();
+
+        if (json.success && json.data && json.data.url) {
+            const imgUrl = json.data.url;
+
+            // URL input এ বসাও
+            if (urlInput) {
+                urlInput.value = imgUrl;
+                urlInput.style.borderColor = '#10b981';
+            }
+
+            // Preview দেখাও
+            if (previewDiv && previewImg) {
+                previewImg.src = imgUrl;
+                previewDiv.style.display = 'block';
+            }
+
+            if (statusDiv) {
+                statusDiv.innerHTML = '<i class="fa fa-check-circle" style="color:#10b981"></i> <span style="color:#10b981">আপলোড সফল হয়েছে!</span>';
+                setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
+            }
+            console.log('[ImgBB] ✅ Uploaded:', imgUrl);
+
+        } else {
+            throw new Error(json.error ? json.error.message : 'Upload failed');
+        }
+
+    } catch(e) {
+        console.error('[ImgBB] Error:', e.message);
+        if (statusDiv) {
+            statusDiv.innerHTML = '<i class="fa fa-times-circle" style="color:#ef4444"></i> <span style="color:#ef4444">আপলোড ব্যর্থ! লিংক দিয়ে চেষ্টা করুন।</span>';
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 4000);
+        }
+        fileInput.value = '';
+    }
+};
+
 window.toggleRefundFields = function() {
     const methodSelect = document.getElementById('refundMethod');
     const paymentDiv = document.getElementById('paymentFields');
