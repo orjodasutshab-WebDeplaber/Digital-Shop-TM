@@ -8394,7 +8394,7 @@ function showNoticeBoardPopup() {
         return `
             <!-- ছবি -->
             ${n.img ? `<div style="width:100%; border-radius:12px; overflow:hidden; margin-bottom:18px; max-height:1000px;">
-                <img src="${n.img}" style="width:100%; height:260px; object-fit:cover; display:block;" onerror="this.parentElement.style.display='none'">
+                <img src="${n.img}" style="width:100%; height:360px; object-fit:cover; display:block;" onerror="this.parentElement.style.display='none'">
             </div>` : ''}
 
             <!-- Badge + Title -->
