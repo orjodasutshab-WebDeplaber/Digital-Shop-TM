@@ -4234,11 +4234,38 @@ function quickUpdateStatus(retId, newStatus) {
 
 // রেকর্ড ডিলিট করার জন্য
 function deleteReturnRecord(retId) {
-    if(confirm("আপনি কি নিশ্চিতভাবে এই রিটার্ন রেকর্ডটি ডিলিট করতে চান?")) {
+    if(confirm("আপনি কি নিশ্চিতভাবে এই রিটার্ন রেকর্ডটি সম্পূর্ণ ডিলিট করতে চান?")) {
+        // ১. সংশ্লিষ্ট order এর isReturned flag সরাও
+        const ret = appState.returns.find(r => r.id === retId);
+        if (ret) {
+            const orderIdx = appState.orders.findIndex(o => String(o.id) === String(ret.orderId));
+            if (orderIdx !== -1) {
+                delete appState.orders[orderIdx].isReturned;
+                delete appState.orders[orderIdx].returnId;
+                delete appState.orders[orderIdx].returnStatus;
+                saveData(DB_KEYS.ORDERS, appState.orders);
+                // Firebase order update
+                try {
+                    if (typeof firebase !== 'undefined' && firebase.firestore)
+                        firebase.firestore().collection('orders').doc(String(ret.orderId)).set(appState.orders[orderIdx]).catch(()=>{});
+                } catch(e) {}
+            }
+        }
+        // ২. appState থেকে বাদ
         appState.returns = appState.returns.filter(r => r.id !== retId);
         saveData(DB_KEYS.RETURNS, appState.returns);
-        document.getElementById('adminRetModal').remove();
+        // ৩. Firebase থেকে delete
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore)
+                firebase.firestore().collection('returns').doc(String(retId)).delete()
+                    .then(() => console.log('[FB] ✅ Return deleted:', retId))
+                    .catch(e => console.warn('[FB] return delete err:', e.message));
+        } catch(e) {}
+        // ৪. UI update
+        const modal = document.getElementById('adminRetModal');
+        if (modal) modal.remove();
         renderAdminReturnList();
+        alert("✅ রিটার্ন রিকোয়েস্ট সম্পূর্ণ ডিলিট হয়েছে।");
     }
 }
 
