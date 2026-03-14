@@ -189,13 +189,28 @@ function loadDatabase() {
     appState.specialRequests = storedRequests ? JSON.parse(storedRequests) : [];
 
     // ৫. রিকোয়েস্ট ব্লক স্ট্যাটাস লোড করা
+    // ৫. রিকোয়েস্ট ব্লক স্ট্যাটাস লোড (localStorage + Firebase)
     const storedSettings = localStorage.getItem('request_settings');
     if (storedSettings) {
         const settings = JSON.parse(storedSettings);
         appState.isRequestBlocked = settings.isRequestBlocked || false;
     } else {
-        appState.isRequestBlocked = false; // বাই ডিফল্ট খোলা থাকবে
+        appState.isRequestBlocked = false;
     }
+    // Firebase থেকেও latest block status নিই
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('app_settings').doc('request_settings').get()
+                .then(snap => {
+                    if (snap.exists) {
+                        const d = snap.data();
+                        appState.isRequestBlocked = d.isRequestBlocked || false;
+                        saveData('request_settings', { isRequestBlocked: appState.isRequestBlocked });
+                        console.log('[FB] Block status loaded:', appState.isRequestBlocked);
+                    }
+                }).catch(() => {});
+        }
+    } catch(e) {}
 
     // ৪.৫ রিটার্ন রিকোয়েস্ট লোড করা
     const storedReturns = localStorage.getItem('returns');
@@ -6708,31 +6723,42 @@ function renderRequestList() {
 }
 function deleteSingleRequest(reqId) {
     if (!confirm("আপনি কি এই রিকোয়েস্টটি ডিলিট করতে চান?")) return;
-
-    // ১. মেমোরি (appState) থেকে ডিলিট
+    // ১. appState থেকে বাদ
     appState.specialRequests = appState.specialRequests.filter(r => r.reqId !== reqId);
-
-    // ২. লোকাল স্টোরেজে নতুন লিস্ট সেভ করা (সরাসরি নাম ব্যবহার করা হয়েছে)
+    // ২. localStorage সেভ
     saveData('special_requests', appState.specialRequests);
-    
-    // ৩. রিফ্রেশ ছাড়াই UI আপডেট করা
-    if (typeof renderRequestList === 'function') {
-        renderRequestList();
-    }
-
-    // ঐচ্ছিক: ইউজারকে একটি কনফার্মেশন মেসেজ দেওয়া
-    console.log("✅ রিকোয়েস্ট ডিলিট করা হয়েছে এবং স্টোরেজ আপডেট হয়েছে।");
+    // ৩. Firebase special_requests collection থেকে delete
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('special_requests').doc(String(reqId)).delete()
+                .then(() => console.log('[FB] ✅ Request deleted:', reqId))
+                .catch(e => console.warn('[FB] request delete err:', e.message));
+        }
+    } catch(e) {}
+    // ৪. UI refresh
+    if (typeof renderRequestList === 'function') renderRequestList();
 }
 // ৫. গ্লোবাল ব্লক ফাংশন
 function toggleGlobalRequestBlock() {
     appState.isRequestBlocked = !appState.isRequestBlocked;
-    
-    // সেটিংস সেভ করা
-    saveData('request_settings', { isRequestBlocked: appState.isRequestBlocked });
-    
-    const status = appState.isRequestBlocked ? "ব্লক" : "আনব্লক";
-    alert(`সিস্টেম সফলভাবে ${status} করা হয়েছে!`);
-    
+    const blocked = appState.isRequestBlocked;
+
+    // ১. localStorage সেভ
+    saveData('request_settings', { isRequestBlocked: blocked });
+
+    // ২. Firebase এ সরাসরি save (special collection doc হিসেবে)
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('app_settings').doc('request_settings').set(
+                { isRequestBlocked: blocked },
+                { merge: true }
+            ).then(() => console.log('[FB] ✅ Request block saved:', blocked))
+             .catch(e => console.warn('[FB] block save err:', e.message));
+        }
+    } catch(e) {}
+
+    const status = blocked ? "ব্লক" : "আনব্লক";
+    alert(`সিস্টেম সফলভাবে ${status} করা হয়েছে!`);
     renderRequestList();
 }
 function populateDiscountDropdown(productPrice) {
