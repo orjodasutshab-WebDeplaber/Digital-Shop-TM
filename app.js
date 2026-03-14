@@ -5931,34 +5931,51 @@ function createDiscountCard(status) {
 function autoCleanupExpiredCards() {
     const now = new Date().getTime();
     let isChanged = false;
+    const expiredCardIds = []; // Firebase থেকে delete করার জন্য
 
-    // অ্যাডমিন লিস্ট (Global Discounts) থেকে ডিলিট
+    // ১. globalDiscounts থেকে expired card বাদ দাও
     if (appState.globalDiscounts) {
-        const initialLen = appState.globalDiscounts.length;
-        appState.globalDiscounts = appState.globalDiscounts.filter(card => {
-            return new Date(card.expiry).getTime() > now;
-        });
-        if (appState.globalDiscounts.length !== initialLen) isChanged = true;
+        const before = appState.globalDiscounts.length;
+        const expired = appState.globalDiscounts.filter(card => new Date(card.expiry).getTime() <= now);
+        expired.forEach(card => expiredCardIds.push(card.id || card.cardId));
+        appState.globalDiscounts = appState.globalDiscounts.filter(card => new Date(card.expiry).getTime() > now);
+        if (appState.globalDiscounts.length !== before) isChanged = true;
     }
 
-    // সকল ইউজারের প্রোফাইল (User Discounts) থেকে ডিলিট
+    // ২. ইউজারদের myDiscounts থেকেও বাদ দাও
     if (appState.users) {
         appState.users.forEach(user => {
             if (user.myDiscounts) {
-                const initialCount = user.myDiscounts.length;
-                user.myDiscounts = user.myDiscounts.filter(d => {
-                    return new Date(d.expiry).getTime() > now;
-                });
-                if (user.myDiscounts.length !== initialCount) isChanged = true;
+                const before = user.myDiscounts.length;
+                user.myDiscounts = user.myDiscounts.filter(d => new Date(d.expiry).getTime() > now);
+                if (user.myDiscounts.length !== before) isChanged = true;
             }
         });
     }
 
-    // যদি কোনো কার্ড ক্লিন করা হয়, তবে ডাটাবেসে সেভ করো
     if (isChanged) {
+        // ৩. localStorage সেভ
         saveData(DB_KEYS.GLOBAL_DISCOUNTS || 'global_discounts', appState.globalDiscounts);
         saveData(DB_KEYS.USERS, appState.users);
-        console.log("মেয়াদোত্তীর্ণ কার্ডগুলো অটো-ডিলিট করা হয়েছে।");
+        console.log('[Cleanup] Expired cards removed locally:', expiredCardIds);
+
+        // ৪. Firebase থেকে expired card documents delete
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore && expiredCardIds.length > 0) {
+                const fdb = firebase.firestore();
+                expiredCardIds.forEach(cardId => {
+                    if (!cardId) return;
+                    fdb.collection('global_discounts').doc(String(cardId)).delete()
+                        .then(() => console.log('[FB] ✅ Expired card deleted:', cardId))
+                        .catch(e => console.warn('[FB] card delete err:', cardId, e.message));
+                });
+                // ইউজারদের updated data Firebase এ push করো
+                if (typeof window.pushToCloud === 'function') {
+                    setTimeout(() => window.pushToCloud('TM_DB_USERS_V2'), 1000);
+                    setTimeout(() => window.pushToCloud('global_discounts'), 1000);
+                }
+            }
+        } catch(e) { console.warn('[Cleanup] Firebase err:', e); }
     }
 }
 
