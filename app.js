@@ -8369,6 +8369,14 @@ function adminDeleteNotice(id) {
     let notices = JSON.parse(localStorage.getItem('TM_DB_NOTICES_V1') || '[]');
     notices = notices.filter(n => n.id !== id);
     localStorage.setItem('TM_DB_NOTICES_V1', JSON.stringify(notices));
+    // Firebase notices collection থেকে delete
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('notices').doc(String(id)).delete()
+                .then(() => console.log('[FB] ✅ Notice deleted:', id))
+                .catch(e => console.warn('[FB] notice delete err:', e.message));
+        }
+    } catch(e) {}
     renderNoticeList();
 }
 
