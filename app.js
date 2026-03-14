@@ -5931,23 +5931,30 @@ function createDiscountCard(status) {
 function autoCleanupExpiredCards() {
     const now = new Date().getTime();
     let isChanged = false;
-    const expiredCardIds = []; // Firebase থেকে delete করার জন্য
+    const expiredCardIds = [];
 
-    // ১. globalDiscounts থেকে expired card বাদ দাও
+    // ১. globalDiscounts থেকে expired card বাদ
     if (appState.globalDiscounts) {
         const before = appState.globalDiscounts.length;
-        const expired = appState.globalDiscounts.filter(card => new Date(card.expiry).getTime() <= now);
-        expired.forEach(card => expiredCardIds.push(card.id || card.cardId));
-        appState.globalDiscounts = appState.globalDiscounts.filter(card => new Date(card.expiry).getTime() > now);
+        appState.globalDiscounts.forEach(card => {
+            if (new Date(card.expiry).getTime() <= now) {
+                expiredCardIds.push(card.id || card.cardId);
+            }
+        });
+        appState.globalDiscounts = appState.globalDiscounts.filter(card =>
+            new Date(card.expiry).getTime() > now
+        );
         if (appState.globalDiscounts.length !== before) isChanged = true;
     }
 
-    // ২. ইউজারদের myDiscounts থেকেও বাদ দাও
+    // ২. ইউজারদের myDiscounts থেকেও বাদ
     if (appState.users) {
         appState.users.forEach(user => {
             if (user.myDiscounts) {
                 const before = user.myDiscounts.length;
-                user.myDiscounts = user.myDiscounts.filter(d => new Date(d.expiry).getTime() > now);
+                user.myDiscounts = user.myDiscounts.filter(d =>
+                    new Date(d.expiry).getTime() > now
+                );
                 if (user.myDiscounts.length !== before) isChanged = true;
             }
         });
@@ -5955,24 +5962,24 @@ function autoCleanupExpiredCards() {
 
     if (isChanged) {
         // ৩. localStorage সেভ
-        saveData(DB_KEYS.GLOBAL_DISCOUNTS || 'global_discounts', appState.globalDiscounts);
+        saveData(DB_KEYS.GLOBAL_DISCOUNTS || 'TM_DB_GIFT_CARDS_V2', appState.globalDiscounts);
         saveData(DB_KEYS.USERS, appState.users);
         console.log('[Cleanup] Expired cards removed locally:', expiredCardIds);
 
-        // ৪. Firebase থেকে expired card documents delete
+        // ৪. Firebase gift_cards collection থেকে delete
         try {
             if (typeof firebase !== 'undefined' && firebase.firestore && expiredCardIds.length > 0) {
                 const fdb = firebase.firestore();
                 expiredCardIds.forEach(cardId => {
                     if (!cardId) return;
-                    fdb.collection('global_discounts').doc(String(cardId)).delete()
-                        .then(() => console.log('[FB] ✅ Expired card deleted:', cardId))
-                        .catch(e => console.warn('[FB] card delete err:', cardId, e.message));
+                    // gift_cards collection এ delete
+                    fdb.collection('gift_cards').doc(String(cardId)).delete()
+                        .then(() => console.log('[FB] ✅ Expired gift card deleted:', cardId))
+                        .catch(e => console.warn('[FB] gift_card delete err:', cardId, e.message));
                 });
-                // ইউজারদের updated data Firebase এ push করো
+                // Users Firebase এ push
                 if (typeof window.pushToCloud === 'function') {
-                    setTimeout(() => window.pushToCloud('TM_DB_USERS_V2'), 1000);
-                    setTimeout(() => window.pushToCloud('global_discounts'), 1000);
+                    setTimeout(() => window.pushToCloud('TM_DB_USERS_V2'), 800);
                 }
             }
         } catch(e) { console.warn('[Cleanup] Firebase err:', e); }
@@ -6141,38 +6148,26 @@ function createNewGiftCard() {
 }
 function deleteGiftCard(cardId) {
     if(!confirm("নিশ্চিত ডিলিট করবেন? ইউজারদের প্রোফাইল থেকেও মুছে যাবে।")) return;
-
-    // ১. মেইন কার্ড লিস্ট থেকে ডিলিট করা
     if(appState.globalDiscounts) {
-        appState.globalDiscounts = appState.globalDiscounts.filter(c => c.cardId !== cardId);
-        // DB_KEYS ব্যবহার করা হলো যেন ডাটা হারায় না
+        appState.globalDiscounts = appState.globalDiscounts.filter(c => c.cardId !== cardId && c.id !== cardId);
         saveData(DB_KEYS.GLOBAL_DISCOUNTS, appState.globalDiscounts);
     }
-
-    // ২. সকল ইউজারের ওয়ালেট বা প্রোফাইল থেকে কার্ডটি রিমুভ করা
     if(appState.users && appState.users.length > 0) {
         appState.users.forEach(user => {
-            if(user.myDiscounts) {
-                user.myDiscounts = user.myDiscounts.filter(d => d.parentCardId !== cardId);
-            }
+            if(user.myDiscounts)
+                user.myDiscounts = user.myDiscounts.filter(d => d.parentCardId !== cardId && d.cardId !== cardId);
         });
-        // ইউজার ডাটা সেভ করা
         saveData(DB_KEYS.USERS, appState.users);
     }
-
-    // ৩. UI রিফ্রেশ করা (একই সাথে কার্ড লিস্ট এবং ইউজার লিস্ট)
+    // Firebase gift_cards delete
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore)
+            firebase.firestore().collection('gift_cards').doc(String(cardId)).delete()
+                .then(() => console.log('[FB] ✅ Gift card deleted:', cardId))
+                .catch(e => console.warn('[FB] gift delete err:', e.message));
+    } catch(e) {}
     const cardListContainer = document.getElementById('created-cards-list');
-    if(cardListContainer) {
-        cardListContainer.innerHTML = renderCreatedCards();
-    }
-
-    // ৪. ইউজার লিস্টও আপডেট করে দেওয়া যেন গিফট পাঠানোর সময় পুরনো কার্ডের প্রভাব না থাকে
-    const userListContainer = document.getElementById('gift-user-list');
-    if(userListContainer) {
-        userListContainer.innerHTML = renderGiftUserList(appState.users);
-    }
-
-    alert("✅ কার্ডটি সফলভাবে ডিলিট করা হয়েছে!");
+    if(cardListContainer) cardListContainer.innerHTML = renderCreatedCards();
 }
 
 // ৫. ইউজার রেন্ডার
@@ -6336,8 +6331,13 @@ function publishAdminCard(cardId) {
 // ২. ডিলিট লজিক
 function deleteAdminCard(cardId) {
     if (confirm("আপনি কি নিশ্চিতভাবে এই কার্ডটি ডিলিট করতে চান?")) {
-        appState.globalDiscounts = appState.globalDiscounts.filter(c => c.id !== cardId);
+        appState.globalDiscounts = appState.globalDiscounts.filter(c => c.id !== cardId && c.cardId !== cardId);
         saveData(DB_KEYS.GLOBAL_DISCOUNTS, appState.globalDiscounts);
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore)
+                firebase.firestore().collection('gift_cards').doc(String(cardId)).delete()
+                    .catch(e => console.warn('[FB] gift delete err:', e.message));
+        } catch(e) {}
         renderAdminCards();
     }
 }
@@ -6612,47 +6612,37 @@ function renderDraftCardsInModal() {
 
 function deleteDraftCard(cardId) {
     if(!confirm("আপনি কি নিশ্চিতভাবে এই ড্রাফট কার্ডটি ডিলিট করতে চান?")) return;
-
-    // ১. মেইন লিস্ট থেকে ড্রাফট কার্ডটি রিমুভ করা
     if(appState.globalDiscounts) {
-        appState.globalDiscounts = appState.globalDiscounts.filter(c => (c.id !== cardId && c.cardId !== cardId));
+        appState.globalDiscounts = appState.globalDiscounts.filter(c => c.id !== cardId && c.cardId !== cardId);
         saveData(DB_KEYS.GLOBAL_DISCOUNTS, appState.globalDiscounts);
     }
-
-    // ২. UI রিফ্রেশ করা (আসল সমাধান এখানে)
-    // ড্রাফট লিস্টের জন্য আপনার renderDraftCards ফাংশনটি কল করতে হবে
-    if (typeof renderDraftCards === 'function') {
-        renderDraftCards(); 
-    }
-
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore)
+            firebase.firestore().collection('gift_cards').doc(String(cardId)).delete()
+                .catch(e => console.warn('[FB] draft delete err:', e.message));
+    } catch(e) {}
+    if (typeof renderDraftCards === 'function') renderDraftCards();
     alert("✅ ড্রাফট কার্ডটি ডিলিট করা হয়েছে!");
 }
 function deleteActiveCard(cardId) {
-    if(!confirm("সতর্কবার্তা: এটি ডিলিট করলে সব ইউজারের ওয়ালেট থেকেও মুছে যাবে। নিশ্চিত তো?")) return;
-
-    // ১. মেইন কার্ড লিস্ট থেকে ডিলিট করা
+    if(!confirm("সতর্কবার্তা: ডিলিট করলে সব ইউজারের ওয়ালেট থেকেও মুছে যাবে। নিশ্চিত?")) return;
     if(appState.globalDiscounts) {
-        appState.globalDiscounts = appState.globalDiscounts.filter(c => (c.id !== cardId && c.cardId !== cardId));
+        appState.globalDiscounts = appState.globalDiscounts.filter(c => c.id !== cardId && c.cardId !== cardId);
         saveData(DB_KEYS.GLOBAL_DISCOUNTS, appState.globalDiscounts);
     }
-
-    // ২. সকল ইউজারের প্রোফাইল/ওয়ালেট থেকে রিমুভ করা
     if(appState.users) {
         appState.users.forEach(user => {
-            if(user.myDiscounts) {
-                user.myDiscounts = user.myDiscounts.filter(d => (d.id !== cardId && d.cardId !== cardId));
-            }
+            if(user.myDiscounts)
+                user.myDiscounts = user.myDiscounts.filter(d => d.id !== cardId && d.cardId !== cardId);
         });
         saveData(DB_KEYS.USERS, appState.users);
     }
-
-    // ৩. UI রিফ্রেশ করা (আসল সমাধান এখানে)
-    // আমরা সরাসরি আপনার ওই রেন্ডার ফাংশনটিকে কল করছি যাতে রিফ্রেশ না লাগে
-    if (typeof renderActiveAdminCards === 'function') {
-        renderActiveAdminCards(); 
-    }
-
-    alert("✅ একটিভ কার্ডটি সফলভাবে মুছে ফেলা হয়েছে!");
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore)
+            firebase.firestore().collection('gift_cards').doc(String(cardId)).delete()
+                .catch(e => console.warn('[FB] active card delete err:', e.message));
+    } catch(e) {}
+    if (typeof renderActiveAdminCards === 'function') renderActiveAdminCards();
 }
 
 
