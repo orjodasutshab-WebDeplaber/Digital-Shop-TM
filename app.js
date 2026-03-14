@@ -3624,7 +3624,6 @@ window.uploadReturnImageFile = async function(fileInput) {
     const file = fileInput.files[0];
     if (!file) return;
 
-    // ৫MB limit
     if (file.size > 5 * 1024 * 1024) {
         alert("❌ ছবির size সর্বোচ্চ ৫MB হতে পারবে!");
         fileInput.value = '';
@@ -3632,64 +3631,61 @@ window.uploadReturnImageFile = async function(fileInput) {
     }
 
     const group = fileInput.closest('.img-input-group');
-    const statusDiv = group.querySelector('.img-upload-status');
-    const urlInput = group.querySelector('.return-image-url');
-    const previewDiv = group.querySelector('.single-preview');
+    const statusDiv = group ? group.querySelector('.img-upload-status') : null;
+    const urlInput  = group ? group.querySelector('.return-image-url') : null;
+    const previewDiv = group ? group.querySelector('.single-preview') : null;
     const previewImg = previewDiv ? previewDiv.querySelector('img') : null;
 
-    // Loading দেখাও
-    if (statusDiv) { statusDiv.style.display = 'block'; statusDiv.innerHTML = '<i class="fa fa-spinner fa-spin"></i> আপলোড হচ্ছে...'; }
+    if (statusDiv) {
+        statusDiv.style.display = 'block';
+        statusDiv.innerHTML = '<i class="fa fa-spinner fa-spin"></i> আপলোড হচ্ছে...';
+    }
 
     try {
-        // Base64 convert
+        // ১. File → Base64
         const base64 = await new Promise((res, rej) => {
             const reader = new FileReader();
-            reader.onload = e => res(e.target.result.split(',')[1]);
+            reader.onload  = e => res(e.target.result.split(',')[1]);
             reader.onerror = rej;
             reader.readAsDataURL(file);
         });
 
-        // ImgBB API call
-        const formData = new FormData();
-        formData.append('key',  + IMGBB_KEY + r);
-        formData.append('image', base64);
+        // ২. ImgBB API — URL params দিয়ে (CORS issue নেই)
+        const apiKey = '5be9029fcab9d8ab514eeeb3563af84d';
+        const resp = await fetch(
+            'https://api.imgbb.com/1/upload?key=' + apiKey,
+            { method: 'POST', body: (() => { const fd = new FormData(); fd.append('image', base64); return fd; })() }
+        );
 
-        const resp = await fetch('https://api.imgbb.com/1/upload', {
-            method: 'POST',
-            body: formData
-        });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
         const json = await resp.json();
 
         if (json.success && json.data && json.data.url) {
-            const imgUrl = json.data.url;
+            const imgUrl = json.data.display_url || json.data.url;
 
-            // URL input এ বসাও
             if (urlInput) {
                 urlInput.value = imgUrl;
                 urlInput.style.borderColor = '#10b981';
             }
-
-            // Preview দেখাও
             if (previewDiv && previewImg) {
                 previewImg.src = imgUrl;
                 previewDiv.style.display = 'block';
             }
-
             if (statusDiv) {
-                statusDiv.innerHTML = '<i class="fa fa-check-circle" style="color:#10b981"></i> <span style="color:#10b981">আপলোড সফল হয়েছে!</span>';
-                setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
+                statusDiv.innerHTML = '<i class="fa fa-check-circle" style="color:#10b981"></i> <span style="color:#10b981">✅ আপলোড সফল!</span>';
+                setTimeout(() => { if(statusDiv) statusDiv.style.display = 'none'; }, 3000);
             }
             console.log('[ImgBB] ✅ Uploaded:', imgUrl);
 
         } else {
-            throw new Error(json.error ? json.error.message : 'Upload failed');
+            throw new Error((json.error && json.error.message) ? json.error.message : 'Upload failed');
         }
 
     } catch(e) {
         console.error('[ImgBB] Error:', e.message);
         if (statusDiv) {
             statusDiv.innerHTML = '<i class="fa fa-times-circle" style="color:#ef4444"></i> <span style="color:#ef4444">আপলোড ব্যর্থ! লিংক দিয়ে চেষ্টা করুন।</span>';
-            setTimeout(() => { statusDiv.style.display = 'none'; }, 4000);
+            setTimeout(() => { if(statusDiv) statusDiv.style.display = 'none'; }, 4000);
         }
         fileInput.value = '';
     }
