@@ -7961,13 +7961,16 @@ function openSironamShop(id, title) {
             </div>
         </div>
 
-        <div style="width:95%; max-width:1500px; height:450px; margin:20px auto; background:#111827; border-radius:20px; overflow:hidden; border:1px solid #334155; display:flex; align-items:center; justify-content:center;">
-            ${currentDeliAd ? 
-                `<a href="${currentDeliAd.link}" target="_blank" style="width:100%; height:100%;">
-                    <img src="${currentDeliAd.img}" style="width:100%; height:100%; object-fit:fill;">
-                 </a>` : 
-                `<p style="color:#4b5563;">এখানে ডেলি বিজ্ঞাপন প্রদর্শিত হবে</p>`
-            }
+        <div id="sironamDeliBoard" style="width:95%; max-width:1500px; height:450px; margin:20px auto; background:#111827; border-radius:20px; overflow:hidden; border:1px solid #334155; display:flex; align-items:center; justify-content:center; position:relative;">
+            ${(() => {
+                const ads = deliAds.filter(a => String(a.sironamId) === String(id));
+                if (ads.length === 0) return '<p style="color:#4b5563;">এখানে ডেলি বিজ্ঞাপন প্রদর্শিত হবে</p>';
+                return ads.map((ad, idx) => `
+                    <a href="${ad.link}" target="_blank" class="deli-slide-item" data-sironam-id="${id}"
+                       style="width:100%; height:100%; display:${idx===0?'block':'none'}; position:absolute; top:0; left:0;">
+                        <img src="${ad.img}" style="width:100%; height:100%; object-fit:fill;">
+                    </a>`).join('');
+            })()}
         </div>
 
         <div id="shopProductGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:20px; padding:30px;">
@@ -7976,6 +7979,21 @@ function openSironamShop(id, title) {
     </div>`;
 
     document.body.insertAdjacentHTML('beforeend', shopHTML);
+
+    // ── Deli Ads Slider — ৫ সেকেন্ড পর পর ──
+    const _sironamAds = deliAds.filter(a => String(a.sironamId) === String(id));
+    if (_sironamAds.length > 1) {
+        let _deliIdx = 0;
+        const _deliTimer = setInterval(() => {
+            const board = document.getElementById('sironamDeliBoard');
+            if (!board) { clearInterval(_deliTimer); return; }
+            const slides = board.querySelectorAll('.deli-slide-item');
+            if (!slides.length) { clearInterval(_deliTimer); return; }
+            slides[_deliIdx].style.display = 'none';
+            _deliIdx = (_deliIdx + 1) % slides.length;
+            slides[_deliIdx].style.display = 'block';
+        }, 5000);
+    }
 }
 // ১. শিরোনাম অনুযায়ী পণ্য রেন্ডার করার ফাংশন (Fix)
 // ১. শিরোনাম অনুযায়ী পণ্য রেন্ডার করার ফাংশন (Updated: Added Admin Actions)
