@@ -5711,11 +5711,15 @@ function claimPublicDiscount() {
 
     if (!me.myDiscounts) me.myDiscounts = [];
 
-    // ৩. Duplicate check
-    const alreadyClaimed = me.myDiscounts.some(d =>
+    // ৩. Duplicate check — myDiscounts ও usedCards দুটোই দেখা
+    const alreadyClaimed = (me.myDiscounts || []).some(d =>
         d.id === targetCard.id || d.cardId === targetCard.id || d.code === targetCard.code
     );
+    const alreadyUsed = (me.usedCards || []).some(d =>
+        d.id === targetCard.id || d.code === targetCard.code
+    );
     if (alreadyClaimed) return alert("⚠️ আপনি ইতিমধ্যে এই কোডটি ক্লেইম করেছেন!");
+    if (alreadyUsed) return alert("⚠️ আপনি এই কার্ডটি আগে একবার ব্যবহার করেছেন!");
 
     // ৪. Limit check
     if (targetCard.limit && targetCard.limit !== 'Unlimited') {
@@ -6078,16 +6082,25 @@ function autoCleanupExpiredCards() {
         if (appState.globalDiscounts.length !== before) isChanged = true;
     }
 
-    // ২. ইউজারদের myDiscounts থেকেও বাদ
+    // ২. ইউজারদের myDiscounts ও usedCards থেকে expired বাদ
     if (appState.users) {
         appState.users.forEach(user => {
             if (user.myDiscounts) {
                 const before = user.myDiscounts.length;
                 user.myDiscounts = user.myDiscounts.filter(d => {
                     const exp = new Date(d.expiry).getTime();
-                    return isNaN(exp) || exp > now; // invalid expiry হলে রেখে দাও
+                    return isNaN(exp) || exp > now;
                 });
                 if (user.myDiscounts.length !== before) isChanged = true;
+            }
+            // usedCards — expired হলে সরাও (duplicate claim prevention শেষ)
+            if (user.usedCards) {
+                const before = user.usedCards.length;
+                user.usedCards = user.usedCards.filter(d => {
+                    const exp = new Date(d.expiry).getTime();
+                    return isNaN(exp) || exp > now;
+                });
+                if (user.usedCards.length !== before) isChanged = true;
             }
         });
     }
@@ -6999,18 +7012,46 @@ function applyDiscountLogic() {
     appState.currentProduct.finalPrice = finalTotal.toFixed(0);
 }
 // ৩. ব্যবহারের পর কার্ড রিমুভ করার লজিক
+// ৩. ব্যবহারের পর কার্ড myDiscounts থেকে সরিয়ে usedCards এ রাখা
 function finalizeDiscountUsage() {
     const select = document.getElementById('order-discount-card');
     const selectedCardId = select.value;
-
     if (selectedCardId === "none") return;
 
     const me = appState.users.find(u => u.id === appState.currentUser?.id);
-    if (me && me.myDiscounts) {
-        me.myDiscounts = me.myDiscounts.filter(c => (c.id !== selectedCardId && c.code !== selectedCardId));
-        saveData(DB_KEYS.USERS, appState.users);
-        console.log("💳 কার্ডটি ব্যবহার শেষে রিমুভ করা হয়েছে।");
+    if (!me || !me.myDiscounts) return;
+
+    // ব্যবহৃত কার্ড খুঁজে বের করা
+    const usedCard = me.myDiscounts.find(c => c.id === selectedCardId || c.code === selectedCardId);
+
+    // myDiscounts থেকে সরানো
+    me.myDiscounts = me.myDiscounts.filter(c => c.id !== selectedCardId && c.code !== selectedCardId);
+
+    // usedCards এ রাখা — expiry সহ (মেয়াদ শেষে autoCleanup সরাবে)
+    if (usedCard) {
+        if (!me.usedCards) me.usedCards = [];
+        const alreadyUsed = me.usedCards.some(c => c.id === usedCard.id || c.code === usedCard.code);
+        if (!alreadyUsed) {
+            me.usedCards.push({
+                id: usedCard.id || usedCard.cardId,
+                code: usedCard.code,
+                name: usedCard.name,
+                expiry: usedCard.expiry,
+                usedAt: new Date().toISOString()
+            });
+        }
     }
+
+    // localStorage + Firebase save
+    saveData(DB_KEYS.USERS, appState.users);
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('users').doc(String(me.id))
+                .set({ myDiscounts: me.myDiscounts, usedCards: me.usedCards || [] }, { merge: true })
+                .catch(()=>{});
+        }
+    } catch(e) {}
+    console.log("[Card] Used & moved to usedCards:", usedCard?.code);
 }
 
 
