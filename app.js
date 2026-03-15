@@ -5051,25 +5051,33 @@ function openHelpModal() {
 
 // ২. পাসওয়ার্ড রিসেট করার চূড়ান্ত ও সচল ফাংশন
 function submitPasswordReset() {
-    const userId = document.getElementById('resetUserId').value.trim();
+    const mobileInput = document.getElementById('resetUserId').value.trim();
     const adminCodeInput = document.getElementById('resetAdminCode').value.trim();
     const newPass = document.getElementById('resetNewPass').value.trim();
 
-    // আপনার সিস্টেমের appState থেকে ইউজার খুঁজে বের করা
-    const userIndex = appState.users.findIndex(u => u.id === userId);
+    if (!mobileInput || mobileInput.length < 11) {
+        alert("❌ সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন!"); return;
+    }
+    if (!newPass || newPass.length < 4) {
+        alert("❌ নতুন পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে!"); return;
+    }
+
+    // মোবাইল নম্বর দিয়ে user খোঁজা
+    const userIndex = appState.users.findIndex(u =>
+        String(u.mobile) === String(mobileInput) ||
+        String(u.phone)  === String(mobileInput)
+    );
 
     if (userIndex === -1) {
-        alert("❌ ভুল ইউজার আইডি! আবার চেষ্টা করুন।");
-        return;
+        alert("❌ এই মোবাইল নম্বরে কোনো একাউন্ট পাওয়া যায়নি!"); return;
     }
 
-    // এডমিন কোড যাচাই (৬ ডিজিট) + expiry check
     const user = appState.users[userIndex];
+
+    // Admin code যাচাই
     if (!user.adminCode || user.adminCode != adminCodeInput) {
-        alert("❌ ভুল এডমিন কোড! সঠিক কোডটি হেল্পলাইন থেকে নিন।");
-        return;
+        alert("❌ ভুল এডমিন কোড! সঠিক কোডটি হেল্পলাইন থেকে নিন।"); return;
     }
-    // ✅ Expiry check — মেয়াদ শেষ হলে ব্যবহার করা যাবে না
     if (user.adminCodeExpiry && Date.now() > user.adminCodeExpiry) {
         alert("❌ এডমিন কোডের মেয়াদ শেষ হয়ে গেছে। নতুন কোড নিন।");
         delete user.adminCode;
@@ -5078,22 +5086,25 @@ function submitPasswordReset() {
         return;
     }
 
-    // পাসওয়ার্ড পরিবর্তন (আপনার লগইন ফাংশন অনুযায়ী u.pass আপডেট করা হচ্ছে)
-    appState.users[userIndex].pass = newPass; 
-
-    // লোকাল স্টোরেজে স্থায়ীভাবে সেভ করা (আপনার DB_KEYS.USERS ব্যবহার করে)
+    // পাসওয়ার্ড পরিবর্তন
+    appState.users[userIndex].pass = newPass;
     localStorage.setItem(DB_KEYS.USERS, JSON.stringify(appState.users));
 
-    alert("✅ অভিনন্দন! পাসওয়ার্ড সফলভাবে আপডেট হয়েছে। এখন নতুন পাসওয়ার্ড দিয়ে লগইন করুন।");
-    
-    // ফর্ম পরিষ্কার ও মোডাল বন্ধ করা
+    // Firebase update
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('users').doc(String(user.id))
+                .set({ pass: newPass }, { merge: true })
+                .then(() => console.log('[FB] ✅ Password reset:', user.id))
+                .catch(e => console.warn('[FB] pass reset err:', e.message));
+        }
+    } catch(e) {}
+
+    alert("✅ পাসওয়ার্ড সফলভাবে আপডেট হয়েছে! নতুন পাসওয়ার্ড দিয়ে লগইন করুন।");
     document.getElementById('resetUserId').value = "";
     document.getElementById('resetAdminCode').value = "";
     document.getElementById('resetNewPass').value = "";
     closeModal('resetPasswordModal');
-    
-    // UI রিফ্রেশ করার জন্য (প্রয়োজন হলে)
-    if(typeof renderUserList === "function") renderUserList();
 }
 // মোডাল বন্ধ করার কমন ফাংশন
 function closeModal(id) {
