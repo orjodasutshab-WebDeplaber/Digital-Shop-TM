@@ -35,7 +35,6 @@ const KEY_MAP = {
   'tm_reports':           'reports',
   'all_discounts':        'all_discounts',
   'global_discounts':     'global_discounts',
-  'night_boards':          'night_boards',
 };
 
 // Single doc keys (not array)

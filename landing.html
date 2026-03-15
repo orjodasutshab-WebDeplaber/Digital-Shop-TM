@@ -32,16 +32,6 @@
 .g-btn img{width:20px;height:20px;}
 .or-div{display:flex;align-items:center;gap:10px;margin-bottom:12px;color:#475569;font-size:13px;}
 .or-div::before,.or-div::after{content:'';flex:1;height:1px;background:#334155;}
-
-/* NIGHT BOARD */
-.night-board-wrap{width:600px;min-height:750px;flex-shrink:0;border-radius:20px;overflow:hidden;border:1px solid rgba(99,102,241,.25);background:#060d1a;box-shadow:0 20px 55px rgba(0,0,0,.6);position:relative;}
-.night-board-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;background:#060d1a;}
-.night-board-slide.active{opacity:1;}
-.night-board-slide img{width:100%;height:100%;object-fit:fill;display:block;}
-.night-board-slide a{display:block;width:100%;height:100%;}
-.night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:750px;}
-@media(max-width:1100px){.night-board-wrap{display:none;}}
-
 </style>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -82,7 +72,7 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 .lb-dot.active{width:22px;background:#6366f1;}
 
 /* SIRONAM */
-.sir-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:1400px;margin:0 auto;}
+.sir-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;max-width:1400px;margin:0 auto;}
 .sir-card{border-radius:15px;overflow:hidden;cursor:pointer;position:relative;aspect-ratio:4/3;border:1px solid rgba(99,102,241,.18);transition:all .3s;background:#0f172a;}
 .sir-card:hover{border-color:rgba(99,102,241,.65);transform:translateY(-5px);box-shadow:0 14px 35px rgba(99,102,241,.18);}
 .sir-card img{width:100%;height:100%;object-fit:fill;display:block;transition:transform .4s;}
@@ -167,9 +157,9 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 24px;border-radius:50px;font-size:14px;font-weight:600;border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 28px rgba(0,0,0,.4);z-index:9999999;display:none;white-space:nowrap;}
 
 @media(max-width:1580px){.lb2-grid{grid-template-columns:repeat(3,1fr);}.lb2-card{width:100%;}}
-@media(max-width:900px){.lb2-grid{grid-template-columns:repeat(2,1fr);}.lb2-card{height:250px;}.sir-grid{grid-template-columns:repeat(2,1fr) !important;}}
+@media(max-width:900px){.lb2-grid{grid-template-columns:repeat(2,1fr);}.lb2-card{height:250px;}}
 @media(max-width:600px){
-    .lb2-grid{grid-template-columns:1fr;}.lb2-card{height:220px;}.sir-grid{grid-template-columns:repeat(2,1fr) !important;}
+    .lb2-grid{grid-template-columns:1fr;}.lb2-card{height:220px;}
     .cta-board{height:270px;}.lb-wrap{height:210px;}.cta-title{font-size:20px;}
     .top-nav{padding:10px 13px;}.brand-name{font-size:15px;}
     .btn-ln,.btn-su{padding:7px 11px;font-size:12px;}.two{grid-template-columns:1fr;}
@@ -202,24 +192,13 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
     </div>
 </div>
 
-<!-- SIRONAM + NIGHT BOARD -->
+<!-- SIRONAM -->
 <div class="sec">
     <div class="sec-hd">
         <h2 class="sec-title">🌋 স্পেশাল ক্যাটাগরি</h2>
         <p class="sec-sub">আমাদের বিশেষভাবে নির্বাচিত পণ্যসমূহ — ক্লিক করুন</p>
     </div>
-    <div style="display:flex; gap:20px; align-items:flex-start; max-width:1400px; margin:0 auto;">
-        <div style="flex:1; min-width:0;">
-            <div class="sir-grid" id="sironamGrid"></div>
-        </div>
-        <!-- Night Board -->
-        <div class="night-board-wrap" id="nightBoardWrap">
-            <div id="nightBoardSlider" class="night-board-empty">
-                <i class="fa fa-moon" style="font-size:48px;margin-bottom:12px;opacity:0.3;"></i>
-                <p style="font-size:13px;">নাইট বোর্ড</p>
-            </div>
-        </div>
-    </div>
+    <div class="sir-grid" id="sironamGrid"></div>
 </div>
 
 <!-- LOCAL BOARDS -->
@@ -341,7 +320,7 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 
 <script>
 const SK='TM_SESSION_USER',UK='TM_DB_USERS_V2',LBK='TM_LOGIN_LEADERBOARDS',
-      SIK='sironam_list',PKK='TM_DB_PRODUCTS_V2',DELIK='deli_ads',NIK='night_boards',
+      SIK='sironam_list',PKK='TM_DB_PRODUCTS_V2',DELIK='deli_ads',
       LOCLK='TM_LOCAL_BOARDS',
       AID='DigitalShopOrjo',APW='Orjo@1010',APH='01822963824',MP='index.html';
 
@@ -487,38 +466,6 @@ function spFilter(){
     });
 }
 
-/* NIGHT BOARD */
-function renderNightBoard(){
-    const list = JSON.parse(localStorage.getItem(NIK)) || [];
-    const slider = document.getElementById('nightBoardSlider');
-    const wrap = document.getElementById('nightBoardWrap');
-    if (!slider) return;
-    if (!list.length) {
-        slider.className = 'night-board-empty';
-        slider.innerHTML = '<i class="fa fa-moon" style="font-size:48px;margin-bottom:12px;opacity:0.3;"></i><p style="font-size:13px;">নাইট বোর্ড</p>';
-        return;
-    }
-    slider.className = '';
-    slider.innerHTML = list.map((b, idx) => `
-        <div class="night-board-slide ${idx===0?'active':''}" data-idx="${idx}">
-            ${b.link ? `<a href="${b.link}" target="_blank">` : ''}
-            <img src="${b.img}" onerror="this.style.display='none'" alt="night board">
-            ${b.link ? '</a>' : ''}
-        </div>`).join('');
-    // auto slider
-    if (list.length > 1) {
-        clearInterval(window._nightBoardTimer);
-        let ni = 0;
-        window._nightBoardTimer = setInterval(() => {
-            const slides = document.querySelectorAll('.night-board-slide');
-            if (!slides.length) { clearInterval(window._nightBoardTimer); return; }
-            slides[ni].classList.remove('active');
-            ni = (ni + 1) % slides.length;
-            slides[ni].classList.add('active');
-        }, 5000);
-    }
-}
-
 /* LOCAL BOARDS */
 function renderLocalBoards(){
     const items=JSON.parse(localStorage.getItem(LOCLK))||[];
@@ -617,8 +564,7 @@ window.addEventListener('load',()=>{
 });
 
 /* INIT */
-(window.TM_READY||Promise.resolve()).then(()=>{renderLB();renderSironam();
-    renderNightBoard();renderLocalBoards();});
+(window.TM_READY||Promise.resolve()).then(()=>{renderLB();renderSironam();renderLocalBoards();});
 </script>
 <script src="firebase-sync.js"></script>
 </body>

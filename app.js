@@ -5376,72 +5376,9 @@ function confirmFinalOrder(isCOD = false) {
     }
 
     // ৭. ইউজার কনফার্মেশন ও হোয়াটসঅ্যাপে ডাটা পাঠানো
-    // ── সুন্দর Order Success Popup ──
+    alert(`✅ অর্ডার সফল!\nঅর্ডার আইডি: ${orderId}\nপরিমাণ: ${orderQty} পিস\nডিসকাউন্ট: ৳${calculatedDiscount}`);
+    
     closeModal('checkoutModal');
-    setTimeout(() => {
-        const pop = document.createElement('div');
-        pop.id = 'orderSuccessPop';
-        pop.style.cssText = `
-            position:fixed; inset:0; z-index:999999999;
-            background:rgba(10,20,40,0.82); backdrop-filter:blur(10px);
-            display:flex; align-items:center; justify-content:center; padding:16px;
-            animation:osFadeIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
-        `;
-        pop.innerHTML = `
-            <style>
-                @keyframes osFadeIn { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
-                @keyframes osCheck { 0%{stroke-dashoffset:60} 100%{stroke-dashoffset:0} }
-                @keyframes osPulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)} 50%{box-shadow:0 0 0 18px rgba(34,197,94,0)} }
-            </style>
-            <div style="background:linear-gradient(160deg,#0f172a,#1e293b); border-radius:28px; padding:36px 28px; max-width:360px; width:100%; text-align:center; border:1px solid rgba(255,255,255,0.08); box-shadow:0 32px 80px rgba(0,0,0,0.5); position:relative; overflow:hidden;">
-
-                <!-- background glow -->
-                <div style="position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:220px; height:220px; background:radial-gradient(circle,rgba(34,197,94,0.12),transparent 70%); border-radius:50%;"></div>
-
-                <!-- check icon -->
-                <div style="width:80px; height:80px; background:linear-gradient(135deg,#16a34a,#22c55e); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; animation:osPulse 2s infinite;">
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                        <path d="M8 20 L16 28 L32 12" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"
-                            stroke-dasharray="60" stroke-dashoffset="60" style="animation:osCheck 0.5s ease 0.3s forwards"/>
-                    </svg>
-                </div>
-
-                <div style="background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); display:inline-block; padding:4px 16px; border-radius:20px; margin-bottom:14px;">
-                    <span style="color:#4ade80; font-size:12px; font-weight:700; letter-spacing:1px;">✅ অর্ডার সফল হয়েছে!</span>
-                </div>
-
-                <h2 style="color:#f8fafc; font-size:22px; font-weight:800; margin:0 0 6px 0;">ধন্যবাদ! 🎉</h2>
-                <p style="color:#94a3b8; font-size:13px; margin:0 0 24px 0;">আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।</p>
-
-                <!-- order details -->
-                <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:16px; margin-bottom:20px; text-align:left;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:10px; border-bottom:1px dashed rgba(255,255,255,0.08);">
-                        <span style="color:#64748b; font-size:12px;">অর্ডার আইডি</span>
-                        <span style="color:#60a5fa; font-size:13px; font-weight:700;">${orderId}</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <span style="color:#64748b; font-size:12px;">পরিমাণ</span>
-                        <span style="color:#f1f5f9; font-size:13px; font-weight:600;">${orderQty} পিস</span>
-                    </div>
-                    ${calculatedDiscount > 0 ? `
-                    <div style="display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px dashed rgba(255,255,255,0.08);">
-                        <span style="color:#64748b; font-size:12px;">ডিসকাউন্ট</span>
-                        <span style="color:#4ade80; font-size:13px; font-weight:700;">-৳${calculatedDiscount}</span>
-                    </div>` : ''}
-                </div>
-
-                <button onclick="document.getElementById('orderSuccessPop').remove()"
-                    style="width:100%; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; border:none; padding:14px; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer; letter-spacing:0.5px;">
-                    ঠিক আছে 👍
-                </button>
-
-                <p style="color:#475569; font-size:11px; margin:14px 0 0 0;">My Account → Order Tracking থেকে ট্র্যাক করুন</p>
-            </div>
-        `;
-        document.body.appendChild(pop);
-        // বাইরে click করলে বন্ধ
-        pop.addEventListener('click', e => { if(e.target === pop) pop.remove(); });
-    }, 200);
     
     // const whatsappMsg = `*নতুন অর্ডার (Digital Shop TM)*\n\n` +
     //                     `🆔 আইডি: ${orderId}\n` +
@@ -7866,7 +7803,6 @@ function openLastPortalParcel() {
 <button class="parcel-btn" onclick="openBeliBoardControl('left')">বেলি বোড বাম</button>
 <button class="parcel-btn" onclick="openSironamControl()">শিরোনাম মেনশন</button>
 <button class="parcel-btn" onclick="openCategoryControl()">ক্যাটাগরি নিয়ন্ত্রণ</button>
-<button class="parcel-btn" onclick="openNightBoardControl()" style="grid-column:1/-1; background:linear-gradient(135deg,#1e1b4b,#3730a3); border-color:#6366f1;"><i class="fa fa-moon" style="margin-right:6px;"></i> নাইট বোর্ড সিস্টেম</button>
             </div>
          <h3>এডমিন কে স্বাগতম পোটালের লাস্ট মেইন সেক্টের এ ☺️।আপনার য়াত্রা শভ হউক🥳। এটা অনেক গুরুত্বপূর্ণ সেটিং তাই এডমিন কাছে অনুরোধ রইল বুজে চিন্তে কাজ করবেন🙂💗/<h3>
         </div>
@@ -7893,151 +7829,6 @@ function openLastPortalParcel() {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-}
-
-
-// ══════════════════════════════════════════
-// নাইট বোর্ড সিস্টেম
-// ══════════════════════════════════════════
-function openNightBoardControl() {
-    const existing = document.getElementById('nightBoardModal');
-    if (existing) existing.remove();
-
-    function renderNightList() {
-        const boards = JSON.parse(localStorage.getItem('night_boards') || '[]');
-        if (!boards.length) return '<p style="color:#6b7280; text-align:center; padding:20px;">কোনো নাইট বোর্ড নেই</p>';
-        return boards.map((b, idx) => `
-            <div style="display:flex; align-items:center; gap:12px; background:#1f2937; border-radius:12px; padding:10px; margin-bottom:10px; border:1px solid #374151;">
-                <img src="${b.img}" style="width:70px; height:50px; object-fit:cover; border-radius:8px;" onerror="this.style.display='none'">
-                <div style="flex:1; overflow:hidden;">
-                    <div style="color:#f3f4f6; font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${b.img}</div>
-                    ${b.link ? `<div style="color:#6b7280; font-size:11px; margin-top:2px;">${b.link}</div>` : ''}
-                </div>
-                <button onclick="deleteNightBoard(${b.id})" style="background:#ef4444; color:#fff; border:none; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:14px; flex-shrink:0;">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </div>`).join('');
-    }
-
-    const html = `
-    <div id="nightBoardModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:flex; justify-content:center; align-items:center; z-index:999999999; padding:16px; backdrop-filter:blur(8px);">
-        <div style="background:#111827; color:#fff; width:100%; max-width:520px; border-radius:20px; border:1px solid #374151; box-shadow:0 25px 60px rgba(0,0,0,0.6); position:relative; overflow:hidden; max-height:90vh; display:flex; flex-direction:column;">
-
-            <!-- Header -->
-            <div style="background:linear-gradient(135deg,#1e1b4b,#3730a3); padding:18px 22px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <i class="fa fa-moon" style="font-size:18px; color:#a5b4fc;"></i>
-                    <span style="font-size:16px; font-weight:800; color:#fff;">নাইট বোর্ড সিস্টেম</span>
-                </div>
-                <button onclick="document.getElementById('nightBoardModal').remove()" style="background:rgba(255,255,255,0.1); border:none; color:#fff; width:30px; height:30px; border-radius:8px; cursor:pointer; font-size:16px;">&times;</button>
-            </div>
-
-            <!-- Body -->
-            <div style="padding:20px; overflow-y:auto; flex:1;">
-                <!-- Image URL -->
-                <div style="margin-bottom:14px;">
-                    <label style="font-size:12px; color:#9ca3af; display:block; margin-bottom:6px; font-weight:600;">ছবির লিংক *</label>
-                    <input type="url" id="nightImgUrl" placeholder="https://..." style="width:100%; padding:12px; border-radius:10px; border:1px solid #374151; background:#1f2937; color:#fff; outline:none; box-sizing:border-box; font-size:13px;">
-                </div>
-
-                <!-- Link (optional) -->
-                <div style="margin-bottom:18px;">
-                    <label style="font-size:12px; color:#9ca3af; display:block; margin-bottom:6px; font-weight:600;">বিস্তারিত লিংক <span style="color:#4b5563;">(ঐচ্ছিক)</span></label>
-                    <input type="url" id="nightLinkUrl" placeholder="https://... (click করলে যাবে)" style="width:100%; padding:12px; border-radius:10px; border:1px solid #374151; background:#1f2937; color:#fff; outline:none; box-sizing:border-box; font-size:13px;">
-                </div>
-
-                <!-- Publish button -->
-                <button onclick="publishNightBoard()" style="width:100%; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff; border:none; padding:14px; border-radius:12px; font-size:15px; font-weight:800; cursor:pointer; margin-bottom:22px;">
-                    <i class="fa fa-paper-plane" style="margin-right:8px;"></i> পাবলিশ করুন
-                </button>
-
-                <!-- List -->
-                <div style="font-size:12px; color:#9ca3af; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">পাবলিশ হওয়া বোর্ড</div>
-                <div id="nightBoardList">${renderNightList()}</div>
-            </div>
-        </div>
-    </div>`;
-    document.body.insertAdjacentHTML('beforeend', html);
-}
-
-function publishNightBoard() {
-    const img  = (document.getElementById('nightImgUrl')?.value || '').trim();
-    const link = (document.getElementById('nightLinkUrl')?.value || '').trim();
-
-    if (!img) { alert('❌ ছবির লিংক দিন!'); return; }
-
-    const boards = JSON.parse(localStorage.getItem('night_boards') || '[]');
-    const newBoard = { id: Date.now(), img, link: link || '' };
-    boards.push(newBoard);
-    localStorage.setItem('night_boards', JSON.stringify(boards));
-
-    // Firebase
-    try {
-        if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firebase.firestore().collection('night_boards').doc(String(newBoard.id)).set(newBoard)
-                .then(() => console.log('[FB] ✅ Night board saved:', newBoard.id))
-                .catch(e => console.warn('[FB] night board err:', e.message));
-        }
-    } catch(e) {}
-
-    // input clear
-    if (document.getElementById('nightImgUrl')) document.getElementById('nightImgUrl').value = '';
-    if (document.getElementById('nightLinkUrl')) document.getElementById('nightLinkUrl').value = '';
-
-    // list refresh
-    const listEl = document.getElementById('nightBoardList');
-    if (listEl) {
-        const updBoards = JSON.parse(localStorage.getItem('night_boards') || '[]');
-        listEl.innerHTML = updBoards.length
-            ? updBoards.map((b) => `
-                <div style="display:flex; align-items:center; gap:12px; background:#1f2937; border-radius:12px; padding:10px; margin-bottom:10px; border:1px solid #374151;">
-                    <img src="${b.img}" style="width:70px; height:50px; object-fit:cover; border-radius:8px;" onerror="this.style.display='none'">
-                    <div style="flex:1; overflow:hidden;">
-                        <div style="color:#f3f4f6; font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${b.img}</div>
-                        ${b.link ? `<div style="color:#6b7280; font-size:11px; margin-top:2px;">${b.link}</div>` : ''}
-                    </div>
-                    <button onclick="deleteNightBoard(${b.id})" style="background:#ef4444; color:#fff; border:none; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:14px; flex-shrink:0;">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </div>`).join('')
-            : '<p style="color:#6b7280; text-align:center; padding:20px;">কোনো নাইট বোর্ড নেই</p>';
-    }
-    alert('✅ নাইট বোর্ড পাবলিশ হয়েছে!');
-}
-
-function deleteNightBoard(boardId) {
-    if (!confirm('এই বোর্ডটি ডিলিট করবেন?')) return;
-    let boards = JSON.parse(localStorage.getItem('night_boards') || '[]');
-    boards = boards.filter(b => b.id !== boardId);
-    localStorage.setItem('night_boards', JSON.stringify(boards));
-
-    // Firebase delete
-    try {
-        if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firebase.firestore().collection('night_boards').doc(String(boardId)).delete()
-                .then(() => console.log('[FB] ✅ Night board deleted:', boardId))
-                .catch(e => console.warn('[FB] night board delete err:', e.message));
-        }
-    } catch(e) {}
-
-    // UI refresh
-    const listEl = document.getElementById('nightBoardList');
-    if (listEl) {
-        const updBoards = JSON.parse(localStorage.getItem('night_boards') || '[]');
-        listEl.innerHTML = updBoards.length
-            ? updBoards.map(b => `
-                <div style="display:flex; align-items:center; gap:12px; background:#1f2937; border-radius:12px; padding:10px; margin-bottom:10px; border:1px solid #374151;">
-                    <img src="${b.img}" style="width:70px; height:50px; object-fit:cover; border-radius:8px;" onerror="this.style.display='none'">
-                    <div style="flex:1; overflow:hidden;">
-                        <div style="color:#f3f4f6; font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${b.img}</div>
-                        ${b.link ? `<div style="color:#6b7280; font-size:11px; margin-top:2px;">${b.link}</div>` : ''}
-                    </div>
-                    <button onclick="deleteNightBoard(${b.id})" style="background:#ef4444; color:#fff; border:none; width:32px; height:32px; border-radius:8px; cursor:pointer; font-size:14px; flex-shrink:0;">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </div>`).join('')
-            : '<p style="color:#6b7280; text-align:center; padding:20px;">কোনো নাইট বোর্ড নেই</p>';
-    }
 }
 
 // বেলি বোড ডাটা স্টোর
