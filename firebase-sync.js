@@ -405,11 +405,6 @@ function startListeners() {
     setLocal('TM_DB_GIFT_CARDS_V2', arr);
     if (window.appState) window.appState.globalDiscounts = arr;
 
-    // Expired cards auto-cleanup
-    if (typeof autoCleanupExpiredCards === 'function') {
-      autoCleanupExpiredCards();
-    }
-
     // User card panel refresh (user side)
     if (typeof renderUserCards === 'function') {
       const userCardList = document.getElementById('userCardList');

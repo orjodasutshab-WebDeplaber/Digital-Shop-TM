@@ -5603,54 +5603,105 @@ function renderUserCards() {
 
 
 function renderUserInventory() {
-    const container = document.getElementById('userCardList'); 
+    const container = document.getElementById('userCardList');
     if (!container) return;
 
+    const now = new Date().getTime();
     const me = appState.users.find(u => u.id === appState.currentUser?.id);
-    const myCards = me?.myDiscounts || []; 
 
-    if (myCards.length === 0) {
+    // ── ১. User এর নিজস্ব cards (myDiscounts) — expired বাদ দাও ──
+    const myCards = (me?.myDiscounts || []).filter(d => {
+        const exp = new Date(d.expiry).getTime();
+        return isNaN(exp) || exp > now;
+    });
+
+    // ── ২. Available public cards — claim করা যায় এমন ──
+    const publicCards = (appState.globalDiscounts || []).filter(c => {
+        if (!c.isPublished || c.origin !== 'admin-panel' || c.target !== 'public') return false;
+        const exp = new Date(c.expiry).getTime();
+        if (!isNaN(exp) && exp <= now) return false; // expired
+        // ইউজার আগে claim করেছে কিনা
+        const claimed = myCards.some(d => d.id === c.id || d.cardId === c.id || d.code === c.code);
+        return !claimed;
+    });
+
+    if (myCards.length === 0 && publicCards.length === 0) {
         container.innerHTML = `
-            <div id="noCardMsg" style="text-align:center; padding:30px 15px; background: #fdfdfd; border: 2px dashed #e2e8f0; border-radius: 15px;">
-                <i class="fa fa-folder-open" style="font-size: 30px; color: #cbd5e1; margin-bottom: 10px; display: block;"></i>
-                <p style="color:#94a3b8; font-size:13px; margin: 0;">আপনার কাছে বর্তমানে কোনো <br>অ্যাক্টিভ ডিসকাউন্ট কার্ড নেই।</p>
+            <div style="text-align:center; padding:30px 15px; background:#fdfdfd; border:2px dashed #e2e8f0; border-radius:15px;">
+                <i class="fa fa-folder-open" style="font-size:30px; color:#cbd5e1; margin-bottom:10px; display:block;"></i>
+                <p style="color:#94a3b8; font-size:13px; margin:0;">আপনার কাছে বর্তমানে কোনো অ্যাক্টিভ ডিসকাউন্ট কার্ড নেই।</p>
             </div>`;
         return;
     }
 
-    container.innerHTML = myCards.map(card => {
-        // তারিখ এবং সময় ফরম্যাট করা
-        const expiryDate = new Date(card.expiry);
-        const dateStr = expiryDate.toLocaleDateString('bn-BD');
-        const timeStr = expiryDate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+    let html = '';
 
-        return `
-        <div class="user-promo-card" style="background: linear-gradient(135deg, #ffffff, #f8fafc); border-radius: 16px; padding: 15px; margin-bottom: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative; overflow: hidden; text-align: left;">
-            <div style="position:absolute; left:0; top:0; bottom:0; width:6px; background: #27ae60;"></div>
-            
-            <div style="padding-left: 10px;">
-                <h4 style="margin: 0; color: #1e293b; font-size: 16px; font-weight: 800;">${card.name}</h4>
-                <div style="margin-top: 5px; display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 20px; font-weight: 900; color: #27ae60;">${card.amount}${card.type === '%' ? '%' : '৳'}</span>
-                    <span style="font-size: 11px; color: #27ae60; background: #ecfdf5; padding: 2px 8px; border-radius: 20px; font-weight: 600;">OFFER</span>
+    // ── Public available cards ──
+    if (publicCards.length > 0) {
+        html += `<div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">🎁 ক্লেইম করুন</div>`;
+        html += publicCards.map(card => {
+            const exp = new Date(card.expiry);
+            const dateStr = exp.toLocaleDateString('bn-BD');
+            const timeStr = exp.toLocaleTimeString('bn-BD', {hour:'2-digit', minute:'2-digit'});
+            return `
+            <div style="background:linear-gradient(135deg,#fff7ed,#fffbeb); border:1.5px dashed #f97316; border-radius:15px; padding:14px; margin-bottom:10px; position:relative; overflow:hidden;">
+                <div style="position:absolute; left:0; top:0; bottom:0; width:5px; background:#f97316; border-radius:5px 0 0 5px;"></div>
+                <div style="padding-left:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h4 style="margin:0; color:#1e293b; font-size:15px; font-weight:800;">${card.name}</h4>
+                        <span style="background:#f97316; color:#fff; font-size:13px; font-weight:900; padding:3px 10px; border-radius:20px;">${card.amount}${card.type === '%' ? '%' : '৳'} OFF</span>
+                    </div>
+                    <div style="margin-top:6px; font-size:11px; color:#64748b; display:flex; gap:12px;">
+                        <span>🛒 মিন: ৳${card.minAmount || card.min || 0}</span>
+                        <span>⏰ ${dateStr} | ${timeStr}</span>
+                    </div>
+                    <div style="margin-top:8px; display:flex; align-items:center; justify-content:space-between;">
+                        <span style="background:#fff; border:1.5px dashed #f97316; color:#f97316; font-size:12px; font-weight:800; padding:4px 12px; border-radius:8px; letter-spacing:1px;">CODE: ${card.code}</span>
+                        <button onclick="quickClaimCard('${card.code}')" style="background:#f97316; color:#fff; border:none; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer;">ক্লেইম করুন</button>
+                    </div>
                 </div>
-                
-                <div style="margin-top: 10px; border-top: 1px dashed #eee; padding-top: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-                    <small style="color: #64748b; font-size: 10px;">🛒 মিন: ৳${card.minAmount || card.min || 0}</small>
-                    <small style="color: #64748b; font-size: 10px;">📈 ম্যাক্স: ৳${card.maxAmount || card.max || 'N/A'}</small>
-                </div>
+            </div>`;
+        }).join('');
+    }
 
-                <div style="margin-top: 8px; font-size: 11px; color: #ef4444; font-weight: 700;">
-                    <i class="fa fa-clock"></i> মেয়াদ: ${dateStr} | ${timeStr}
+    // ── User এর নিজস্ব claimed cards ──
+    if (myCards.length > 0) {
+        if (publicCards.length > 0) {
+            html += `<div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin:12px 0 8px;">✅ আমার কার্ড</div>`;
+        }
+        html += myCards.map(card => {
+            const exp = new Date(card.expiry);
+            const dateStr = exp.toLocaleDateString('bn-BD');
+            const timeStr = exp.toLocaleTimeString('bn-BD', {hour:'2-digit', minute:'2-digit'});
+            return `
+            <div style="background:linear-gradient(135deg,#fff,#f8fafc); border-radius:15px; padding:14px; margin-bottom:10px; border:1px solid #e2e8f0; box-shadow:0 2px 8px rgba(0,0,0,0.05); position:relative; overflow:hidden;">
+                <div style="position:absolute; left:0; top:0; bottom:0; width:5px; background:#27ae60; border-radius:5px 0 0 5px;"></div>
+                <div style="padding-left:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h4 style="margin:0; color:#1e293b; font-size:15px; font-weight:800;">${card.name}</h4>
+                        <span style="background:#27ae60; color:#fff; font-size:13px; font-weight:900; padding:3px 10px; border-radius:20px;">${card.amount}${card.type === '%' ? '%' : '৳'} OFF</span>
+                    </div>
+                    <div style="margin-top:6px; font-size:11px; color:#64748b; display:flex; gap:12px;">
+                        <span>🛒 মিন: ৳${card.minAmount || card.min || 0}</span>
+                        <span>⏰ ${dateStr} | ${timeStr}</span>
+                    </div>
+                    <div style="margin-top:8px; background:#f0fdf4; border:1.5px dashed #27ae60; padding:5px 10px; border-radius:8px; text-align:center;">
+                        <span style="color:#27ae60; font-size:12px; font-weight:800; letter-spacing:1px;">CODE: ${card.code}</span>
+                    </div>
                 </div>
-            </div>
+            </div>`;
+        }).join('');
+    }
 
-            <div style="margin-top: 10px; background: #f0fdf4; border: 1px dashed #27ae60; padding: 5px; border-radius: 8px; text-align: center;">
-                <span style="font-size: 12px; color: #27ae60; font-weight: 800; letter-spacing: 1px;">CODE: ${card.code}</span>
-            </div>
-        </div>`;
-    }).join('');
+    container.innerHTML = html;
 }
+
+// Quick claim — card code সরাসরি input এ দিয়ে claim করা
+window.quickClaimCard = function(code) {
+    const inputBox = document.getElementById('promo-input-box');
+    if (inputBox) inputBox.value = code;
+    if (typeof claimPublicDiscount === 'function') claimPublicDiscount();
+};
 
 function claimPublicDiscount() {
     const inputBox = document.getElementById('promo-input-box');
