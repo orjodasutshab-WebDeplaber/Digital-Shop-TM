@@ -305,6 +305,13 @@ function startListeners() {
           }
         }
       } catch(e) {}
+      // User card panel — myDiscounts change হলে refresh
+      try {
+        if (typeof renderUserCards === 'function') {
+          const userCardList = document.getElementById('userCardList');
+          if (userCardList) renderUserCards();
+        }
+      } catch(e) {}
     }
     _pulling = false;
   });
@@ -369,6 +376,42 @@ function startListeners() {
       if (typeof window.refreshBeliDisplay === 'function') window.refreshBeliDisplay();
     });
   });
+
+  // Gift Cards real-time listener
+  db.collection('gift_cards').onSnapshot(snap => {
+    _pulling = true;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('TM_DB_GIFT_CARDS_V2', arr);
+    if (window.appState) window.appState.globalDiscounts = arr;
+
+    // Expired cards auto-cleanup
+    if (typeof autoCleanupExpiredCards === 'function') {
+      autoCleanupExpiredCards();
+    }
+
+    // User card panel refresh (user side)
+    if (typeof renderUserCards === 'function') {
+      const userCardList = document.getElementById('userCardList');
+      if (userCardList) renderUserCards();
+    }
+
+    // Admin panel refresh (draft + active)
+    if (typeof renderDraftCards === 'function') {
+      const draftList = document.getElementById('modal-draft-list');
+      if (draftList) renderDraftCards();
+    }
+    if (typeof renderActiveAdminCards === 'function') {
+      const activeList = document.getElementById('active-discount-list');
+      if (activeList) renderActiveAdminCards();
+    }
+
+    // Users collection এ myDiscounts update হলে user card ও refresh
+    _pulling = false;
+    console.log('[FB] ↻ Gift cards updated:', arr.length);
+  });
+
+  // Users listener এ myDiscounts change হলে user card refresh
+  // (already handled in users listener above)
 
   console.log('[FB] Listeners started');
 }

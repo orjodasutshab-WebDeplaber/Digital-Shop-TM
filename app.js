@@ -86,6 +86,20 @@ window.onload = function() {
     // ৭. অটো কার্ড ক্লিনআপ (পুরনো বা মেয়াদ শেষ হওয়া কার্ড ডিলিট করা)
     if (typeof autoCleanupExpiredCards === 'function') {
         autoCleanupExpiredCards();
+        // প্রতি ৩০ সেকেন্ডে check — expired হলে auto remove + UI refresh
+        setInterval(() => {
+            autoCleanupExpiredCards();
+            // User card panel refresh
+            if (typeof renderUserCards === 'function') {
+                const userCardList = document.getElementById('userCardList');
+                if (userCardList) renderUserCards();
+            }
+            // Admin panel refresh
+            if (typeof renderActiveAdminCards === 'function') {
+                const activeList = document.getElementById('active-discount-list');
+                if (activeList) renderActiveAdminCards();
+            }
+        }, 30000); // ৩০ সেকেন্ড
     }
     setTimeout(() => {
     if (typeof showNoticeBoardPopup === 'function') showNoticeBoardPopup();
