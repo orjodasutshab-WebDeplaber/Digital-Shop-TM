@@ -2292,17 +2292,40 @@ function handleUserSearch() {
 // ১. মোবাইল নম্বর পরিবর্তন
 function adminChangeMobile(userId) {
     const user = appState.users.find(u => u.id === userId);
-    const newMobile = prompt("ইউজারের নতুন মোবাইল নম্বর দিন:", user.mobile);
-    
-    if (newMobile && newMobile.length >= 11) {
-        user.mobile = newMobile;
-        user.id = newMobile; // যেহেতু আপনার সিস্টেমে মোবাইল নম্বরই ID
-        saveData(DB_KEYS.USERS, appState.users);
-        loadAdminTab('users'); // লিস্ট রিফ্রেশ
-        alert("✅ মোবাইল নম্বর আপডেট করা হয়েছে!");
-    } else if (newMobile !== null) {
-        alert("❌ সঠিক মোবাইল নম্বর দিন!");
+    if (!user) return alert("ইউজার পাওয়া যায়নি!");
+    const newMobile = prompt("ইউজারের নতুন মোবাইল নম্বর দিন:", user.mobile || user.phone || "");
+
+    if (newMobile === null) return; // Cancel চাপলে কিছু করব না
+    if (!newMobile || newMobile.length < 11) {
+        alert("❌ সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন!");
+        return;
     }
+
+    const oldId = userId;
+    // mobile update — ID বদলাবে না, শুধু mobile field update
+    user.mobile = newMobile;
+    user.phone  = newMobile;
+
+    // localStorage সেভ
+    saveData(DB_KEYS.USERS, appState.users);
+
+    // Firebase — পুরনো doc update (ID অপরিবর্তিত)
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('users').doc(String(oldId)).update({
+                mobile: newMobile,
+                phone:  newMobile
+            }).then(() => console.log('[FB] ✅ Mobile updated:', oldId, newMobile))
+              .catch(e => {
+                  // doc না থাকলে set দিয়ে তৈরি করি
+                  firebase.firestore().collection('users').doc(String(oldId)).set(user)
+                      .catch(err => console.warn('[FB] mobile update err:', err.message));
+              });
+        }
+    } catch(e) {}
+
+    loadAdminTab('users');
+    alert("✅ মোবাইল নম্বর আপডেট হয়েছে!");
 }
 
 // ২. ইউজার ডিলিট করা
