@@ -5609,6 +5609,91 @@ function renderUserInventory() {
     const now = new Date().getTime();
     const me = appState.users.find(u => u.id === appState.currentUser?.id);
 
+    // expired বাদ দিয়ে valid cards
+    const myCards = (me?.myDiscounts || []).filter(d => {
+        const exp = new Date(d.expiry).getTime();
+        return isNaN(exp) || exp > now;
+    });
+
+    if (myCards.length === 0) {
+        container.innerHTML = `
+            <div id="noCardMsg" style="text-align:center; padding:30px 15px; background:#fdfdfd; border:2px dashed #e2e8f0; border-radius:15px;">
+                <i class="fa fa-folder-open" style="font-size:30px; color:#cbd5e1; margin-bottom:10px; display:block;"></i>
+                <p style="color:#94a3b8; font-size:13px; margin:0;">আপনার কাছে বর্তমানে কোনো<br>অ্যাক্টিভ ডিসকাউন্ট কার্ড নেই।</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = myCards.map(card => {
+        const exp = new Date(card.expiry);
+        const dateStr = exp.toLocaleDateString('bn-BD');
+        const timeStr = exp.toLocaleTimeString('bn-BD', {hour:'2-digit', minute:'2-digit'});
+        const isPublicCard = card.origin === 'admin-panel' && !card.parentCardId;
+        const isUserCard   = !!card.parentCardId || card.origin === 'gift-engine';
+
+        if (isUserCard) {
+            // ── User card design (সবুজ, gift style) ──
+            return `
+            <div style="background:linear-gradient(135deg,#0f4c2a,#1a6b3c); border-radius:18px; padding:16px; margin-bottom:12px; position:relative; overflow:hidden; box-shadow:0 6px 20px rgba(15,76,42,0.3);">
+                <!-- decorative circles -->
+                <div style="position:absolute; top:-20px; right:-20px; width:80px; height:80px; background:rgba(255,255,255,0.05); border-radius:50%;"></div>
+                <div style="position:absolute; bottom:-15px; left:30px; width:60px; height:60px; background:rgba(255,255,255,0.04); border-radius:50%;"></div>
+
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
+                    <div>
+                        <div style="background:rgba(255,255,255,0.15); display:inline-block; padding:2px 10px; border-radius:20px; font-size:10px; color:#a7f3d0; font-weight:700; margin-bottom:6px;">🎁 গিফট কার্ড</div>
+                        <h4 style="margin:0; color:#fff; font-size:16px; font-weight:800;">${card.name}</h4>
+                        <div style="color:#a7f3d0; font-size:11px; margin-top:4px;">🛒 মিন: ৳${card.minAmount||card.min||0} &nbsp;|&nbsp; ম্যাক্স: ৳${card.maxAmount||card.max||'N/A'}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:28px; font-weight:900; color:#4ade80; line-height:1;">${card.amount}${card.type==='%'?'%':'৳'}</div>
+                        <div style="font-size:10px; color:#a7f3d0; font-weight:600;">OFF</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:12px; border-top:1px dashed rgba(255,255,255,0.2); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="background:rgba(255,255,255,0.1); border:1px dashed rgba(255,255,255,0.3); padding:5px 14px; border-radius:8px;">
+                        <span style="color:#fff; font-size:13px; font-weight:800; letter-spacing:2px;">CODE: ${card.code||'N/A'}</span>
+                    </div>
+                    <div style="font-size:10px; color:#a7f3d0;">⏰ ${dateStr} | ${timeStr}</div>
+                </div>
+            </div>`;
+        } else {
+            // ── Public card design (নীল, promo style) ──
+            return `
+            <div style="background:linear-gradient(135deg,#1e3a8a,#1d4ed8); border-radius:18px; padding:16px; margin-bottom:12px; position:relative; overflow:hidden; box-shadow:0 6px 20px rgba(30,58,138,0.3);">
+                <!-- decorative -->
+                <div style="position:absolute; top:-20px; right:-20px; width:80px; height:80px; background:rgba(255,255,255,0.06); border-radius:50%;"></div>
+                <div style="position:absolute; bottom:-15px; left:30px; width:60px; height:60px; background:rgba(255,255,255,0.04); border-radius:50%;"></div>
+
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
+                    <div>
+                        <div style="background:rgba(255,255,255,0.15); display:inline-block; padding:2px 10px; border-radius:20px; font-size:10px; color:#bfdbfe; font-weight:700; margin-bottom:6px;">🏷️ প্রোমো কার্ড</div>
+                        <h4 style="margin:0; color:#fff; font-size:16px; font-weight:800;">${card.name}</h4>
+                        <div style="color:#bfdbfe; font-size:11px; margin-top:4px;">🛒 মিন: ৳${card.minAmount||card.min||0} &nbsp;|&nbsp; ম্যাক্স: ৳${card.maxAmount||card.max||'N/A'}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:28px; font-weight:900; color:#60a5fa; line-height:1;">${card.amount}${card.type==='%'?'%':'৳'}</div>
+                        <div style="font-size:10px; color:#bfdbfe; font-weight:600;">OFF</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:12px; border-top:1px dashed rgba(255,255,255,0.2); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="background:rgba(255,255,255,0.1); border:1px dashed rgba(255,255,255,0.3); padding:5px 14px; border-radius:8px;">
+                        <span style="color:#fff; font-size:13px; font-weight:800; letter-spacing:2px;">CODE: ${card.code||'N/A'}</span>
+                    </div>
+                    <div style="font-size:10px; color:#bfdbfe;">⏰ ${dateStr} | ${timeStr}</div>
+                </div>
+            </div>`;
+        }
+    }).join('');
+}
+    const container = document.getElementById('userCardList');
+    if (!container) return;
+
+    const now = new Date().getTime();
+    const me = appState.users.find(u => u.id === appState.currentUser?.id);
+
     // ── ১. User এর নিজস্ব cards (myDiscounts) — expired বাদ দাও ──
     const myCards = (me?.myDiscounts || []).filter(d => {
         const exp = new Date(d.expiry).getTime();
@@ -5695,13 +5780,6 @@ function renderUserInventory() {
 
     container.innerHTML = html;
 }
-
-// Quick claim — card code সরাসরি input এ দিয়ে claim করা
-window.quickClaimCard = function(code) {
-    const inputBox = document.getElementById('promo-input-box');
-    if (inputBox) inputBox.value = code;
-    if (typeof claimPublicDiscount === 'function') claimPublicDiscount();
-};
 
 function claimPublicDiscount() {
     const inputBox = document.getElementById('promo-input-box');
