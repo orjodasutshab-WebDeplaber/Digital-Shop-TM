@@ -2310,8 +2310,16 @@ function adminDeleteUser(userId) {
     if (confirm("আপনি কি নিশ্চিতভাবে এই ইউজারকে ডিলিট করতে চান? এই কাজ আর ফেরত আনা যাবে না!")) {
         appState.users = appState.users.filter(u => u.id !== userId);
         saveData(DB_KEYS.USERS, appState.users);
-        loadAdminTab('users'); // লিস্ট রিফ্রেশ
-        alert("🗑️ ইউজার সফলভাবে রিমুভ করা হয়েছে।");
+        // Firebase users collection থেকে delete
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                firebase.firestore().collection('users').doc(String(userId)).delete()
+                    .then(() => console.log('[FB] ✅ User deleted:', userId))
+                    .catch(e => console.warn('[FB] user delete err:', e.message));
+            }
+        } catch(e) {}
+        loadAdminTab('users');
+        alert("🗑️ ইউজার সফলভাবে রিমুভ করা হয়েছে।");
     }
 }
 
