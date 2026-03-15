@@ -1,0 +1,1695 @@
+/* =======================================================
+   DIGITAL SHOP TM - MASTER STYLESHEET
+   Version: 2.0 (Premium)
+   ======================================================= */
+
+/* -------------------------------------------------------
+   1. GLOBAL VARIABLES & THEME CONFIGURATION
+   ------------------------------------------------------- */
+/* --- Digital Shop TM Custom Scrollbar Design --- */
+
+/* ১. পুরো সাইটের জন্য স্ক্রলবার উইথ (Width) */
+::-webkit-scrollbar {
+    width: 8px; /* ভার্টিক্যাল স্ক্রলবার */
+    height: 8px; /* হরিজন্টাল স্ক্রলবার */
+}
+
+/* ২. স্ক্রলবার ট্র্যাক (যেটার ওপর দিয়ে স্ক্রলবার চলে) */
+::-webkit-scrollbar-track {
+    background: #0f172a; /* আপনার সাইটের ব্যাকগ্রাউন্ডের সাথে মিল রেখে */
+    border-radius: 10px;
+}
+
+/* ৩. স্ক্রলবার থাম্ব (যেটা আমরা ধরি বা যেটা নড়াচড়া করে) */
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #38bdf8, #1e293b); /* সুন্দর ব্লু গ্রেডিয়েন্ট */
+    border-radius: 10px;
+    border: 2px solid #0f172a; /* ট্র্যাকের সাথে আলাদা করার জন্য গ্যাপ */
+    transition: 0.3s;
+}
+
+/* ৪. থাম্ব হোভার ইফেক্ট (মাউস ধরলে রঙ বদলাবে) */
+::-webkit-scrollbar-thumb:hover {
+    background: #38bdf8; /* উজ্জ্বল স্কাই ব্লু */
+    cursor: pointer;
+}
+
+/* ৫. ফায়ারফক্স ব্রাউজারের জন্য সাপোর্ট (Firefox Support) */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #38bdf8 #0f172a;
+}
+
+/* ৬. বিশেষ করে চ্যাট বক্স বা মোডালের জন্য ডিজাইন ফিক্স */
+.modal-box::-webkit-scrollbar,
+#userChatBox::-webkit-scrollbar,
+#returnChatBox::-webkit-scrollbar {
+    width: 5px; /* ছোট বক্সের জন্য চিকন স্ক্রলবার */
+}
+
+   :root {
+    /* Color Palette - Light Mode (Default) */
+    --primary-color: #00b894;       /* Main Brand Color (Greenish) */
+    --primary-hover: #00a884;
+    --secondary-color: #0984e3;     /* Accent Color (Blue) */
+    --text-main: #2d3436;           /* Dark Text */
+    --text-muted: #636e72;          /* Gray Text */
+    --bg-body: #f1f2f6;             /* Light Gray Background */
+    --bg-card: #ffffff;             /* White Card Background */
+    --border-color: #dfe6e9;
+    --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
+    --shadow-md: 0 5px 15px rgba(0,0,0,0.08);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.15);
+    
+    /* Functional Colors */
+    --danger: #d63031;
+    --success: #00b894;
+    --warning: #fdcb6e;
+    --white: #ffffff;
+    
+    /* Layout Dimensions */
+    --header-height: 70px;
+    --sidebar-width: 260px;
+    --border-radius: 12px;
+}
+
+/* Dark Mode Variables (Point 5 Implementation) */
+body.dark-theme {
+    --primary-color: #00b894;
+    --primary-hover: #55efc4;
+    --secondary-color: #74b9ff;
+    --text-main: #dfe6e9;
+    --text-muted: #b2bec3;
+    --bg-body: #1e272e;            /* Dark Background */
+    --bg-card: #2d3436;            /* Dark Card Background */
+    --border-color: #636e72;
+    --shadow-sm: 0 2px 5px rgba(0,0,0,0.3);
+    --shadow-md: 0 5px 15px rgba(0,0,0,0.4);
+}
+
+/* -------------------------------------------------------
+   2. RESET & BASE STYLES
+   ------------------------------------------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+    font-family: 'Hind Siliguri', sans-serif; /* Bengali Friendly Font */
+}
+
+body {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    transition: background-color 0.4s ease, color 0.4s ease;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+button { cursor: pointer; border: none; font-family: inherit; }
+
+/* Custom Scrollbar (Point 15) */
+.scroll-custom::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.scroll-custom::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+}
+.scroll-custom::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+.scroll-custom::-webkit-scrollbar-thumb:hover {
+    background: var(--secondary-color);
+}
+
+/* -------------------------------------------------------
+   3. HEADER STYLES (Point 17)
+   ------------------------------------------------------- */
+.site-header {
+    background-color: var(--bg-card);
+    height: var(--header-height);
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 5%;
+}
+
+.header-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Branding */
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+    padding: 2px;
+    transition: transform 0.3s ease;
+}
+
+.brand-logo:hover {
+    transform: rotate(10deg);
+}
+
+.company-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 0;
+    line-height: 1.1;
+}
+
+.company-slogan {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* User Controls */
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 20px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-login {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+.btn-login:hover {
+    background: rgba(0, 184, 148, 0.1);
+}
+
+.btn-register {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-register:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+}
+
+/* Logged In User Profile (Point 5) */
+.user-profile-area {
+    position: relative;
+    cursor: pointer;
+}
+
+.profile-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-body);
+    padding: 5px 15px;
+    border-radius: 50px;
+    border: 1px solid var(--border-color);
+    transition: 0.3s;
+}
+
+.profile-trigger:hover {
+    border-color: var(--primary-color);
+}
+
+.user-info-text {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+}
+
+.greeting { font-size: 10px; color: var(--text-muted); }
+.user-name-display { font-weight: 700; font-size: 14px; }
+
+.user-avatar-small {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.arrow-icon { font-size: 12px; color: var(--text-muted); }
+
+/* Dropdown Menu */
+.dropdown-content {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: var(--bg-card);
+    width: 260px;
+    border-radius: 15px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid var(--border-color);
+}
+
+/* Class to show dropdown via JS */
+.user-profile-area.active .dropdown-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-header {
+    background: var(--bg-body);
+    padding: 12px 20px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dropdown-list li {
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.2s;
+}
+
+.dropdown-list li:hover {
+    background: var(--bg-body);
+    color: var(--primary-color);
+    padding-left: 25px; /* Slide effect */
+}
+
+.highlight-item {
+    color: var(--secondary-color) !important;
+    font-weight: 600;
+}
+
+.dropdown-footer {
+    padding: 10px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-logout {
+    width: 100%;
+    background: rgba(214, 48, 49, 0.1);
+    color: var(--danger);
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.btn-logout:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* -------------------------------------------------------
+   4. NAVIGATION BAR (Point 2)
+   ------------------------------------------------------- */
+.main-navigation {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 0;
+    position: sticky;
+    top: var(--header-height);
+    z-index: 990;
+}
+
+.nav-container {
+    display: flex;
+    gap: 15px;
+    padding: 0 5%;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+}
+
+.nav-item {
+    background: var(--bg-body);
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-item:hover, .nav-item.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3);
+}
+
+/* -------------------------------------------------------
+   5. AD & MAIN CONTENT (Point 9 & 16)
+   ------------------------------------------------------- */
+.advertisement-section {
+    padding: 20px 5%;
+}
+
+.ad-container {
+    width: 100%;
+    height: 120px;
+    background: linear-gradient(45deg, #74b9ff, #a29bfe);
+    border-radius: var(--border-radius);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    position: relative;
+}
+
+.ad-placeholder {
+    text-align: center;
+}
+
+.main-content-area {
+    padding: 30px 5% 60px 5%;
+    min-height: 80vh;
+}
+
+.section-title {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.section-title h2 {
+    font-size: 24px;
+    color: var(--text-main);
+}
+
+.title-underline {
+    width: 60px;
+    height: 4px;
+    background: var(--primary-color);
+    margin-top: 5px;
+    border-radius: 2px;
+}
+
+/* Product Grid System */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 25px;
+}
+
+/* Product Card Design (Detailed) */
+.product-card {
+    background: var(--bg-card);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
+}
+
+.product-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    transition: 0.5s;
+}
+
+.product-card:hover img {
+    transform: scale(1.05);
+}
+
+.product-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    display: block;
+}
+
+/* অর্ডার করুন বাটনটি স্পষ্ট করার জন্য */
+.btn-buy-now {
+    background-color: #00b894 !important; /* উজ্জ্বল সবুজ রঙ */
+    color: #ffffff !important; /* টেক্সট একদম সাদা */
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: 0.3s;
+}
+
+.btn-buy-now:hover {
+    background-color: #009470 !important;
+    transform: translateY(-2px);
+}
+
+
+
+/* Admin Edit Button on Card */
+
+
+/* -------------------------------------------------------
+   6. MODAL SYSTEM (Styles for ALL Popups)
+   ------------------------------------------------------- */
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px); /* Modern blur effect */
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    animation: fadeIn 0.3s forwards;
+}
+/* প্রফেশনাল অ্যাডমিন বাটন লেআউট */
+.admin-actions-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 100; /* স্লাইডারের সবার উপরে থাকবে */
+    display: flex;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.2); /* হালকা স্বচ্ছ ব্যাকগ্রাউন্ড */
+    backdrop-filter: blur(5px);
+    padding: 5px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.admin-btn {
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    color: #fff;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.btn-edit { 
+    background: #0084ff; 
+    box-shadow: 0 2px 8px rgba(0, 132, 255, 0.4);
+}
+.btn-edit:hover { background: #0056b3; transform: scale(1.05); }
+
+.btn-delete { 
+    background: #ff3b30; 
+    box-shadow: 0 2px 8px rgba(255, 59, 48, 0.4);
+}
+.btn-delete:hover { background: #c41e15; transform: scale(1.05); }
+
+/* প্রোডাক্ট কার্ডে পজিশন নিশ্চিত করা */
+.product-card {
+    position: relative !important;
+    overflow: hidden;
+}
+
+/* Modal Sizes */
+.modal-box {
+    background: var(--bg-card);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    position: relative;
+    transform: scale(0.8);
+    animation: scaleUp 0.3s forwards;
+    color: var(--text-main);
+}
+
+.small-modal { width: 90%; max-width: 400px; }
+.medium-modal { width: 95%; max-width: 600px; }
+.fullscreen-modal { width: 95%; height: 90vh; max-width: 1200px; padding: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Modal Header & Close */
+.modal-header { margin-bottom: 20px; text-align: center; }
+.modal-header h3 { font-size: 22px; color: var(--primary-color); }
+.modal-header p { font-size: 14px; color: var(--text-muted); }
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: 0.3s;
+}
+.close-btn:hover { color: var(--danger); transform: rotate(90deg); }
+
+/* Form Styles */
+.form-group { margin-bottom: 15px; text-align: left; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+
+input, textarea, select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-body);
+    color: var(--text-main);
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+input:focus, textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(0, 184, 148, 0.1);
+}
+
+.btn-full-width { width: 100%; padding: 12px; margin-top: 10px; font-size: 16px; }
+.btn-primary { background: var(--primary-color); color: white; border-radius: 10px; }
+.btn-primary:hover { background: var(--primary-hover); }
+
+/* -------------------------------------------------------
+   7. CHECKOUT MODAL STYLES (Point 6 & 7)
+   ------------------------------------------------------- */
+.checkout-summary {
+    background: rgba(9, 132, 227, 0.1);
+    border-left: 5px solid var(--secondary-color);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+.checkout-summary p { margin: 5px 0; font-size: 14px; }
+.checkout-summary h4 { color: var(--secondary-color); margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 5px; }
+
+.payment-instructions {
+    text-align: center;
+    background: #fff3cd;
+    color: #856404;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ffeeba;
+}
+
+.payment-icon { width: 60px; margin-bottom: 10px; }
+.warning-text { font-size: 12px; color: var(--danger); }
+
+/* Hidden utility class */
+.hidden { display: none !important; }
+
+/* -------------------------------------------------------
+   8. ADMIN PANEL STYLES (Point 10-14)
+   ------------------------------------------------------- */
+.admin-top-bar {
+    background: #2d3436;
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-admin-btn {
+    background: var(--danger);
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.admin-layout-wrapper {
+    display: flex;
+    height: 100%;
+}
+
+/* Admin Sidebar */
+.admin-sidebar {
+    width: var(--sidebar-width);
+    background: #353b48;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-btn {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: transparent;
+    color: #bdc3c7;
+    text-align: left;
+    border-radius: 10px;
+    transition: 0.3s;
+    font-size: 15px;
+}
+
+.menu-btn:hover, .menu-btn.active {
+    background: var(--primary-color);
+    color: white;
+    padding-left: 20px;
+}
+
+.menu-btn i { width: 25px; }
+
+/* Admin Content Area */
+.admin-content-view {
+    flex: 1;
+    background: var(--bg-body);
+    padding: 30px;
+    overflow-y: auto;
+}
+
+/* Admin Tables & Forms */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-card);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-table th, .admin-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-table th { background: var(--bg-body); font-weight: 700; }
+.status-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+.status-pending { background: #ffeaa7; color: #d35400; }
+.status-success { background: #55efc4; color: #00b894; }
+
+/* -------------------------------------------------------
+   9. ANIMATIONS
+   ------------------------------------------------------- */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* -------------------------------------------------------
+   10. FOOTER
+   ------------------------------------------------------- */
+.site-footer {
+    background: var(--bg-card);
+    text-align: center;
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+/* Mobile Responsiveness */
+/* ===== MOBILE TOUCH OPTIMIZATIONS (Desktop Layout Preserved) ===== */
+/* মোবাইলে পিসির মতো layout — শুধু touch ও scroll উন্নত করা */
+@media (max-width: 1280px) {
+    /* Touch scroll smooth করা */
+    * { -webkit-overflow-scrolling: touch; }
+    
+    /* Hover state touch এ কাজ করে না তাই active দিয়ে ঠিক করা */
+    .product-card:active { transform: scale(0.98); }
+    .btn-buy-now:active { opacity: 0.85; }
+    .menu-btn:active { opacity: 0.8; }
+    
+    /* Scrollable areas touch friendly */
+    .admin-sidebar { -webkit-overflow-scrolling: touch; overflow-x: auto; }
+    .modal-scroll { -webkit-overflow-scrolling: touch; }
+    
+    /* Input zoom prevent — iOS এ input focus করলে zoom হয় এটা বন্ধ */
+    input, select, textarea { font-size: 16px !important; }
+}
+/* Product Slider Styles */
+.product-slider {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+.slides-container {
+    display: flex;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    height: 100%;
+}
+.slide-img {
+    min-width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.slide-prev, .slide-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.4);
+    color: white;
+    padding: 5px 8px;
+    border-radius: 50%;
+    font-size: 12px;
+    z-index: 5;
+}
+.slide-prev { left: 5px; }
+.slide-next { right: 5px; }
+/* অ্যাডমিন প্যানেলে লাইভ প্রিভিউ থাম্বনেইল */
+.preview-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 5px;
+    border: 2px solid #00b894;
+}
+
+.multi-img-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+/* অ্যাডমিন প্যানেল ইম্প্রুভমেন্ট */
+.multi-img-box {
+    margin-bottom: 8px;
+    display: flex;
+    gap: 5px;
+}
+
+.btn-mini-add {
+    background: #e1eafc;
+    color: #2d3436;
+    padding: 5px 12px;
+    font-size: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px dashed #2d3436;
+}
+
+.live-preview-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.preview-thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 2px solid var(--primary-color);
+}
+
+/* স্লাইডার অটো-স্ক্রলিং ইফেক্ট */
+.slides-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+}
+
+.slide-img {
+    scroll-snap-align: start;
+    min-width: 100%;
+}
+/* অ্যাডমিন প্যানেলের ইনপুট এরিয়া ফিক্স */
+#adminMainContainer {
+    max-height: 80vh; /* স্ক্রিনের ৮০% উচ্চতা নিবে */
+    overflow-y: auto; /* বেশি বড় হলে স্ক্রলবার আসবে */
+    padding-bottom: 100px; /* নিচের দিকে বাড়তি জায়গা রাখবে */
+    position: relative;
+}
+
+/* ইমেজ ইনপুট গ্রুপকে একটি নির্দিষ্ট বক্সের ভেতর রাখা */
+#imageInputGroup {
+    max-height: 200px; /* ৫-৬টি বক্সের পর স্ক্রলবার আসবে */
+    overflow-y: auto;
+    background: rgba(0,0,0,0.02);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* পাবলিশ বাটনকে একটু আলাদা করা */
+.admin-publish-btn-container {
+    position: sticky;
+    bottom: -30px;
+    background: var(--bg-card);
+    padding: 20px 0;
+    z-index: 10;
+}
+/* ছবি বড় করার জন্য স্টাইল */
+.slide-img {
+    cursor: zoom-in; /* মাউস নিলে জুম আইকন দেখাবে */
+    transition: transform 0.3s ease;
+}
+
+.slide-img:hover {
+    opacity: 0.9;
+}
+
+#imageLightbox {
+    background: rgba(0, 0, 0, 0.9); /* ব্যাকগ্রাউন্ড আরও গাঢ় হবে */
+    cursor: zoom-out;
+}
+
+#lightboxImg {
+    animation: zoomEffect 0.3s ease-out;
+}
+
+@keyframes zoomEffect {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* ইউজার লিস্ট এবং সাধারণ টেক্সট স্পষ্ট করা */
+.user-list-item, .admin-panel-text, .form-group label {
+    color: #f7f4f4 !important; /* হালকা ধূসর বা সাদাটে রঙ যা ডার্ক মোডে ভালো দেখায় */
+}
+
+/* যদি টেবিল বা লিস্ট থাকে তবে তার ব্যাকগ্রাউন্ড */
+.list-container {
+    background: rgba(255, 255, 255, 0.05); /* হালকা স্বচ্ছ সাদা ভাব */
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+input[type="text"], input[type="number"], select {
+    background-color: #2d3436 !important; /* ইনপুট বক্সের ব্যাকগ্রাউন্ড ডার্ক */
+    color: #ffffff !important; /* টাইপিং হবে সাদা রঙে */
+    border: 1px solid #636e72;
+    padding: 8px;
+}
+/* ইউজার লিস্ট বা এডমিন প্যানেলের টেক্সট ফিক্স */
+.admin-panel-content, .user-details, .order-item {
+    color: #ffffff !important; /* সব লেখা সাদা করে দিবে */
+}
+
+.form-group label {
+    color: #ecf0f1 !important;
+}
+/* ইউজার লিস্ট টেবিল বা কার্ডের জন্য */
+.user-list-container, .user-item {
+    background: #2d3436 !important; /* ডার্ক ব্যাকগ্রাউন্ড */
+    color: #ffffff !important; /* সাদা লেখা */
+    border: 1px solid #636e72;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+/* লিস্টের ভেতরের সাদা বড় বক্সগুলো ছোট এবং সুন্দর করা */
+.user-details-box {
+    background: #1e272e !important;
+    color: #ffffff !important;
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #00b894; /* পাশে একটি সবুজ বর্ডার */
+    margin: 5px 0;
+}
+
+/* ইনপুট ফিল্ড বা সাদা এরিয়া ফিক্স */
+input, select, textarea {
+    background: #353b48 !important; /* ইনপুট বক্স ডার্ক হবে */
+    color: #ffffff !important; /* টাইপিং হবে সাদা */
+    border: 1px solid #7f8c8d !important;
+}
+
+/* রিসেট পাসওয়ার্ড বাটনটি সুন্দর করা */
+.btn-reset-pass {
+    background: #cf9372 !important;
+    color: white !important;
+    border-radius: 5px;
+    padding: 5px 15px;
+}
+
+/* --- Digital Shop TM - User List Improvements --- */
+.user-list-grid {
+    display: grid;
+    gap: 12px;
+    padding: 10px 0;
+}
+
+.user-info-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.user-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* টেক্সট কালার অটোমেশন */
+.u-name {
+    color: var(--text-main);
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.u-role, .u-phone {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ডার্ক মোডে লেখা আরও উজ্জ্বল করার জন্য */
+body.dark-theme .u-name { color: #ffffff !important; }
+body.dark-theme .u-role, body.dark-theme .u-phone { color: #b2bec3 !important; }
+
+.admin-badge {
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.btn-reset-pass {
+    background: #08aedc;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+body.dark-theme .btn-reset-pass {
+    background: var(--primary-color);
+}
+/* ইউজার অ্যাকশন বাটন স্টাইল */
+.user-actions {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+/* স্ক্রল বারকে সুন্দর করার জন্য */
+#userOrderHistoryList::-webkit-scrollbar {
+    width: 5px;
+}
+#userOrderHistoryList::-webkit-scrollbar-thumb {
+    background: #3498db; 
+    border-radius: 10px;
+}
+
+/* Digital Shop TM Search Bar CSS */
+.header-search-box {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 0 15px;
+}
+
+.search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 14px;
+}
+
+.search-wrapper input {
+    width: 100%;
+    padding: 8px 10px 8px 38px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid #444;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.search-wrapper input:focus {
+    border-color: #3498db;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* মোবাইলের জন্য রেসপন্সিভ */
+/* Search wrapper — desktop size maintain */
+.search-wrapper { max-width: 300px; }
+
+
+/* ১. লগইন ফর্মের ভেতরের সব সাধারণ টেক্সট এবং শিরোনাম কালো করা */
+#loginModal, .login-modal, .login-container {
+    color: #21d810 !important;
+}
+
+/* ২. ইনপুট বক্সের ঠিক ওপরে থাকা টেক্সটগুলোকে টার্গেট করা */
+.login-modal div, 
+.login-modal span, 
+.login-modal b, 
+.login-modal strong {
+    color: #06e542 !important; /* সাদার ওপর স্পষ্ট দেখানোর জন্য গাঢ় কালো */
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ৩. যদি লেখাগুলো সরাসরি ইনপুট বক্সের ওপরে থাকে (ছবি অনুযায়ী) */
+.login-modal form {
+    color: #17fc07 !important;
+}
+#floatingHelpline {
+    transition: transform 0.3s ease;
+}
+#floatingHelpline:hover {
+    transform: scale(1.1); /* মাউস নিলে একটু বড় হবে */
+}
+
+/* স্ক্রলবারটি সবসময় দেখানোর জন্য এবং কালার করার জন্য */
+#checkoutSummaryBox::-webkit-scrollbar {
+    width: 8px !important;              /* বারটি কতটুকু মোটা হবে */
+    display: block !important;          /* নিশ্চিতভাবে দেখাবে */
+}
+
+#checkoutSummaryBox::-webkit-scrollbar-thumb {
+    background: #27ae60 !important;    /* স্ক্রলবারের কালার (সবুজ) */
+    border-radius: 10px;               /* কোণা গোল হবে */
+}
+
+#checkoutSummaryBox::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1); /* স্ক্রলবারের পেছনের রাস্তা */
+}
+
+/* পপ-আপের ভেতরের স্ক্রলবার সুন্দর করার জন্য */
+.modal-box::-webkit-scrollbar {
+    width: 6px;
+}
+.modal-box::-webkit-scrollbar-thumb {
+    background: #27ae60; /* আপনার পোর্টালের সবুজ রঙ */
+    border-radius: 10px;
+}
+
+/* শুধু পণ্য পাবলিশ/অ্যাড প্রোডাক্ট ফর্মের জন্য */
+.form-group label, 
+.add-product-container label, 
+#publishProductForm label {
+    color: #000000 !important; /* লাইট মোডে কালো */
+    display: block !important; /* এক লাইনে আসা বন্ধ করবে */
+    margin-bottom: 8px !important;
+    font-weight: bold !important;
+    text-align: left !important;
+}
+
+/* ডার্ক মোড অন থাকলে শুধু এই ফর্মের লেখা সাদা হবে */
+body.dark-mode .form-group label, 
+body.dark-mode .add-product-container label {
+    color: #ffffff !important;
+}
+
+/* ইনপুট বক্সের ডিজাইন ঠিক করা */
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+    width: 100% !important;
+    padding: 10px !important;
+    margin-bottom: 15px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    display: block !important; /* এটি লেখাকে নিচে নিচে রাখবে */
+    color: #000 !important;
+    background: #fff !important;
+}
+
+/* অর্ডার লিস্টের ডিজাইন যেন না ভাঙে তার সুরক্ষা */
+.order-list label, .order-item span {
+    display: inline !important; /* অর্ডার লিস্টের জন্য ডিফল্ট ইনলাইন */
+}
+.admin-panel button {
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
+}
+#blockOptions label {
+    font-size: 14px;
+    display: block;
+    margin: 5px 0;
+}
+
+
+/* ডিসকাউন্ট কার্ড লিস্টের জন্য কাস্টম স্ক্রলবার */
+#userCardList {
+    scrollbar-width: thin; /* ফায়ারফক্সের জন্য */
+    scrollbar-color: #27ae60 #f1f1f1; /* ফায়ারফক্সের জন্য */
+}
+
+/* ক্রোম, এজ এবং সাফারির জন্য স্ক্রলবার ডিজাইন */
+#userCardList::-webkit-scrollbar {
+    width: 6px; /* স্ক্রলবারের প্রস্থ */
+}
+
+#userCardList::-webkit-scrollbar-track {
+    background: #f1f1f1; /* স্ক্রলবারের পেছনের অংশ */
+    border-radius: 10px;
+}
+
+#userCardList::-webkit-scrollbar-thumb {
+    background: #27ae60; /* স্ক্রলবারের মুভিং অংশ (সবুজ রঙ) */
+    border-radius: 10px;
+    border: 1px solid #ffffff;
+}
+
+#userCardList::-webkit-scrollbar-thumb:hover {
+    background: #219150; /* মাউস নিলে রঙ একটু গাঢ় হবে */
+}
+
+
+
+@keyframes pulse-red {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7); }
+    70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+}
+
+.premium-discount-card {
+    background: #1ac52b;
+    border-radius: 16px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 15px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    border: 1px solid #fee2e2; /* হালকা লাল বর্ডার */
+    min-height: 110px;
+}
+
+.card-left {
+    /* লাল গ্রেডিয়েন্ট থিম */
+    background: linear-gradient(135deg, #ff4757, #ee5253); 
+    color: rgb(255, 255, 255);
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-right: 2px dashed rgba(255,255,255,0.4);
+}
+
+.discount-badge .amount { font-size: 24px; font-weight: 900; }
+.discount-badge .type { font-size: 16px; font-weight: 700; }
+.off-text { font-size: 10px; letter-spacing: 2px; font-weight: bold; opacity: 0.9; }
+
+.card-right {
+    padding: 12px 15px;
+    width: 70%;
+    background: #20da99;
+}
+
+.card-title { margin: 0 0 5px 0; font-size: 15px; color: #1e293b; font-weight: 800; }
+
+.card-details {
+    display: flex;
+    gap: 10px;
+    font-size: 11px;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.card-details i { color: #ff4757; margin-right: 3px; } /* আইকন কালার লাল */
+
+.promo-box {
+    background: #fff5f5; /* হালকা লাল ব্যাকগ্রাউন্ড */
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 5px 10px;
+    display: inline-block;
+}
+
+.code-label { font-size: 10px; color: #f87171; font-weight: bold; margin-right: 5px; }
+.code-value { font-size: 13px; color: #b91c1c; font-weight: 900; letter-spacing: 1px; }
+
+.expiry-box {
+    margin-top: 8px;
+    font-size: 10px;
+    color: #ef4444;
+    font-weight: 700;
+}
+
+/* কার্ডের দুই পাশের খাঁজ (Punch Holes) */
+.punch-hole {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: #ffffff; 
+    border-radius: 50%;
+    left: 30%;
+    margin-left: -10px;
+    border: 1px solid #fee2e2;
+}
+.punch-hole.top { top: -11px; }
+.punch-hole.bottom { bottom: -11px; }
+
+
+/* রেডিও বাটন এবং টেক্সট ফিক্স */
+.target-option {
+    flex: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 700;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f1f5f9; /* হালকা ব্যাকগ্রাউন্ড যাতে লেখা ফুটে ওঠে */
+    transition: 0.3s;
+    color: #475569;
+    border: 2px solid transparent;
+}
+
+input[name="targetType"]:checked + span {
+    color: #1a237e;
+}
+
+/* কার্ডের সুন্দর ডিজাইন */
+.admin-card-item {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: 0.3s;
+}
+
+.admin-card-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+.card-action-btns {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 15px;
+}
+
+.card-action-btns button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* স্ক্রিন যাতে ডানে-বামে না নড়ে */
+}
+
+/* বিজ্ঞাপনের মেইন প্যারেন্ট যদি প্যারিং করা থাকে তবে সেটা সরাতে এটি দিন */
+#appContent {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+#leaderboardAdArea {
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        margin-top: 0;
+        overflow: hidden;
+        background: #000;
+    }
+
+    #billboard-section {
+        width: 100%;
+        /* ১.৫ সেন্টিমিটার ছোট করার পর উচ্চতা ৩৪০ পিক্সেল রাখা হয়েছে */
+        height: 340px; 
+        position: relative;
+        /* ওপরে ও নিচে দুটি নীল বর্ডার */
+        border-top: 4px solid #6366f1;
+        border-bottom: 4px solid #6366f1;
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .slide {
+        width: 100%;
+        height: 100%;
+        display: none;
+        animation: fadeIn 0.8s ease-in-out; /* ছবি আসার সময় হালকা এনিমেশন হবে */
+    }
+
+    .slide.active {
+        display: block;
+    }
+
+    .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: fill; /* পুরো স্ক্রিন বরাট করবে */
+        cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0.5; }
+        to { opacity: 1; }
+    }
+/* মোডালটিকে সবার উপরে আনার জন্য মাস্টার ক্লাস */
+.modal-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(0, 0, 0, 0.7) !important; /* কালচে ব্যাকগ্রাউন্ড */
+    backdrop-filter: blur(8px) !important;      /* ব্যাকগ্রাউন্ড ব্লার */
+    z-index: 99999999 !important;             /* সর্বোচ্চ লেয়ার */
+    display: none;                             /* শুরুতে হাইড থাকবে */
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+/* সাইডবারকে স্ক্রলযোগ্য করা */
+.admin-sidebar {
+    max-height: calc(100vh - 80px); /* টপ বার বাদ দিয়ে বাকি অংশ */
+    overflow-y: auto;               /* লম্বা হলে স্ক্রলবার আসবে */
+    overflow-x: hidden;             /* ডানে বামে স্ক্রল বন্ধ */
+}
+
+/* স্ক্রলবারটি সুন্দর ও চিকন করার জন্য (ঐচ্ছিক কিন্তু সাজেস্টেড) */
+.admin-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+    background: #4b5563; /* আপনার থিমের সাথে মিল রেখে কালার */
+    border-radius: 10px;
+}
+/* বেলি বোড এবং লোড মোর সেকশনের ডিজাইন */
+.load-more-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin: 30px 0;
+    padding: 0 10px;
+}
+
+/* বেলি বোড কন্টেইনারের সাইজ নির্ধারণ */
+.beli-board {
+    width: 730px;  /* আপনার চাহিদামতো Width */
+    height: 340px; /* আপনার চাহিদামতো Height */
+    background: #1e293b;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed #4b5563;
+    flex-shrink: 0; /* সাইজ যেন ছোট হয়ে না যায় */
+}
+
+.beli-board img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* cover এর বদলে contain দিন */
+    background: #0f172a; /* খালি জায়গায় ব্যাকগ্রাউন্ড কালার */
+    cursor: pointer;
+}
+
+.sironam-grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin: 40px auto;
+    max-width: 1200px;
+    padding: 0 15px;
+}
+
+/* শিরোনাম গ্রিড কন্টেইনার */
+.sironam-grid-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* এক লাইনে ৫টি কার্ড নিশ্চিত করা */
+    gap: 15px;
+    margin: 40px auto;
+    max-width: 95%;
+    padding: 0 10px;
+}
+
+/* আপনার অরিজিনাল কার্ড ডিজাইন (আপডেটেড) */
+.sironam-card {
+    /* width ও height নির্দিষ্ট ৩০০ পিক্সেলের বদলে রেসপনসিভ বর্গাকার করা হয়েছে */
+    aspect-ratio: 1 / 1; 
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+    background: #1e293b; /* ছবির পেছনের ব্যাকগ্রাউন্ড */
+}
+
+.sironam-card:hover {
+    transform: translateY(-10px) scale(1.02); /* একটু বেশি উপরে উঠবে */
+}
+
+/* ছবি পূর্ণাঙ্গ দেখানোর ফিক্স */
+.sironam-card img {
+    width: 100%;
+    height: 100%;
+    /* object-fit: cover এর বদলে fill বা contain ব্যবহার করুন যাতে ছবি না কাটে */
+    object-fit: fill; 
+    display: block;
+}
+
+/* আপনার অরিজিনাল ওভারলে (আপাতত হাইড যদি না লাগে) */
+.sironam-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 20px 10px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    display: none; /* আপনার অনুরোধ অনুযায়ী আপাতত নাম লুকানো */
+}
+
+
+/* স্পেশাল ক্যাটাগরি শিরোনামের সম্পূর্ণ ডিজাইন */
+.special-category-container {
+    text-align: center;
+    margin: 30px auto 40px auto;
+    padding: 5px 5px;
+    background: linear-gradient(135deg, #111827 0%, #1e293b 100%); /* ডার্ক ডাইনামিক ব্যাকগ্রাউন্ড */
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    max-width: 1500px;
+    border: 1px solid #334155;
+    position: relative;
+    overflow: hidden;
+}
+
+/* ব্যাকগ্রাউন্ডে হালকা গ্লো ইফেক্ট */
+.special-category-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.special-category-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin: 0 0 15px 0;
+    font-family: 'Hind Siliguri', sans-serif;
+    
+    /* গ্রেডিয়েন্ট টেক্সট এরর ফিক্স */
+    background: linear-gradient(135deg, #f3f4f6 0%, #e879f9 50%, #f3f4f6 100%);
+    background-clip: text;          /* স্ট্যান্ডার্ড প্রপার্টি */
+    -webkit-background-clip: text;  /* সাফারি ও ক্রোম এর জন্য */
+    -webkit-text-fill-color: transparent;
+    color: transparent;             /* ব্যাকআপ হিসেবে */
+    
+    /* ডিসপ্লে ফিক্স */
+    display: inline-flex;           /* Flex এর বদলে inline-flex ব্যবহার করা ভালো যদি ক্লিপ না হয় */
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    width: 100%;                    /* পুরো উইডথ নিশ্চিত করতে */
+    
+    /* হালকা গ্লো এবং শ্যাডো */
+    text-shadow: 0 2px 10px rgba(168, 85, 247, 0.4);
+    position: relative;
+}
+
+/* ইমোজি অ্যানিমেশন */
+.special-category-title span {
+    display: inline-block;
+    animation: emoji-float 3s ease-in-out infinite;
+}
+
+.special-category-title .emoji-right {
+    animation-delay: 1.5s; /* ডান পাশেরটা দেরিতে ভাসবে */
+}
+
+
+
+/* ভাসমান ইমোজি অ্যানিমেশন লজিক */
+@keyframes emoji-float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(5deg); }
+}
+
+
+
+/* ============================================================
+   MOBILE DESKTOP-LIKE EXPERIENCE — Final Fixes
+   পিসির মতো দেখানোর জন্য extra tweaks
+   ============================================================ */
+
+/* Body overflow — horizontal scroll enable (desktop layout wide) */
+html, body {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Modals — মোবাইলে full viewport দেখাবে কিন্তু desktop size maintain */
+.modal-overlay, .mo {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Admin panel sidebar — horizontal scroll on touch */
+.admin-sidebar {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    max-height: 90vh;
+}
+
+/* Product grid — desktop columns maintain */
+.products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+}
+
+/* Buttons — touch target minimum size */
+button, .btn, .menu-btn, .btn-buy-now {
+    min-height: 36px;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+/* Prevent text selection on buttons (mobile annoyance) */
+button, .menu-btn {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Scrollbar thin on mobile */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+/* Modal scroll fix */
+.modal-content, [id$="Modal"] > div, .mb {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+}
+
+/* Image fit maintain */
+img { max-width: 100%; height: auto; }
+
+/* Sticky header z-index on mobile */
+.site-header, .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+/* Admin panel full screen modal on mobile */
+#adminPanelModal > div {
+    max-height: 98vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
