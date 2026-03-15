@@ -2383,12 +2383,24 @@ function loadTheme() {
 function updatePassword() {
     const oldP = document.getElementById('oldPass').value;
     const newP = document.getElementById('newPass').value;
-    
-    if(appState.currentUser.pass !== oldP) return alert("❌ বর্তমান পাসওয়ার্ড ভুল!");
-    
+
+    if (!newP || newP.length < 4) return alert("❌ নতুন পাসওয়ার্ড কমপক্ষে ৪ অক্ষরের হতে হবে!");
+    if (appState.currentUser.pass !== oldP) return alert("❌ বর্তমান পাসওয়ার্ড ভুল!");
+
     appState.currentUser.pass = newP;
     updateCurrentUserRecord();
-    alert("✅ পাসওয়ার্ড পরিবর্তিত হয়েছে।");
+
+    // Firebase সরাসরি update
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('users').doc(String(appState.currentUser.id))
+                .set({ pass: newP }, { merge: true })
+                .then(() => console.log('[FB] ✅ Password updated'))
+                .catch(e => console.warn('[FB] pass err:', e.message));
+        }
+    } catch(e) {}
+
+    alert("✅ পাসওয়ার্ড পরিবর্তিত হয়েছে।");
     closeModal('resetPasswordModal');
 }
 
