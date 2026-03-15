@@ -5628,8 +5628,11 @@ function renderUserInventory() {
         const exp = new Date(card.expiry);
         const dateStr = exp.toLocaleDateString('bn-BD');
         const timeStr = exp.toLocaleTimeString('bn-BD', {hour:'2-digit', minute:'2-digit'});
-        const isPublicCard = card.origin === 'admin-panel' && !card.parentCardId;
-        const isUserCard   = !!card.parentCardId || card.origin === 'gift-engine';
+        // Public card: admin-panel থেকে claim করা (target=public বা code আছে)
+        // User card: gift-engine থেকে সরাসরি পাওয়া বা parentCardId আছে
+        const isUserCard = (card.origin === 'gift-engine') || 
+                           (card.parentCardId && (appState.globalDiscounts||[]).find(g => g.id === card.parentCardId && g.target === 'user'));
+        const isPublicCard = !isUserCard;
 
         if (isUserCard) {
             // ── User card design (সবুজ, gift style) ──
@@ -5691,76 +5694,81 @@ function renderUserInventory() {
 function claimPublicDiscount() {
     const inputBox = document.getElementById('promo-input-box');
     const codeInput = inputBox.value.trim().toUpperCase();
-    
+
     if (!codeInput) return alert("❌ প্রোমো কোডটি লিখুন!");
 
-    // ১. গ্লোবাল কার্ড লিস্ট থেকে পাবলিক কার্ডটি খুঁজে বের করা
-    const targetCard = (appState.globalDiscounts || []).find(c => 
-        c.code === codeInput && 
-        c.isPublished === true && 
+    // ১. কার্ড খোঁজা
+    const targetCard = (appState.globalDiscounts || []).find(c =>
+        c.code === codeInput &&
+        c.isPublished === true &&
         c.origin === 'admin-panel'
     );
+    if (!targetCard) return alert("❌ প্রোমো কোডটি ভুল অথবা এই অফারটি আর একটিভ নেই!");
 
-    if (!targetCard) {
-        return alert("❌ দুঃখিত, প্রোমো কোডটি ভুল অথবা এই অফারটি এখন আর একটিভ নেই!");
-    }
-
-    // ২. বর্তমান ইউজারকে নিশ্চিত করা
+    // ২. User check
     const me = appState.users.find(u => u.id === appState.currentUser?.id);
-    if (!me) return alert("❌ ক্লেইম করার আগে দয়া করে লগইন করুন!");
+    if (!me) return alert("❌ ক্লেইম করার আগে লগইন করুন!");
 
-    // ৩. ইউজারের myDiscounts নিশ্চিত করা
     if (!me.myDiscounts) me.myDiscounts = [];
 
-    // ৪. চেক করা: ইউজার ইতিমধ্যে এটি ক্লেইম করেছে কি না
-    const alreadyClaimed = me.myDiscounts.some(d => 
-        (d.id === targetCard.id) || (d.cardId === targetCard.id) || (d.code === targetCard.code)
+    // ৩. Duplicate check
+    const alreadyClaimed = me.myDiscounts.some(d =>
+        d.id === targetCard.id || d.cardId === targetCard.id || d.code === targetCard.code
     );
+    if (alreadyClaimed) return alert("⚠️ আপনি ইতিমধ্যে এই কোডটি ক্লেইম করেছেন!");
 
-    if (alreadyClaimed) {
-        return alert("⚠️ আপনি ইতিমধ্যে এই কোডটি ক্লেইম করেছেন!");
-    }
-
-    // --- নতুন যোগ করা অংশ: কার্ডের ব্যবহারের সীমা (Limit) চেক করা ---
-    // কতজন ইউজার এই কার্ডটি অলরেডি নিয়েছে তা ডাটাবেস থেকে গুনে দেখা
-    const totalClaimedCount = (appState.users || []).reduce((count, user) => {
-        const hasCard = user.myDiscounts && user.myDiscounts.some(d => (d.id === targetCard.id) || (d.cardId === targetCard.id));
-        return count + (hasCard ? 1 : 0);
-    }, 0);
-
-    // যদি কার্ডে লিমিট দেওয়া থাকে এবং তা পূরণ হয়ে যায়
+    // ৪. Limit check
     if (targetCard.limit && targetCard.limit !== 'Unlimited') {
         const limitNumber = parseInt(targetCard.limit);
-        if (totalClaimedCount >= limitNumber) {
-            return alert("🛑 দুঃখিত! এই কার্ডটির ব্যবহারের সীমা (" + limitNumber + " জন) পূর্ণ হয়ে গেছে।");
+        const totalClaimed = (appState.users || []).reduce((count, user) => {
+            const has = user.myDiscounts && user.myDiscounts.some(d =>
+                d.id === targetCard.id || d.cardId === targetCard.id
+            );
+            return count + (has ? 1 : 0);
+        }, 0);
+        if (totalClaimed >= limitNumber) {
+            return alert("🛑 দুঃখিত! এই কার্ডটির সীমা (" + limitNumber + " জন) পূর্ণ হয়ে গেছে।");
         }
     }
-    // -----------------------------------------------------------
 
-    // ৫. ইউজারের প্রোফাইলে কার্ডটি যোগ করা
-    me.myDiscounts.push({ 
-        ...targetCard, 
-        cardId: targetCard.id, 
-        receivedAt: new Date().toISOString() 
-    });
+    // ৫. Card যোগ করা — public card হিসেবে mark করি
+    const claimedCard = {
+        ...targetCard,
+        cardId: targetCard.id,
+        origin: 'admin-panel',   // public card চেনার জন্য
+        parentCardId: null,       // user card নয়
+        receivedAt: new Date().toISOString()
+    };
+    me.myDiscounts.push(claimedCard);
 
-    // ৬. ডাটা স্থায়ীভাবে সেভ করা
-    if (typeof saveData === "function") {
-        saveData(DB_KEYS.USERS, appState.users);
-    } else {
-        localStorage.setItem('users', JSON.stringify(appState.users));
-    }
+    // ৬. localStorage save
+    if (typeof saveData === 'function') saveData(DB_KEYS.USERS, appState.users);
+    else localStorage.setItem('users', JSON.stringify(appState.users));
 
-    // ৭. UI আপডেট করা
-    if (typeof renderUserInventory === 'function') {
-        renderUserInventory(); 
-    } else if (typeof renderUserCards === 'function') {
-        renderUserCards();
-    }
+    // ৭. Firebase সরাসরি save — রিফ্রেশ ছাড়াই live
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('users').doc(String(me.id))
+                .set(me)
+                .then(() => console.log('[FB] ✅ Public card claimed:', me.id))
+                .catch(e => console.warn('[FB] claim err:', e.message));
+        }
+    } catch(e) {}
+
+    // ৮. Session update
+    try {
+        const SK = 'TM_SESSION_USER';
+        const newSess = Object.assign({}, appState.currentUser, { myDiscounts: me.myDiscounts });
+        appState.currentUser = newSess;
+        if (window._TM_CACHE) window._TM_CACHE[SK] = JSON.stringify(newSess);
+        if (localStorage._fbOrigSet) localStorage._fbOrigSet(SK, JSON.stringify(newSess));
+    } catch(e) {}
+
+    // ৯. UI refresh
+    if (typeof renderUserInventory === 'function') renderUserInventory();
+    else if (typeof renderUserCards === 'function') renderUserCards();
 
     alert("✅ অভিনন্দন! '" + targetCard.name + "' সফলভাবে আপনার ওয়ালেটে যোগ হয়েছে।");
-    
-    // ৮. ইনপুট বক্স খালি করা
     inputBox.value = "";
 }
 function getDiscountMgmtUI() {
