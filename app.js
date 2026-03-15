@@ -6027,9 +6027,10 @@ function autoCleanupExpiredCards() {
                 expiredCardIds.push(card.id || card.cardId);
             }
         });
-        appState.globalDiscounts = appState.globalDiscounts.filter(card =>
-            new Date(card.expiry).getTime() > now
-        );
+        appState.globalDiscounts = appState.globalDiscounts.filter(card => {
+            const exp = new Date(card.expiry).getTime();
+            return isNaN(exp) || exp > now; // invalid expiry হলে রেখে দাও
+        });
         if (appState.globalDiscounts.length !== before) isChanged = true;
     }
 
@@ -6038,9 +6039,10 @@ function autoCleanupExpiredCards() {
         appState.users.forEach(user => {
             if (user.myDiscounts) {
                 const before = user.myDiscounts.length;
-                user.myDiscounts = user.myDiscounts.filter(d =>
-                    new Date(d.expiry).getTime() > now
-                );
+                user.myDiscounts = user.myDiscounts.filter(d => {
+                    const exp = new Date(d.expiry).getTime();
+                    return isNaN(exp) || exp > now; // invalid expiry হলে রেখে দাও
+                });
                 if (user.myDiscounts.length !== before) isChanged = true;
             }
         });
@@ -6392,25 +6394,59 @@ window.addEventListener('load', checkDiscountNotification);
 function publishAdminCard(cardId) {
     const card = appState.globalDiscounts.find(c => c.id === cardId);
     if (!card) return;
-
     if (card.isPublished) return alert("এই কার্ডটি অলরেডি পাবলিশ করা আছে!");
 
     if (card.target === 'user') {
-        // সব ইউজারের লিস্টে কার্ডটি ঢুকিয়ে দেওয়া (সরাসরি গিফট)
+        // ইউজার কার্ড — সব user এর myDiscounts এ push
+        // শুধু প্রয়োজনীয় fields copy করি (expiry কে timestamp এ normalize করি)
+        const expiryTs = new Date(card.expiry).getTime();
+        const userCard = {
+            id: card.id,
+            cardId: card.id,
+            parentCardId: card.id,
+            name: card.name,
+            type: card.type,
+            amount: card.amount,
+            expiry: expiryTs,         // সবসময় timestamp হিসেবে রাখি
+            min: card.minAmount || card.min || 0,
+            max: card.maxAmount || card.max || 0,
+            code: card.code,
+            origin: 'admin-panel',
+            status: 'unused'
+        };
         appState.users.forEach(user => {
+            if (user.role === 'admin' || user.role === 'sub_admin') return; // admin skip
             if (!user.myDiscounts) user.myDiscounts = [];
-            user.myDiscounts.push({ ...card, parentCardId: card.id, status: 'unused' });
+            // duplicate check
+            const alreadyHas = user.myDiscounts.some(d => d.parentCardId === card.id || d.id === card.id);
+            if (!alreadyHas) user.myDiscounts.push({...userCard});
         });
         saveData(DB_KEYS.USERS, appState.users);
-        alert("✅ সফল! কার্ডটি সকল ইউজারের ওয়ালেটে পাঠানো হয়েছে।");
+        // Firebase users update
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                appState.users.forEach(u => {
+                    if (u.role === 'admin' || u.role === 'sub_admin') return;
+                    firebase.firestore().collection('users').doc(String(u.id))
+                        .set({ myDiscounts: u.myDiscounts || [] }, { merge: true })
+                        .catch(()=>{});
+                });
+            }
+        } catch(e) {}
+        alert("✅ সফল! কার্ডটি সকল ইউজারের ওয়ালেটে পাঠানো হয়েছে।");
     } else {
-        // পাবলিক কার্ড হলে শুধু স্ট্যাটাস আপডেট
-        card.isPublished = true;
         alert("✅ লাইভ! এখন ইউজাররা কোড ব্যবহার করতে পারবে।");
     }
 
     card.isPublished = true;
     saveData(DB_KEYS.GLOBAL_DISCOUNTS, appState.globalDiscounts);
+    // Firebase gift_cards update
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('gift_cards').doc(String(card.id))
+                .set(card).catch(()=>{});
+        }
+    } catch(e) {}
     renderAdminCards();
 }
 
