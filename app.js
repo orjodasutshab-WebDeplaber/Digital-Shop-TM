@@ -6422,13 +6422,15 @@ function publishAdminCard(cardId) {
             if (!alreadyHas) user.myDiscounts.push({...userCard});
         });
         saveData(DB_KEYS.USERS, appState.users);
-        // Firebase users update
+        // Firebase users update — প্রতিটি user এ myDiscounts merge করি
+        // এতে users listener trigger হবে → সব device এ live update
         try {
             if (typeof firebase !== 'undefined' && firebase.firestore) {
+                const fdb = firebase.firestore();
                 appState.users.forEach(u => {
                     if (u.role === 'admin' || u.role === 'sub_admin') return;
-                    firebase.firestore().collection('users').doc(String(u.id))
-                        .set({ myDiscounts: u.myDiscounts || [] }, { merge: true })
+                    fdb.collection('users').doc(String(u.id))
+                        .set(u)  // full user object save — listener সঠিকভাবে trigger হবে
                         .catch(()=>{});
                 });
             }

@@ -305,8 +305,29 @@ function startListeners() {
           }
         }
       } catch(e) {}
-      // User card panel — myDiscounts change হলে refresh
+      // Current user এর myDiscounts live update + card refresh
       try {
+        const SK = 'TM_SESSION_USER';
+        const sessRaw = window._TM_CACHE && window._TM_CACHE[SK];
+        if (sessRaw) {
+          const cu = JSON.parse(sessRaw);
+          if (cu && cu.id) {
+            const updatedUser = arr.find(u => u.id === cu.id);
+            if (updatedUser) {
+              const oldDiscounts = JSON.stringify(cu.myDiscounts || []);
+              const newDiscounts = JSON.stringify(updatedUser.myDiscounts || []);
+              if (oldDiscounts !== newDiscounts) {
+                // myDiscounts বদলেছে — session update করি
+                const newSess = Object.assign({}, cu, { myDiscounts: updatedUser.myDiscounts || [] });
+                if (window._TM_CACHE) window._TM_CACHE[SK] = JSON.stringify(newSess);
+                if (localStorage._fbOrigSet) localStorage._fbOrigSet(SK, JSON.stringify(newSess));
+                if (window.appState) window.appState.currentUser = newSess;
+                console.log('[FB] ↻ myDiscounts updated for:', cu.id);
+              }
+            }
+          }
+        }
+        // User card panel refresh
         if (typeof renderUserCards === 'function') {
           const userCardList = document.getElementById('userCardList');
           if (userCardList) renderUserCards();
