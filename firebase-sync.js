@@ -215,6 +215,39 @@ function startListeners() {
   db.collection('users').onSnapshot(snap => {
     _pulling = true;
     const arr = snap.docs.map(d => d.data()).filter(u => u.id && u.name);
+
+    // ── Auto-logout: current user এর account delete হয়েছে কিনা চেক ──
+    try {
+      const SK = 'TM_SESSION_USER';
+      const sessRaw = window._TM_CACHE && window._TM_CACHE[SK];
+      if (sessRaw) {
+        const cu = JSON.parse(sessRaw);
+        // Admin নিজে delete হলে logout করব না
+        if (cu && cu.role !== 'admin' && cu.id) {
+          const stillExists = arr.some(u => u.id === cu.id);
+          if (!stillExists) {
+            console.log('[FB] ⚠️ Account deleted by admin — logging out:', cu.id);
+            // Session clear করো
+            if (window._TM_CACHE) delete window._TM_CACHE[SK];
+            if (localStorage._fbOrigSet) localStorage._fbOrigSet(SK, '');
+            if (window.appState) window.appState.currentUser = null;
+            // Alert দিয়ে logout
+            setTimeout(() => {
+              alert('⚠️ আপনার একাউন্টটি অ্যাডমিন কর্তৃক মুছে ফেলা হয়েছে।');
+              if (typeof logoutUser === 'function') {
+                logoutUser();
+              } else {
+                localStorage.removeItem('TM_SESSION_USER');
+                location.reload();
+              }
+            }, 500);
+            _pulling = false;
+            return;
+          }
+        }
+      }
+    } catch(e) {}
+
     if (arr.length > 0) {
       setLocal('TM_DB_USERS_V2', arr);
       if (window.appState) window.appState.users = arr;
