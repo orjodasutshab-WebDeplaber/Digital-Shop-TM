@@ -5376,9 +5376,72 @@ function confirmFinalOrder(isCOD = false) {
     }
 
     // ৭. ইউজার কনফার্মেশন ও হোয়াটসঅ্যাপে ডাটা পাঠানো
-    alert(`✅ অর্ডার সফল!\nঅর্ডার আইডি: ${orderId}\nপরিমাণ: ${orderQty} পিস\nডিসকাউন্ট: ৳${calculatedDiscount}`);
-    
+    // ── সুন্দর Order Success Popup ──
     closeModal('checkoutModal');
+    setTimeout(() => {
+        const pop = document.createElement('div');
+        pop.id = 'orderSuccessPop';
+        pop.style.cssText = `
+            position:fixed; inset:0; z-index:999999999;
+            background:rgba(10,20,40,0.82); backdrop-filter:blur(10px);
+            display:flex; align-items:center; justify-content:center; padding:16px;
+            animation:osFadeIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+        `;
+        pop.innerHTML = `
+            <style>
+                @keyframes osFadeIn { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
+                @keyframes osCheck { 0%{stroke-dashoffset:60} 100%{stroke-dashoffset:0} }
+                @keyframes osPulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)} 50%{box-shadow:0 0 0 18px rgba(34,197,94,0)} }
+            </style>
+            <div style="background:linear-gradient(160deg,#0f172a,#1e293b); border-radius:28px; padding:36px 28px; max-width:360px; width:100%; text-align:center; border:1px solid rgba(255,255,255,0.08); box-shadow:0 32px 80px rgba(0,0,0,0.5); position:relative; overflow:hidden;">
+
+                <!-- background glow -->
+                <div style="position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:220px; height:220px; background:radial-gradient(circle,rgba(34,197,94,0.12),transparent 70%); border-radius:50%;"></div>
+
+                <!-- check icon -->
+                <div style="width:80px; height:80px; background:linear-gradient(135deg,#16a34a,#22c55e); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; animation:osPulse 2s infinite;">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                        <path d="M8 20 L16 28 L32 12" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-dasharray="60" stroke-dashoffset="60" style="animation:osCheck 0.5s ease 0.3s forwards"/>
+                    </svg>
+                </div>
+
+                <div style="background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.25); display:inline-block; padding:4px 16px; border-radius:20px; margin-bottom:14px;">
+                    <span style="color:#4ade80; font-size:12px; font-weight:700; letter-spacing:1px;">✅ অর্ডার সফল হয়েছে!</span>
+                </div>
+
+                <h2 style="color:#f8fafc; font-size:22px; font-weight:800; margin:0 0 6px 0;">ধন্যবাদ! 🎉</h2>
+                <p style="color:#94a3b8; font-size:13px; margin:0 0 24px 0;">আপনার অর্ডারটি সফলভাবে গ্রহণ করা হয়েছে।</p>
+
+                <!-- order details -->
+                <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:16px; margin-bottom:20px; text-align:left;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:10px; border-bottom:1px dashed rgba(255,255,255,0.08);">
+                        <span style="color:#64748b; font-size:12px;">অর্ডার আইডি</span>
+                        <span style="color:#60a5fa; font-size:13px; font-weight:700;">${orderId}</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <span style="color:#64748b; font-size:12px;">পরিমাণ</span>
+                        <span style="color:#f1f5f9; font-size:13px; font-weight:600;">${orderQty} পিস</span>
+                    </div>
+                    ${calculatedDiscount > 0 ? `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px dashed rgba(255,255,255,0.08);">
+                        <span style="color:#64748b; font-size:12px;">ডিসকাউন্ট</span>
+                        <span style="color:#4ade80; font-size:13px; font-weight:700;">-৳${calculatedDiscount}</span>
+                    </div>` : ''}
+                </div>
+
+                <button onclick="document.getElementById('orderSuccessPop').remove()"
+                    style="width:100%; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; border:none; padding:14px; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer; letter-spacing:0.5px;">
+                    ঠিক আছে 👍
+                </button>
+
+                <p style="color:#475569; font-size:11px; margin:14px 0 0 0;">My Account → Order Tracking থেকে ট্র্যাক করুন</p>
+            </div>
+        `;
+        document.body.appendChild(pop);
+        // বাইরে click করলে বন্ধ
+        pop.addEventListener('click', e => { if(e.target === pop) pop.remove(); });
+    }, 200);
     
     // const whatsappMsg = `*নতুন অর্ডার (Digital Shop TM)*\n\n` +
     //                     `🆔 আইডি: ${orderId}\n` +
