@@ -2294,36 +2294,23 @@ function adminChangeMobile(userId) {
     const user = appState.users.find(u => u.id === userId);
     if (!user) return alert("ইউজার পাওয়া যায়নি!");
     const newMobile = prompt("ইউজারের নতুন মোবাইল নম্বর দিন:", user.mobile || user.phone || "");
-
-    if (newMobile === null) return; // Cancel চাপলে কিছু করব না
-    if (!newMobile || newMobile.length < 11) {
-        alert("❌ সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন!");
-        return;
+    if (newMobile === null) return;
+    if (!newMobile || newMobile.trim().length < 11) {
+        alert("❌ সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন!"); return;
     }
-
-    const oldId = userId;
-    // mobile update — ID বদলাবে না, শুধু mobile field update
-    user.mobile = newMobile;
-    user.phone  = newMobile;
-
-    // localStorage সেভ
+    const num = newMobile.trim();
+    user.mobile = num;
+    user.phone  = num;
     saveData(DB_KEYS.USERS, appState.users);
-
-    // Firebase — পুরনো doc update (ID অপরিবর্তিত)
+    // Firebase সরাসরি update
     try {
         if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firebase.firestore().collection('users').doc(String(oldId)).update({
-                mobile: newMobile,
-                phone:  newMobile
-            }).then(() => console.log('[FB] ✅ Mobile updated:', oldId, newMobile))
-              .catch(e => {
-                  // doc না থাকলে set দিয়ে তৈরি করি
-                  firebase.firestore().collection('users').doc(String(oldId)).set(user)
-                      .catch(err => console.warn('[FB] mobile update err:', err.message));
-              });
+            firebase.firestore().collection('users').doc(String(userId))
+                .set({ mobile: num, phone: num }, { merge: true })
+                .then(() => console.log('[FB] ✅ Mobile updated:', userId))
+                .catch(e => console.warn('[FB] mobile err:', e.message));
         }
     } catch(e) {}
-
     loadAdminTab('users');
     alert("✅ মোবাইল নম্বর আপডেট হয়েছে!");
 }
@@ -2433,20 +2420,27 @@ function filterDistricts() {
 }
 
 function adminChangeEmail(userId) {
-    const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS)) || [];
-    const userIndex = users.findIndex(u => u.id === userId);
-
-    if (userIndex !== -1) {
-        const newEmail = prompt("নতুন ইমেইল এড্রেস লিখুন:", users[userIndex].email || "");
-        
-        if (newEmail !== null && newEmail.trim() !== "") {
-            users[userIndex].email = newEmail.trim();
-            saveData(DB_KEYS.USERS, users);
-            appState.users = users;
-            renderAdminUsers(document.getElementById('adminMainContainer'));
-            showToast("✅ ইমেইল আপডেট করা হয়েছে");
+    const user = appState.users.find(u => u.id === userId);
+    if (!user) return alert("ইউজার পাওয়া যায়নি!");
+    const newEmail = prompt("নতুন ইমেইল এড্রেস লিখুন:", user.email || "");
+    if (newEmail === null) return;
+    if (!newEmail.trim()) { alert("❌ ইমেইল খালি রাখা যাবে না!"); return; }
+    const em = newEmail.trim();
+    user.email = em;
+    saveData(DB_KEYS.USERS, appState.users);
+    appState.users = appState.users;
+    // Firebase সরাসরি update
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore().collection('users').doc(String(userId))
+                .set({ email: em }, { merge: true })
+                .then(() => console.log('[FB] ✅ Email updated:', userId))
+                .catch(e => console.warn('[FB] email err:', e.message));
         }
-    }
+    } catch(e) {}
+    renderAdminUsers(document.getElementById('adminMainContainer'));
+    if (typeof showToast === 'function') showToast("✅ ইমেইল আপডেট করা হয়েছে");
+    else alert("✅ ইমেইল আপডেট হয়েছে!");
 }
 
 function filterUpazilas() {
