@@ -498,7 +498,7 @@ async function lndSendOtp(){
     const otp=String(Math.floor(100000+Math.random()*900000));
     _lndOtp.code=otp; _lndOtp.expiry=Date.now()+5*60*1000;
     try{
-        await emailjs.send('service_btr76ra','template_hmdmslt',{email:user.email,passcode:otp,time:new Date(_lndOtp.expiry).toLocaleTimeString()});
+        await emailjs.send('service_btr76ra','template_z1yxlup',{email:user.email,passcode:otp,time:new Date(_lndOtp.expiry).toLocaleTimeString()});
         document.getElementById('lndStep1').style.display='none';
         document.getElementById('lndStep2').style.display='block';
         document.getElementById('lndOtpInfo').textContent='✅ OTP পাঠানো হয়েছে: '+user.email.replace(/(.{2})(.*)(@.*)/,'$1***$3');
