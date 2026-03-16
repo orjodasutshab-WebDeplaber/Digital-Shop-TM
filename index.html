@@ -1016,25 +1016,9 @@ document.addEventListener('click', function(event) {
                 </div>
             </div>
 
-            <!-- OTP পদ্ধতি বেছে নিন -->
-            <div style="margin-bottom: 18px;">
-                <label style="color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 10px; font-size: 13px;">OTP কোথায় পাঠাবেন?</label>
-                <div style="display: flex; gap: 10px;">
-                    <label id="otpMethodEmail" onclick="selectOtpMethod('email')" style="flex:1; display:flex; align-items:center; gap:8px; padding:12px; background:#0f172a; border:2px solid #6366f1; border-radius:12px; cursor:pointer; transition:all 0.2s;">
-                        <input type="radio" name="otpMethod" value="email" checked style="accent-color:#6366f1;">
-                        <div>
-                            <div style="color:#fff; font-size:13px; font-weight:700;">📧 Email</div>
-                            <div style="color:#94a3b8; font-size:11px;">ইমেইলে OTP</div>
-                        </div>
-                    </label>
-                    <label id="otpMethodSms" onclick="selectOtpMethod('sms')" style="flex:1; display:flex; align-items:center; gap:8px; padding:12px; background:#0f172a; border:2px solid #334155; border-radius:12px; cursor:pointer; transition:all 0.2s;">
-                        <input type="radio" name="otpMethod" value="sms" style="accent-color:#10b981;">
-                        <div>
-                            <div style="color:#fff; font-size:13px; font-weight:700;">📱 SMS</div>
-                            <div style="color:#94a3b8; font-size:11px;">মোবাইলে OTP</div>
-                        </div>
-                    </label>
-                </div>
+            <!-- Email OTP info -->
+            <div style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3); border-radius:12px; padding:10px 14px; margin-bottom:15px; font-size:12px; color:#a5b4fc;">
+                <i class="fa fa-info-circle"></i> আপনার একাউন্টের ইমেইলে ৬ ডিজিটের OTP কোড পাঠানো হবে
             </div>
 
             <div id="step1Msg" style="display:none; padding:10px; border-radius:10px; font-size:13px; margin-bottom:12px;"></div>
