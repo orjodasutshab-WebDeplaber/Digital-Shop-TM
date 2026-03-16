@@ -313,35 +313,49 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
             <div class="msub">ইমেইল OTP দিয়ে পাসওয়ার্ড পরিবর্তন করুন</div>
         </div>
         <div class="mbody">
-            <!-- Step 1 -->
+            <!-- Step 1: একাউন্ট খোঁজা -->
             <div id="lndStep1">
-                <div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);border-radius:10px;padding:10px;margin-bottom:14px;font-size:12px;color:#a5b4fc;text-align:center;">
-                    <i class="fa fa-info-circle"></i> আপনার একাউন্টের ইমেইলে OTP কোড পাঠানো হবে
-                </div>
                 <div class="ig">
-                    <label class="il" style="color:#fca5a5;">মোবাইল নম্বর</label>
-                    <div class="iw"><i class="fa fa-mobile-alt" style="color:#ef4444;"></i>
-                    <input type="number" id="lndMobile" class="fi" placeholder="১১ ডিজিটের মোবাইল নম্বর"></div>
+                    <label class="il" style="color:#fca5a5;">আইডি / মোবাইল / ইমেইল</label>
+                    <div class="iw"><i class="fa fa-search" style="color:#ef4444;"></i>
+                    <input type="text" id="lndQuery" class="fi" placeholder="আইডি, মোবাইল বা ইমেইল দিন"></div>
+                </div>
+                <!-- user confirm card -->
+                <div id="lndUserCard" style="display:none; background:#0f172a; border:1px solid #334155; border-radius:12px; padding:12px; margin-bottom:12px;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:38px;height:38px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">👤</div>
+                        <div>
+                            <div id="lndUserNameShow" style="color:#fff;font-weight:700;font-size:14px;"></div>
+                            <div id="lndUserEmailShow" style="color:#94a3b8;font-size:11px;margin-top:2px;"></div>
+                        </div>
+                    </div>
                 </div>
                 <div id="lndStep1Msg" style="display:none;padding:9px;border-radius:9px;font-size:12px;margin-bottom:10px;"></div>
-                <button class="bsub" onclick="lndSendOtp()" id="lndSendBtn" style="background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;">
-                    <i class="fa fa-paper-plane"></i> OTP পাঠান
-                </button>
+                <div id="lndFindBtnWrap">
+                    <button class="bsub" onclick="lndFindUser()" style="background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;">
+                        <i class="fa fa-search"></i> একাউন্ট খুঁজুন
+                    </button>
+                </div>
+                <div id="lndSendOtpWrap" style="display:none;">
+                    <button class="bsub" onclick="lndSendOtp()" id="lndSendBtn" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;">
+                        <i class="fa fa-paper-plane"></i> ইমেইলে OTP পাঠান
+                    </button>
+                </div>
                 <div class="mswitch"><a href="#" onclick="switchM('resetModal','loginModal')" style="color:#94a3b8;border-color:#334155;">← লগইনে ফিরুন</a></div>
             </div>
-            <!-- Step 2 -->
+            <!-- Step 2: OTP verify -->
             <div id="lndStep2" style="display:none;">
                 <div id="lndOtpInfo" style="background:rgba(16,185,129,0.1);border:1px solid #10b981;border-radius:10px;padding:10px;margin-bottom:14px;font-size:12px;color:#6ee7b7;text-align:center;"></div>
                 <div class="ig">
                     <label class="il" style="color:#fca5a5;">OTP কোড</label>
                     <div class="iw"><i class="fa fa-key" style="color:#ef4444;"></i>
-                    <input type="number" id="lndOtpInput" class="fi" placeholder="৬ ডিজিটের OTP" style="letter-spacing:4px;font-weight:700;font-size:16px;"></div>
+                    <input type="number" id="lndOtpInput" class="fi" placeholder="৬ ডিজিটের OTP" style="letter-spacing:4px;font-weight:700;font-size:16px;text-align:center;"></div>
                 </div>
                 <div id="lndTimer" style="color:#f59e0b;font-size:12px;text-align:center;margin-bottom:10px;"></div>
                 <div class="ig">
                     <label class="il" style="color:#fca5a5;">নতুন পাসওয়ার্ড</label>
                     <div class="iw"><i class="fa fa-lock" style="color:#ef4444;"></i>
-                    <input type="password" id="lndNewPass" class="fi" placeholder="••••••••"></div>
+                    <input type="password" id="lndNewPass" class="fi" placeholder="কমপক্ষে ৪ অক্ষর"></div>
                 </div>
                 <div id="lndStep2Msg" style="display:none;padding:9px;border-radius:9px;font-size:12px;margin-bottom:10px;"></div>
                 <div style="display:flex;gap:8px;">
@@ -449,7 +463,24 @@ function doRegister(){
     });
 }
 /* LANDING OTP RESET */
-let _lndOtp={code:null,expiry:null,mobile:null,timer:null};
+let _lndOtp={code:null,expiry:null,userId:null,timer:null};
+function lndFindUser(){
+    const query=String(document.getElementById('lndQuery')?.value||'').trim();
+    if(!query){_lndMsg('lndStep1Msg','❌ আইডি, মোবাইল বা ইমেইল দিন!','error');return;}
+    const users=JSON.parse(localStorage.getItem(UK)||'[]');
+    const user=users.find(u=>String(u.id)===query||String(u.mobile)===query||String(u.phone)===query||(u.email&&u.email.toLowerCase()===query.toLowerCase()));
+    if(!user){_lndMsg('lndStep1Msg','❌ এই তথ্য দিয়ে কোনো একাউন্ট পাওয়া যায়নি!','error');return;}
+    if(!user.email){_lndMsg('lndStep1Msg','❌ এই একাউন্টে ইমেইল নেই! Admin এর সাথে যোগাযোগ করুন।','error');return;}
+    _lndOtp.userId=String(user.id);
+    const nameEl=document.getElementById('lndUserNameShow'),emailEl=document.getElementById('lndUserEmailShow');
+    const card=document.getElementById('lndUserCard'),findWrap=document.getElementById('lndFindBtnWrap'),sendWrap=document.getElementById('lndSendOtpWrap');
+    if(nameEl)nameEl.textContent='👤 '+(user.name||'ইউজার');
+    if(emailEl)emailEl.textContent='📧 '+user.email.replace(/(.{2})(.*)(@.*)/,'$1***$3');
+    if(card)card.style.display='block';
+    if(findWrap)findWrap.style.display='none';
+    if(sendWrap)sendWrap.style.display='block';
+    document.getElementById('lndStep1Msg').style.display='none';
+}
 function _lndMsg(id,msg,type){
     const el=document.getElementById(id); if(!el) return;
     el.style.display='block';
@@ -459,13 +490,9 @@ function _lndMsg(id,msg,type){
     el.textContent=msg;
 }
 async function lndSendOtp(){
-    const mobile=String(document.getElementById('lndMobile')?.value||'').trim();
-    if(!mobile||mobile.length<11){_lndMsg('lndStep1Msg','❌ সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন!','error');return;}
     const users=JSON.parse(localStorage.getItem(UK)||'[]');
-    const user=users.find(u=>String(u.mobile)===mobile||String(u.phone)===mobile);
-    if(!user){_lndMsg('lndStep1Msg','❌ এই মোবাইল নম্বরে কোনো একাউন্ট নেই!','error');return;}
-    if(!user.email){_lndMsg('lndStep1Msg','❌ এই একাউন্টে ইমেইল নেই! Admin এর সাথে যোগাযোগ করুন।','error');return;}
-    _lndOtp.mobile=mobile;
+    const user=users.find(u=>String(u.id)===_lndOtp.userId);
+    if(!user||!user.email){_lndMsg('lndStep1Msg','❌ ইউজার পাওয়া যায়নি!','error');return;}
     const btn=document.getElementById('lndSendBtn');
     if(btn){btn.disabled=true;btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> পাঠানো হচ্ছে...';}
     const otp=String(Math.floor(100000+Math.random()*900000));
@@ -487,7 +514,7 @@ async function lndSendOtp(){
             if(secs<=0){clearInterval(_lndOtp.timer);if(timerEl){timerEl.textContent='⚠️ মেয়াদ শেষ!';timerEl.style.color='#ef4444';}if(resendBtn)resendBtn.style.display='inline';_lndOtp.code=null;}
         },1000);
     }catch(e){_lndMsg('lndStep1Msg','❌ Email পাঠাতে সমস্যা হয়েছে! আবার চেষ্টা করুন।','error');}
-    if(btn){btn.disabled=false;btn.innerHTML='<i class="fa fa-paper-plane"></i> OTP পাঠান';}
+    if(btn){btn.disabled=false;btn.innerHTML='<i class="fa fa-paper-plane"></i> ইমেইলে OTP পাঠান';}
 }
 function lndBackStep1(){
     clearInterval(_lndOtp.timer);
@@ -506,7 +533,7 @@ async function lndVerifyOtp(){
     if(otpIn!==_lndOtp.code){_lndMsg('lndStep2Msg','❌ ভুল OTP! আবার চেষ্টা করুন।','error');return;}
     clearInterval(_lndOtp.timer);
     const users=JSON.parse(localStorage.getItem(UK)||'[]');
-    const idx=users.findIndex(u=>String(u.mobile)===_lndOtp.mobile||String(u.phone)===_lndOtp.mobile);
+    const idx=users.findIndex(u=>String(u.id)===_lndOtp.userId);
     if(idx===-1){_lndMsg('lndStep2Msg','❌ ইউজার পাওয়া যায়নি!','error');return;}
     users[idx].pass=newPass;
     localStorage.setItem(UK,JSON.stringify(users));
@@ -518,11 +545,13 @@ async function lndVerifyOtp(){
 }
 function closeResetOtp(){
     clearInterval(_lndOtp.timer);
-    _lndOtp={code:null,expiry:null,mobile:null,timer:null};
+    _lndOtp={code:null,expiry:null,userId:null,timer:null};
+    const card=document.getElementById('lndUserCard'),findWrap=document.getElementById('lndFindBtnWrap'),sendWrap=document.getElementById('lndSendOtpWrap');
+    if(card)card.style.display='none'; if(findWrap)findWrap.style.display='block'; if(sendWrap)sendWrap.style.display='none';
     closeM('resetModal');
     const s1=document.getElementById('lndStep1'),s2=document.getElementById('lndStep2');
     if(s1)s1.style.display='block'; if(s2)s2.style.display='none';
-    ['lndMobile','lndOtpInput','lndNewPass'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['lndQuery','lndOtpInput','lndNewPass'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     ['lndStep1Msg','lndStep2Msg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
 }
 function doReset(){

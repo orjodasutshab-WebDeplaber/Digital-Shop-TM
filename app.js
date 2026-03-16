@@ -2698,7 +2698,22 @@ function cancelUserOrder(orderId) {
     }
 }
 function openModal(id) {
-    document.getElementById(id).style.display = 'flex';
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.setProperty('display', 'flex', 'important');
+    // পাসওয়ার্ড রিসেট modal খুললে লগইন user এর তথ্য auto-fill
+    if (id === 'resetPasswordModal' && appState.currentUser) {
+        const u = appState.currentUser;
+        const input = document.getElementById('resetUserId');
+        if (input) {
+            input.value = u.mobile || u.phone || u.email || u.id || '';
+            input.readOnly = true;
+            input.style.background = '#1e293b';
+            input.style.color = '#94a3b8';
+        }
+        // auto find করো
+        setTimeout(() => findUserForReset(), 100);
+    }
 }
 
 function closeModal(id) {
@@ -5106,10 +5121,39 @@ function _startOtpTimer() {
         }
     },1000);
 }
+// একাউন্ট খুঁজুন বাটন
+function findUserForReset() {
+    const query = String(document.getElementById('resetUserId')?.value||'').trim();
+    if (!query) { _showResetMsg('step1Msg','❌ আইডি, মোবাইল বা ইমেইল দিন!','error'); return; }
+    const user = (appState.users||[]).find(u=>
+        String(u.id)===query ||
+        String(u.mobile)===query ||
+        String(u.phone)===query ||
+        (u.email && u.email.toLowerCase()===query.toLowerCase())
+    );
+    if (!user) { _showResetMsg('step1Msg','❌ এই তথ্য দিয়ে কোনো একাউন্ট পাওয়া যায়নি!','error'); return; }
+    if (!user.email) { _showResetMsg('step1Msg','❌ এই একাউন্টে ইমেইল নেই! Admin এর সাথে যোগাযোগ করুন।','error'); return; }
+    // ইউজার card দেখাও
+    _otpState.userMobile = String(user.mobile||user.phone||user.id);
+    const nameEl  = document.getElementById('resetUserName');
+    const emailEl = document.getElementById('resetUserEmail');
+    const card    = document.getElementById('resetUserCard');
+    const findBtn = document.getElementById('resetFindBtn');
+    const sendBtn = document.getElementById('resetSendOtpBtn');
+    const msgEl   = document.getElementById('step1Msg');
+    if (nameEl)  nameEl.textContent  = '👤 ' + (user.name||'ইউজার');
+    if (emailEl) emailEl.textContent = '📧 ' + user.email.replace(/(.{2})(.*)(@.*)/,'$1***$3');
+    if (card)    card.style.display  = 'block';
+    if (findBtn) findBtn.style.display = 'none';
+    if (sendBtn) sendBtn.style.display = 'block';
+    if (msgEl)   msgEl.style.display  = 'none';
+}
+
 async function sendOtpForReset() {
-    const mobile = String(document.getElementById('resetUserId')?.value||'').trim();
-    if(!mobile||mobile.length<11){ _showResetMsg('step1Msg','❌ সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন!','error'); return; }
-    const user = (appState.users||[]).find(u=>String(u.mobile)===mobile||String(u.phone)===mobile);
+    const mobile = _otpState.userMobile;
+    const user = (appState.users||[]).find(u=>
+        String(u.mobile)===mobile||String(u.phone)===mobile||String(u.id)===mobile
+    );
     if(!user){ _showResetMsg('step1Msg','❌ এই মোবাইল নম্বরে কোনো একাউন্ট পাওয়া যায়নি!','error'); return; }
     _otpState.userMobile = mobile;
     const btn=document.getElementById('sendOtpBtn');
@@ -5174,8 +5218,18 @@ function closeResetModal(){
     document.getElementById('resetPasswordModal').style.setProperty('display','none','important');
     const s1=document.getElementById('resetStep1'),s2=document.getElementById('resetStep2');
     if(s1)s1.style.display='block'; if(s2)s2.style.display='none';
-    ['resetUserId','resetOtpInput','resetNewPass'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    // input reset
+    const input = document.getElementById('resetUserId');
+    if(input){ input.value=''; input.readOnly=false; input.style.background='#0f172a'; input.style.color='#fff'; }
+    ['resetOtpInput','resetNewPass'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     ['step1Msg','step2Msg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    // card & buttons reset
+    const card=document.getElementById('resetUserCard');
+    const findBtn=document.getElementById('resetFindBtn');
+    const sendBtn=document.getElementById('resetSendOtpBtn');
+    if(card)card.style.display='none';
+    if(findBtn)findBtn.style.display='block';
+    if(sendBtn)sendBtn.style.display='none';
     selectOtpMethod('email');
 }
 

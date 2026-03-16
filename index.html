@@ -1003,66 +1003,67 @@ document.addEventListener('click', function(event) {
         <span onclick="closeResetModal()" style="position: absolute; right: 20px; top: 15px; cursor: pointer; font-size: 24px; color: #64748b;"><i class="fa fa-times"></i></span>
         <div style="text-align: center; margin-bottom: 20px;">
             <div style="width: 60px; height: 60px; background: rgba(231,76,60,0.15); color: #e74c3c; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 25px;"><i class="fa fa-shield-alt"></i></div>
-            <h3 style="color: #fff; margin: 0; font-size: 20px; font-weight: 700;">পাসওয়ার্ড রিসেট</h3>
+            <h3 style="color: #fff; margin: 0; font-size: 20px; font-weight: 700;">পাসওয়ার্ড পরিবর্তন</h3>
         </div>
 
-        <!-- Step 1: মোবাইল নম্বর + OTP পদ্ধতি -->
+        <!-- Step 1: আইডি/মোবাইল/Email দিন — লগইন থাকলে auto-filled -->
         <div id="resetStep1">
             <div style="margin-bottom: 15px;">
-                <label style="color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px;">মোবাইল নম্বর</label>
+                <label style="color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px;">আইডি / মোবাইল / ইমেইল</label>
                 <div style="position: relative;">
-                    <i class="fa fa-mobile-alt" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
-                    <input type="number" id="resetUserId" placeholder="মোবাইল নম্বর দিন" style="width: 100%; padding: 12px 12px 12px 40px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: #fff; outline: none; box-sizing: border-box;">
+                    <i class="fa fa-user" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                    <input type="text" id="resetUserId" placeholder="আইডি, মোবাইল বা ইমেইল দিন" style="width: 100%; padding: 12px 12px 12px 40px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: #fff; outline: none; box-sizing: border-box;">
                 </div>
             </div>
-
-            <!-- Email OTP info -->
-            <div style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3); border-radius:12px; padding:10px 14px; margin-bottom:15px; font-size:12px; color:#a5b4fc;">
-                <i class="fa fa-info-circle"></i> আপনার একাউন্টের ইমেইলে ৬ ডিজিটের OTP কোড পাঠানো হবে
-            </div>
-
             <div id="step1Msg" style="display:none; padding:10px; border-radius:10px; font-size:13px; margin-bottom:12px;"></div>
-
-            <button onclick="sendOtpForReset()" id="sendOtpBtn" style="width: 100%; background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; padding: 14px; border-radius: 14px; cursor: pointer; font-weight: 800; font-size: 15px;">
-                <i class="fa fa-paper-plane"></i> OTP পাঠান
-            </button>
+            <!-- Step 1.5: ইউজার confirm card -->
+            <div id="resetUserCard" style="display:none; background:#0f172a; border:1px solid #334155; border-radius:12px; padding:14px; margin-bottom:14px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:42px;height:42px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👤</div>
+                    <div>
+                        <div id="resetUserName" style="color:#fff;font-weight:700;font-size:15px;"></div>
+                        <div id="resetUserEmail" style="color:#94a3b8;font-size:12px;margin-top:2px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="resetFindBtn" style="display:block;">
+                <button onclick="findUserForReset()" style="width: 100%; background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; padding: 14px; border-radius: 14px; cursor: pointer; font-weight: 800; font-size: 15px;">
+                    <i class="fa fa-search"></i> একাউন্ট খুঁজুন
+                </button>
+            </div>
+            <div id="resetSendOtpBtn" style="display:none;">
+                <button onclick="sendOtpForReset()" id="sendOtpBtn" style="width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 14px; border-radius: 14px; cursor: pointer; font-weight: 800; font-size: 15px;">
+                    <i class="fa fa-paper-plane"></i> ইমেইলে OTP পাঠান
+                </button>
+            </div>
         </div>
 
-        <!-- Step 2: OTP যাচাই + নতুন পাসওয়ার্ড -->
+        <!-- Step 2: OTP + নতুন পাসওয়ার্ড -->
         <div id="resetStep2" style="display:none;">
             <div id="otpSentInfo" style="background:rgba(16,185,129,0.1); border:1px solid #10b981; border-radius:12px; padding:12px; margin-bottom:16px; font-size:13px; color:#6ee7b7; text-align:center;"></div>
-
             <div style="margin-bottom: 15px;">
                 <label style="color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px;">OTP কোড</label>
-                <div style="display:flex; gap:8px;">
-                    <input type="number" id="resetOtpInput" placeholder="৬ ডিজিটের OTP" style="flex:1; padding: 12px; background: #0f172a; border: 2px solid #6366f1; border-radius: 12px; color: #fff; font-size:18px; font-weight:700; letter-spacing:4px; outline: none; text-align:center;">
-                </div>
+                <input type="number" id="resetOtpInput" placeholder="৬ ডিজিটের OTP" style="width:100%; padding: 14px; background: #0f172a; border: 2px solid #6366f1; border-radius: 12px; color: #fff; font-size:20px; font-weight:700; letter-spacing:6px; outline: none; text-align:center; box-sizing:border-box;">
                 <div id="otpTimer" style="color:#f59e0b; font-size:12px; margin-top:6px; text-align:center;"></div>
             </div>
-
             <div style="margin-bottom: 20px;">
                 <label style="color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px;">নতুন পাসওয়ার্ড</label>
                 <div style="position: relative;">
                     <i class="fa fa-lock" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
-                    <input type="password" id="resetNewPass" placeholder="••••••••" style="width: 100%; padding: 12px 12px 12px 40px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: #fff; outline: none; box-sizing: border-box;">
+                    <input type="password" id="resetNewPass" placeholder="কমপক্ষে ৪ অক্ষর" style="width: 100%; padding: 12px 12px 12px 40px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: #fff; outline: none; box-sizing: border-box;">
                 </div>
             </div>
-
             <div id="step2Msg" style="display:none; padding:10px; border-radius:10px; font-size:13px; margin-bottom:12px;"></div>
-
             <div style="display:flex; gap:10px;">
                 <button onclick="goBackToStep1()" style="flex:1; background:#334155; color:#fff; border:none; padding:14px; border-radius:14px; cursor:pointer; font-weight:700;">← পেছনে</button>
                 <button onclick="verifyOtpAndReset()" style="flex:2; background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; border: none; padding: 14px; border-radius: 14px; cursor: pointer; font-weight: 800; font-size: 15px;">
                     <i class="fa fa-sync-alt"></i> রিসেট করুন
                 </button>
             </div>
-
             <div style="text-align:center; margin-top:12px;">
-                <button onclick="resendOtp()" id="resendBtn" style="background:none; border:none; color:#6366f1; cursor:pointer; font-size:13px; text-decoration:underline; display:none;">পুনরায় OTP পাঠান</button>
+                <button onclick="resendOtp()" id="resendBtn" style="display:none; background:none; border:none; color:#6366f1; cursor:pointer; font-size:13px; text-decoration:underline;">পুনরায় OTP পাঠান</button>
             </div>
         </div>
-
-        <!-- Firebase reCAPTCHA container -->
         <div id="recaptcha-container"></div>
     </div>
 </div>
