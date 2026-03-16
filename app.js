@@ -5064,6 +5064,121 @@ function openHelpModal() {
 }
 
 // ২. পাসওয়ার্ড রিসেট করার চূড়ান্ত ও সচল ফাংশন
+// ═══════════════════════════════════════════════
+// OTP PASSWORD RESET SYSTEM
+// ═══════════════════════════════════════════════
+const OTP_CONFIG = {
+    EMAILJS_SERVICE:  'service_btr76ra',
+    EMAILJS_TEMPLATE: 'template_hmdmslt',
+    OTP_EXPIRY_MS:    5 * 60 * 1000
+};
+let _otpState = { code:null, expiry:null, method:'email', userMobile:null, timerInterval:null, confirmationResult:null };
+
+function selectOtpMethod(method) {
+    _otpState.method = method;
+    const emailLabel = document.getElementById('otpMethodEmail');
+    const smsLabel   = document.getElementById('otpMethodSms');
+    if (emailLabel) emailLabel.style.borderColor = method==='email' ? '#6366f1' : '#334155';
+    if (smsLabel)   smsLabel.style.borderColor   = method==='sms'   ? '#10b981' : '#334155';
+}
+function _showResetMsg(elId, msg, type) {
+    const el = document.getElementById(elId); if(!el) return;
+    el.style.display='block';
+    el.style.background = type==='error' ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)';
+    el.style.border = '1px solid '+(type==='error' ? '#ef4444' : '#10b981');
+    el.style.color  = type==='error' ? '#fca5a5' : '#6ee7b7';
+    el.innerHTML = msg;
+}
+function _startOtpTimer() {
+    let secs=300;
+    const timerEl=document.getElementById('otpTimer'), resendBtn=document.getElementById('resendBtn');
+    if(resendBtn) resendBtn.style.display='none';
+    clearInterval(_otpState.timerInterval);
+    _otpState.timerInterval = setInterval(()=>{
+        secs--;
+        const m=Math.floor(secs/60), s=secs%60;
+        if(timerEl) timerEl.textContent='⏱ মেয়াদ: '+m+':'+(s<10?'0'+s:s);
+        if(secs<=0){
+            clearInterval(_otpState.timerInterval);
+            if(timerEl){timerEl.textContent='⚠️ OTP মেয়াদ শেষ!'; timerEl.style.color='#ef4444';}
+            if(resendBtn) resendBtn.style.display='inline';
+            _otpState.code=null;
+        }
+    },1000);
+}
+async function sendOtpForReset() {
+    const mobile = String(document.getElementById('resetUserId')?.value||'').trim();
+    if(!mobile||mobile.length<11){ _showResetMsg('step1Msg','❌ সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন!','error'); return; }
+    const user = (appState.users||[]).find(u=>String(u.mobile)===mobile||String(u.phone)===mobile);
+    if(!user){ _showResetMsg('step1Msg','❌ এই মোবাইল নম্বরে কোনো একাউন্ট পাওয়া যায়নি!','error'); return; }
+    _otpState.userMobile = mobile;
+    const btn=document.getElementById('sendOtpBtn');
+    if(btn){btn.disabled=true; btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> পাঠানো হচ্ছে...';}
+    if(_otpState.method==='email'){
+        if(!user.email){ _showResetMsg('step1Msg','❌ এই একাউন্টে ইমেইল নেই! SMS ব্যবহার করুন।','error'); if(btn){btn.disabled=false;btn.innerHTML='<i class="fa fa-paper-plane"></i> OTP পাঠান';} return; }
+        const otp=String(Math.floor(100000+Math.random()*900000));
+        _otpState.code=otp; _otpState.expiry=Date.now()+OTP_CONFIG.OTP_EXPIRY_MS;
+        try {
+            await emailjs.send(OTP_CONFIG.EMAILJS_SERVICE, OTP_CONFIG.EMAILJS_TEMPLATE, { email:user.email, passcode:otp, time:new Date(_otpState.expiry).toLocaleTimeString() });
+            document.getElementById('resetStep1').style.display='none';
+            document.getElementById('resetStep2').style.display='block';
+            document.getElementById('otpSentInfo').textContent='✅ OTP পাঠানো হয়েছে: '+user.email.replace(/(.{2})(.*)(@.*)/,'$1***$3');
+            _startOtpTimer();
+        } catch(e){ _showResetMsg('step1Msg','❌ Email পাঠাতে সমস্যা! SMS ব্যবহার করুন।','error'); }
+    } else {
+        try {
+            if(!window.firebasePhoneRecaptcha){ window.firebasePhoneRecaptcha=new firebase.auth.RecaptchaVerifier('recaptcha-container',{size:'invisible',callback:()=>{}}); }
+            let phone=mobile; if(!phone.startsWith('+')) phone='+88'+phone;
+            const cr=await firebase.auth().signInWithPhoneNumber(phone,window.firebasePhoneRecaptcha);
+            _otpState.confirmationResult=cr;
+            document.getElementById('resetStep1').style.display='none';
+            document.getElementById('resetStep2').style.display='block';
+            document.getElementById('otpSentInfo').textContent='✅ SMS পাঠানো হয়েছে: '+phone.slice(0,5)+'****'+phone.slice(-3);
+            _startOtpTimer();
+        } catch(e){ _showResetMsg('step1Msg','❌ SMS সমস্যা: '+(e.message||'আবার চেষ্টা করুন'),'error'); window.firebasePhoneRecaptcha=null; }
+    }
+    if(btn){btn.disabled=false; btn.innerHTML='<i class="fa fa-paper-plane"></i> OTP পাঠান';}
+}
+async function verifyOtpAndReset() {
+    const otpInput=String(document.getElementById('resetOtpInput')?.value||'').trim();
+    const newPass=String(document.getElementById('resetNewPass')?.value||'').trim();
+    if(!otpInput||otpInput.length!==6){ _showResetMsg('step2Msg','❌ ৬ ডিজিটের OTP দিন!','error'); return; }
+    if(!newPass||newPass.length<4){ _showResetMsg('step2Msg','❌ পাসওয়ার্ড কমপক্ষে ৪ অক্ষর!','error'); return; }
+    const mobile=_otpState.userMobile;
+    const userIdx=(appState.users||[]).findIndex(u=>String(u.mobile)===mobile||String(u.phone)===mobile);
+    if(userIdx===-1){ _showResetMsg('step2Msg','❌ ইউজার পাওয়া যায়নি!','error'); return; }
+    if(_otpState.method==='email'){
+        if(!_otpState.code){ _showResetMsg('step2Msg','❌ OTP মেয়াদ শেষ! পুনরায় পাঠান।','error'); return; }
+        if(Date.now()>_otpState.expiry){ _showResetMsg('step2Msg','❌ OTP মেয়াদ শেষ!','error'); _otpState.code=null; return; }
+        if(otpInput!==_otpState.code){ _showResetMsg('step2Msg','❌ ভুল OTP! আবার চেষ্টা করুন।','error'); return; }
+    } else {
+        try { await _otpState.confirmationResult.confirm(otpInput); }
+        catch(e){ _showResetMsg('step2Msg','❌ ভুল SMS OTP!','error'); return; }
+    }
+    clearInterval(_otpState.timerInterval);
+    appState.users[userIdx].pass=newPass;
+    localStorage.setItem(DB_KEYS.USERS,JSON.stringify(appState.users));
+    try {
+        if(typeof firebase!=='undefined'&&firebase.firestore) firebase.firestore().collection('users').doc(String(appState.users[userIdx].id)).set({pass:newPass},{merge:true});
+        if(typeof window.pushToCloud==='function') window.pushToCloud(DB_KEYS.USERS);
+    } catch(e){}
+    _showResetMsg('step2Msg','✅ পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে!','success');
+    setTimeout(()=>closeResetModal(),1800);
+}
+function resendOtp(){ document.getElementById('resetStep2').style.display='none'; document.getElementById('resetStep1').style.display='block'; document.getElementById('step1Msg').style.display='none'; _otpState.code=null; _otpState.confirmationResult=null; window.firebasePhoneRecaptcha=null; }
+function goBackToStep1(){ clearInterval(_otpState.timerInterval); document.getElementById('resetStep2').style.display='none'; document.getElementById('resetStep1').style.display='block'; ['step1Msg','step2Msg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';}); _otpState.code=null; _otpState.confirmationResult=null; }
+function closeResetModal(){
+    clearInterval(_otpState.timerInterval);
+    _otpState={code:null,expiry:null,method:'email',userMobile:null,timerInterval:null,confirmationResult:null};
+    window.firebasePhoneRecaptcha=null;
+    document.getElementById('resetPasswordModal').style.setProperty('display','none','important');
+    const s1=document.getElementById('resetStep1'),s2=document.getElementById('resetStep2');
+    if(s1)s1.style.display='block'; if(s2)s2.style.display='none';
+    ['resetUserId','resetOtpInput','resetNewPass'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['step1Msg','step2Msg'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    selectOtpMethod('email');
+}
+
 function submitPasswordReset() {
     const mobileInput = document.getElementById('resetUserId').value.trim();
     const adminCodeInput = document.getElementById('resetAdminCode').value.trim();
