@@ -5084,7 +5084,7 @@ function openHelpModal() {
 // ═══════════════════════════════════════════════
 const OTP_CONFIG = {
     EMAILJS_SERVICE:  'service_btr76ra',
-    EMAILJS_TEMPLATE: 'template_hmdmslt',
+    EMAILJS_TEMPLATE: 'template_z1yxlup',
     OTP_EXPIRY_MS:    5 * 60 * 1000
 };
 let _otpState = { code:null, expiry:null, method:'email', userMobile:null, timerInterval:null, confirmationResult:null };
@@ -5163,7 +5163,7 @@ async function sendOtpForReset() {
         const otp=String(Math.floor(100000+Math.random()*900000));
         _otpState.code=otp; _otpState.expiry=Date.now()+OTP_CONFIG.OTP_EXPIRY_MS;
         try {
-            await emailjs.send(OTP_CONFIG.EMAILJS_SERVICE, OTP_CONFIG.EMAILJS_TEMPLATE, { email:user.email, passcode:otp, time:new Date(_otpState.expiry).toLocaleTimeString() });
+            await emailjs.send(OTP_CONFIG.EMAILJS_SERVICE, OTP_CONFIG.EMAILJS_TEMPLATE, { email:user.email, passcode:otp });
             document.getElementById('resetStep1').style.display='none';
             document.getElementById('resetStep2').style.display='block';
             document.getElementById('otpSentInfo').textContent='✅ OTP পাঠানো হয়েছে: '+user.email.replace(/(.{2})(.*)(@.*)/,'$1***$3');
