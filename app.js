@@ -7959,13 +7959,19 @@ function publishNightBoard() {
     boards.push(newBoard);
     localStorage.setItem('night_boards', JSON.stringify(boards));
 
+    // pushToCloud দিয়ে Firebase এ push
+    if (typeof window.pushToCloud === 'function') {
+        setTimeout(() => window.pushToCloud('night_boards'), 100);
+    }
+    // সাথে direct Firebase call ও রাখা হলো backup হিসেবে
     try {
-        if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firebase.firestore().collection('night_boards').doc(String(newBoard.id)).set(newBoard)
+        const _db = (typeof db !== 'undefined' && db) || (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length && firebase.firestore());
+        if (_db && _db.collection) {
+            _db.collection('night_boards').doc(String(newBoard.id)).set(newBoard)
                 .then(() => console.log('[FB] ✅ Night board saved:', newBoard.id))
                 .catch(e => console.warn('[FB] night board err:', e.message));
         }
-    } catch(e) {}
+    } catch(e) { console.warn('[FB] night board exception:', e); }
 
     if (document.getElementById('nightImgUrl')) document.getElementById('nightImgUrl').value = '';
     if (document.getElementById('nightLinkUrl')) document.getElementById('nightLinkUrl').value = '';
@@ -7994,13 +8000,19 @@ function deleteNightBoard(boardId) {
     boards = boards.filter(b => b.id !== boardId);
     localStorage.setItem('night_boards', JSON.stringify(boards));
 
+    // pushToCloud দিয়ে Firebase update
+    if (typeof window.pushToCloud === 'function') {
+        setTimeout(() => window.pushToCloud('night_boards'), 100);
+    }
+    // direct Firebase delete
     try {
-        if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firebase.firestore().collection('night_boards').doc(String(boardId)).delete()
+        const _db = (typeof db !== 'undefined' && db) || (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length && firebase.firestore());
+        if (_db && _db.collection) {
+            _db.collection('night_boards').doc(String(boardId)).delete()
                 .then(() => console.log('[FB] ✅ Night board deleted:', boardId))
                 .catch(e => console.warn('[FB] night board delete err:', e.message));
         }
-    } catch(e) {}
+    } catch(e) { console.warn('[FB] night board delete exception:', e); }
 
     const listEl = document.getElementById('nightBoardList');
     if (listEl) {

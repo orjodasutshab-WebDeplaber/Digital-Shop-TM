@@ -427,8 +427,18 @@ function startListeners() {
     console.log('[FB] ↻ Gift cards updated:', arr.length);
   });
 
-  // Users listener এ myDiscounts change হলে user card refresh
-  // (already handled in users listener above)
+  // Night Boards real-time listener
+  db.collection('night_boards').onSnapshot(snap => {
+    _pulling = true;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('night_boards', arr);
+    _pulling = false;
+    console.log('[FB] ↻ Night boards updated:', arr.length);
+    // landing page এ refresh করা
+    if (typeof window.renderNightBoardLanding === 'function') {
+      window.renderNightBoardLanding();
+    }
+  });
 
   console.log('[FB] Listeners started');
 }
