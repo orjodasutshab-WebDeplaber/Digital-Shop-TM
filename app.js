@@ -10375,14 +10375,18 @@ function pmxOpenUserOrderDetail(orderId) {
                 localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(allOrders));
                 _pmxRenderUserDetailModal(o);
             } else {
-                // pmx_orders collection থেকে fallback
-                db.collection('pmx_orders').doc(String(orderId)).get().then(d => {
-                    if (d.exists) _pmxRenderUserDetailModal(d.data());
-                }).catch(() => {
-                    const orders = pmxGetAll(PMX_KEYS.ORDERS);
-                    const o2 = orders.find(o => String(o.id) === String(orderId));
-                    if (o2) _pmxRenderUserDetailModal(o2);
-                });
+                // localStorage থেকে fallback (পুরানো orders যেগুলো user doc এ নেই)
+                const lsOrders = pmxGetAll(PMX_KEYS.ORDERS);
+                const o2 = lsOrders.find(o => String(o.id) === String(orderId));
+                if (o2) {
+                    _pmxRenderUserDetailModal(o2);
+                } else {
+                    // pmx_orders collection থেকে শেষ চেষ্টা
+                    db.collection('pmx_orders').doc(String(orderId)).get().then(d => {
+                        if (d.exists) _pmxRenderUserDetailModal(d.data());
+                        else showToast('❌ অর্ডার পাওয়া যায়নি!');
+                    }).catch(() => showToast('❌ অর্ডার লোড হয়নি!'));
+                }
             }
         }).catch(() => {
             const orders = pmxGetAll(PMX_KEYS.ORDERS);
