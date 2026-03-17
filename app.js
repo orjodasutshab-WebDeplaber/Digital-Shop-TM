@@ -10006,8 +10006,8 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
     // এই হেডারের holders অথবা global (headerId খালি) holders
     const holders = allHolders.filter(h => !h.headerId || String(h.headerId) === String(headerId));
     const holderSlides = holders.length
-        ? holders.map((h,i) => `<div style="position:absolute;inset:0;display:${i===0?'flex':'none'};align-items:center;justify-content:center;background:#111827;"><img src="${h.img}" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;" onerror="this.style.display='none'"></div>`).join('')
-        : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#4b5563;">হোল্ডার বোর্ড এখনো নেই</div>';
+        ? holders.map((h,i) => `<div class="pmx-slide" style="position:absolute;inset:0;display:${i===0?'block':'none'};"><img src="${h.img}" style="width:100%;height:100%;object-fit:fill;" onerror="this.style.opacity='0'"></div>`).join('')
+        : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#4b5563;font-size:14px;">হোল্ডার বোর্ড এখনো নেই</div>';
 
     document.body.insertAdjacentHTML('beforeend', `
     <div id="pmxHeaderShopModal" style="position:fixed;inset:0;background:#0f172a;z-index:999999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;">
@@ -10016,8 +10016,17 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
             <button onclick="document.getElementById('pmxHeaderShopModal').remove()" style="background:#ef4444;color:#fff;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:700;font-family:'Hind Siliguri',sans-serif;">✕ বন্ধ</button>
         </div>
         <!-- হোল্ডার বোর্ড -->
-        <div id="pmxHolderBoard" style="width:100%;max-width:1520px;height:350px;margin:20px auto;background:#111827;border-radius:14px;overflow:hidden;border:1px solid #334151;position:relative;">
+        <div id="pmxHolderBoard" style="width:100%;max-width:1520px;height:350px;margin:20px auto;background:#0a0a0a;border-radius:14px;overflow:hidden;border:1px solid #334151;position:relative;">
             ${holderSlides}
+            ${holders.length > 1 ? `
+            <!-- বাম বাটন -->
+            <button onclick="pmxSlideNav(-1)" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:2px solid rgba(255,255,255,0.3);width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;z-index:10;transition:all 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.6)'">&#8249;</button>
+            <!-- ডান বাটন -->
+            <button onclick="pmxSlideNav(1)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:2px solid rgba(255,255,255,0.3);width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;z-index:10;transition:all 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.6)'">&#8250;</button>
+            <!-- dots -->
+            <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10;">
+                ${holders.map((_,i)=>`<div id="pmxDot${i}" style="width:${i===0?'20':'8'}px;height:8px;border-radius:4px;background:${i===0?'#a78bfa':'rgba(255,255,255,0.4)'};transition:all 0.3s;"></div>`).join('')}
+            </div>` : ''}
         </div>
         <!-- প্রোডাক্ট গ্রিড -->
         <div style="padding:20px;max-width:1520px;margin:0 auto;">
@@ -10037,18 +10046,33 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
         </div>
     </div>`);
 
-    // holder slide auto
+    // Slider logic
     if (holders.length > 1) {
-        let hi = 0;
-        setInterval(() => {
+        window._pmxSlideIdx = 0;
+        window._pmxSlideTotal = holders.length;
+
+        window.pmxSlideNav = function(dir) {
             const board = document.getElementById('pmxHolderBoard');
             if (!board) return;
-            const slides = board.querySelectorAll('div[style*="position:absolute"]');
+            const slides = board.querySelectorAll('.pmx-slide');
             if (!slides.length) return;
-            slides[hi].style.display = 'none';
-            hi = (hi + 1) % slides.length;
-            slides[hi].style.display = 'block';
-        }, 4000);
+            // hide current
+            slides[window._pmxSlideIdx].style.display = 'none';
+            const dot = document.getElementById('pmxDot' + window._pmxSlideIdx);
+            if (dot) { dot.style.width='8px'; dot.style.background='rgba(255,255,255,0.4)'; }
+            // next
+            window._pmxSlideIdx = (window._pmxSlideIdx + dir + window._pmxSlideTotal) % window._pmxSlideTotal;
+            slides[window._pmxSlideIdx].style.display = 'block';
+            const newDot = document.getElementById('pmxDot' + window._pmxSlideIdx);
+            if (newDot) { newDot.style.width='20px'; newDot.style.background='#a78bfa'; }
+        };
+
+        // auto 5s
+        if (window._pmxSlideTimer) clearInterval(window._pmxSlideTimer);
+        window._pmxSlideTimer = setInterval(() => {
+            if (!document.getElementById('pmxHolderBoard')) { clearInterval(window._pmxSlideTimer); return; }
+            window.pmxSlideNav(1);
+        }, 5000);
     }
 }
 
