@@ -10308,45 +10308,79 @@ function _pmxRenderUserOrderModal(orders) {
     document.getElementById('pmxUserOrderModal')?.remove();
     const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
     const statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
-    document.body.insertAdjacentHTML('beforeend', `
-    <div id="pmxUserOrderModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
-        <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:600px;max-height:90vh;overflow-y:auto;border:1px solid #7c3aed;position:relative;">
-            <button onclick="document.getElementById('pmxUserOrderModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
-            <h3 style="color:#a78bfa;margin:0 0 20px;font-size:17px;">⭐ প্রিমিয়াম ডিটেইলস</h3>
-            ${!orders.length
-                ? '<p style="color:#4b5563;text-align:center;padding:30px;">কোনো অর্ডার নেই</p>'
-                : orders.map(o => `
-                <div style="background:#0f172a;border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid #374151;">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-                        <div>
-                            <div style="color:#fff;font-weight:700;font-size:14px;">${o.productName}</div>
-                            <div style="color:#10b981;font-weight:700;">৳${o.price}</div>
-                        </div>
-                        <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;">${statusLabels[o.status]||o.status}</span>
-                    </div>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                        <button data-oid="${o.id}" class="pmx-detail-btn" style="background:#6366f1;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">📋 বিস্তারিত</button>
-                        ${o.status==='pending' ? `<button data-oid="${o.id}" class="pmx-del-btn" style="background:#ef4444;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">🗑 ডিলিট</button>` : ''}
-                    </div>
-                </div>`).join('')}
-        </div>
-    </div>`);
-    // event delegation — data-id দিয়ে বাটন কাজ করাবো
-    const modal = document.getElementById('pmxUserOrderModal');
-    if (modal) {
-        modal.addEventListener('click', function(e) {
-            const detailBtn = e.target.closest('.pmx-detail-btn');
-            const delBtn = e.target.closest('.pmx-del-btn');
-            if (detailBtn) {
-                const oid = detailBtn.getAttribute('data-oid');
-                if (oid) pmxOpenUserOrderDetail(oid);
+
+    // Overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'pmxUserOrderModal';
+    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;";
+
+    // Inner box
+    const box = document.createElement('div');
+    box.style.cssText = "background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:600px;max-height:90vh;overflow-y:auto;border:1px solid #7c3aed;position:relative;";
+
+    // Close button
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '✕';
+    closeBtn.style.cssText = "position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;";
+    closeBtn.onclick = () => overlay.remove();
+    box.appendChild(closeBtn);
+
+    // Title
+    const title = document.createElement('h3');
+    title.style.cssText = "color:#a78bfa;margin:0 0 20px;font-size:17px;";
+    title.textContent = '⭐ প্রিমিয়াম ডিটেইলস';
+    box.appendChild(title);
+
+    if (!orders.length) {
+        const empty = document.createElement('p');
+        empty.style.cssText = "color:#4b5563;text-align:center;padding:30px;";
+        empty.textContent = 'কোনো অর্ডার নেই';
+        box.appendChild(empty);
+    } else {
+        orders.forEach(function(o) {
+            const card = document.createElement('div');
+            card.style.cssText = "background:#0f172a;border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid #374151;";
+
+            const top = document.createElement('div');
+            top.style.cssText = "display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;";
+
+            const info = document.createElement('div');
+            info.innerHTML = '<div style="color:#fff;font-weight:700;font-size:14px;">' + (o.productName||'') + '</div><div style="color:#10b981;font-weight:700;">৳' + (o.price||'') + '</div>';
+
+            const badge = document.createElement('span');
+            badge.style.cssText = "background:" + (statusColors[o.status]||'#374151') + ";color:#fff;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;";
+            badge.textContent = statusLabels[o.status] || o.status;
+
+            top.appendChild(info);
+            top.appendChild(badge);
+            card.appendChild(top);
+
+            const btnRow = document.createElement('div');
+            btnRow.style.cssText = "display:flex;gap:8px;flex-wrap:wrap;";
+
+            // বিস্তারিত বাটন
+            const detBtn = document.createElement('button');
+            detBtn.textContent = '📋 বিস্তারিত';
+            detBtn.style.cssText = "background:#6366f1;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;";
+            detBtn.onclick = (function(oid){ return function(){ pmxOpenUserOrderDetail(oid); }; })(o.id);
+            btnRow.appendChild(detBtn);
+
+            // ডিলিট বাটন (pending হলে)
+            if (o.status === 'pending') {
+                const delBtn = document.createElement('button');
+                delBtn.textContent = '🗑 ডিলিট';
+                delBtn.style.cssText = "background:#ef4444;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;";
+                delBtn.onclick = (function(oid){ return function(){ pmxUserDeleteOrder(oid); }; })(o.id);
+                btnRow.appendChild(delBtn);
             }
-            if (delBtn) {
-                const oid = delBtn.getAttribute('data-oid');
-                if (oid) pmxUserDeleteOrder(oid);
-            }
+
+            card.appendChild(btnRow);
+            box.appendChild(card);
         });
     }
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
 }
 function pmxUserDeleteOrder(orderId) {
     if (!confirm('অর্ডার ডিলিট করবেন?')) return;
