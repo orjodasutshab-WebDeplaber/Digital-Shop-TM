@@ -10325,12 +10325,28 @@ function _pmxRenderUserOrderModal(orders) {
                         <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;">${statusLabels[o.status]||o.status}</span>
                     </div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                        <button onclick="pmxOpenUserOrderDetail('${o.id}')" style="background:#6366f1;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">📋 বিস্তারিত</button>
-                        ${o.status==='pending' ? `<button onclick="pmxUserDeleteOrder('${o.id}')" style="background:#ef4444;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">🗑 ডিলিট</button>` : ''}
+                        <button data-oid="${o.id}" class="pmx-detail-btn" style="background:#6366f1;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">📋 বিস্তারিত</button>
+                        ${o.status==='pending' ? `<button data-oid="${o.id}" class="pmx-del-btn" style="background:#ef4444;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">🗑 ডিলিট</button>` : ''}
                     </div>
                 </div>`).join('')}
         </div>
     </div>`);
+    // event delegation — data-id দিয়ে বাটন কাজ করাবো
+    const modal = document.getElementById('pmxUserOrderModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            const detailBtn = e.target.closest('.pmx-detail-btn');
+            const delBtn = e.target.closest('.pmx-del-btn');
+            if (detailBtn) {
+                const oid = detailBtn.getAttribute('data-oid');
+                if (oid) pmxOpenUserOrderDetail(oid);
+            }
+            if (delBtn) {
+                const oid = delBtn.getAttribute('data-oid');
+                if (oid) pmxUserDeleteOrder(oid);
+            }
+        });
+    }
 }
 function pmxUserDeleteOrder(orderId) {
     if (!confirm('অর্ডার ডিলিট করবেন?')) return;
