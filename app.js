@@ -10112,11 +10112,17 @@ function pmxPlaceOrder(productId) {
     const p = products.find(p => String(p.id) === String(productId));
     if (!p) return;
     const orders = pmxGetAll(PMX_KEYS.ORDERS);
+    // logged-in user এর ID সবসময় save করা হবে যাতে ডিটেইলস এ দেখা যায়
+    const cu = appState.currentUser;
     const order = {
         id: 'PMX' + Date.now(),
         productId: p.id, productName: p.name, price: p.price,
         desc: p.desc||'', img: p.img||'', tbCode: p.tb||'',
-        userId, userMobile: mobile,
+        userId: userId||'',
+        userMobile: mobile||(cu?.mobile||cu?.phone||''),
+        // logged-in user এর actual ID — filter এ কাজে লাগবে
+        loggedUserId: cu ? String(cu.id) : '',
+        loggedUserMobile: cu ? String(cu.mobile||cu.phone||'') : '',
         status: 'pending', comments: [],
         createdAt: new Date().toISOString()
     };
@@ -10126,7 +10132,17 @@ function pmxPlaceOrder(productId) {
     if (db) db.collection('pmx_orders').doc(order.id).set(order);
     pmxPushCloud('pmx_orders');
     document.getElementById('pmxBuyModal')?.remove();
-    showToast('✅ অর্ডার সফল! প্রিমিয়াম ডিটেইলস এ যান।');
+    // Success popup
+    const popup = document.createElement('div');
+    popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999999999;display:flex;align-items:center;justify-content:center;font-family:"Hind Siliguri",sans-serif;';
+    popup.innerHTML = `
+        <div style="background:#1e293b;border-radius:20px;padding:32px 28px;width:90%;max-width:380px;text-align:center;border:1px solid #10b981;">
+            <div style="width:64px;height:64px;background:rgba(16,185,129,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px;">✅</div>
+            <h3 style="color:#fff;font-size:18px;font-weight:700;margin:0 0 10px;">আপনার অর্ডার কনফার্ম হয়েছে!</h3>
+            <p style="color:#94a3b8;font-size:13px;margin:0 0 20px;line-height:1.6;">একাউন্ট অপশনের ভেতরে থাকা <strong style="color:#a78bfa;">প্রিমিয়াম ডিটেইলস</strong> এ গিয়ে চেক করুন।</p>
+            <button onclick="this.parentElement.parentElement.remove()" style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:12px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">👍 ঠিক আছে</button>
+        </div>`;
+    document.body.appendChild(popup);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -10138,9 +10154,11 @@ function pmxOpenUserOrders() {
     const cu = appState.currentUser;
     if (!cu) { showToast('❌ লগইন করুন!'); return; }
     const orders = pmxGetAll(PMX_KEYS.ORDERS).filter(o =>
+        String(o.loggedUserId) === String(cu.id) ||
+        String(o.loggedUserMobile) === String(cu.mobile||cu.phone||'') ||
         String(o.userId) === String(cu.id) ||
-        String(o.userId) === String(cu.mobile) ||
-        String(o.userMobile) === String(cu.mobile)
+        String(o.userId) === String(cu.mobile||cu.phone||'') ||
+        String(o.userMobile) === String(cu.mobile||cu.phone||'')
     );
     const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
     const statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
