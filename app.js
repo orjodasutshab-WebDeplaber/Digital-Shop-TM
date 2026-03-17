@@ -10480,7 +10480,7 @@ function _pmxRenderUserDetailModal(o) {
                 <div id="pmxUserComments" style="max-height:180px;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column-reverse;">${pmxRenderComments(comments)}</div>
                 <div style="display:flex;gap:8px;">
                     <input id="pmxUserComment" placeholder="মেসেজ লিখুন..." style="flex:1;padding:8px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;font-family:'Hind Siliguri',sans-serif;">
-                    <button onclick="pmxAddComment('${orderId}','user')" style="background:#10b981;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">পাঠান</button>
+                    <button onclick="pmxAddComment('${o.id}','user')" style="background:#10b981;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">পাঠান</button>
                 </div>
             </div>
         </div>
