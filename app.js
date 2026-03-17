@@ -9923,6 +9923,9 @@ function pmxOpenOrderDetail(orderId) {
     if (el) el.remove();
     const comments = o.comments || [];
     const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
+    const statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
+    const payColor = o.payMethod === 'nagad' ? '#f97316' : '#e91e8c';
+    const payLabel = o.payMethod === 'nagad' ? '🟠 নগদ' : '🔴 বিকাশ';
     document.body.insertAdjacentHTML('beforeend', `
     <div id="pmxOrderDetailModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
         <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:560px;max-height:90vh;overflow-y:auto;border:1px solid #334155;position:relative;">
@@ -9931,14 +9934,22 @@ function pmxOpenOrderDetail(orderId) {
             ${prod?.img ? `<img src="${prod.img}" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
             <div style="background:#0f172a;border-radius:10px;padding:14px;margin-bottom:14px;">
                 <div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:6px;">${o.productName}</div>
-                <div style="color:#10b981;font-size:15px;font-weight:700;margin-bottom:6px;">৳${o.price}</div>
-                <div style="color:#94a3b8;font-size:13px;margin-bottom:6px;">${prod?.desc||o.desc||''}</div>
-                <div style="color:#6b7280;font-size:12px;">👤 ${o.userId||''} | 📱 ${o.userMobile||''}</div>
-                <div style="margin-top:10px;"><span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">${o.status}</span></div>
+                <div style="color:#10b981;font-size:15px;font-weight:700;margin-bottom:8px;">৳${o.price}</div>
+                <div style="color:#94a3b8;font-size:13px;margin-bottom:8px;">${prod?.desc||o.desc||''}</div>
+                <div style="color:#6b7280;font-size:12px;margin-bottom:8px;">👤 ${o.userId||'-'} | 📱 ${o.userMobile||'-'}</div>
+                <!-- Payment info -->
+                ${o.payMethod ? `
+                <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:10px;margin-bottom:10px;border-left:3px solid ${payColor};">
+                    <div style="color:${payColor};font-size:13px;font-weight:700;margin-bottom:4px;">${payLabel}</div>
+                    <div style="color:#e2e8f0;font-size:13px;">TrxID: <strong style="color:#fbbf24;">${o.trxId||'-'}</strong></div>
+                </div>` : ''}
+                <!-- Status -->
+                <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">${statusLabels[o.status]||o.status}</span>
             </div>
+            <!-- Comment section -->
             <div style="background:#0f172a;border-radius:10px;padding:14px;">
                 <div style="color:#a78bfa;font-weight:700;margin-bottom:10px;">💬 কমেন্ট</div>
-                <div id="pmxDetailComments" style="max-height:180px;overflow-y:auto;margin-bottom:12px;">${pmxRenderComments(comments)}</div>
+                <div id="pmxDetailComments" style="max-height:200px;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column-reverse;">${pmxRenderComments(comments)}</div>
                 <div style="display:flex;gap:8px;">
                     <input id="pmxAdminComment" placeholder="Admin কমেন্ট লিখুন..." style="flex:1;padding:8px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;font-family:'Hind Siliguri',sans-serif;">
                     <button onclick="pmxAddComment('${orderId}','admin')" style="background:#6366f1;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">পাঠান</button>
@@ -9969,7 +9980,8 @@ function pmxAddComment(orderId, role) {
     pmxDb()?.collection('pmx_orders').doc(String(orderId)).update({ comments: orders[idx].comments });
     const el = document.getElementById(inputId);
     if (el) el.value = '';
-    const commentEl = document.getElementById('pmxDetailComments');
+    // admin বা user যেকোনো comment el refresh
+    const commentEl = document.getElementById('pmxDetailComments') || document.getElementById('pmxUserComments');
     if (commentEl) commentEl.innerHTML = pmxRenderComments(orders[idx].comments);
 }
 
@@ -10095,7 +10107,26 @@ function pmxOpenBuyModal(productId) {
             ${p.desc ? `<div style="color:#94a3b8;font-size:13px;margin-bottom:14px;line-height:1.5;">${p.desc}</div>` : ''}
             <div style="background:#0f172a;border-radius:12px;padding:14px;margin-bottom:14px;">
                 <input id="pmxBuyUserId" placeholder="ইউজার আইডি / মোবাইল / লিংক" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
-                <input id="pmxBuyMobile" placeholder="মোবাইল নম্বর" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+                <input id="pmxBuyMobile" placeholder="আপনার মোবাইল নম্বর" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+                <!-- পেমেন্ট method -->
+                <label style="color:#94a3b8;font-size:13px;display:block;margin-bottom:8px;">পেমেন্ট পদ্ধতি *</label>
+                <div style="display:flex;gap:10px;margin-bottom:12px;">
+                    <label onclick="pmxSelectPayment('bkash')" id="pmxPayBkash" style="flex:1;display:flex;align-items:center;gap:8px;padding:10px;background:#1e293b;border:2px solid #e91e8c;border-radius:10px;cursor:pointer;">
+                        <input type="radio" name="pmxPayMethod" value="bkash" checked style="accent-color:#e91e8c;">
+                        <span style="color:#fff;font-size:13px;font-weight:700;">💳 বিকাশ</span>
+                    </label>
+                    <label onclick="pmxSelectPayment('nagad')" id="pmxPayNagad" style="flex:1;display:flex;align-items:center;gap:8px;padding:10px;background:#1e293b;border:2px solid #374151;border-radius:10px;cursor:pointer;">
+                        <input type="radio" name="pmxPayMethod" value="nagad" style="accent-color:#f97316;">
+                        <span style="color:#fff;font-size:13px;font-weight:700;">💳 নগদ</span>
+                    </label>
+                </div>
+                <!-- payment info box -->
+                <div id="pmxPayInfoBox" style="background:rgba(233,30,140,0.1);border:1px solid #e91e8c;border-radius:10px;padding:12px;margin-bottom:12px;">
+                    <div style="color:#f9a8d4;font-size:12px;margin-bottom:4px;">বিকাশ নম্বরে পাঠান:</div>
+                    <div style="color:#fff;font-size:16px;font-weight:700;letter-spacing:1px;">018*********</div>
+                    <div style="color:#94a3b8;font-size:11px;margin-top:4px;">(Send Money করুন)</div>
+                </div>
+                <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *" style="width:100%;padding:10px;border-radius:8px;border:2px solid #6366f1;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-weight:600;">
                 <div style="background:rgba(245,158,11,0.1);border:1px solid #f59e0b;border-radius:8px;padding:10px;font-size:12px;color:#fcd34d;line-height:1.6;margin-bottom:14px;">
                     📌 অর্ডার হওয়ার পর আপনাকে মেসেজ দিয়ে বিস্তারিত জানতে চাওয়া হবে। কোনো কিছু ভুল বা না বুঝলে ওখানে জানিয়ে দেওয়া হবে। তাই অর্ডার করুন, পরে সংশোধন করতে পারবেন।
                 </div>
@@ -10104,15 +10135,40 @@ function pmxOpenBuyModal(productId) {
         </div>
     </div>`);
 }
+function pmxSelectPayment(method) {
+    const bkash = document.getElementById('pmxPayBkash');
+    const nagad  = document.getElementById('pmxPayNagad');
+    const box    = document.getElementById('pmxPayInfoBox');
+    if (!box) return;
+    if (method === 'bkash') {
+        if (bkash) bkash.style.borderColor = '#e91e8c';
+        if (nagad) nagad.style.borderColor = '#374151';
+        box.style.background = 'rgba(233,30,140,0.1)';
+        box.style.borderColor = '#e91e8c';
+        box.innerHTML = `<div style="color:#f9a8d4;font-size:12px;margin-bottom:4px;">বিকাশ নম্বরে পাঠান:</div>
+            <div style="color:#fff;font-size:16px;font-weight:700;letter-spacing:1px;">018*********</div>
+            <div style="color:#94a3b8;font-size:11px;margin-top:4px;">(Send Money করুন)</div>`;
+    } else {
+        if (nagad) nagad.style.borderColor = '#f97316';
+        if (bkash) bkash.style.borderColor = '#374151';
+        box.style.background = 'rgba(249,115,22,0.1)';
+        box.style.borderColor = '#f97316';
+        box.innerHTML = `<div style="color:#fed7aa;font-size:12px;margin-bottom:4px;">নগদ নম্বরে পাঠান:</div>
+            <div style="color:#fff;font-size:16px;font-weight:700;letter-spacing:1px;">01329885689</div>
+            <div style="color:#94a3b8;font-size:11px;margin-top:4px;">(Send Money করুন)</div>`;
+    }
+}
 function pmxPlaceOrder(productId) {
     const userId = document.getElementById('pmxBuyUserId')?.value.trim();
     const mobile = document.getElementById('pmxBuyMobile')?.value.trim();
+    const trxId  = document.getElementById('pmxBuyTrxId')?.value.trim();
+    const payMethod = document.querySelector('input[name="pmxPayMethod"]:checked')?.value || 'bkash';
     if (!userId && !mobile) { showToast('❌ ইউজার আইডি বা মোবাইল দিন!'); return; }
+    if (!trxId) { showToast('❌ TrxID দিন!'); return; }
     const products = pmxGetAll(PMX_KEYS.PRODUCTS);
     const p = products.find(p => String(p.id) === String(productId));
     if (!p) return;
     const orders = pmxGetAll(PMX_KEYS.ORDERS);
-    // logged-in user এর ID সবসময় save করা হবে যাতে ডিটেইলস এ দেখা যায়
     const cu = appState.currentUser;
     const order = {
         id: 'PMX' + Date.now(),
@@ -10120,7 +10176,7 @@ function pmxPlaceOrder(productId) {
         desc: p.desc||'', img: p.img||'', tbCode: p.tb||'',
         userId: userId||'',
         userMobile: mobile||(cu?.mobile||cu?.phone||''),
-        // logged-in user এর actual ID — filter এ কাজে লাগবে
+        payMethod, trxId,
         loggedUserId: cu ? String(cu.id) : '',
         loggedUserMobile: cu ? String(cu.mobile||cu.phone||'') : '',
         status: 'pending', comments: [],
@@ -10204,6 +10260,7 @@ function pmxOpenUserOrderDetail(orderId) {
     if (el) el.remove();
     const comments = o.comments || [];
     const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
+    const statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
     document.body.insertAdjacentHTML('beforeend', `
     <div id="pmxUserDetailModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
         <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;border:1px solid #334155;position:relative;">
@@ -10211,13 +10268,20 @@ function pmxOpenUserOrderDetail(orderId) {
             ${o.img ? `<img src="${o.img}" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
             <div style="background:#0f172a;border-radius:10px;padding:14px;margin-bottom:14px;">
                 <div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:4px;">${o.productName}</div>
-                <div style="color:#10b981;font-size:15px;font-weight:700;margin-bottom:6px;">৳${o.price}</div>
-                <div style="color:#94a3b8;font-size:13px;margin-bottom:8px;">${o.desc||''}</div>
-                <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">${o.status}</span>
+                <div style="color:#10b981;font-size:15px;font-weight:700;margin-bottom:8px;">৳${o.price}</div>
+                <div style="color:#94a3b8;font-size:13px;margin-bottom:10px;">${o.desc||''}</div>
+                <!-- User info -->
+                <div style="background:rgba(99,102,241,0.1);border-radius:8px;padding:10px;margin-bottom:10px;border-left:3px solid #6366f1;">
+                    ${o.userId ? `<div style="color:#94a3b8;font-size:12px;">🆔 আইডি/মোবাইল/লিংক: <span style="color:#e2e8f0;">${o.userId}</span></div>` : ''}
+                    ${o.userMobile ? `<div style="color:#94a3b8;font-size:12px;margin-top:3px;">📱 মোবাইল: <span style="color:#e2e8f0;">${o.userMobile}</span></div>` : ''}
+                </div>
+                <!-- Status -->
+                <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">${statusLabels[o.status]||o.status}</span>
             </div>
+            <!-- Comment section -->
             <div style="background:#0f172a;border-radius:10px;padding:14px;">
                 <div style="color:#a78bfa;font-weight:700;margin-bottom:10px;">💬 Admin এর সাথে যোগাযোগ</div>
-                <div id="pmxUserComments" style="max-height:160px;overflow-y:auto;margin-bottom:12px;">${pmxRenderComments(comments)}</div>
+                <div id="pmxUserComments" style="max-height:180px;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column-reverse;">${pmxRenderComments(comments)}</div>
                 <div style="display:flex;gap:8px;">
                     <input id="pmxUserComment" placeholder="মেসেজ লিখুন..." style="flex:1;padding:8px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;font-family:'Hind Siliguri',sans-serif;">
                     <button onclick="pmxAddComment('${orderId}','user')" style="background:#10b981;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">পাঠান</button>
