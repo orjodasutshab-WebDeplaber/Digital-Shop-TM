@@ -9784,6 +9784,9 @@ function pmxOpenHolderAdmin() {
     document.getElementById('lastPortalModal')?.remove();
     const el = document.getElementById('pmxHolderAdminModal');
     if (el) el.remove();
+    const headers = pmxGetAll(PMX_KEYS.HEADERS);
+    const headerOpts = '<option value="">-- সব হেডারে (Global) --</option>' +
+        headers.map(h=>`<option value="${h.id}">${h.name}</option>`).join('');
     document.body.insertAdjacentHTML('beforeend', `
     <div id="pmxHolderAdminModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
         <div style="background:#1e293b;border-radius:20px;padding:28px;width:90%;max-width:560px;max-height:90vh;overflow-y:auto;border:1px solid #10b981;position:relative;">
@@ -9791,7 +9794,9 @@ function pmxOpenHolderAdmin() {
             <h3 style="color:#34d399;margin:0 0 20px;font-size:17px;">🏆 প্রিমিয়াম হোল্ডার বোর্ড</h3>
             <div style="background:#0f172a;border-radius:12px;padding:16px;margin-bottom:16px;">
                 <input id="pmxHolImg" type="text" placeholder="ছবির লিংক *" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
-                <textarea id="pmxHolDesc" placeholder="বিস্তারিত (ঐচ্ছিক)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;min-height:70px;resize:vertical;"></textarea>
+                <textarea id="pmxHolDesc" placeholder="বিস্তারিত (ঐচ্ছিক)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;min-height:70px;resize:vertical;"></textarea>
+                <label style="color:#94a3b8;font-size:13px;display:block;margin-bottom:6px;">হেডার সিলেক্ট করুন</label>
+                <select id="pmxHolHeader" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;">${headerOpts}</select>
                 <button onclick="pmxPublishHolder()" style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">✅ পাবলিশ করুন</button>
             </div>
             <div id="pmxHolderList">${pmxRenderHolderList()}</div>
@@ -9801,28 +9806,37 @@ function pmxOpenHolderAdmin() {
 function pmxPublishHolder() {
     const img = document.getElementById('pmxHolImg')?.value.trim();
     const desc = document.getElementById('pmxHolDesc')?.value.trim();
+    const headerId = document.getElementById('pmxHolHeader')?.value || '';
     if (!img) { showToast('❌ ছবির লিংক দিন!'); return; }
     const holders = pmxGetAll(PMX_KEYS.HOLDERS);
-    const h = { id: Date.now(), img, desc: desc||'' };
+    const h = { id: Date.now(), img, desc: desc||'', headerId: headerId ? Number(headerId) : '' };
     holders.push(h);
     localStorage.setItem(PMX_KEYS.HOLDERS, JSON.stringify(holders));
     const db = pmxDb();
     if (db) db.collection('pmx_holders').doc(String(h.id)).set(h);
     pmxPushCloud('pmx_holders');
     ['pmxHolImg','pmxHolDesc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    const sel = document.getElementById('pmxHolHeader'); if(sel) sel.value='';
     const list = document.getElementById('pmxHolderList');
     if (list) list.innerHTML = pmxRenderHolderList();
     showToast('✅ হোল্ডার বোর্ড পাবলিশ হয়েছে!');
 }
 function pmxRenderHolderList() {
     const holders = pmxGetAll(PMX_KEYS.HOLDERS);
+    const headers = pmxGetAll(PMX_KEYS.HEADERS);
     if (!holders.length) return '<p style="color:#4b5563;text-align:center;padding:16px;">কোনো হোল্ডার বোর্ড নেই</p>';
-    return holders.map(h => `
+    return holders.map(h => {
+        const hdr = headers.find(x => String(x.id) === String(h.headerId));
+        return `
         <div style="display:flex;align-items:center;gap:10px;background:#0f172a;border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid #374151;">
-            <img src="${h.img}" style="width:60px;height:45px;object-fit:cover;border-radius:6px;" onerror="this.style.display='none'">
-            <div style="flex:1;color:#94a3b8;font-size:12px;">${h.desc||'(বিবরণ নেই)'}</div>
+            <img src="${h.img}" style="width:70px;height:50px;object-fit:contain;background:#111827;border-radius:6px;" onerror="this.style.display='none'">
+            <div style="flex:1;">
+                <div style="color:#94a3b8;font-size:12px;">${h.desc||'(বিবরণ নেই)'}</div>
+                <div style="color:#34d399;font-size:11px;margin-top:3px;">${hdr ? '📌 '+hdr.name : '🌐 Global (সব হেডারে)'}</div>
+            </div>
             <button onclick="pmxDeleteHolder(${h.id})" style="background:#ef4444;color:#fff;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;">🗑</button>
-        </div>`).join('');
+        </div>`;
+    }).join('');
 }
 function pmxDeleteHolder(id) {
     if (!confirm('ডিলিট করবেন?')) return;
@@ -9988,9 +10002,11 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
     if (el) el.remove();
     const allProducts = pmxGetAll(PMX_KEYS.PRODUCTS);
     const products = allProducts.filter(p => p.headerId === headerId || String(p.headerId) === String(headerId));
-    const holders = pmxGetAll(PMX_KEYS.HOLDERS);
+    const allHolders = pmxGetAll(PMX_KEYS.HOLDERS);
+    // এই হেডারের holders অথবা global (headerId খালি) holders
+    const holders = allHolders.filter(h => !h.headerId || String(h.headerId) === String(headerId));
     const holderSlides = holders.length
-        ? holders.map((h,i) => `<div style="position:absolute;inset:0;display:${i===0?'block':'none'};"><img src="${h.img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"></div>`).join('')
+        ? holders.map((h,i) => `<div style="position:absolute;inset:0;display:${i===0?'flex':'none'};align-items:center;justify-content:center;background:#111827;"><img src="${h.img}" style="max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;" onerror="this.style.display='none'"></div>`).join('')
         : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#4b5563;">হোল্ডার বোর্ড এখনো নেই</div>';
 
     document.body.insertAdjacentHTML('beforeend', `
