@@ -9615,6 +9615,17 @@ function pmxGetAll(col) {
     try { return JSON.parse(localStorage.getItem(col) || '[]'); } catch(e) { return []; }
 }
 function pmxPushCloud(col) {
+    if (col === 'pmx_orders') {
+        // pmx_orders push করার আগে deleted list দিয়ে filter করা
+        const deleted = JSON.parse(localStorage.getItem('pmx_deleted_orders') || '[]');
+        if (deleted.length) {
+            let orders = pmxGetAll('pmx_orders');
+            const filtered = orders.filter(o => !deleted.includes(String(o.id)));
+            if (filtered.length !== orders.length) {
+                localStorage.setItem('pmx_orders', JSON.stringify(filtered));
+            }
+        }
+    }
     if (typeof window.pushToCloud === 'function') setTimeout(()=>window.pushToCloud(col), 100);
 }
 
@@ -9907,10 +9918,15 @@ function pmxAdminDeleteOrder(orderId) {
     let orders = pmxGetAll(PMX_KEYS.ORDERS);
     orders = orders.filter(o => String(o.id) !== String(orderId));
     localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(orders));
+    // স্থায়ী deleted list এ রাখা
+    const deleted = JSON.parse(localStorage.getItem('pmx_deleted_orders') || '[]');
+    if (!deleted.includes(String(orderId))) deleted.push(String(orderId));
+    localStorage.setItem('pmx_deleted_orders', JSON.stringify(deleted));
+    // Firebase থেকে delete
     pmxDb()?.collection('pmx_orders').doc(String(orderId)).delete();
     const list = document.getElementById('pmxAdminOrderList');
     if (list) list.innerHTML = pmxRenderAdminOrders();
-    showToast('🗑 অর্ডার ডিলিট হয়েছে!');
+    showToast('🗑 অর্ডার স্থায়ীভাবে ডিলিট হয়েছে!');
 }
 function pmxOpenOrderDetail(orderId) {
     const orders = pmxGetAll(PMX_KEYS.ORDERS);
@@ -10247,6 +10263,11 @@ function pmxUserDeleteOrder(orderId) {
     let orders = pmxGetAll(PMX_KEYS.ORDERS);
     orders = orders.filter(o => String(o.id) !== String(orderId));
     localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(orders));
+    // স্থায়ী deleted list এ রাখা
+    const deleted = JSON.parse(localStorage.getItem('pmx_deleted_orders') || '[]');
+    if (!deleted.includes(String(orderId))) deleted.push(String(orderId));
+    localStorage.setItem('pmx_deleted_orders', JSON.stringify(deleted));
+    // Firebase থেকে delete
     pmxDb()?.collection('pmx_orders').doc(String(orderId)).delete();
     document.getElementById('pmxUserOrderModal')?.remove();
     pmxOpenUserOrders();
@@ -10296,10 +10317,9 @@ function pmxOpenUserOrderDetail(orderId) {
 // ══════════════════════════════════════════════════════════════════
 window.addEventListener('load', function() {
     pmxRefreshDisplay();
-    // Firebase থেকে sync
     const db = pmxDb();
     if (db) {
-        ['pmx_headers','pmx_products','pmx_orders','pmx_holders'].forEach(col => {
+        ['pmx_headers','pmx_products','pmx_holders'].forEach(col => {
             db.collection(col).get().then(snap => {
                 const arr = snap.docs.map(d => d.data());
                 if (arr.length) {
@@ -10308,5 +10328,17 @@ window.addEventListener('load', function() {
                 }
             }).catch(()=>{});
         });
+        // pmx_orders আলাদাভাবে — deleted list দিয়ে filter
+        db.collection('pmx_orders').get().then(snap => {
+            const deleted = JSON.parse(localStorage.getItem('pmx_deleted_orders') || '[]');
+            const arr = snap.docs.map(d => d.data()).filter(o => !deleted.includes(String(o.id)));
+            // Firebase থেকে deleted orders মুছে ফেলা (যদি কোনো কারণে থেকে যায়)
+            snap.docs.forEach(d => {
+                if (deleted.includes(String(d.id))) {
+                    db.collection('pmx_orders').doc(d.id).delete().catch(()=>{});
+                }
+            });
+            localStorage.setItem('pmx_orders', JSON.stringify(arr));
+        }).catch(()=>{});
     }
 });
