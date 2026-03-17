@@ -36,6 +36,10 @@ const KEY_MAP = {
   'all_discounts':        'all_discounts',
   'global_discounts':     'global_discounts',
   'night_boards':          'night_boards',
+  'pmx_headers':           'pmx_headers',
+  'pmx_products':          'pmx_products',
+  'pmx_orders':            'pmx_orders',
+  'pmx_holders':           'pmx_holders',
 };
 
 // Single doc keys (not array)

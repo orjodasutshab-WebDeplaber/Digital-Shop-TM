@@ -5163,7 +5163,7 @@ async function sendOtpForReset() {
         const otp=String(Math.floor(100000+Math.random()*900000));
         _otpState.code=otp; _otpState.expiry=Date.now()+OTP_CONFIG.OTP_EXPIRY_MS;
         try {
-            await emailjs.send(OTP_CONFIG.EMAILJS_SERVICE, OTP_CONFIG.EMAILJS_TEMPLATE, { email:user.email, passcode:otp });
+            await emailjs.send(OTP_CONFIG.EMAILJS_SERVICE, OTP_CONFIG.EMAILJS_TEMPLATE, { email:user.email, passcode:otp, time:new Date(_otpState.expiry).toLocaleTimeString() });
             document.getElementById('resetStep1').style.display='none';
             document.getElementById('resetStep2').style.display='block';
             document.getElementById('otpSentInfo').textContent='✅ OTP পাঠানো হয়েছে: '+user.email.replace(/(.{2})(.*)(@.*)/,'$1***$3');
@@ -9584,3 +9584,607 @@ function _initMobileFixes() {
 
     console.log('[TM] Mobile fixes applied ✅');
 }
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║          PREMIUM PRODUCT SYSTEM — PMX (Conflict-Free)          ║
+// ╚══════════════════════════════════════════════════════════════════╝
+// Collections: pmx_headers, pmx_products, pmx_orders, pmx_holders
+// LocalStorage keys: PMX_HEADERS, PMX_PRODUCTS, PMX_ORDERS, PMX_HOLDERS
+// All functions prefixed: pmx_ to avoid any conflict
+
+const PMX_KEYS = {
+    HEADERS:  'pmx_headers',
+    PRODUCTS: 'pmx_products',
+    ORDERS:   'pmx_orders',
+    HOLDERS:  'pmx_holders'
+};
+
+// ── Firebase helper ──────────────────────────────────────────────
+function pmxDb() {
+    try { return (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) ? firebase.firestore() : null; } catch(e) { return null; }
+}
+function pmxSave(col, id, data) {
+    localStorage.setItem(PMX_KEYS[col] || col, JSON.stringify(pmxGetAll(col)));
+    const db = pmxDb();
+    if (db) db.collection(col).doc(String(id)).set(data).catch(e=>console.warn('[PMX]',e.message));
+}
+function pmxDelete(col, id) {
+    const db = pmxDb();
+    if (db) db.collection(col).doc(String(id)).delete().catch(e=>console.warn('[PMX] del',e.message));
+}
+function pmxGetAll(col) {
+    try { return JSON.parse(localStorage.getItem(col) || '[]'); } catch(e) { return []; }
+}
+function pmxPushCloud(col) {
+    if (typeof window.pushToCloud === 'function') setTimeout(()=>window.pushToCloud(col), 100);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 1. LAST PORTAL — 4টি নতুন বাটন যোগ
+// ══════════════════════════════════════════════════════════════════
+(function() {
+    const _orig = window.openLastPortalParcel;
+    window.openLastPortalParcel = function() {
+        if (appState.currentUser && appState.currentUser.role === 'sub_admin') {
+            if (!(appState.currentUser.permissions||[]).includes('last_portal')) {
+                showToast('🚫 এই ফাংশনে আপনার এক্সেস নেই!'); return;
+            }
+        }
+        const existing = document.getElementById('lastPortalModal');
+        if (existing) existing.remove();
+        document.body.insertAdjacentHTML('beforeend', `
+        <div id="lastPortalModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:99999999;font-family:'Hind Siliguri',sans-serif;">
+            <div style="background:#111827;color:white;padding:30px;border-radius:20px;width:90%;max-width:900px;text-align:center;position:relative;border:1px solid #374151;">
+                <span onclick="this.parentElement.parentElement.remove()" style="position:absolute;top:15px;right:20px;cursor:pointer;font-size:28px;color:#9ca3af;">&times;</span>
+                <h3 style="margin-bottom:25px;font-size:18px;">লাস্ট পোর্টাল পার্সেল</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                    <button class="parcel-btn" onclick="openBeliBoardControl('right')">বেলি বোড ডান</button>
+                    <button class="parcel-btn" onclick="openBeliBoardControl('left')">বেলি বোড বাম</button>
+                    <button class="parcel-btn" onclick="openSironamControl()">শিরোনাম মেনশন</button>
+                    <button class="parcel-btn" onclick="openCategoryControl()">ক্যাটাগরি নিয়ন্ত্রণ</button>
+                    <button class="parcel-btn" onclick="openNightBoardControl()" style="grid-column:1/-1;background:linear-gradient(135deg,#1e1b4b,#3730a3);border-color:#6366f1;"><i class="fa fa-moon" style="margin-right:6px;"></i> নাইট বোর্ড সিস্টেম</button>
+                    <button class="parcel-btn" onclick="pmxOpenHeaderAdmin()" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);border-color:#8b5cf6;">⭐ প্রিমিয়াম হেডার</button>
+                    <button class="parcel-btn" onclick="pmxOpenProductAdmin()" style="background:linear-gradient(135deg,#0ea5e9,#0369a1);border-color:#38bdf8;">📦 প্রিমিয়াম প্রোডাক্ট পাবলিশ</button>
+                    <button class="parcel-btn" onclick="pmxOpenOrderAdmin()" style="background:linear-gradient(135deg,#f59e0b,#b45309);border-color:#fbbf24;">🛒 প্রিমিয়াম অর্ডার</button>
+                    <button class="parcel-btn" onclick="pmxOpenHolderAdmin()" style="background:linear-gradient(135deg,#10b981,#047857);border-color:#34d399;">🏆 প্রিমিয়াম হোল্ডার বোর্ড</button>
+                </div>
+                <h3 style="margin-top:20px;font-size:13px;color:#6b7280;">এডমিন কে স্বাগতম পোটালের লাস্ট মেইন সেক্টের এ ☺️। বুজে চিন্তে কাজ করবেন 🙂💗</h3>
+            </div>
+        </div>
+        <style>.parcel-btn{background:#1f2937;color:#f3f4f6;border:1px solid #4b5563;padding:20px 10px;border-radius:12px;cursor:pointer;font-weight:600;font-size:15px;transition:all 0.3s;font-family:'Hind Siliguri',sans-serif;}.parcel-btn:hover{background:#4f46e5;border-color:#6366f1;transform:scale(1.05);}</style>
+        `);
+    };
+})();
+
+// ══════════════════════════════════════════════════════════════════
+// 2. প্রিমিয়াম হেডার ADMIN
+// ══════════════════════════════════════════════════════════════════
+function pmxOpenHeaderAdmin() {
+    document.getElementById('lastPortalModal')?.remove();
+    const el = document.getElementById('pmxHeaderModal');
+    if (el) el.remove();
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxHeaderModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
+        <div style="background:#1e293b;border-radius:20px;padding:28px;width:90%;max-width:560px;max-height:90vh;overflow-y:auto;border:1px solid #7c3aed;position:relative;">
+            <button onclick="document.getElementById('pmxHeaderModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:20px;width:32px;height:32px;border-radius:50%;cursor:pointer;">✕</button>
+            <h3 style="color:#a78bfa;margin:0 0 20px;font-size:17px;">⭐ প্রিমিয়াম হেডার ম্যানেজমেন্ট</h3>
+            <div style="background:#0f172a;border-radius:12px;padding:16px;margin-bottom:16px;">
+                <input id="pmxHdrImg" type="text" placeholder="ছবির লিংক" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
+                <input id="pmxHdrName" type="text" placeholder="হেডারের নাম" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
+                <input id="pmxHdrTB" type="text" placeholder="TB কোড (ঐচ্ছিক)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;">
+                <button onclick="pmxPublishHeader()" style="width:100%;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">✅ পাবলিশ করুন</button>
+            </div>
+            <div id="pmxHeaderList">${pmxRenderHeaderList()}</div>
+        </div>
+    </div>`);
+}
+function pmxPublishHeader() {
+    const img = document.getElementById('pmxHdrImg')?.value.trim();
+    const name = document.getElementById('pmxHdrName')?.value.trim();
+    const tb = document.getElementById('pmxHdrTB')?.value.trim();
+    if (!name) { showToast('❌ নাম দিন!'); return; }
+    const headers = pmxGetAll(PMX_KEYS.HEADERS);
+    const h = { id: Date.now(), img: img||'', name, tb: tb||'' };
+    headers.push(h);
+    localStorage.setItem(PMX_KEYS.HEADERS, JSON.stringify(headers));
+    const db = pmxDb();
+    if (db) db.collection('pmx_headers').doc(String(h.id)).set(h);
+    pmxPushCloud('pmx_headers');
+    ['pmxHdrImg','pmxHdrName','pmxHdrTB'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    const list = document.getElementById('pmxHeaderList');
+    if (list) list.innerHTML = pmxRenderHeaderList();
+    pmxRefreshDisplay();
+    showToast('✅ প্রিমিয়াম হেডার পাবলিশ হয়েছে!');
+}
+function pmxRenderHeaderList() {
+    const headers = pmxGetAll(PMX_KEYS.HEADERS);
+    if (!headers.length) return '<p style="color:#4b5563;text-align:center;padding:16px;">কোনো হেডার নেই</p>';
+    return headers.map(h => `
+        <div style="display:flex;align-items:center;gap:10px;background:#0f172a;border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid #374151;">
+            ${h.img ? `<img src="${h.img}" style="width:50px;height:40px;object-fit:cover;border-radius:6px;" onerror="this.style.display='none'">` : '<div style="width:50px;height:40px;background:#374151;border-radius:6px;"></div>'}
+            <div style="flex:1;">
+                <div style="color:#fff;font-weight:700;font-size:13px;">${h.name}</div>
+                ${h.tb ? `<div style="color:#6b7280;font-size:11px;">TB: ${h.tb}</div>` : ''}
+            </div>
+            <button onclick="pmxDeleteHeader(${h.id})" style="background:#ef4444;color:#fff;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:13px;">🗑</button>
+        </div>`).join('');
+}
+function pmxDeleteHeader(id) {
+    if (!confirm('এই হেডার ও এর সব প্রোডাক্ট ডিলিট হবে!')) return;
+    let headers = pmxGetAll(PMX_KEYS.HEADERS);
+    headers = headers.filter(h => h.id !== id);
+    localStorage.setItem(PMX_KEYS.HEADERS, JSON.stringify(headers));
+    // সংযুক্ত প্রোডাক্টও ডিলিট
+    let products = pmxGetAll(PMX_KEYS.PRODUCTS);
+    const toDelete = products.filter(p => p.headerId === id);
+    products = products.filter(p => p.headerId !== id);
+    localStorage.setItem(PMX_KEYS.PRODUCTS, JSON.stringify(products));
+    const db = pmxDb();
+    if (db) {
+        db.collection('pmx_headers').doc(String(id)).delete();
+        toDelete.forEach(p => db.collection('pmx_products').doc(String(p.id)).delete());
+    }
+    const list = document.getElementById('pmxHeaderList');
+    if (list) list.innerHTML = pmxRenderHeaderList();
+    pmxRefreshDisplay();
+    showToast('🗑 হেডার ও প্রোডাক্ট ডিলিট হয়েছে!');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 3. প্রিমিয়াম প্রোডাক্ট ADMIN
+// ══════════════════════════════════════════════════════════════════
+function pmxOpenProductAdmin() {
+    document.getElementById('lastPortalModal')?.remove();
+    const el = document.getElementById('pmxProductModal');
+    if (el) el.remove();
+    const headers = pmxGetAll(PMX_KEYS.HEADERS);
+    const headerOpts = headers.length
+        ? headers.map(h=>`<option value="${h.id}">${h.name}</option>`).join('')
+        : '<option value="">-- আগে হেডার তৈরি করুন --</option>';
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxProductModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
+        <div style="background:#1e293b;border-radius:20px;padding:28px;width:90%;max-width:560px;max-height:90vh;overflow-y:auto;border:1px solid #0ea5e9;position:relative;">
+            <button onclick="document.getElementById('pmxProductModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:20px;width:32px;height:32px;border-radius:50%;cursor:pointer;">✕</button>
+            <h3 style="color:#38bdf8;margin:0 0 20px;font-size:17px;">📦 প্রিমিয়াম প্রোডাক্ট পাবলিশ</h3>
+            <div style="background:#0f172a;border-radius:12px;padding:16px;margin-bottom:16px;">
+                <input id="pmxPrdImg" type="text" placeholder="ছবির লিংক" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
+                <input id="pmxPrdName" type="text" placeholder="পণ্যের নাম *" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
+                <input id="pmxPrdPrice" type="text" placeholder="দাম *" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
+                <textarea id="pmxPrdDesc" placeholder="বিস্তারিত বিবরণ" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;min-height:80px;resize:vertical;"></textarea>
+                <input id="pmxPrdTB" type="text" placeholder="TB কোড (ঐচ্ছিক)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
+                <label style="color:#94a3b8;font-size:13px;display:block;margin-bottom:6px;">হেডার সিলেক্ট করুন *</label>
+                <select id="pmxPrdHeader" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;">${headerOpts}</select>
+                <button onclick="pmxPublishProduct()" style="width:100%;background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">✅ পাবলিশ করুন</button>
+            </div>
+        </div>
+    </div>`);
+}
+function pmxPublishProduct() {
+    const img = document.getElementById('pmxPrdImg')?.value.trim();
+    const name = document.getElementById('pmxPrdName')?.value.trim();
+    const price = document.getElementById('pmxPrdPrice')?.value.trim();
+    const desc = document.getElementById('pmxPrdDesc')?.value.trim();
+    const tb = document.getElementById('pmxPrdTB')?.value.trim();
+    const headerId = Number(document.getElementById('pmxPrdHeader')?.value);
+    if (!name || !price || !headerId) { showToast('❌ নাম, দাম ও হেডার আবশ্যক!'); return; }
+    const products = pmxGetAll(PMX_KEYS.PRODUCTS);
+    const p = { id: Date.now(), img: img||'', name, price, desc: desc||'', tb: tb||'', headerId, createdAt: new Date().toISOString() };
+    products.push(p);
+    localStorage.setItem(PMX_KEYS.PRODUCTS, JSON.stringify(products));
+    const db = pmxDb();
+    if (db) db.collection('pmx_products').doc(String(p.id)).set(p);
+    pmxPushCloud('pmx_products');
+    document.getElementById('pmxProductModal')?.remove();
+    showToast('✅ প্রিমিয়াম প্রোডাক্ট পাবলিশ হয়েছে!');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 4. প্রিমিয়াম হোল্ডার ADMIN
+// ══════════════════════════════════════════════════════════════════
+function pmxOpenHolderAdmin() {
+    document.getElementById('lastPortalModal')?.remove();
+    const el = document.getElementById('pmxHolderAdminModal');
+    if (el) el.remove();
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxHolderAdminModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
+        <div style="background:#1e293b;border-radius:20px;padding:28px;width:90%;max-width:560px;max-height:90vh;overflow-y:auto;border:1px solid #10b981;position:relative;">
+            <button onclick="document.getElementById('pmxHolderAdminModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:20px;width:32px;height:32px;border-radius:50%;cursor:pointer;">✕</button>
+            <h3 style="color:#34d399;margin:0 0 20px;font-size:17px;">🏆 প্রিমিয়াম হোল্ডার বোর্ড</h3>
+            <div style="background:#0f172a;border-radius:12px;padding:16px;margin-bottom:16px;">
+                <input id="pmxHolImg" type="text" placeholder="ছবির লিংক *" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
+                <textarea id="pmxHolDesc" placeholder="বিস্তারিত (ঐচ্ছিক)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;min-height:70px;resize:vertical;"></textarea>
+                <button onclick="pmxPublishHolder()" style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">✅ পাবলিশ করুন</button>
+            </div>
+            <div id="pmxHolderList">${pmxRenderHolderList()}</div>
+        </div>
+    </div>`);
+}
+function pmxPublishHolder() {
+    const img = document.getElementById('pmxHolImg')?.value.trim();
+    const desc = document.getElementById('pmxHolDesc')?.value.trim();
+    if (!img) { showToast('❌ ছবির লিংক দিন!'); return; }
+    const holders = pmxGetAll(PMX_KEYS.HOLDERS);
+    const h = { id: Date.now(), img, desc: desc||'' };
+    holders.push(h);
+    localStorage.setItem(PMX_KEYS.HOLDERS, JSON.stringify(holders));
+    const db = pmxDb();
+    if (db) db.collection('pmx_holders').doc(String(h.id)).set(h);
+    pmxPushCloud('pmx_holders');
+    ['pmxHolImg','pmxHolDesc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    const list = document.getElementById('pmxHolderList');
+    if (list) list.innerHTML = pmxRenderHolderList();
+    showToast('✅ হোল্ডার বোর্ড পাবলিশ হয়েছে!');
+}
+function pmxRenderHolderList() {
+    const holders = pmxGetAll(PMX_KEYS.HOLDERS);
+    if (!holders.length) return '<p style="color:#4b5563;text-align:center;padding:16px;">কোনো হোল্ডার বোর্ড নেই</p>';
+    return holders.map(h => `
+        <div style="display:flex;align-items:center;gap:10px;background:#0f172a;border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid #374151;">
+            <img src="${h.img}" style="width:60px;height:45px;object-fit:cover;border-radius:6px;" onerror="this.style.display='none'">
+            <div style="flex:1;color:#94a3b8;font-size:12px;">${h.desc||'(বিবরণ নেই)'}</div>
+            <button onclick="pmxDeleteHolder(${h.id})" style="background:#ef4444;color:#fff;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;">🗑</button>
+        </div>`).join('');
+}
+function pmxDeleteHolder(id) {
+    if (!confirm('ডিলিট করবেন?')) return;
+    let holders = pmxGetAll(PMX_KEYS.HOLDERS);
+    holders = holders.filter(h => h.id !== id);
+    localStorage.setItem(PMX_KEYS.HOLDERS, JSON.stringify(holders));
+    pmxDb()?.collection('pmx_holders').doc(String(id)).delete();
+    const list = document.getElementById('pmxHolderList');
+    if (list) list.innerHTML = pmxRenderHolderList();
+    showToast('🗑 ডিলিট হয়েছে!');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 5. প্রিমিয়াম অর্ডার ADMIN
+// ══════════════════════════════════════════════════════════════════
+function pmxOpenOrderAdmin() {
+    document.getElementById('lastPortalModal')?.remove();
+    const el = document.getElementById('pmxOrderAdminModal');
+    if (el) el.remove();
+    const orders = pmxGetAll(PMX_KEYS.ORDERS);
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxOrderAdminModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
+        <div style="background:#1e293b;border-radius:20px;padding:28px;width:95%;max-width:900px;max-height:90vh;overflow-y:auto;border:1px solid #f59e0b;position:relative;">
+            <button onclick="document.getElementById('pmxOrderAdminModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:20px;width:32px;height:32px;border-radius:50%;cursor:pointer;">✕</button>
+            <h3 style="color:#fbbf24;margin:0 0 20px;font-size:17px;">🛒 প্রিমিয়াম অর্ডার ম্যানেজমেন্ট</h3>
+            <div id="pmxAdminOrderList">${pmxRenderAdminOrders()}</div>
+        </div>
+    </div>`);
+}
+function pmxRenderAdminOrders() {
+    const orders = pmxGetAll(PMX_KEYS.ORDERS);
+    if (!orders.length) return '<p style="color:#4b5563;text-align:center;padding:30px;">কোনো অর্ডার নেই</p>';
+    const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
+    const statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
+    return orders.map(o => `
+        <div style="background:#0f172a;border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid #374151;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+                <div>
+                    <div style="color:#fff;font-weight:700;font-size:14px;">${o.productName}</div>
+                    <div style="color:#94a3b8;font-size:12px;">💰 ৳${o.price} | 👤 ${o.userId||o.userMobile||'অজানা'}</div>
+                    <div style="color:#6b7280;font-size:11px;">${new Date(o.createdAt).toLocaleString('bn-BD')}</div>
+                </div>
+                <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;">${statusLabels[o.status]||o.status}</span>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button onclick="pmxSetOrderStatus('${o.id}','confirmed')" style="background:#10b981;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">✅ কনফার্ম</button>
+                <button onclick="pmxSetOrderStatus('${o.id}','pending')" style="background:#f59e0b;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">⏳ পেন্ডিং</button>
+                <button onclick="pmxSetOrderStatus('${o.id}','rejected')" style="background:#ef4444;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">❌ রিজেক্ট</button>
+                <button onclick="pmxSetOrderStatus('${o.id}','delivered')" style="background:#6366f1;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">🚚 ডেলিভারি</button>
+                <button onclick="pmxOpenOrderDetail('${o.id}')" style="background:#334155;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">📋 বিস্তারিত</button>
+                <button onclick="pmxAdminDeleteOrder('${o.id}')" style="background:#7f1d1d;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">🗑 ডিলিট</button>
+            </div>
+        </div>`).join('');
+}
+function pmxSetOrderStatus(orderId, status) {
+    let orders = pmxGetAll(PMX_KEYS.ORDERS);
+    const idx = orders.findIndex(o => String(o.id) === String(orderId));
+    if (idx === -1) return;
+    orders[idx].status = status;
+    localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(orders));
+    pmxDb()?.collection('pmx_orders').doc(String(orderId)).update({ status });
+    const list = document.getElementById('pmxAdminOrderList');
+    if (list) list.innerHTML = pmxRenderAdminOrders();
+    showToast('✅ স্ট্যাটাস আপডেট হয়েছে!');
+}
+function pmxAdminDeleteOrder(orderId) {
+    if (!confirm('অর্ডার ডিলিট করবেন?')) return;
+    let orders = pmxGetAll(PMX_KEYS.ORDERS);
+    orders = orders.filter(o => String(o.id) !== String(orderId));
+    localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(orders));
+    pmxDb()?.collection('pmx_orders').doc(String(orderId)).delete();
+    const list = document.getElementById('pmxAdminOrderList');
+    if (list) list.innerHTML = pmxRenderAdminOrders();
+    showToast('🗑 অর্ডার ডিলিট হয়েছে!');
+}
+function pmxOpenOrderDetail(orderId) {
+    const orders = pmxGetAll(PMX_KEYS.ORDERS);
+    const o = orders.find(o => String(o.id) === String(orderId));
+    if (!o) return;
+    const products = pmxGetAll(PMX_KEYS.PRODUCTS);
+    let prod = products.find(p => String(p.id) === String(o.productId));
+    if (!prod && o.tbCode) prod = products.find(p => p.tb && p.tb.toLowerCase() === o.tbCode.toLowerCase());
+    const el = document.getElementById('pmxOrderDetailModal');
+    if (el) el.remove();
+    const comments = o.comments || [];
+    const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxOrderDetailModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
+        <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:560px;max-height:90vh;overflow-y:auto;border:1px solid #334155;position:relative;">
+            <button onclick="document.getElementById('pmxOrderDetailModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
+            <h3 style="color:#fbbf24;margin:0 0 16px;font-size:16px;">📋 অর্ডার বিস্তারিত</h3>
+            ${prod?.img ? `<img src="${prod.img}" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
+            <div style="background:#0f172a;border-radius:10px;padding:14px;margin-bottom:14px;">
+                <div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:6px;">${o.productName}</div>
+                <div style="color:#10b981;font-size:15px;font-weight:700;margin-bottom:6px;">৳${o.price}</div>
+                <div style="color:#94a3b8;font-size:13px;margin-bottom:6px;">${prod?.desc||o.desc||''}</div>
+                <div style="color:#6b7280;font-size:12px;">👤 ${o.userId||''} | 📱 ${o.userMobile||''}</div>
+                <div style="margin-top:10px;"><span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">${o.status}</span></div>
+            </div>
+            <div style="background:#0f172a;border-radius:10px;padding:14px;">
+                <div style="color:#a78bfa;font-weight:700;margin-bottom:10px;">💬 কমেন্ট</div>
+                <div id="pmxDetailComments" style="max-height:180px;overflow-y:auto;margin-bottom:12px;">${pmxRenderComments(comments)}</div>
+                <div style="display:flex;gap:8px;">
+                    <input id="pmxAdminComment" placeholder="Admin কমেন্ট লিখুন..." style="flex:1;padding:8px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;font-family:'Hind Siliguri',sans-serif;">
+                    <button onclick="pmxAddComment('${orderId}','admin')" style="background:#6366f1;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">পাঠান</button>
+                </div>
+            </div>
+        </div>
+    </div>`);
+}
+function pmxRenderComments(comments) {
+    if (!comments.length) return '<p style="color:#4b5563;font-size:13px;text-align:center;">কোনো কমেন্ট নেই</p>';
+    return comments.map(c => `
+        <div style="background:${c.role==='admin'?'rgba(99,102,241,0.15)':'rgba(16,185,129,0.1)'};border-radius:8px;padding:8px 10px;margin-bottom:8px;border-left:3px solid ${c.role==='admin'?'#6366f1':'#10b981'};">
+            <div style="color:${c.role==='admin'?'#818cf8':'#34d399'};font-size:11px;font-weight:700;margin-bottom:4px;">${c.role==='admin'?'👨‍💼 Admin':'👤 User'} · ${new Date(c.time).toLocaleString('bn-BD')}</div>
+            <div style="color:#e2e8f0;font-size:13px;">${c.text}</div>
+        </div>`).join('');
+}
+function pmxAddComment(orderId, role) {
+    const inputId = role === 'admin' ? 'pmxAdminComment' : 'pmxUserComment';
+    const text = document.getElementById(inputId)?.value.trim();
+    if (!text) return;
+    let orders = pmxGetAll(PMX_KEYS.ORDERS);
+    const idx = orders.findIndex(o => String(o.id) === String(orderId));
+    if (idx === -1) return;
+    if (!orders[idx].comments) orders[idx].comments = [];
+    const comment = { role, text, time: new Date().toISOString() };
+    orders[idx].comments.push(comment);
+    localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(orders));
+    pmxDb()?.collection('pmx_orders').doc(String(orderId)).update({ comments: orders[idx].comments });
+    const el = document.getElementById(inputId);
+    if (el) el.value = '';
+    const commentEl = document.getElementById('pmxDetailComments');
+    if (commentEl) commentEl.innerHTML = pmxRenderComments(orders[idx].comments);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 6. USER — প্রিমিয়াম হেডার DISPLAY (sironam এর নিচে)
+// ══════════════════════════════════════════════════════════════════
+function pmxRefreshDisplay() {
+    const container = document.getElementById('pmx-header-display');
+    if (!container) return;
+    const headers = pmxGetAll(PMX_KEYS.HEADERS);
+    if (!headers.length) { container.innerHTML = ''; return; }
+    container.innerHTML = `
+        <div style="padding:16px 0 8px;">
+            <h3 style="color:#a78bfa;font-size:16px;font-weight:700;margin:0 0 14px;padding:0 16px;">⭐ প্রিমিয়াম প্রোডাক্ট</h3>
+            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:0 16px;overflow-x:auto;">
+                ${headers.map(h => `
+                    <div onclick="pmxOpenHeaderShop(${h.id},'${h.name.replace(/'/g,"\\'")}','${h.img}')" style="cursor:pointer;text-align:center;background:#1e293b;border-radius:12px;padding:10px 6px;border:1px solid #334155;transition:all 0.2s;" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='#334155'">
+                        <img src="${h.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;margin-bottom:6px;" onerror="this.src='ko.jpeg'">
+                        <div style="color:#e2e8f0;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.name}</div>
+                    </div>`).join('')}
+            </div>
+        </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 7. হেডার SHOP — ইউজার ক্লিক করলে
+// ══════════════════════════════════════════════════════════════════
+function pmxOpenHeaderShop(headerId, headerName, headerImg) {
+    const el = document.getElementById('pmxHeaderShopModal');
+    if (el) el.remove();
+    const allProducts = pmxGetAll(PMX_KEYS.PRODUCTS);
+    const products = allProducts.filter(p => p.headerId === headerId || String(p.headerId) === String(headerId));
+    const holders = pmxGetAll(PMX_KEYS.HOLDERS);
+    const holderSlides = holders.length
+        ? holders.map((h,i) => `<div style="position:absolute;inset:0;display:${i===0?'block':'none'};"><img src="${h.img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"></div>`).join('')
+        : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#4b5563;">হোল্ডার বোর্ড এখনো নেই</div>';
+
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxHeaderShopModal" style="position:fixed;inset:0;background:#0f172a;z-index:999999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;">
+        <div style="position:sticky;top:0;background:#1e293b;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155;z-index:10;">
+            <h2 style="color:#a78bfa;margin:0;font-size:17px;font-weight:700;">⭐ ${headerName}</h2>
+            <button onclick="document.getElementById('pmxHeaderShopModal').remove()" style="background:#ef4444;color:#fff;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:700;font-family:'Hind Siliguri',sans-serif;">✕ বন্ধ</button>
+        </div>
+        <!-- হোল্ডার বোর্ড -->
+        <div id="pmxHolderBoard" style="width:100%;max-width:1520px;height:350px;margin:20px auto;background:#111827;border-radius:14px;overflow:hidden;border:1px solid #334151;position:relative;">
+            ${holderSlides}
+        </div>
+        <!-- প্রোডাক্ট গ্রিড -->
+        <div style="padding:20px;max-width:1520px;margin:0 auto;">
+            ${!products.length
+                ? '<p style="color:#4b5563;text-align:center;padding:40px;">এই হেডারে কোনো প্রোডাক্ট নেই</p>'
+                : `<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:14px;">
+                    ${products.map(p => `
+                        <div style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;text-align:center;">
+                            <img src="${p.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:cover;" onerror="this.src='ko.jpeg'">
+                            <div style="padding:8px;">
+                                <div style="color:#e2e8f0;font-size:12px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+                                <div style="color:#10b981;font-size:13px;font-weight:700;margin-bottom:8px;">৳${p.price}</div>
+                                <button onclick="pmxOpenBuyModal('${p.id}')" style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:6px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Hind Siliguri',sans-serif;">🛒 Buy</button>
+                            </div>
+                        </div>`).join('')}
+                </div>`}
+        </div>
+    </div>`);
+
+    // holder slide auto
+    if (holders.length > 1) {
+        let hi = 0;
+        setInterval(() => {
+            const board = document.getElementById('pmxHolderBoard');
+            if (!board) return;
+            const slides = board.querySelectorAll('div[style*="position:absolute"]');
+            if (!slides.length) return;
+            slides[hi].style.display = 'none';
+            hi = (hi + 1) % slides.length;
+            slides[hi].style.display = 'block';
+        }, 4000);
+    }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 8. BUY MODAL
+// ══════════════════════════════════════════════════════════════════
+function pmxOpenBuyModal(productId) {
+    const products = pmxGetAll(PMX_KEYS.PRODUCTS);
+    const p = products.find(p => String(p.id) === String(productId));
+    if (!p) return;
+    const el = document.getElementById('pmxBuyModal');
+    if (el) el.remove();
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxBuyModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
+        <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto;border:1px solid #10b981;position:relative;">
+            <button onclick="document.getElementById('pmxBuyModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
+            ${p.img ? `<img src="${p.img}" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
+            <div style="color:#fff;font-size:17px;font-weight:700;margin-bottom:4px;">${p.name}</div>
+            <div style="color:#10b981;font-size:16px;font-weight:700;margin-bottom:8px;">৳${p.price}</div>
+            ${p.desc ? `<div style="color:#94a3b8;font-size:13px;margin-bottom:14px;line-height:1.5;">${p.desc}</div>` : ''}
+            <div style="background:#0f172a;border-radius:12px;padding:14px;margin-bottom:14px;">
+                <input id="pmxBuyUserId" placeholder="ইউজার আইডি / মোবাইল / লিংক" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+                <input id="pmxBuyMobile" placeholder="মোবাইল নম্বর" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+                <div style="background:rgba(245,158,11,0.1);border:1px solid #f59e0b;border-radius:8px;padding:10px;font-size:12px;color:#fcd34d;line-height:1.6;margin-bottom:14px;">
+                    📌 অর্ডার হওয়ার পর আপনাকে মেসেজ দিয়ে বিস্তারিত জানতে চাওয়া হবে। কোনো কিছু ভুল বা না বুঝলে ওখানে জানিয়ে দেওয়া হবে। তাই অর্ডার করুন, পরে সংশোধন করতে পারবেন।
+                </div>
+                <button onclick="pmxPlaceOrder('${p.id}')" style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:14px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">🛒 Buy করুন</button>
+            </div>
+        </div>
+    </div>`);
+}
+function pmxPlaceOrder(productId) {
+    const userId = document.getElementById('pmxBuyUserId')?.value.trim();
+    const mobile = document.getElementById('pmxBuyMobile')?.value.trim();
+    if (!userId && !mobile) { showToast('❌ ইউজার আইডি বা মোবাইল দিন!'); return; }
+    const products = pmxGetAll(PMX_KEYS.PRODUCTS);
+    const p = products.find(p => String(p.id) === String(productId));
+    if (!p) return;
+    const orders = pmxGetAll(PMX_KEYS.ORDERS);
+    const order = {
+        id: 'PMX' + Date.now(),
+        productId: p.id, productName: p.name, price: p.price,
+        desc: p.desc||'', img: p.img||'', tbCode: p.tb||'',
+        userId, userMobile: mobile,
+        status: 'pending', comments: [],
+        createdAt: new Date().toISOString()
+    };
+    orders.push(order);
+    localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(orders));
+    const db = pmxDb();
+    if (db) db.collection('pmx_orders').doc(order.id).set(order);
+    pmxPushCloud('pmx_orders');
+    document.getElementById('pmxBuyModal')?.remove();
+    showToast('✅ অর্ডার সফল! প্রিমিয়াম ডিটেইলস এ যান।');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 9. USER — প্রিমিয়াম ডিটেইলস (My Account)
+// ══════════════════════════════════════════════════════════════════
+function pmxOpenUserOrders() {
+    const el = document.getElementById('pmxUserOrderModal');
+    if (el) el.remove();
+    const cu = appState.currentUser;
+    if (!cu) { showToast('❌ লগইন করুন!'); return; }
+    const orders = pmxGetAll(PMX_KEYS.ORDERS).filter(o =>
+        String(o.userId) === String(cu.id) ||
+        String(o.userId) === String(cu.mobile) ||
+        String(o.userMobile) === String(cu.mobile)
+    );
+    const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
+    const statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxUserOrderModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
+        <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:600px;max-height:90vh;overflow-y:auto;border:1px solid #7c3aed;position:relative;">
+            <button onclick="document.getElementById('pmxUserOrderModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
+            <h3 style="color:#a78bfa;margin:0 0 20px;font-size:17px;">⭐ প্রিমিয়াম ডিটেইলস</h3>
+            ${!orders.length
+                ? '<p style="color:#4b5563;text-align:center;padding:30px;">কোনো অর্ডার নেই</p>'
+                : orders.map(o => `
+                <div style="background:#0f172a;border-radius:12px;padding:14px;margin-bottom:12px;border:1px solid #374151;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                        <div>
+                            <div style="color:#fff;font-weight:700;font-size:14px;">${o.productName}</div>
+                            <div style="color:#10b981;font-weight:700;">৳${o.price}</div>
+                        </div>
+                        <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;">${statusLabels[o.status]||o.status}</span>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button onclick="pmxOpenUserOrderDetail('${o.id}')" style="background:#6366f1;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">📋 বিস্তারিত</button>
+                        ${o.status==='pending' ? `<button onclick="pmxUserDeleteOrder('${o.id}')" style="background:#ef4444;color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:'Hind Siliguri',sans-serif;">🗑 ডিলিট</button>` : ''}
+                    </div>
+                </div>`).join('')}
+        </div>
+    </div>`);
+}
+function pmxUserDeleteOrder(orderId) {
+    if (!confirm('অর্ডার ডিলিট করবেন?')) return;
+    let orders = pmxGetAll(PMX_KEYS.ORDERS);
+    orders = orders.filter(o => String(o.id) !== String(orderId));
+    localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(orders));
+    pmxDb()?.collection('pmx_orders').doc(String(orderId)).delete();
+    document.getElementById('pmxUserOrderModal')?.remove();
+    pmxOpenUserOrders();
+    showToast('🗑 ডিলিট হয়েছে!');
+}
+function pmxOpenUserOrderDetail(orderId) {
+    const orders = pmxGetAll(PMX_KEYS.ORDERS);
+    const o = orders.find(o => String(o.id) === String(orderId));
+    if (!o) return;
+    const el = document.getElementById('pmxUserDetailModal');
+    if (el) el.remove();
+    const comments = o.comments || [];
+    const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxUserDetailModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
+        <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;border:1px solid #334155;position:relative;">
+            <button onclick="document.getElementById('pmxUserDetailModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
+            ${o.img ? `<img src="${o.img}" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
+            <div style="background:#0f172a;border-radius:10px;padding:14px;margin-bottom:14px;">
+                <div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:4px;">${o.productName}</div>
+                <div style="color:#10b981;font-size:15px;font-weight:700;margin-bottom:6px;">৳${o.price}</div>
+                <div style="color:#94a3b8;font-size:13px;margin-bottom:8px;">${o.desc||''}</div>
+                <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">${o.status}</span>
+            </div>
+            <div style="background:#0f172a;border-radius:10px;padding:14px;">
+                <div style="color:#a78bfa;font-weight:700;margin-bottom:10px;">💬 Admin এর সাথে যোগাযোগ</div>
+                <div id="pmxUserComments" style="max-height:160px;overflow-y:auto;margin-bottom:12px;">${pmxRenderComments(comments)}</div>
+                <div style="display:flex;gap:8px;">
+                    <input id="pmxUserComment" placeholder="মেসেজ লিখুন..." style="flex:1;padding:8px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;font-family:'Hind Siliguri',sans-serif;">
+                    <button onclick="pmxAddComment('${orderId}','user')" style="background:#10b981;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">পাঠান</button>
+                </div>
+            </div>
+        </div>
+    </div>`);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// 10. PAGE LOAD — display + Firebase sync
+// ══════════════════════════════════════════════════════════════════
+window.addEventListener('load', function() {
+    pmxRefreshDisplay();
+    // Firebase থেকে sync
+    const db = pmxDb();
+    if (db) {
+        ['pmx_headers','pmx_products','pmx_orders','pmx_holders'].forEach(col => {
+            db.collection(col).get().then(snap => {
+                const arr = snap.docs.map(d => d.data());
+                if (arr.length) {
+                    localStorage.setItem(col, JSON.stringify(arr));
+                    if (col === 'pmx_headers') pmxRefreshDisplay();
+                }
+            }).catch(()=>{});
+        });
+    }
+});

@@ -154,6 +154,7 @@
                 </li>
                 <li class="dp-item" onclick="openModal('orderTrackingModal')"><i class="fa fa-box-open"></i> ভিউ অর্ডার (ট্র্যাকিং)</li>
                 <li class="dp-item" onclick="openUserOrders()"><i class="fa fa-shopping-bag"></i> আমার অর্ডার</li>
+                <li class="dp-item" onclick="pmxOpenUserOrders()" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);"><i class="fa fa-crown" style="color:#a78bfa;"></i> ⭐ প্রিমিয়াম ডিটেইলস</li>
 
                 <li class="dp-item" onclick="openUserCart()">
                 <i class="fa fa-shopping-cart"></i> ইউর কার্ট
@@ -496,6 +497,9 @@ document.addEventListener('click', function(event) {
     
 </div>
 <div id="sironam-portal-display" class="sironam-grid-container"></div>
+
+<!-- প্রিমিয়াম প্রোডাক্ট হেডার -->
+<div id="pmx-header-display" style="padding:0 0 10px;"></div>
 
 </main>
 <div id="aboutUsModal" style="display:none; position:fixed; z-index:90999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.98); overflow-y:auto; font-family:'Segoe UI', Roboto, sans-serif;">
