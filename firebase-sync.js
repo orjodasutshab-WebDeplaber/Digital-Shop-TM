@@ -438,10 +438,31 @@ function startListeners() {
     setLocal('night_boards', arr);
     _pulling = false;
     console.log('[FB] ↻ Night boards updated:', arr.length);
-    // landing page এ refresh করা
     if (typeof window.renderNightBoardLanding === 'function') {
       window.renderNightBoardLanding();
     }
+  });
+
+  // ── pmx_orders listener — admin থেকে status/comment update হলে user document sync ──
+  db.collection('pmx_orders').onSnapshot(snap => {
+    snap.docChanges().forEach(change => {
+      if (change.type === 'modified' || change.type === 'added') {
+        const order = change.doc.data();
+        if (!order || !order.loggedUserId) return;
+        // User document এ pmxOrders array update করা
+        const userRef = db.collection('users').doc(String(order.loggedUserId));
+        userRef.get().then(doc => {
+          if (!doc.exists) return;
+          const pmxOrders = doc.data().pmxOrders || [];
+          const idx = pmxOrders.findIndex(o => String(o.id) === String(order.id));
+          if (idx >= 0) {
+            // শুধু status ও comments update করা (order data মুছব না)
+            pmxOrders[idx] = { ...pmxOrders[idx], status: order.status, comments: order.comments || [] };
+            userRef.set({ pmxOrders }, { merge: true });
+          }
+        }).catch(() => {});
+      }
+    });
   });
 
   console.log('[FB] Listeners started');

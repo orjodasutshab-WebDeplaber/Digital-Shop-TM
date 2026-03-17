@@ -9907,8 +9907,24 @@ function pmxSetOrderStatus(orderId, status) {
     const idx = orders.findIndex(o => String(o.id) === String(orderId));
     if (idx === -1) return;
     orders[idx].status = status;
+    const loggedId = orders[idx].loggedUserId;
     localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(orders));
-    pmxDb()?.collection('pmx_orders').doc(String(orderId)).update({ status });
+    const db = pmxDb();
+    // pmx_orders collection update
+    if (db) db.collection('pmx_orders').doc(String(orderId)).update({ status }).catch(()=>{});
+    // ── User document এও status sync ──
+    if (db && loggedId) {
+        const userRef = db.collection('users').doc(String(loggedId));
+        userRef.get().then(doc => {
+            if (!doc.exists) return;
+            const pmxOrders = doc.data().pmxOrders || [];
+            const oidx = pmxOrders.findIndex(o => String(o.id) === String(orderId));
+            if (oidx >= 0) {
+                pmxOrders[oidx].status = status;
+                userRef.set({ pmxOrders }, { merge: true });
+            }
+        }).catch(()=>{});
+    }
     const list = document.getElementById('pmxAdminOrderList');
     if (list) list.innerHTML = pmxRenderAdminOrders();
     showToast('✅ স্ট্যাটাস আপডেট হয়েছে!');
@@ -9992,13 +10008,29 @@ function pmxAddComment(orderId, role) {
     if (!orders[idx].comments) orders[idx].comments = [];
     const comment = { role, text, time: new Date().toISOString() };
     orders[idx].comments.push(comment);
+    const updatedComments = orders[idx].comments;
     localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(orders));
-    pmxDb()?.collection('pmx_orders').doc(String(orderId)).update({ comments: orders[idx].comments });
+    const db = pmxDb();
+    // pmx_orders collection এ update
+    if (db) db.collection('pmx_orders').doc(String(orderId)).update({ comments: updatedComments }).catch(()=>{});
+    // ── User document এও comment sync ──
+    const loggedId = orders[idx].loggedUserId;
+    if (db && loggedId) {
+        const userRef = db.collection('users').doc(String(loggedId));
+        userRef.get().then(doc => {
+            if (!doc.exists) return;
+            const pmxOrders = doc.data().pmxOrders || [];
+            const oidx = pmxOrders.findIndex(o => String(o.id) === String(orderId));
+            if (oidx >= 0) {
+                pmxOrders[oidx].comments = updatedComments;
+                userRef.set({ pmxOrders }, { merge: true });
+            }
+        }).catch(()=>{});
+    }
     const el = document.getElementById(inputId);
     if (el) el.value = '';
-    // admin বা user যেকোনো comment el refresh
     const commentEl = document.getElementById('pmxDetailComments') || document.getElementById('pmxUserComments');
-    if (commentEl) commentEl.innerHTML = pmxRenderComments(orders[idx].comments);
+    if (commentEl) commentEl.innerHTML = pmxRenderComments(updatedComments);
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -10201,8 +10233,20 @@ function pmxPlaceOrder(productId) {
     orders.push(order);
     localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(orders));
     const db = pmxDb();
+    // ── Admin এর জন্য pmx_orders collection এ রাখা ──
     if (db) db.collection('pmx_orders').doc(order.id).set(order);
-    pmxPushCloud('pmx_orders');
+    // ── User নিজের document এ pmxOrders array তে save ──
+    if (db && cu && cu.id) {
+        const userRef = db.collection('users').doc(String(cu.id));
+        userRef.get().then(doc => {
+            const existing = doc.exists ? (doc.data().pmxOrders || []) : [];
+            // duplicate check
+            if (!existing.find(o => o.id === order.id)) {
+                existing.push(order);
+            }
+            userRef.set({ pmxOrders: existing }, { merge: true });
+        }).catch(e => console.warn('[PMX] user order save:', e.message));
+    }
     document.getElementById('pmxBuyModal')?.remove();
     // Success popup
     const popup = document.createElement('div');
@@ -10225,6 +10269,31 @@ function pmxOpenUserOrders() {
     if (el) el.remove();
     const cu = appState.currentUser;
     if (!cu) { showToast('❌ লগইন করুন!'); return; }
+
+    // ── Firebase থেকে user এর নিজের orders লোড ──
+    const db = pmxDb();
+    if (db && cu.id) {
+        db.collection('users').doc(String(cu.id)).get().then(doc => {
+            const orders = doc.exists ? (doc.data().pmxOrders || []) : [];
+            // localStorage এও sync রাখা (শুধু এই user এর)
+            const allOrders = pmxGetAll(PMX_KEYS.ORDERS).filter(o =>
+                String(o.loggedUserId) !== String(cu.id) &&
+                String(o.loggedUserMobile) !== String(cu.mobile||cu.phone||'')
+            );
+            const merged = [...allOrders, ...orders];
+            localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(merged));
+            _pmxRenderUserOrderModal(orders);
+        }).catch(() => {
+            // Firebase fail হলে localStorage থেকে fallback
+            const orders = pmxGetAll(PMX_KEYS.ORDERS).filter(o =>
+                String(o.loggedUserId) === String(cu.id) ||
+                String(o.loggedUserMobile) === String(cu.mobile||cu.phone||'')
+            );
+            _pmxRenderUserOrderModal(orders);
+        });
+        return;
+    }
+    // db না থাকলে localStorage fallback
     const orders = pmxGetAll(PMX_KEYS.ORDERS).filter(o =>
         String(o.loggedUserId) === String(cu.id) ||
         String(o.loggedUserMobile) === String(cu.mobile||cu.phone||'') ||
@@ -10232,6 +10301,11 @@ function pmxOpenUserOrders() {
         String(o.userId) === String(cu.mobile||cu.phone||'') ||
         String(o.userMobile) === String(cu.mobile||cu.phone||'')
     );
+    _pmxRenderUserOrderModal(orders);
+}
+
+function _pmxRenderUserOrderModal(orders) {
+    document.getElementById('pmxUserOrderModal')?.remove();
     const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
     const statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
     document.body.insertAdjacentHTML('beforeend', `
@@ -10260,22 +10334,69 @@ function pmxOpenUserOrders() {
 }
 function pmxUserDeleteOrder(orderId) {
     if (!confirm('অর্ডার ডিলিট করবেন?')) return;
+    const cu = appState.currentUser;
+    // localStorage থেকে সরানো
     let orders = pmxGetAll(PMX_KEYS.ORDERS);
     orders = orders.filter(o => String(o.id) !== String(orderId));
     localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(orders));
-    // স্থায়ী deleted list এ রাখা
+    // স্থায়ী deleted list
     const deleted = JSON.parse(localStorage.getItem('pmx_deleted_orders') || '[]');
     if (!deleted.includes(String(orderId))) deleted.push(String(orderId));
     localStorage.setItem('pmx_deleted_orders', JSON.stringify(deleted));
-    // Firebase থেকে delete
-    pmxDb()?.collection('pmx_orders').doc(String(orderId)).delete();
+    const db = pmxDb();
+    // ── pmx_orders collection থেকে delete ──
+    if (db) db.collection('pmx_orders').doc(String(orderId)).delete().catch(()=>{});
+    // ── User document এ pmxOrders থেকেও সরানো ──
+    if (db && cu && cu.id) {
+        const userRef = db.collection('users').doc(String(cu.id));
+        userRef.get().then(doc => {
+            if (!doc.exists) return;
+            const pmxOrders = (doc.data().pmxOrders || []).filter(o => String(o.id) !== String(orderId));
+            userRef.set({ pmxOrders }, { merge: true });
+        }).catch(e => console.warn('[PMX] user order delete:', e.message));
+    }
     document.getElementById('pmxUserOrderModal')?.remove();
     pmxOpenUserOrders();
     showToast('🗑 ডিলিট হয়েছে!');
 }
 function pmxOpenUserOrderDetail(orderId) {
+    const cu = appState.currentUser;
+    const db = pmxDb();
+    // Firebase থেকে latest order data লোড (comments update থাকে)
+    if (db && cu && cu.id) {
+        db.collection('users').doc(String(cu.id)).get().then(doc => {
+            const pmxOrders = doc.exists ? (doc.data().pmxOrders || []) : [];
+            const o = pmxOrders.find(o => String(o.id) === String(orderId));
+            if (o) {
+                // localStorage sync
+                let allOrders = pmxGetAll(PMX_KEYS.ORDERS);
+                const idx = allOrders.findIndex(x => String(x.id) === String(orderId));
+                if (idx >= 0) allOrders[idx] = o; else allOrders.push(o);
+                localStorage.setItem(PMX_KEYS.ORDERS, JSON.stringify(allOrders));
+                _pmxRenderUserDetailModal(o);
+            } else {
+                // pmx_orders collection থেকে fallback
+                db.collection('pmx_orders').doc(String(orderId)).get().then(d => {
+                    if (d.exists) _pmxRenderUserDetailModal(d.data());
+                }).catch(() => {
+                    const orders = pmxGetAll(PMX_KEYS.ORDERS);
+                    const o2 = orders.find(o => String(o.id) === String(orderId));
+                    if (o2) _pmxRenderUserDetailModal(o2);
+                });
+            }
+        }).catch(() => {
+            const orders = pmxGetAll(PMX_KEYS.ORDERS);
+            const o = orders.find(o => String(o.id) === String(orderId));
+            if (o) _pmxRenderUserDetailModal(o);
+        });
+        return;
+    }
     const orders = pmxGetAll(PMX_KEYS.ORDERS);
     const o = orders.find(o => String(o.id) === String(orderId));
+    if (!o) return;
+    _pmxRenderUserDetailModal(o);
+}
+function _pmxRenderUserDetailModal(o) {
     if (!o) return;
     const el = document.getElementById('pmxUserDetailModal');
     if (el) el.remove();
