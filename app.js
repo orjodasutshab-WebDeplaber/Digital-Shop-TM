@@ -4447,6 +4447,22 @@ window.deleteStatusHistory = function(retId, index) {
 
 
 
+function openImgZoom(src) {
+    const existing = document.getElementById('imgZoomOverlay');
+    if (existing) existing.remove();
+    const overlay = document.createElement('div');
+    overlay.id = 'imgZoomOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:999999999999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;animation:fadeIn 0.2s ease;';
+    overlay.innerHTML = `
+        <button onclick="document.getElementById('imgZoomOverlay').remove()" style="position:absolute;top:16px;right:20px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:22px;width:42px;height:42px;border-radius:50%;cursor:pointer;z-index:10;font-weight:bold;">✕</button>
+        <img src="${src}" style="max-width:95vw;max-height:92vh;object-fit:contain;border-radius:8px;box-shadow:0 0 60px rgba(0,0,0,0.8);user-select:none;" onerror="this.src='ko.jpeg'">
+        <div style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.5);font-size:12px;">যেকোনো জায়গায় ক্লিক করে বন্ধ করুন</div>`;
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) overlay.remove();
+    });
+    document.body.appendChild(overlay);
+}
+
 function openProductDetails(productId) {
     // ১. প্রোডাক্ট খুঁজে বের করা
     const item = appState.products.find(p => String(p.id) === String(productId));
@@ -4546,9 +4562,9 @@ function openProductDetails(productId) {
                     <div style="flex:1; min-width:320px;">
                         <div style="background:#000; border-radius:20px; overflow:hidden; height:450px; position:relative; border:1px solid #334155; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);">
                             <div id="modalGallery" style="display:flex; overflow-x:auto; scroll-snap-type:x mandatory; height:100%; scrollbar-width:none;">
-                                ${images.map(img => `<img src="${img}" style="min-width:100%; height:100%; object-fit:contain; scroll-snap-align:start;">`).join('')}
+                                ${images.map(img => `<img src="${img}" style="min-width:100%; height:100%; object-fit:contain; scroll-snap-align:start; cursor:zoom-in; transition:transform 0.2s;" onclick="openImgZoom('${img}')" title="ক্লিক করুন বড় দেখতে">`).join('')}
                             </div>
-                            <div style="position:absolute; bottom:15px; width:100%; text-align:center; color:#fff; font-size:12px; background:rgba(0,0,0,0.6); padding:8px 0; backdrop-filter:blur(5px);">ডানে বা বামে স্লাইড করুন ↔️</div>
+                            <div style="position:absolute; bottom:15px; width:100%; text-align:center; color:#fff; font-size:12px; background:rgba(0,0,0,0.6); padding:8px 0; backdrop-filter:blur(5px);">🔍 ছবিতে ক্লিক করুন বড় দেখতে &nbsp;|&nbsp; ডানে বা বামে স্লাইড করুন ↔️</div>
                         </div>
                         
                         <div style="display:flex; gap:10px; margin-top:20px;">
