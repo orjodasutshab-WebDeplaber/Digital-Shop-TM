@@ -10041,17 +10041,131 @@ function pmxRefreshDisplay() {
     if (!container) return;
     const headers = pmxGetAll(PMX_KEYS.HEADERS);
     if (!headers.length) { container.innerHTML = ''; return; }
+    const isLoggedIn = !!appState.currentUser;
+    const clickFn = isLoggedIn ? 'pmxOpenHeaderShop' : 'pmxOpenHeaderShopGuest';
     container.innerHTML = `
         <div style="padding:16px 0 8px;">
             <h3 style="color:#a78bfa;font-size:16px;font-weight:700;margin:0 0 14px;padding:0 16px;">⭐ প্রিমিয়াম প্রোডাক্ট</h3>
             <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:0 16px;overflow-x:auto;">
                 ${headers.map(h => `
-                    <div onclick="pmxOpenHeaderShop(${h.id},'${h.name.replace(/'/g,"\\'")}','${h.img}')" style="cursor:pointer;text-align:center;background:#1e293b;border-radius:12px;padding:10px 6px;border:1px solid #334155;transition:all 0.2s;" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='#334155'">
+                    <div onclick="${clickFn}(${h.id},'${h.name.replace(/'/g,"\\'")}','${h.img||''}')" style="cursor:pointer;text-align:center;background:#1e293b;border-radius:12px;padding:10px 6px;border:1px solid #334155;transition:all 0.2s;" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='#334155'">
                         <img src="${h.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;margin-bottom:6px;" onerror="this.src='ko.jpeg'">
                         <div style="color:#e2e8f0;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.name}</div>
                     </div>`).join('')}
             </div>
         </div>`;
+    // গেস্ট ভিউ — page এ inline guest section ও update করো
+    _pmxRefreshGuestSection();
+}
+
+// গেস্ট mode এ page এ inline premium section
+function _pmxRefreshGuestSection() {
+    const gc = document.getElementById('pmx-guest-header-display');
+    if (!gc) return;
+    if (appState.currentUser) { gc.innerHTML = ''; return; } // লগইন থাকলে দরকার নেই
+    const headers = pmxGetAll(PMX_KEYS.HEADERS);
+    if (!headers.length) { gc.innerHTML = ''; return; }
+    gc.innerHTML = `
+        <div style="padding:20px 16px 10px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                <div style="height:2px;flex:1;background:linear-gradient(90deg,transparent,#7c3aed);"></div>
+                <h3 style="color:#a78bfa;font-size:15px;font-weight:800;margin:0;white-space:nowrap;">⭐ প্রিমিয়াম ক্যাটাগরি</h3>
+                <div style="height:2px;flex:1;background:linear-gradient(90deg,#7c3aed,transparent);"></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:12px;">
+                ${headers.map(h => `
+                    <div onclick="pmxOpenHeaderShopGuest(${h.id},'${h.name.replace(/'/g,"\\'")}','${h.img||''}')"
+                         style="cursor:pointer;text-align:center;background:linear-gradient(145deg,#1e293b,#0f172a);border-radius:14px;padding:10px 6px;border:1px solid #334155;transition:all 0.25s;position:relative;overflow:hidden;"
+                         onmouseover="this.style.borderColor='#a78bfa';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 20px rgba(124,58,237,0.25)'"
+                         onmouseout="this.style.borderColor='#334155';this.style.transform='translateY(0)';this.style.boxShadow='none'">
+                        <div style="position:absolute;top:4px;right:4px;background:#a78bfa;color:#fff;font-size:8px;padding:1px 5px;border-radius:10px;font-weight:700;">PRO</div>
+                        <img src="${h.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:7px;" onerror="this.src='ko.jpeg'">
+                        <div style="color:#e2e8f0;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.name}</div>
+                    </div>`).join('')}
+            </div>
+        </div>`;
+}
+
+// গেস্ট ভিউ — header shop (Buy বাটনে login redirect)
+function pmxOpenHeaderShopGuest(headerId, headerName, headerImg) {
+    const el = document.getElementById('pmxGuestHeaderShopModal');
+    if (el) el.remove();
+    const allProducts = pmxGetAll(PMX_KEYS.PRODUCTS);
+    const products = allProducts.filter(p => String(p.headerId) === String(headerId));
+    const allHolders = pmxGetAll(PMX_KEYS.HOLDERS);
+    const holders = allHolders.filter(h => !h.headerId || String(h.headerId) === String(headerId));
+    const holderSlides = holders.length
+        ? holders.map((h,i) => `<div class="pmxg-slide" style="position:absolute;inset:0;display:${i===0?'block':'none'};"><img src="${h.img}" style="width:100%;height:100%;object-fit:fill;" onerror="this.style.opacity='0'"></div>`).join('')
+        : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#4b5563;font-size:14px;">হোল্ডার বোর্ড এখনো নেই</div>';
+
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxGuestHeaderShopModal" style="position:fixed;inset:0;background:#0f172a;z-index:999999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;">
+        <div style="position:sticky;top:0;background:#1e293b;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155;z-index:10;">
+            <h2 style="color:#a78bfa;margin:0;font-size:17px;font-weight:700;">⭐ ${headerName}</h2>
+            <button onclick="document.getElementById('pmxGuestHeaderShopModal').remove()" style="background:#ef4444;color:#fff;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:700;font-family:'Hind Siliguri',sans-serif;">✕ বন্ধ</button>
+        </div>
+        <!-- হোল্ডার বোর্ড -->
+        <div id="pmxGuestHolderBoard" style="width:100%;max-width:1520px;height:300px;margin:20px auto;background:#0a0a0a;border-radius:14px;overflow:hidden;border:1px solid #334151;position:relative;">
+            ${holderSlides}
+            ${holders.length > 1 ? `
+            <button onclick="pmxGuestSlideNav(-1)" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:2px solid rgba(255,255,255,0.3);width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;z-index:10;">&#8249;</button>
+            <button onclick="pmxGuestSlideNav(1)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:2px solid rgba(255,255,255,0.3);width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;z-index:10;">&#8250;</button>
+            <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10;">
+                ${holders.map((_,i)=>`<div id="pmxGuestDot${i}" style="width:${i===0?'20':'8'}px;height:8px;border-radius:4px;background:${i===0?'#a78bfa':'rgba(255,255,255,0.4)'};transition:all 0.3s;"></div>`).join('')}
+            </div>` : ''}
+        </div>
+        <!-- লগইন ব্যানার -->
+        <div style="margin:0 16px 20px;background:linear-gradient(135deg,#7c3aed22,#10b98122);border:1px solid #7c3aed;border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+                <div style="color:#a78bfa;font-weight:800;font-size:15px;margin-bottom:4px;">🔐 প্রিমিয়াম অ্যাক্সেস</div>
+                <div style="color:#94a3b8;font-size:12px;">কিনতে হলে আগে লগইন করুন</div>
+            </div>
+            <button onclick="window.location.href='landing.html'" style="background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border:none;padding:10px 22px;border-radius:20px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-size:14px;">🚀 লগইন করুন</button>
+        </div>
+        <!-- প্রোডাক্ট গ্রিড -->
+        <div style="padding:0 20px 20px;max-width:1520px;margin:0 auto;">
+            ${!products.length
+                ? '<p style="color:#4b5563;text-align:center;padding:40px;">এই ক্যাটাগরিতে কোনো প্রোডাক্ট নেই</p>'
+                : `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;">
+                    ${products.map(p => `
+                        <div style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;text-align:center;">
+                            <div style="position:relative;">
+                                <img src="${p.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:cover;" onerror="this.src='ko.jpeg'">
+                                <div style="position:absolute;inset:0;background:rgba(0,0,0,0.15);"></div>
+                            </div>
+                            <div style="padding:10px 8px;">
+                                <div style="color:#e2e8f0;font-size:12px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+                                <div style="color:#10b981;font-size:14px;font-weight:800;margin-bottom:10px;">৳${p.price}</div>
+                                <button onclick="window.location.href='landing.html'" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border:none;padding:8px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Hind Siliguri',sans-serif;">🔐 কিনতে লগইন করুন</button>
+                            </div>
+                        </div>`).join('')}
+                </div>`}
+        </div>
+    </div>`);
+
+    // Slider logic
+    if (holders.length > 1) {
+        window._pmxGSlideIdx = 0;
+        window._pmxGSlideTotal = holders.length;
+        window.pmxGuestSlideNav = function(dir) {
+            const board = document.getElementById('pmxGuestHolderBoard');
+            if (!board) return;
+            const slides = board.querySelectorAll('.pmxg-slide');
+            if (!slides.length) return;
+            slides[window._pmxGSlideIdx].style.display = 'none';
+            const dot = document.getElementById('pmxGuestDot' + window._pmxGSlideIdx);
+            if (dot) { dot.style.width='8px'; dot.style.background='rgba(255,255,255,0.4)'; }
+            window._pmxGSlideIdx = (window._pmxGSlideIdx + dir + window._pmxGSlideTotal) % window._pmxGSlideTotal;
+            slides[window._pmxGSlideIdx].style.display = 'block';
+            const newDot = document.getElementById('pmxGuestDot' + window._pmxGSlideIdx);
+            if (newDot) { newDot.style.width='20px'; newDot.style.background='#a78bfa'; }
+        };
+        if (window._pmxGSlideTimer) clearInterval(window._pmxGSlideTimer);
+        window._pmxGSlideTimer = setInterval(() => {
+            if (!document.getElementById('pmxGuestHolderBoard')) { clearInterval(window._pmxGSlideTimer); return; }
+            window.pmxGuestSlideNav(1);
+        }, 5000);
+    }
 }
 
 // ══════════════════════════════════════════════════════════════════
