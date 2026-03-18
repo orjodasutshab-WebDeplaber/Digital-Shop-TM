@@ -695,7 +695,7 @@ document.addEventListener('click', function(event) {
     <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;">
         <div>
             <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
-                <img src="ko.jpeg" alt="Digital Shop TM Logo" style="width:48px; height:48px; border-radius:10px; object-fit:cover; border:2px solid #10b981;" onerror="this.style.display='none'">
+                <img src="ko.jpeg" alt="Logo" style="width:48px;height:48px;border-radius:10px;object-fit:cover;border:2px solid #10b981;" onerror="this.style.display='none'">
                 <h2 style="color: #10b981; margin:0;">Digital Shop TM</h2>
             </div>
             <p style="font-size: 14px; line-height: 1.6;">আপনার বিশ্বস্ত অনলাইন শপ।</p>
@@ -730,34 +730,60 @@ document.addEventListener('click', function(event) {
                 <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" style="height: 35px;">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" style="height: 35px;">
             </div>
-            <!-- পেমেন্ট মেথড -->
-            <div style="margin-top:20px;">
-                <p style="font-size:12px;color:#6b7280;margin-bottom:10px;">পেমেন্ট মেথড:</p>
+
+            <!-- আসল পেমেন্ট লোগো -->
+            <div style="margin-top:18px;">
+                <p style="font-size:12px;color:#6b7280;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">পেমেন্ট মেথড</p>
                 <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
-                    <!-- বিকাশ -->
-                    <div style="background:#e91e8c;border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:5px;">
-                        <span style="color:#fff;font-size:12px;font-weight:800;">bKash</span>
+
+                    <!-- bKash -->
+                    <div style="background:#fff;border-radius:8px;padding:4px 8px;height:36px;display:flex;align-items:center;justify-content:center;">
+                        <svg viewBox="0 0 80 28" width="70" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="80" height="28" rx="4" fill="#E2136E"/>
+                            <text x="8" y="20" font-family="Arial Black,Arial" font-weight="900" font-size="14" fill="#fff">bKash</text>
+                        </svg>
                     </div>
-                    <!-- নগদ -->
-                    <div style="background:#f97316;border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:5px;">
-                        <span style="color:#fff;font-size:12px;font-weight:800;">Nagad</span>
+
+                    <!-- Nagad -->
+                    <div style="background:#fff;border-radius:8px;padding:4px 8px;height:36px;display:flex;align-items:center;justify-content:center;">
+                        <svg viewBox="0 0 80 28" width="70" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="80" height="28" rx="4" fill="#F15922"/>
+                            <text x="8" y="20" font-family="Arial Black,Arial" font-weight="900" font-size="14" fill="#fff">Nagad</text>
+                        </svg>
                     </div>
-                    <!-- রকেট -->
-                    <div style="background:#8b5cf6;border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:5px;">
-                        <span style="color:#fff;font-size:12px;font-weight:800;">Rocket</span>
+
+                    <!-- Rocket / DBBL -->
+                    <div style="background:#fff;border-radius:8px;padding:4px 8px;height:36px;display:flex;align-items:center;justify-content:center;">
+                        <svg viewBox="0 0 86 28" width="76" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="86" height="28" rx="4" fill="#8B008B"/>
+                            <text x="6" y="20" font-family="Arial Black,Arial" font-weight="900" font-size="13" fill="#fff">Rocket</text>
+                        </svg>
                     </div>
+
                     <!-- Dutch-Bangla -->
-                    <div style="background:#16a34a;border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:5px;">
-                        <span style="color:#fff;font-size:12px;font-weight:800;">DBBL</span>
+                    <div style="background:#fff;border-radius:8px;padding:4px 8px;height:36px;display:flex;align-items:center;justify-content:center;">
+                        <svg viewBox="0 0 52 28" width="46" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="52" height="28" rx="4" fill="#006838"/>
+                            <text x="6" y="20" font-family="Arial Black,Arial" font-weight="900" font-size="13" fill="#fff">DBBL</text>
+                        </svg>
                     </div>
-                    <!-- Islami Bank -->
-                    <div style="background:#1d4ed8;border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:5px;">
-                        <span style="color:#fff;font-size:11px;font-weight:800;">Islami Bank</span>
+
+                    <!-- Upay -->
+                    <div style="background:#fff;border-radius:8px;padding:4px 8px;height:36px;display:flex;align-items:center;justify-content:center;">
+                        <svg viewBox="0 0 60 28" width="54" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="60" height="28" rx="4" fill="#EE3424"/>
+                            <text x="8" y="20" font-family="Arial Black,Arial" font-weight="900" font-size="14" fill="#fff">Upay</text>
+                        </svg>
                     </div>
-                    <!-- UCash -->
-                    <div style="background:#dc2626;border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:5px;">
-                        <span style="color:#fff;font-size:12px;font-weight:800;">UCash</span>
+
+                    <!-- City Bank -->
+                    <div style="background:#fff;border-radius:8px;padding:4px 8px;height:36px;display:flex;align-items:center;justify-content:center;">
+                        <svg viewBox="0 0 80 28" width="70" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="80" height="28" rx="4" fill="#003087"/>
+                            <text x="6" y="20" font-family="Arial Black,Arial" font-weight="900" font-size="12" fill="#fff">City Bank</text>
+                        </svg>
                     </div>
+
                 </div>
             </div>
         </div>
