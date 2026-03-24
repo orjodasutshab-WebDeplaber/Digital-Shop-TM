@@ -57,7 +57,8 @@
 .night-board-slide img{width:100%;height:100%;object-fit:fill;display:block;}
 .night-board-slide a{display:block;width:100%;height:100%;}
 .night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:750px;}
-@media(max-width:1100px){.night-board-wrap{display:none;}}
+@media(max-width:1100px){.night-board-wrap{display:block;}}
+body.is-mobile .night-board-wrap{width:100% !important;min-height:220px !important;border-radius:12px !important;height:220px;}
 
 </style>
 <style>
@@ -67,7 +68,7 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 /* NAV */
 .top-nav{position:sticky;top:0;z-index:500;background:rgba(10,15,30,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(99,102,241,.2);padding:12px 26px;display:flex;justify-content:space-between;align-items:center;}
 .brand{display:flex;align-items:center;gap:12px;}
-.brand img{width:44px;height:44px;border-radius:11px;border:2px solid #6366f1;object-fit:fill;}
+.brand img{width:44px;height:44px;border-radius:11px;border:2px solid #6366f1;object-fit:cover;}
 .brand-name{font-size:18px;font-weight:800;}
 .brand-slogan{font-size:11px;color:#94a3b8;}
 .nav-btns{display:flex;gap:9px;}
@@ -129,7 +130,7 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 .blob2{bottom:-100px;right:-80px;width:370px;height:370px;background:rgba(168,85,247,.2);animation:bf 8s ease-in-out infinite reverse;}
 .blob3{top:50%;left:50%;transform:translate(-50%,-50%);width:270px;height:270px;background:rgba(16,185,129,.1);}
 .cta-inner{position:relative;z-index:5;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;text-align:center;padding:20px;}
-.cta-logo{width:85px;height:85px;border-radius:19px;border:3px solid rgba(255,255,255,.22);object-fit:fill;box-shadow:0 10px 28px rgba(0,0,0,.4);}
+.cta-logo{width:85px;height:85px;border-radius:19px;border:3px solid rgba(255,255,255,.22);object-fit:cover;box-shadow:0 10px 28px rgba(0,0,0,.4);}
 .cta-title{font-size:35px;font-weight:900;text-shadow:0 2px 20px rgba(0,0,0,.4);}
 .cta-sub{color:rgba(255,255,255,.58);font-size:14px;}
 .cta-btn{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;padding:15px 44px;border-radius:50px;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 13px 36px rgba(16,185,129,.4);display:flex;align-items:center;gap:10px;transition:all .3s;}
@@ -188,8 +189,8 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 @media(max-width:900px){.lb2-grid{grid-template-columns:repeat(2,1fr);}.lb2-card{height:250px;}.sir-grid{grid-template-columns:repeat(2,1fr) !important;}}
 
 /* ✅ মোবাইল স্টাইল — body.is-mobile class দিয়ে কাজ করে */
-body.is-mobile .lb2-grid{grid-template-columns:1fr;}
-body.is-mobile .lb2-card{height:220px;}
+body.is-mobile .lb2-grid{grid-template-columns:repeat(2,1fr);}
+body.is-mobile .lb2-card{height:180px;}
 body.is-mobile .cta-board{height:270px;}
 body.is-mobile .lb-wrap{height:450px;border-radius:0;margin:0;width:100%;}
 body.is-mobile .cta-title{font-size:20px;}
@@ -270,23 +271,14 @@ body.is-mobile .ft-hotline svg{width:18px;height:18px;}
     </div>
 </div>
 
-<!-- SIRONAM + NIGHT BOARD -->
+<!-- SIRONAM -->
 <div class="sec">
     <div class="sec-hd">
         <h2 class="sec-title">🌋 স্পেশাল ক্যাটাগরি</h2>
         <p class="sec-sub">আমাদের বিশেষভাবে নির্বাচিত পণ্যসমূহ — ক্লিক করুন</p>
     </div>
-    <div style="display:flex; gap:20px; align-items:flex-start; max-width:1400px; margin:0 auto;">
-        <div style="flex:1; min-width:0;">
-            <div class="sir-grid" id="sironamGrid"></div>
-        </div>
-        <!-- Night Board -->
-        <div class="night-board-wrap" id="nightBoardWrap">
-            <div id="nightBoardSlider" class="night-board-empty">
-                <i class="fa fa-moon" style="font-size:48px;margin-bottom:12px;opacity:0.3;"></i>
-                <p style="font-size:13px;">নাইট বোর্ড</p>
-            </div>
-        </div>
+    <div style="max-width:1400px; margin:0 auto;">
+        <div class="sir-grid" id="sironamGrid"></div>
     </div>
 </div>
 
@@ -302,7 +294,7 @@ body.is-mobile .ft-hotline svg{width:18px;height:18px;}
 .pmx-scroll-track::-webkit-scrollbar{display:none;}
 .pmx-cat-card{flex-shrink:0;width:170px;background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;position:relative;transition:transform .2s;box-shadow:0 4px 18px rgba(0,0,0,0.35);}
 .pmx-cat-card:active{transform:scale(0.97);}
-.pmx-cat-img{width:100%;height:150px;object-fit:fill;display:block;background:#e8e8e8;}
+.pmx-cat-img{width:100%;height:150px;object-fit:cover;display:block;background:#e8e8e8;}
 .pmx-cat-pro-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;}
 .pmx-cat-body{padding:10px 10px 12px;}
 .pmx-cat-name{color:#111;font-size:13px;font-weight:800;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -318,6 +310,16 @@ body.is-mobile .ft-hotline svg{width:18px;height:18px;}
     </div>
     <div class="pmx-scroll-track" id="pmxGuestHeaderGrid"></div>
 </div>
+</div>
+
+<!-- NIGHT BOARD — প্রিমিয়ামের নিচে -->
+<div class="sec" style="padding-top:0;">
+    <div class="night-board-wrap" id="nightBoardWrap" style="width:100%;max-width:1400px;margin:0 auto;min-height:300px;border-radius:16px;">
+        <div id="nightBoardSlider" class="night-board-empty">
+            <i class="fa fa-moon" style="font-size:48px;margin-bottom:12px;opacity:0.3;"></i>
+            <p style="font-size:13px;">নাইট বোর্ড</p>
+        </div>
+    </div>
 </div>
 
 <!-- LOCAL BOARDS -->
@@ -781,7 +783,7 @@ function openSir(sid,title){
     const ads=JSON.parse(localStorage.getItem(DELIK))||[];
     const ad=ads.find(a=>String(a.sironamId)===String(sid));
     const adBox=document.getElementById('sirDeliAd');
-    if(ad&&ad.img){adBox.style.display='block';adBox.innerHTML=`<a href="${ad.link||'#'}" target="_blank" style="display:block;width:100%;height:100%;"><img src="${ad.img}" style="width:100%;height:100%;object-fit:fill;"></a>`;}
+    if(ad&&ad.img){adBox.style.display='block';adBox.innerHTML=`<a href="${ad.link||'#'}" target="_blank" style="display:block;width:100%;height:100%;"><img src="${ad.img}" style="width:100%;height:100%;object-fit:cover;"></a>`;}
     else{adBox.style.display='none';}
     // Products
     const prods=JSON.parse(localStorage.getItem(PKK))||[];
@@ -790,7 +792,7 @@ function openSir(sid,title){
         ?`<div style="grid-column:1/-1;text-align:center;padding:55px;color:#334155;"><i class="fa fa-box-open" style="font-size:44px;display:block;margin-bottom:12px;"></i><p>এই ক্যাটাগরিতে কোনো পণ্য নেই</p></div>`
         :tagged.map(p=>`
             <div class="sp-card" style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;transition:.3s;" onmouseover="this.style.borderColor='#6366f1';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#334155';this.style.transform='none'">
-                <div style="height:175px;overflow:hidden;background:#0f172a;"><img src="${p.images?.[0]||p.img||''}" alt="${p.name||''}" style="width:100%;height:100%;object-fit:fill;" onerror="this.style.display='none'"></div>
+                <div style="height:175px;overflow:hidden;background:#0f172a;"><img src="${p.images?.[0]||p.img||''}" alt="${p.name||''}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"></div>
                 <div style="padding:11px;">
                     <div style="color:#fff;font-size:13px;font-weight:700;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" data-name="${(p.name||'').toLowerCase()}">${p.name||'পণ্য'}</div>
                     <div style="color:#10b981;font-size:15px;font-weight:800;margin-bottom:8px;">৳${p.price||0}</div>
@@ -1012,7 +1014,7 @@ function openPmxGuestShop(headerId, headerName, headerImg){
     } else {
         productGrid.innerHTML=products.map(p=>`
             <div style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;text-align:center;transition:.25s;" onmouseover="this.style.borderColor='#7c3aed';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#334155';this.style.transform='none'">
-                <img src="${p.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:fill;" onerror="this.src='ko.jpeg'">
+                <img src="${p.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:cover;" onerror="this.src='ko.jpeg'">
                 <div style="padding:10px 8px;">
                     <div style="color:#e2e8f0;font-size:12px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name||''}</div>
                     <div style="color:#10b981;font-size:15px;font-weight:800;margin-bottom:10px;">৳${p.price||0}</div>
