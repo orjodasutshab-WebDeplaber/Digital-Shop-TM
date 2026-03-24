@@ -2,7 +2,22 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3, user-scalable=yes">
+<meta name="viewport" content="width=800">
+<script>
+(function(){
+    function setScale(){
+        var sw = window.screen.width;
+        var dw = 800;
+        if(sw < dw){
+            var scale = sw / dw;
+            var vp = document.querySelector('meta[name=viewport]');
+            if(vp) vp.content = 'width='+dw+',initial-scale='+scale.toFixed(4)+',minimum-scale='+scale.toFixed(4)+',maximum-scale=3,user-scalable=yes';
+        }
+    }
+    setScale();
+    window.addEventListener('resize', setScale);
+})();
+</script>
 <title>Digital Shop TM | স্বাগতম</title>
 <link rel="icon" type="image/x-icon" href="ko.jpeg">
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -156,57 +171,37 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 @media(max-width:600px){
     .lb2-grid{grid-template-columns:1fr;}.lb2-card{height:220px;}
     .cta-board{height:270px;}.lb-wrap{height:210px;}.cta-title{font-size:20px;}
-    .two{grid-template-columns:1fr;}
-
-    /* ── NAV: লোগো ও ব্র্যান্ড নাম বড় ── */
-    .top-nav{padding:12px 14px;}
-    .brand img{width:50px !important;height:50px !important;border-radius:12px !important;}
-    .brand-name{font-size:20px !important;font-weight:800 !important;line-height:1.2;}
-    .brand-slogan{font-size:11px;}
-
-    /* ── লগইন ও সাইন আপ বাটন বড় ── */
+    .top-nav{padding:10px 13px;}
+    /* ✅ ব্র্যান্ড নাম ও স্লোগান বড় */
+    .brand-name{font-size:22px;font-weight:900;}
+    .brand-slogan{font-size:12px;}
+    .brand img{width:40px;height:40px;}
+    /* ✅ লগইন ও সাইন আপ বাটন বড় */
+    .btn-ln,.btn-su{padding:11px 18px;font-size:15px;font-weight:800;border-radius:12px;}
     .nav-btns{gap:8px;}
-    .btn-ln{
-        padding:11px 18px !important;
-        font-size:15px !important;
-        border-radius:12px !important;
-        font-weight:700 !important;
-        border-width:2px !important;
-    }
-    .btn-su{
-        padding:11px 18px !important;
-        font-size:15px !important;
-        border-radius:12px !important;
-        font-weight:700 !important;
-    }
-
-    /* ── স্পেশাল ক্যাটাগরি — এক লাইনে ৩টা ── */
-    .sir-grid{
-        grid-template-columns:repeat(3,1fr) !important;
-        gap:10px !important;
-    }
-    .sir-card{border-radius:10px !important;}
-    .sir-name{font-size:11px !important;}
-    .sir-hint{font-size:10px !important;}
-
-    /* ── প্রিমিয়াম ক্যাটাগরি গেস্ট গ্রিড — এক লাইনে ৩টা ── */
-    #pmxGuestHeaderGrid{
-        grid-template-columns:repeat(3,1fr) !important;
-        gap:10px !important;
-    }
-
-    /* ── Footer বড় ── */
-    .ft{padding:35px 16px 22px !important;}
-    .ft-grid{gap:22px !important;}
-    .ft-logo-text{font-size:20px !important;}
-    .ft-tagline{font-size:13px !important;line-height:1.7 !important;}
-    .ft-col h4{font-size:14px !important;margin-bottom:12px !important;}
-    .ft-col ul{gap:11px !important;}
-    .ft-col ul li a{font-size:14px !important;}
-    .ft-copy{font-size:13px !important;}
-    .ft-hotline{padding:8px 14px !important;}
-    .ft-hotline span,.ft-hotline a{font-size:13px !important;}
-    .ft-social a{width:36px !important;height:36px !important;font-size:14px !important;}
+    /* ✅ স্পেশাল ক্যাটাগরি ৩ কলাম */
+    .sir-grid{grid-template-columns:repeat(3,1fr) !important;gap:8px;}
+    .sir-name{font-size:11px;}
+    .sir-hint{font-size:10px;}
+    .two{grid-template-columns:1fr;}
+}
+/* ✅ Footer মোবাইলে বড় ও সুন্দর */
+@media(max-width:640px){
+    .ft{padding:36px 18px 28px;}
+    .ft-grid{grid-template-columns:1fr;gap:28px;}
+    .ft-brand{grid-column:unset;}
+    .ft-logo-text{font-size:22px;}
+    .ft-tagline{font-size:14px;max-width:100%;line-height:1.8;}
+    .ft-social a{width:42px;height:42px;font-size:16px;border-radius:10px;}
+    .ft-col h4{font-size:16px;margin-bottom:16px;}
+    .ft-col ul{gap:14px;}
+    .ft-col ul li a{font-size:16px;}
+    .ft-divider{margin:24px auto;}
+    .ft-bottom{flex-direction:column;align-items:flex-start;gap:14px;}
+    .ft-copy{font-size:15px;}
+    .ft-hotline{padding:10px 16px;border-radius:12px;}
+    .ft-hotline span,.ft-hotline a{font-size:15px;}
+    .ft-hotline svg{width:18px;height:18px;}
 }
 </style>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -333,7 +328,7 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 .ft-hotline svg{width:14px;height:14px;fill:#22c55e;flex-shrink:0;}
 .ft-hotline span{font-size:12px;color:#94a3b8;}
 .ft-hotline a{font-size:12px;color:#22c55e;text-decoration:none;font-weight:600;}
-@media(max-width:640px){.ft-grid{grid-template-columns:1fr 1fr;}.ft-brand{grid-column:1/-1;}.ft-bottom{flex-direction:column;align-items:flex-start;}}
+@media(max-width:640px){.ft-grid{grid-template-columns:1fr;}.ft-brand{grid-column:unset;}.ft-bottom{flex-direction:column;align-items:flex-start;}}
 </style>
 <footer class="ft">
   <div class="ft-grid">
