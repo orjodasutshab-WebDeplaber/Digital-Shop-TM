@@ -69,7 +69,7 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 .brand{display:flex;align-items:center;gap:12px;}
 .brand img{width:44px;height:44px;border-radius:11px;border:2px solid #6366f1;object-fit:cover;}
 .brand-name{font-size:18px;font-weight:800;}
-.brand-slogan{font-size:11px;color:#475569;}
+.brand-slogan{font-size:11px;color:#94a3b8;}
 .nav-btns{display:flex;gap:9px;}
 .btn-ln{background:transparent;color:#a5b4fc;border:2px solid #6366f1;padding:8px 18px;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit;display:flex;align-items:center;gap:6px;transition:.2s;}
 .btn-ln:hover{background:rgba(99,102,241,.15);}
@@ -197,7 +197,7 @@ body.is-mobile .top-nav{padding:10px 13px;}
 
 /* ✅ ব্র্যান্ড নাম বড় */
 body.is-mobile .brand-name{font-size:26px !important;font-weight:900 !important;}
-body.is-mobile .brand-slogan{font-size:13px !important;}
+body.is-mobile .brand-slogan{font-size:13px !important;color:#a5b4fc !important;font-weight:600 !important;}
 body.is-mobile .brand img{width:42px;height:42px;}
 
 /* ✅ লগইন ও সাইন আপ বাটন বড় */
@@ -276,13 +276,34 @@ body.is-mobile .ft-hotline svg{width:18px;height:18px;}
     </div>
 </div>
 
-<!-- প্রিমিয়াম ক্যাটাগরি (লগইনের আগে) -->
-<div class="sec" id="pmxGuestSection" style="display:none;">
-    <div class="sec-hd">
-        <h2 class="sec-title">⭐ প্রিমিয়াম ক্যাটাগরি</h2>
-        <p class="sec-sub">প্রিমিয়াম পণ্য কিনতে লগইন করুন</p>
+<!-- প্রিমিয়াম ক্যাটাগরি — Flash Sale Style -->
+<div id="pmxGuestSection" style="display:none;margin:0 0 10px;">
+<style>
+.pmx-flash-wrap{background:linear-gradient(135deg,#1a0a3e,#0d1b4b,#0a1628);padding:18px 0 22px;}
+.pmx-flash-header{display:flex;align-items:center;justify-content:space-between;padding:0 16px 14px;}
+.pmx-flash-title-text{font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;text-transform:uppercase;font-style:italic;}
+.pmx-flash-title-text span{color:#a78bfa;}
+.pmx-flash-login-btn{background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border:none;padding:9px 18px;border-radius:20px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-size:13px;white-space:nowrap;}
+.pmx-scroll-track{display:flex;gap:12px;overflow-x:auto;padding:0 16px 8px;scrollbar-width:none;}
+.pmx-scroll-track::-webkit-scrollbar{display:none;}
+.pmx-cat-card{flex-shrink:0;width:170px;background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;position:relative;transition:transform .2s;box-shadow:0 4px 18px rgba(0,0,0,0.35);}
+.pmx-cat-card:active{transform:scale(0.97);}
+.pmx-cat-img{width:100%;height:150px;object-fit:cover;display:block;background:#e8e8e8;}
+.pmx-cat-pro-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;}
+.pmx-cat-body{padding:10px 10px 12px;}
+.pmx-cat-name{color:#111;font-size:13px;font-weight:800;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pmx-cat-hint{color:#7c3aed;font-size:11px;font-weight:600;}
+</style>
+<div class="pmx-flash-wrap">
+    <div class="pmx-flash-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:26px;">⭐</span>
+            <div class="pmx-flash-title-text">PREMIUM <span>CATEGORY</span></div>
+        </div>
+        <button class="pmx-flash-login-btn" onclick="openM('loginModal')">🔐 লগইন করুন</button>
     </div>
-    <div id="pmxGuestHeaderGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:14px;max-width:1400px;margin:0 auto;padding:0 8px;"></div>
+    <div class="pmx-scroll-track" id="pmxGuestHeaderGrid"></div>
+</div>
 </div>
 
 <!-- LOCAL BOARDS -->
@@ -915,15 +936,16 @@ function renderPmxGuestHeaders(){
     if(!headers.length||!sec||!grid){if(sec)sec.style.display='none';return;}
     sec.style.display='block';
     grid.innerHTML = headers.map(h=>`
-        <div onclick="openPmxGuestShop('${h.id}','${(h.name||'').replace(/'/g,"\\'")}','${h.img||''}')"
-             style="cursor:pointer;text-align:center;background:linear-gradient(145deg,#1e293b,#0f172a);border-radius:14px;padding:12px 8px;border:1px solid #334155;transition:all 0.25s;position:relative;overflow:hidden;"
-             onmouseover="this.style.borderColor='#a78bfa';this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 25px rgba(124,58,237,0.3)'"
-             onmouseout="this.style.borderColor='#334155';this.style.transform='none';this.style.boxShadow='none'">
-            <div style="position:absolute;top:5px;right:5px;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;font-size:8px;padding:2px 6px;border-radius:10px;font-weight:700;">PRO</div>
-            <img src="${h.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;margin-bottom:8px;" onerror="this.src='ko.jpeg'">
-            <div style="color:#e2e8f0;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.name||''}</div>
+        <div class="pmx-cat-card" onclick="openPmxGuestShop('${h.id}','${(h.name||'').replace(/'/g,"\'")}','${h.img||''}')">
+            <img class="pmx-cat-img" src="${h.img||'ko.jpeg'}" onerror="this.src='ko.jpeg'" alt="${h.name||''}">
+            <div class="pmx-cat-pro-badge">⭐ PRO</div>
+            <div class="pmx-cat-body">
+                <div class="pmx-cat-name">${h.name||'ক্যাটাগরি'}</div>
+                <div class="pmx-cat-hint"><i class="fa fa-lock" style="font-size:10px;"></i> লগইন করে দেখুন</div>
+            </div>
         </div>`).join('');
 }
+
 
 function openPmxGuestShop(headerId, headerName, headerImg){
     const modal = document.getElementById('pmxGuestShopModal');
