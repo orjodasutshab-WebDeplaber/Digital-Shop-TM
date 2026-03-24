@@ -206,7 +206,22 @@ body.is-mobile .btn-su{padding:13px 20px !important;font-size:17px !important;fo
 body.is-mobile .nav-btns{gap:10px;}
 
 /* ✅ স্পেশাল ক্যাটাগরি ৩ কলাম */
-body.is-mobile .sir-grid{grid-template-columns:repeat(3,1fr) !important;gap:8px !important;}
+body.is-mobile .sir-grid{
+    display:flex !important;
+    flex-direction:row !important;
+    overflow-x:auto !important;
+    scroll-snap-type:x mandatory !important;
+    -webkit-overflow-scrolling:touch !important;
+    gap:10px !important;
+    padding-bottom:8px !important;
+    scrollbar-width:none !important;
+}
+body.is-mobile .sir-grid::-webkit-scrollbar{display:none;}
+body.is-mobile .sir-card{
+    flex:0 0 calc(33.33% - 7px) !important;
+    scroll-snap-align:start !important;
+    min-width:0 !important;
+}
 body.is-mobile .sir-name{font-size:11px;}
 body.is-mobile .sir-hint{font-size:10px;}
 body.is-mobile .two{grid-template-columns:1fr;}
