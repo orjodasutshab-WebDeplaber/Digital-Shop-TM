@@ -84,17 +84,17 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 .sec-sub{color:#475569;font-size:13px;margin-top:5px;}
 
 /* LEADERBOARD */
-.lb-wrap{width:100%;max-width:1500px;margin:0 auto;height:500px;border-radius:20px;overflow:hidden;border:1px solid rgba(99,102,241,.2);box-shadow:0 20px 55px rgba(0,0,0,.6);position:relative;background:#050a14;}
+.lb-wrap{width:100%;margin:0 auto;height:220px;border-radius:0;overflow:hidden;border:none;box-shadow:none;position:relative;background:#050a14;}
 .lb-slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;}
 .lb-slide.active{opacity:1;}
 .lb-slide img{width:100%;height:100%;object-fit:fill;display:block;}
-.lb-caption{position:absolute;bottom:0;left:0;right:0;padding:13px 22px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-size:16px;font-weight:700;}
+.lb-caption{position:absolute;bottom:0;left:0;right:0;padding:10px 16px 12px;background:linear-gradient(transparent,rgba(0,0,0,.92));font-size:14px;font-weight:700;color:#fff;line-height:1.4;}
 .lb-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;}
 .lb-empty i{font-size:52px;margin-bottom:10px;}
-.lb-arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);color:#fff;border:none;width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:20px;z-index:10;display:none;align-items:center;justify-content:center;transition:.2s;}
+.lb-arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.45);color:#fff;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:22px;z-index:10;display:none;align-items:center;justify-content:center;transition:.2s;}
 .lb-arr:hover{background:rgba(99,102,241,.7);}
 #lbPrev{left:13px;}#lbNext{right:13px;}
-.lb-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:10;}
+.lb-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10;}
 .lb-dot{height:9px;width:9px;border-radius:5px;background:rgba(255,255,255,.28);cursor:pointer;transition:all .3s;}
 .lb-dot.active{width:22px;background:#6366f1;}
 
@@ -191,7 +191,7 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 body.is-mobile .lb2-grid{grid-template-columns:1fr;}
 body.is-mobile .lb2-card{height:220px;}
 body.is-mobile .cta-board{height:270px;}
-body.is-mobile .lb-wrap{height:320px;}
+body.is-mobile .lb-wrap{height:220px;border-radius:0;margin:0;width:100%;}
 body.is-mobile .cta-title{font-size:20px;}
 body.is-mobile .top-nav{padding:10px 13px;}
 
@@ -245,8 +245,7 @@ body.is-mobile .ft-hotline svg{width:18px;height:18px;}
 </nav>
 
 <!-- LEADERBOARD -->
-<div class="sec" style="padding-top:30px;">
-    
+<div class="sec" style="padding:0;margin:0;">
     <div class="lb-wrap">
         <div class="lb-empty" id="lbEmpty"><i class="fa fa-images"></i><p style="font-size:14px;font-weight:600;margin-top:8px;">কোনো লিডারবোর্ড নেই</p></div>
         <div id="lbSlider"></div>
