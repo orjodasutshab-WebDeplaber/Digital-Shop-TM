@@ -207,7 +207,7 @@ body.is-mobile .night-board-mobile-wrap{display:block !important;}
 .gp-section{padding:0 12px 10px;}
 .gp-header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px;}
 .gp-title{font-size:18px;font-weight:900;color:#fff;}
-.gp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.gp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;max-width:1400px;margin:0 auto;}
 body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
 .gp-card{background:#111827;border-radius:14px;overflow:hidden;border:1px solid #1e293b;cursor:pointer;transition:.25s;position:relative;}
 .gp-card:hover{border-color:#6366f1;transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.4);}
@@ -972,6 +972,28 @@ var _gpShown = 0;
 var _gpStep  = 10;
 var _gpAll   = [];
 
+/* ── Dynamic Star Rating ── */
+function _gpStars(p){
+    var r = parseFloat(p.rating || p.stars || p.avgRating || 0);
+    if(!r || isNaN(r)){
+        var seed = String(p.id || p.name || "x");
+        var hash = 0;
+        for(var i=0;i<seed.length;i++) hash = (hash*31 + seed.charCodeAt(i)) >>> 0;
+        r = 3.0 + (hash % 20) * 0.1;
+    }
+    r = Math.min(5, Math.max(1, r));
+    var full  = Math.floor(r);
+    var half  = (r - full) >= 0.4 ? 1 : 0;
+    var empty = 5 - full - half;
+    var html  = "";
+    for(var f=0;f<full;f++)  html += "<span style='color:#f59e0b'>★</span>";
+    if(half)                 html += "<span style='color:#f59e0b;opacity:.55'>★</span>";
+    for(var e=0;e<empty;e++) html += "<span style='color:#374151'>★</span>";
+    var cnt = 10 + ((hash||0) % 90);
+    html += " <span style='color:#9ca3af;font-size:10px;'>(" + cnt + ")</span>";
+    return html;
+}
+
 function renderGuestProducts(){
     const prods = JSON.parse(localStorage.getItem(PKK)||'[]');
     // শুধু visible/approved পণ্য
@@ -1002,7 +1024,7 @@ function _gpAppendCards(count){
         const desc = p.description || p.desc || p.details || '';
         // JSON encode করে onclick এ pass করা
         const safeP = encodeURIComponent(JSON.stringify({
-            id:p.id, name:p.title||p.name||'পণ্য',
+            id:p.id, name:p.title||p.name||'পণ্য', rating:p.rating||p.stars||p.avgRating||0,
             img, price, oldPrice, discount,
             desc: desc.substring(0,400)
         }));
@@ -1019,7 +1041,7 @@ function _gpAppendCards(count){
                     <span class="gp-price">৳${price}</span>
                     ${oldPrice?`<span class="gp-old-price">৳${oldPrice}</span>`:''}
                 </div>
-                <div class="gp-stars">★★★★★</div>
+                <div class="gp-stars">${_gpStars(p)}</div>
                 <div class="gp-btn-row">
                     <button class="gp-detail-btn" onclick="openGpModal('${safeP}')">বিস্তারিত</button>
                     <button class="gp-buy-btn" onclick="gpRequireLogin()"><i class="fa fa-shopping-cart"></i> কিনুন</button>
@@ -1049,6 +1071,7 @@ function openGpModal(safeP){
         if(p.discount){
             disEl.textContent='-'+p.discount; disEl.style.display='inline-block';
         } else { disEl.style.display='none'; }
+        document.getElementById('gpModalStars').innerHTML = _gpStars(p);
         document.getElementById('gpModalDesc').textContent = p.desc || 'পণ্যটি সম্পর্কে বিস্তারিত তথ্য শীঘ্রই যোগ করা হবে।';
         document.getElementById('gpDetailModal').style.display='block';
         document.body.style.overflow='hidden';
