@@ -1024,7 +1024,7 @@ function renderAdminPublish(container) {
                 width: 50px;
                 height: 50px;
                 border-radius: 8px;
-                object-fit: cover;
+                object-fit: fill;
                 border: 2px solid #334155;
             }
         </style>
@@ -2664,7 +2664,7 @@ document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclic
                             '<div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">' +
                                 '<div style="font-weight: bold; color: #2ecc71; font-size: 16px; margin-bottom: 8px;">' + o.price + ' ৳</div>' +
                                 // --- ছবি যোগ করা হয়েছে এখানে ---
-                                '<img src="' + pImage + '" onerror="this.src=\'https://placehold.co/100x100?text=Error\'" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid #444; background: #2a2a2a; margin-bottom: 5px;">' +
+                                '<img src="' + pImage + '" onerror="this.src=\'https://placehold.co/100x100?text=Error\'" style="width: 50px; height: 50px; border-radius: 8px; object-fit: fill; border: 1px solid #444; background: #2a2a2a; margin-bottom: 5px;">' +
                                 // ----------------------------
                                 deleteBtnHtml + 
                             '</div>' +
@@ -2782,7 +2782,7 @@ window.openEditModal = function(productId) {
     const images = Array.isArray(product.images) ? product.images : [product.images || product.image];
     let imageThumbsHtml = images.filter(img => img).map((img) => `
         <div class="edit-img-wrapper" style="position:relative; width:80px; height:80px; border-radius:12px; overflow:hidden; border:2px solid #e2e8f0;">
-            <img src="${img}" style="width:100%; height:100%; object-fit:cover;">
+            <img src="${img}" style="width:100%; height:100%; object-fit:fill;">
             <div onclick="this.parentElement.remove()" style="position:absolute; top:0; right:0; background:rgba(231, 76, 60, 0.9); color:white; width:22px; height:22px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px;">
                 <i class="fa fa-times"></i>
             </div>
@@ -2980,7 +2980,7 @@ function renderAdminAds(container) {
                     ${allAds.map(ad => `
                         <div style="display: flex; align-items: center; justify-content: space-between; background: #0f172a; padding: 10px; border-radius: 12px;">
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <img src="${ad.img}" style="width: 50px; height: 35px; object-fit: cover; border-radius: 5px;">
+                                <img src="${ad.img}" style="width: 50px; height: 35px; object-fit: fill; border-radius: 5px;">
                                 <span style="color: #fff; font-size: 14px;">${ad.title}</span>
                             </div>
                             <button onclick="masterDeleteAd(${ad.id})" style="background: none; border: none; color: #ef4444; cursor: pointer;">
@@ -3608,7 +3608,7 @@ function openReturnModal(orderId) {
                             <!-- Preview -->
                             <div class="single-preview" style="margin-top:10px; display:none;">
                                 <div style="width:80px; height:80px; border-radius:12px; overflow:hidden; border:2px solid #6366f1;">
-                                    <img src="" style="width:100%; height:100%; object-fit:cover;">
+                                    <img src="" style="width:100%; height:100%; object-fit:fill;">
                                 </div>
                                 <span class="preview-ok" style="display:block; font-size:11px; color:#10b981; font-weight:700; margin-top:4px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
                             </div>
@@ -3677,7 +3677,7 @@ window.addNewImageInput = function() {
             oninput="previewSingleImage(this)">
         <div class="single-preview" style="margin-top:10px; display:none;">
             <div style="width:80px; height:80px; border-radius:12px; overflow:hidden; border:2px solid #6366f1;">
-                <img src="" style="width:100%; height:100%; object-fit:cover;">
+                <img src="" style="width:100%; height:100%; object-fit:fill;">
             </div>
             <span style="display:block; font-size:11px; color:#10b981; font-weight:700; margin-top:4px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
         </div>
@@ -3981,7 +3981,7 @@ function openAdminReturnDetail(retId) {
                     <div class="product-card-box" onclick="openProductBySKU('${productSKUDisplay}', '${productID}')">
                         <div style="display:flex; gap:15px; align-items:center;">
                             <div style="width:75px; height:75px; min-width:75px; background:#f1f5f9; border-radius:18px; overflow:hidden; border:1px solid #e2e8f0; display:flex; align-items:center; justify-content:center;">
-                                <img src="${productImageUrl}" onerror="this.src='https://placehold.co/150x150?text=IMG+Error'" style="width:100%; height:100%; object-fit:cover;">
+                                <img src="${productImageUrl}" onerror="this.src='https://placehold.co/150x150?text=IMG+Error'" style="width:100%; height:100%; object-fit:fill;">
                             </div>
                             <div style="flex:1;">
                                 <b style="color:#1e293b; display:block; font-size:15px; margin-bottom:4px;">${order.productName || ret.productName || 'পণ্যটির তথ্য লোড হচ্ছে...'}</b>
@@ -4021,14 +4021,14 @@ function openAdminReturnDetail(retId) {
                  onclick="window.open('${imgUrl}', '_blank')" 
                  onmouseover="this.style.transform='scale(1.05)'" 
                  onmouseout="this.style.transform='scale(1)'">
-                <img src="${imgUrl}" onerror="this.src='https://placehold.co/100x100?text=IMG+Error'" style="width: 100%; height: 100%; object-fit: cover;">
+                <img src="${imgUrl}" onerror="this.src='https://placehold.co/100x100?text=IMG+Error'" style="width: 100%; height: 100%; object-fit: fill;">
             </div>
         `).join('') 
         : 
         (ret.image ? `
             <div style="width: 85px; height: 85px; border-radius: 12px; overflow: hidden; border: 2px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); cursor: zoom-in;" 
                  onclick="window.open('${ret.image}', '_blank')">
-                <img src="${ret.image}" onerror="this.src='https://placehold.co/100x100?text=IMG+Error'" style="width: 100%; height: 100%; object-fit: cover;">
+                <img src="${ret.image}" onerror="this.src='https://placehold.co/100x100?text=IMG+Error'" style="width: 100%; height: 100%; object-fit: fill;">
             </div>
         ` : '<p style="font-size:11px; color:#94a3b8; font-weight:600; margin:5px 0;">📷 কোনো ছবি পাওয়া যায়নি</p>')
     }
@@ -4138,14 +4138,14 @@ function openUserReturnChat(retId) {
                      onclick="window.open('${imgUrl}', '_blank')"
                      onmouseover="this.style.borderColor='#38bdf8'; this.style.transform='scale(1.05)';" 
                      onmouseout="this.style.borderColor='#334155'; this.style.transform='scale(1)';">
-                    <img src="${imgUrl}" onerror="this.src='https://placehold.co/100x100/1e293b/64748b?text=Error'" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="${imgUrl}" onerror="this.src='https://placehold.co/100x100/1e293b/64748b?text=Error'" style="width: 100%; height: 100%; object-fit: fill;">
                 </div>
             `).join('') 
             : 
             (ret.image ? `
                 <div style="width: 75px; height: 75px; border-radius: 12px; overflow: hidden; border: 2px solid #334155; cursor: pointer;" 
                      onclick="window.open('${ret.image}', '_blank')">
-                    <img src="${ret.image}" onerror="this.src='https://placehold.co/100x100/1e293b/64748b?text=Error'" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="${ret.image}" onerror="this.src='https://placehold.co/100x100/1e293b/64748b?text=Error'" style="width: 100%; height: 100%; object-fit: fill;">
                 </div>
             ` : '<p style="font-size:11px; color:#64748b; margin:5px 0;">কোনো ছবি নেই</p>')
         }
@@ -4266,7 +4266,7 @@ function openUserReturnList() {
                     </span>
                     
                     <img src="${pImage}" 
-                         style="width: 55px; height: 55px; border-radius: 12px; object-fit: cover; border: 2px solid #334155; background: #0f172a;">
+                         style="width: 55px; height: 55px; border-radius: 12px; object-fit: fill; border: 2px solid #334155; background: #0f172a;">
                 </div>
             </div>
 
@@ -7559,7 +7559,7 @@ function openUserCart() {
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
                         ${updatedCart.map(item => `
                             <div style="background: #1e293b; border-radius: 15px; padding: 12px; display: flex; gap: 12px; border: 1px solid #334155; position: relative; transition: 0.3s;" onmouseover="this.style.borderColor='#3498db'">
-                                <img src="${item.image || item.images[0]}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px; cursor: pointer;" onclick="openProductDetails('${item.id}')">
+                                <img src="${item.image || item.images[0]}" style="width: 80px; height: 80px; object-fit: fill; border-radius: 10px; cursor: pointer;" onclick="openProductDetails('${item.id}')">
                                 
                                 <div style="flex: 1;">
                                     <h4 style="margin: 0; font-size: 15px; color: #fff; cursor: pointer;" onclick="openProductDetails('${item.id}')">${item.title}</h4>
@@ -8093,7 +8093,7 @@ function openNightBoardControl() {
         if (!boards.length) return '<p style="color:#6b7280; text-align:center; padding:20px;">কোনো নাইট বোর্ড নেই</p>';
         return boards.map(b => `
             <div style="display:flex; align-items:center; gap:12px; background:#1f2937; border-radius:12px; padding:10px; margin-bottom:10px; border:1px solid #374151;">
-                <img src="${b.img}" style="width:70px; height:50px; object-fit:cover; border-radius:8px;" onerror="this.style.display='none'">
+                <img src="${b.img}" style="width:70px; height:50px; object-fit:fill; border-radius:8px;" onerror="this.style.display='none'">
                 <div style="flex:1; overflow:hidden;">
                     <div style="color:#f3f4f6; font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${b.img}</div>
                     ${b.link ? `<div style="color:#6b7280; font-size:11px; margin-top:2px;">${b.link}</div>` : ''}
@@ -8166,7 +8166,7 @@ function publishNightBoard() {
         const updated = JSON.parse(localStorage.getItem('night_boards') || '[]');
         listEl.innerHTML = updated.length ? updated.map(b => `
             <div style="display:flex; align-items:center; gap:12px; background:#1f2937; border-radius:12px; padding:10px; margin-bottom:10px; border:1px solid #374151;">
-                <img src="${b.img}" style="width:70px; height:50px; object-fit:cover; border-radius:8px;" onerror="this.style.display='none'">
+                <img src="${b.img}" style="width:70px; height:50px; object-fit:fill; border-radius:8px;" onerror="this.style.display='none'">
                 <div style="flex:1; overflow:hidden;">
                     <div style="color:#f3f4f6; font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${b.img}</div>
                     ${b.link ? `<div style="color:#6b7280; font-size:11px; margin-top:2px;">${b.link}</div>` : ''}
@@ -8204,7 +8204,7 @@ function deleteNightBoard(boardId) {
         const updated = JSON.parse(localStorage.getItem('night_boards') || '[]');
         listEl.innerHTML = updated.length ? updated.map(b => `
             <div style="display:flex; align-items:center; gap:12px; background:#1f2937; border-radius:12px; padding:10px; margin-bottom:10px; border:1px solid #374151;">
-                <img src="${b.img}" style="width:70px; height:50px; object-fit:cover; border-radius:8px;" onerror="this.style.display='none'">
+                <img src="${b.img}" style="width:70px; height:50px; object-fit:fill; border-radius:8px;" onerror="this.style.display='none'">
                 <div style="flex:1; overflow:hidden;">
                     <div style="color:#f3f4f6; font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${b.img}</div>
                     ${b.link ? `<div style="color:#6b7280; font-size:11px; margin-top:2px;">${b.link}</div>` : ''}
@@ -8313,7 +8313,7 @@ function publishBeliBoard(side) {
 function renderBeliList(side) {
     return beliBoardData[side].map(item => `
         <div style="display:flex; justify-content:space-between; background:#1f2937; padding:10px; margin-bottom:8px; border-radius:8px; align-items:center; border: 1px solid #374151;">
-            <img src="${item.img}" style="width:50px; height:35px; object-fit:cover; border-radius:4px;">
+            <img src="${item.img}" style="width:50px; height:35px; object-fit:fill; border-radius:4px;">
             <button onclick="deleteBeliItem('${side}', ${item.id})" style="background:#ef4444; border:none; color:white; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;">ডিলিট</button>
         </div>
     `).join('') || '<p style="font-size:12px; color:#6b7280;">কোনো ডাটা নেই</p>';
@@ -8438,7 +8438,7 @@ function renderAdminSironamList() {
     return sironamData.map(item => `
         <div style="display:flex; justify-content:space-between; background:#1f2937; padding:10px; margin-bottom:8px; border-radius:8px; align-items:center; border: 1px solid #374151;">
             <div style="display:flex; align-items:center; gap:10px;">
-                <img src="${item.img}" style="width:40px; height:40px; object-fit:cover; border-radius:5px;">
+                <img src="${item.img}" style="width:40px; height:40px; object-fit:fill; border-radius:5px;">
                 <span style="font-size:13px;">${item.name}</span>
             </div>
             <button onclick="deleteSironam(${item.id})" style="background:#ef4444; border:none; color:white; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:12px;">ডিলিট</button>
@@ -8708,7 +8708,7 @@ function publishDeliAd(id) {
 function renderDeliAds(id) {
     return deliAds.filter(a => a.sironamId === id).map(a => `
         <div style="display:flex; justify-content:space-between; background:#1f2937; padding:8px; margin-bottom:5px; border-radius:5px;">
-            <img src="${a.img}" style="width:40px; height:25px; object-fit:cover;">
+            <img src="${a.img}" style="width:40px; height:25px; object-fit:fill;">
             <button onclick="deleteDeliAd(${a.id}, '${id}')" style="background:#ef4444; color:white; border:none; padding:2px 8px; border-radius:4px; cursor:pointer;">ডিলিট</button>
         </div>
     `).join('');
@@ -8964,7 +8964,7 @@ function showNoticeBoardPopup() {
         return `
             <!-- ছবি -->
             ${n.img ? `<div style="width:100%; border-radius:12px; overflow:hidden; margin-bottom:18px; max-height:1000px;">
-                <img src="${n.img}" style="width:100%; height:360px; object-fit:cover; display:block;" onerror="this.parentElement.style.display='none'">
+                <img src="${n.img}" style="width:100%; height:360px; object-fit:fill; display:block;" onerror="this.parentElement.style.display='none'">
             </div>` : ''}
 
             <!-- Badge + Title -->
@@ -9086,7 +9086,7 @@ function renderAdminLocalBoard(container) {
                 ?`<div style="text-align:center;padding:35px;color:#334155;border:2px dashed #1e293b;border-radius:14px;"><i class="fa fa-images" style="font-size:36px;display:block;margin-bottom:10px;"></i>কোনো লোকাল বোর্ড নেই</div>`
                 :items.map((it,idx)=>`
                 <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:9px;">
-                    <img src="${it.img}" style="width:500px;max-width:120px;height:70px;object-fit:cover;border-radius:8px;border:1px solid #334155;flex-shrink:0;" onerror="this.style.background='#1e293b'">
+                    <img src="${it.img}" style="width:500px;max-width:120px;height:70px;object-fit:fill;border-radius:8px;border:1px solid #334155;flex-shrink:0;" onerror="this.style.background='#1e293b'">
                     <div style="flex:1;min-width:0;">
                         <div style="color:#fff;font-size:13px;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${it.link?'🔗 '+it.link:'(কোনো লিংক নেই)'}</div>
                         <div style="color:#475569;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${it.img}</div>
@@ -9149,7 +9149,7 @@ function renderAdminLoginLeaderboard(container) {
                 ?`<div style="text-align:center;padding:35px;color:#334155;border:2px dashed #1e293b;border-radius:14px;"><i class="fa fa-images" style="font-size:36px;display:block;margin-bottom:10px;"></i>কোনো লিডারবোর্ড নেই</div>`
                 :items.map((it,idx)=>`
                 <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;margin-bottom:9px;">
-                    <img src="${it.img}" style="width:120px;height:68px;object-fit:cover;border-radius:8px;border:1px solid #334155;flex-shrink:0;" onerror="this.style.background='#1e293b'">
+                    <img src="${it.img}" style="width:120px;height:68px;object-fit:fill;border-radius:8px;border:1px solid #334155;flex-shrink:0;" onerror="this.style.background='#1e293b'">
                     <div style="flex:1;min-width:0;">
                         <div style="color:#fff;font-size:13px;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${it.desc||'(কোনো বিবরণ নেই)'}</div>
                         <div style="color:#475569;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${it.img}</div>
@@ -9727,7 +9727,7 @@ function pmxRenderHeaderList() {
     if (!headers.length) return '<p style="color:#4b5563;text-align:center;padding:16px;">কোনো হেডার নেই</p>';
     return headers.map(h => `
         <div style="display:flex;align-items:center;gap:10px;background:#0f172a;border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid #374151;">
-            ${h.img ? `<img src="${h.img}" style="width:50px;height:40px;object-fit:cover;border-radius:6px;" onerror="this.style.display='none'">` : '<div style="width:50px;height:40px;background:#374151;border-radius:6px;"></div>'}
+            ${h.img ? `<img src="${h.img}" style="width:50px;height:40px;object-fit:fill;border-radius:6px;" onerror="this.style.display='none'">` : '<div style="width:50px;height:40px;background:#374151;border-radius:6px;"></div>'}
             <div style="flex:1;">
                 <div style="color:#fff;font-weight:700;font-size:13px;">${h.name}</div>
                 ${h.tb ? `<div style="color:#6b7280;font-size:11px;">TB: ${h.tb}</div>` : ''}
@@ -9979,7 +9979,7 @@ function pmxOpenOrderDetail(orderId) {
         <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:560px;max-height:90vh;overflow-y:auto;border:1px solid #334155;position:relative;">
             <button onclick="document.getElementById('pmxOrderDetailModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
             <h3 style="color:#fbbf24;margin:0 0 16px;font-size:16px;">📋 অর্ডার বিস্তারিত</h3>
-            ${prod?.img ? `<img src="${prod.img}" style="width:100%;max-height:200px;object-fit:cover;border-radius:10px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
+            ${prod?.img ? `<img src="${prod.img}" style="width:100%;max-height:200px;object-fit:fill;border-radius:10px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
             <div style="background:#0f172a;border-radius:10px;padding:14px;margin-bottom:14px;">
                 <div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:6px;">${o.productName}</div>
                 <div style="color:#10b981;font-size:15px;font-weight:700;margin-bottom:8px;">৳${o.price}</div>
@@ -10063,7 +10063,7 @@ function pmxRefreshDisplay() {
             <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:0 16px;overflow-x:auto;">
                 ${headers.map(h => `
                     <div onclick="pmxOpenHeaderShop(${h.id},'${h.name.replace(/'/g,"\\'")}','${h.img}')" style="cursor:pointer;text-align:center;background:#1e293b;border-radius:12px;padding:10px 6px;border:1px solid #334155;transition:all 0.2s;" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='#334155'">
-                        <img src="${h.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;margin-bottom:6px;" onerror="this.src='ko.jpeg'">
+                        <img src="${h.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:fill;border-radius:8px;margin-bottom:6px;" onerror="this.src='ko.jpeg'">
                         <div style="color:#e2e8f0;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.name}</div>
                     </div>`).join('')}
             </div>
@@ -10111,7 +10111,7 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
                 : `<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:14px;">
                     ${products.map(p => `
                         <div style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;text-align:center;">
-                            <img src="${p.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:cover;" onerror="this.src='ko.jpeg'">
+                            <img src="${p.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:fill;" onerror="this.src='ko.jpeg'">
                             <div style="padding:8px;">
                                 <div style="color:#e2e8f0;font-size:12px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
                                 <div style="color:#10b981;font-size:13px;font-weight:700;margin-bottom:8px;">৳${p.price}</div>
@@ -10165,7 +10165,7 @@ function pmxOpenBuyModal(productId) {
     <div id="pmxBuyModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
         <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto;border:1px solid #10b981;position:relative;">
             <button onclick="document.getElementById('pmxBuyModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
-            ${p.img ? `<img src="${p.img}" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
+            ${p.img ? `<img src="${p.img}" style="width:100%;max-height:180px;object-fit:fill;border-radius:12px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
             <div style="color:#fff;font-size:17px;font-weight:700;margin-bottom:4px;">${p.name}</div>
             <div style="color:#10b981;font-size:16px;font-weight:700;margin-bottom:8px;">৳${p.price}</div>
             ${p.desc ? `<div style="color:#94a3b8;font-size:13px;margin-bottom:14px;line-height:1.5;">${p.desc}</div>` : ''}
@@ -10477,7 +10477,7 @@ function _pmxRenderUserDetailModal(o) {
     <div id="pmxUserDetailModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
         <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;border:1px solid #334155;position:relative;">
             <button onclick="document.getElementById('pmxUserDetailModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
-            ${o.img ? `<img src="${o.img}" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
+            ${o.img ? `<img src="${o.img}" style="width:100%;max-height:160px;object-fit:fill;border-radius:10px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
             <div style="background:#0f172a;border-radius:10px;padding:14px;margin-bottom:14px;">
                 <div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:4px;">${o.productName}</div>
                 <div style="color:#10b981;font-size:15px;font-weight:700;margin-bottom:8px;">৳${o.price}</div>
