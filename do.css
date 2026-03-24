@@ -433,68 +433,156 @@ button { cursor: pointer; border: none; font-family: inherit; }
 .product-card {
     background: var(--bg-card);
     border-radius: 15px;
-    padding: 15px;
+    padding: 12px;
     text-align: center;
     box-shadow: var(--shadow-sm);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 1px solid transparent;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .product-card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
     box-shadow: var(--shadow-lg);
     border-color: var(--primary-color);
 }
 
+/* স্লাইডার ছবির উচ্চতা বাড়ানো */
+.product-card .product-slider {
+    width: 100%;
+    height: 180px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.product-card .slide-img,
 .product-card img {
     width: 100%;
-    height: 150px;
-    object-fit: fill;
+    height: 180px;
+    object-fit: cover;
     border-radius: 10px;
-    margin-bottom: 12px;
     transition: 0.5s;
 }
 
-.product-card:hover img {
-    transform: scale(1.05);
+.product-card:hover .slide-img {
+    transform: scale(1.04);
 }
 
 .product-title {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     color: var(--text-main);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.4;
 }
 
 .product-price {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--primary-color);
-    margin-bottom: 15px;
+    margin-bottom: 4px;
     display: block;
 }
 
-/* অর্ডার করুন বাটনটি স্পষ্ট করার জন্য */
+/* ── দুটো বাটনের কন্টেইনার ── */
+.product-card-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 8px;
+}
+
+/* কিনুন বাটন */
 .btn-buy-now {
-    background-color: #00b894 !important; /* উজ্জ্বল সবুজ রঙ */
-    color: #ffffff !important; /* টেক্সট একদম সাদা */
-    font-weight: bold;
+    flex: 1;
+    background: linear-gradient(135deg, #00b894, #00a884) !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 12px;
     border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
+    padding: 9px 6px;
+    border-radius: 8px;
     cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 3px 8px rgba(0, 184, 148, 0.35);
     transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
 }
 
 .btn-buy-now:hover {
-    background-color: #009470 !important;
+    background: linear-gradient(135deg, #009470, #007d5f) !important;
     transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 184, 148, 0.5);
+}
+
+/* বিস্তারিত বাটন */
+.btn-details {
+    flex: 1;
+    background: transparent;
+    color: var(--secondary-color);
+    font-weight: 700;
+    font-size: 12px;
+    border: 1.5px solid var(--secondary-color);
+    padding: 9px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.btn-details:hover {
+    background: var(--secondary-color);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* ── মোবাইল রেসপন্সিভ ফিক্স ── */
+@media (max-width: 640px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    .product-card {
+        padding: 10px;
+        border-radius: 12px;
+    }
+
+    .product-card .product-slider,
+    .product-card .slide-img,
+    .product-card img {
+        height: 150px !important;
+    }
+
+    .product-title {
+        font-size: 13px;
+    }
+
+    .product-price {
+        font-size: 15px;
+    }
+
+    .btn-buy-now,
+    .btn-details {
+        font-size: 11px;
+        padding: 8px 4px;
+        border-radius: 7px;
+    }
 }
 
 
@@ -1649,7 +1737,19 @@ html, body {
 
 /* Product grid — desktop columns maintain */
 .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+}
+
+@media (max-width: 640px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+    .product-card .product-slider,
+    .product-card .slide-img,
+    .product-card img {
+        height: 140px !important;
+    }
 }
 
 /* Buttons — touch target minimum size */

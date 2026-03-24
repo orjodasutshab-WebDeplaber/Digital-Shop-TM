@@ -505,6 +505,33 @@ function renderProductGrid(productList, isLoadMore = false) {
 
         const productsHTML = itemsToShow.map(item => {
             const images = Array.isArray(item.images) ? item.images : [item.images || item.image];
+
+            // ── Rating Logic ──────────────────────────────────────────
+            // item.rating থাকলে সেটি ব্যবহার করো, না থাকলে id-based seed দিয়ে ডায়নামিক রেটিং
+            let ratingVal = parseFloat(item.rating) || 0;
+            if (!ratingVal) {
+                // id থেকে একটি consistent seed তৈরি করা হচ্ছে
+                const seed = String(item.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+                // ৩০% পণ্যে ৫ তারা, বাকিগুলোতে ৩.৫–৪.৮ এর মধ্যে ভ্যারিয়েশন
+                const rand = ((seed * 9301 + 49297) % 233280) / 233280;
+                ratingVal = rand < 0.30 ? 5 : parseFloat((3.5 + rand * 1.5).toFixed(1));
+            }
+            const reviewCount = item.reviewCount || item.reviews || (Math.floor(((String(item.id||'').length * 17 + 7) % 120) + 5));
+            // তারা রেন্ডার
+            const fullStars  = Math.floor(ratingVal);
+            const halfStar   = (ratingVal - fullStars) >= 0.5;
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+            const starsHTML  = '<span style="color:#f59e0b;font-size:13px;">'
+                + '★'.repeat(fullStars)
+                + (halfStar ? '½' : '')
+                + '<span style="color:#d1d5db;">' + '★'.repeat(emptyStars) + '</span>'
+                + '</span>';
+            const ratingHTML = `<div class="product-rating" style="display:flex;align-items:center;gap:4px;justify-content:center;margin:5px 0 10px;">
+                ${starsHTML}
+                <span style="font-size:11px;color:var(--text-muted);">${ratingVal.toFixed(1)} (${reviewCount})</span>
+            </div>`;
+            // ─────────────────────────────────────────────────────────
+
             return `
             <div class="product-card" style="position: relative;">
                 ${checkAdmin ? `
@@ -524,9 +551,15 @@ function renderProductGrid(productList, isLoadMore = false) {
                 </div>
                 <h4 class="product-title" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">${item.title}</h4>
                 <span class="product-price">${currency} ${item.price}</span>
-                <button class="btn-buy-now" onclick="initiateCheckout('${item.id}')">
-                    <i class="fa fa-shopping-cart"></i> অর্ডার করুন
-                </button>
+                ${ratingHTML}
+                <div class="product-card-actions">
+                    <button class="btn-buy-now" onclick="initiateCheckout('${item.id}')">
+                        <i class="fa fa-shopping-cart"></i> কিনুন
+                    </button>
+                    <button class="btn-details" onclick="openProductDetails('${item.id}')">
+                        <i class="fa fa-eye"></i> বিস্তারিত
+                    </button>
+                </div>
             </div>`;
         }).join('');
 
