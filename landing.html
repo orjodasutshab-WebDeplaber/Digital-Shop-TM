@@ -2,22 +2,7 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=800">
-<script>
-(function(){
-    function setScale(){
-        var sw = window.screen.width;
-        var dw = 800;
-        if(sw < dw){
-            var scale = sw / dw;
-            var vp = document.querySelector('meta[name=viewport]');
-            if(vp) vp.content = 'width='+dw+',initial-scale='+scale.toFixed(4)+',minimum-scale='+scale.toFixed(4)+',maximum-scale=3,user-scalable=yes';
-        }
-    }
-    setScale();
-    window.addEventListener('resize', setScale);
-})();
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3, user-scalable=yes">
 <title>Digital Shop TM | স্বাগতম</title>
 <link rel="icon" type="image/x-icon" href="ko.jpeg">
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
