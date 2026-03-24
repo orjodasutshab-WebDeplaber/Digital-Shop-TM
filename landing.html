@@ -59,13 +59,13 @@
 .night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:750px;}
 @media(max-width:1100px){.night-board-wrap{display:none;}}
 
-/* মোবাইল নাইট বোর্ড সেকশন */
-.night-board-mobile-wrap{display:none;width:100%;border-radius:16px;overflow:hidden;border:1px solid rgba(99,102,241,.25);background:#060d1a;box-shadow:0 10px 30px rgba(0,0,0,.6);position:relative;min-height:400px;}
+/* মোবাইল নাইট বোর্ড */
+.night-board-mobile-wrap{display:none;width:100%;border-radius:14px;overflow:hidden;border:1px solid rgba(99,102,241,.25);background:#060d1a;position:relative;min-height:380px;margin:10px 0 6px;}
 .night-board-mobile-wrap .night-board-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;background:#060d1a;}
 .night-board-mobile-wrap .night-board-slide.active{opacity:1;}
 .night-board-mobile-wrap .night-board-slide img{width:100%;height:100%;object-fit:fill;display:block;}
 .night-board-mobile-wrap .night-board-slide a{display:block;width:100%;height:100%;}
-.night-board-mobile-wrap .night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:400px;}
+.night-board-mobile-wrap .night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:380px;}
 
 </style>
 <style>
@@ -199,9 +199,55 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 body.is-mobile .lb2-grid{grid-template-columns:repeat(2,1fr);}
 body.is-mobile .lb2-card{height:180px;}
 
-/* ✅ মোবাইলে নাইট বোর্ড — প্রিমিয়াম ক্যাটাগরির নিচে আলাদা সেকশনে */
+/* ✅ মোবাইল নাইট বোর্ড */
 body.is-mobile .night-board-wrap{display:none;}
 body.is-mobile .night-board-mobile-wrap{display:block !important;}
+
+/* ✅ গেস্ট প্রোডাক্ট সেকশন */
+.gp-section{padding:0 12px 10px;}
+.gp-header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 12px;}
+.gp-title{font-size:18px;font-weight:900;color:#fff;}
+.gp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+.gp-card{background:#111827;border-radius:14px;overflow:hidden;border:1px solid #1e293b;cursor:pointer;transition:.25s;position:relative;}
+.gp-card:hover{border-color:#6366f1;transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.4);}
+.gp-img-wrap{width:100%;aspect-ratio:1;overflow:hidden;background:#0a0f1e;position:relative;}
+.gp-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.gp-discount-badge{position:absolute;top:8px;left:8px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;}
+.gp-body{padding:9px 10px 11px;}
+.gp-name{color:#e2e8f0;font-size:12px;font-weight:700;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+body.is-mobile .gp-name{font-size:11px;}
+.gp-price-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.gp-price{color:#ec4899;font-size:15px;font-weight:900;}
+body.is-mobile .gp-price{font-size:14px;}
+.gp-old-price{color:#6b7280;font-size:11px;text-decoration:line-through;}
+.gp-stars{color:#f59e0b;font-size:11px;margin-bottom:8px;}
+.gp-btn-row{display:flex;gap:6px;}
+.gp-detail-btn{flex:1;padding:7px 0;border-radius:8px;border:1px solid #6366f1;background:transparent;color:#818cf8;font-size:11px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
+.gp-detail-btn:hover{background:#6366f1;color:#fff;}
+.gp-buy-btn{flex:1;padding:7px 0;border-radius:8px;border:none;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
+.gp-loadmore-wrap{text-align:center;padding:18px 0 6px;}
+.gp-loadmore-btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:none;padding:11px 32px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:800;font-family:'Hind Siliguri',sans-serif;}
+
+/* ✅ গেস্ট প্রোডাক্ট ডিটেইল মোডাল */
+.gp-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999999;overflow-y:auto;backdrop-filter:blur(6px);}
+.gp-modal-inner{background:#0f172a;max-width:520px;margin:40px auto;border-radius:18px;overflow:hidden;border:1px solid #1e293b;}
+body.is-mobile .gp-modal-inner{margin:0;border-radius:0;min-height:100vh;}
+.gp-modal-img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#0a0f1e;}
+.gp-modal-body{padding:16px 18px 24px;}
+.gp-modal-name{font-size:17px;font-weight:900;color:#fff;margin-bottom:8px;}
+.gp-modal-price-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.gp-modal-price{color:#ec4899;font-size:22px;font-weight:900;}
+.gp-modal-old{color:#6b7280;font-size:14px;text-decoration:line-through;}
+.gp-modal-discount{background:#ef4444;color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;}
+.gp-modal-stars{color:#f59e0b;font-size:13px;margin-bottom:10px;}
+.gp-modal-desc{color:#94a3b8;font-size:13px;line-height:1.6;margin-bottom:16px;}
+.gp-modal-actions{display:flex;gap:10px;}
+.gp-modal-cart-btn,.gp-modal-order-btn{flex:1;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
+.gp-modal-cart-btn{background:#1e293b;color:#818cf8;border:1px solid #6366f1;}
+.gp-modal-order-btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;}
+.gp-modal-close{position:sticky;top:0;background:#0f172a;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;z-index:10;}
+.gp-modal-close-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
 body.is-mobile .cta-board{height:270px;}
 body.is-mobile .lb-wrap{height:450px;border-radius:0;margin:0;width:100%;}
 body.is-mobile .cta-title{font-size:20px;}
@@ -333,10 +379,46 @@ body.is-mobile .ft-hotline svg{width:18px;height:18px;}
 </div>
 
 <!-- মোবাইল নাইট বোর্ড — প্রিমিয়াম ক্যাটাগরির নিচে -->
-<div class="night-board-mobile-wrap" id="nightBoardMobileWrap" style="margin:10px 12px 6px;">
+<div class="night-board-mobile-wrap" id="nightBoardMobileWrap">
     <div id="nightBoardMobileSlider" class="night-board-empty">
         <i class="fa fa-moon" style="font-size:48px;margin-bottom:12px;opacity:0.3;"></i>
         <p style="font-size:13px;">নাইট বোর্ড</p>
+    </div>
+</div>
+
+<!-- গেস্ট প্রোডাক্ট সেকশন — নাইট বোর্ডের নিচে -->
+<div class="gp-section" id="gpSection">
+    <div class="gp-header">
+        <div class="gp-title">🛍️ সকল পণ্য</div>
+    </div>
+    <div class="gp-grid" id="gpGrid"></div>
+    <div class="gp-loadmore-wrap" id="gpLoadMoreWrap" style="display:none;">
+        <button class="gp-loadmore-btn" onclick="gpLoadMore()">আরো দেখুন <i class="fa fa-chevron-down" style="margin-left:6px;"></i></button>
+    </div>
+</div>
+
+<!-- গেস্ট প্রোডাক্ট ডিটেইল মোডাল -->
+<div class="gp-modal" id="gpDetailModal">
+    <div class="gp-modal-inner">
+        <div class="gp-modal-close">
+            <span style="color:#fff;font-size:15px;font-weight:700;" id="gpModalTitle">পণ্যের বিবরণ</span>
+            <button class="gp-modal-close-btn" onclick="closeGpModal()">✕</button>
+        </div>
+        <img class="gp-modal-img" id="gpModalImg" src="" alt="">
+        <div class="gp-modal-body">
+            <div class="gp-modal-name" id="gpModalName"></div>
+            <div class="gp-modal-price-row">
+                <span class="gp-modal-price" id="gpModalPrice"></span>
+                <span class="gp-modal-old" id="gpModalOld"></span>
+                <span class="gp-modal-discount" id="gpModalDiscount" style="display:none;"></span>
+            </div>
+            <div class="gp-modal-stars" id="gpModalStars">★★★★★</div>
+            <div class="gp-modal-desc" id="gpModalDesc"></div>
+            <div class="gp-modal-actions">
+                <button class="gp-modal-cart-btn" onclick="gpRequireLogin()"><i class="fa fa-shopping-cart" style="margin-right:5px;"></i> কার্টে যোগ</button>
+                <button class="gp-modal-order-btn" onclick="gpRequireLogin()"><i class="fa fa-bolt" style="margin-right:5px;"></i> অর্ডার করুন</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -841,11 +923,11 @@ function renderNightBoard(){
             slider.innerHTML = '<i class="fa fa-moon" style="font-size:48px;margin-bottom:12px;opacity:0.3;"></i><p style="font-size:13px;">নাইট বোর্ড</p>';
         } else {
             slider.className = '';
-            slider.innerHTML = list.map((b, idx) => `
+            slider.innerHTML = list.map((b,idx) => `
                 <div class="night-board-slide ${idx===0?'active':''}" data-idx="${idx}">
-                    ${b.link ? `<a href="${b.link}" target="_blank">` : ''}
+                    ${b.link?`<a href="${b.link}" target="_blank">`:''}
                     <img src="${b.img}" onerror="this.style.display='none'" alt="night board">
-                    ${b.link ? '</a>' : ''}
+                    ${b.link?'</a>':''}
                 </div>`).join('');
         }
     }
@@ -858,34 +940,137 @@ function renderNightBoard(){
             mobileSlider.innerHTML = '<i class="fa fa-moon" style="font-size:48px;margin-bottom:12px;opacity:0.3;"></i><p style="font-size:13px;">নাইট বোর্ড</p>';
         } else {
             mobileSlider.className = '';
-            mobileSlider.innerHTML = list.map((b, idx) => `
+            mobileSlider.innerHTML = list.map((b,idx) => `
                 <div class="night-board-slide ${idx===0?'active':''}" data-idx="${idx}">
-                    ${b.link ? `<a href="${b.link}" target="_blank">` : ''}
+                    ${b.link?`<a href="${b.link}" target="_blank">`:''}
                     <img src="${b.img}" onerror="this.style.display='none'" alt="night board">
-                    ${b.link ? '</a>' : ''}
+                    ${b.link?'</a>':''}
                 </div>`).join('');
         }
     }
 
-    // auto slider (ডেস্কটপ + মোবাইল)
+    // auto slider
     if (list.length > 1) {
         clearInterval(window._nightBoardTimer);
         let ni = 0;
         window._nightBoardTimer = setInterval(() => {
-            const dSlides = document.querySelectorAll('#nightBoardSlider .night-board-slide');
-            if (dSlides.length) {
-                dSlides.forEach(s => s.classList.remove('active'));
-                dSlides[ni % dSlides.length].classList.add('active');
-            }
-            const mSlides = document.querySelectorAll('#nightBoardMobileSlider .night-board-slide');
-            if (mSlides.length) {
-                mSlides.forEach(s => s.classList.remove('active'));
-                mSlides[ni % mSlides.length].classList.add('active');
-            }
+            ['#nightBoardSlider','#nightBoardMobileSlider'].forEach(sel=>{
+                const slides = document.querySelectorAll(sel+' .night-board-slide');
+                if(!slides.length) return;
+                slides.forEach(s=>s.classList.remove('active'));
+                slides[ni % slides.length].classList.add('active');
+            });
             ni = (ni + 1) % list.length;
         }, 5000);
     }
 }
+
+/* ══════════════════════════════════════════
+   গেস্ট প্রোডাক্ট সেকশন
+══════════════════════════════════════════ */
+var _gpShown = 0;
+var _gpStep  = 10;
+var _gpAll   = [];
+
+function renderGuestProducts(){
+    const prods = JSON.parse(localStorage.getItem(PKK)||'[]');
+    // শুধু visible/approved পণ্য
+    _gpAll = prods.filter(p => !p.hidden && !p.isHidden);
+    _gpShown = 0;
+    const grid = document.getElementById('gpGrid');
+    if(!grid) return;
+    if(!_gpAll.length){
+        grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#334155;">
+            <i class="fa fa-box-open" style="font-size:36px;display:block;margin-bottom:10px;"></i>
+            <p>কোনো পণ্য নেই</p></div>`;
+        return;
+    }
+    grid.innerHTML = '';
+    _gpAppendCards(_gpStep);
+}
+
+function _gpAppendCards(count){
+    const grid = document.getElementById('gpGrid');
+    const items = _gpAll.slice(_gpShown, _gpShown + count);
+    items.forEach(p => {
+        const imgs = Array.isArray(p.images) ? p.images : [p.images || p.image || p.img || ''];
+        const img  = imgs[0] || 'ko.jpeg';
+        const price    = p.price || 0;
+        const oldPrice = p.oldPrice || p.originalPrice || '';
+        const discount = (oldPrice && oldPrice > price)
+            ? Math.round((1 - price/oldPrice)*100)+'%' : '';
+        const desc = p.description || p.desc || p.details || '';
+        // JSON encode করে onclick এ pass করা
+        const safeP = encodeURIComponent(JSON.stringify({
+            id:p.id, name:p.title||p.name||'পণ্য',
+            img, price, oldPrice, discount,
+            desc: desc.substring(0,400)
+        }));
+        const card = document.createElement('div');
+        card.className = 'gp-card';
+        card.innerHTML = `
+            <div class="gp-img-wrap" onclick="openGpModal('${safeP}')">
+                <img src="${img}" onerror="this.src='ko.jpeg'" alt="${p.title||p.name||''}">
+                ${discount?`<span class="gp-discount-badge">-${discount}</span>`:''}
+            </div>
+            <div class="gp-body">
+                <div class="gp-name">${p.title||p.name||'পণ্য'}</div>
+                <div class="gp-price-row">
+                    <span class="gp-price">৳${price}</span>
+                    ${oldPrice?`<span class="gp-old-price">৳${oldPrice}</span>`:''}
+                </div>
+                <div class="gp-stars">★★★★★</div>
+                <div class="gp-btn-row">
+                    <button class="gp-detail-btn" onclick="openGpModal('${safeP}')">বিস্তারিত</button>
+                    <button class="gp-buy-btn" onclick="gpRequireLogin()"><i class="fa fa-shopping-cart"></i> কিনুন</button>
+                </div>
+            </div>`;
+        grid.appendChild(card);
+    });
+    _gpShown += items.length;
+    const wrap = document.getElementById('gpLoadMoreWrap');
+    if(wrap) wrap.style.display = _gpShown < _gpAll.length ? 'block' : 'none';
+}
+
+function gpLoadMore(){ _gpAppendCards(_gpStep); }
+
+function openGpModal(safeP){
+    try {
+        const p = JSON.parse(decodeURIComponent(safeP));
+        document.getElementById('gpModalTitle').textContent = p.name;
+        document.getElementById('gpModalImg').src = p.img || 'ko.jpeg';
+        document.getElementById('gpModalName').textContent = p.name;
+        document.getElementById('gpModalPrice').textContent = '৳'+p.price;
+        const oldEl = document.getElementById('gpModalOld');
+        const disEl = document.getElementById('gpModalDiscount');
+        if(p.oldPrice){
+            oldEl.textContent='৳'+p.oldPrice; oldEl.style.display='inline';
+        } else { oldEl.style.display='none'; }
+        if(p.discount){
+            disEl.textContent='-'+p.discount; disEl.style.display='inline-block';
+        } else { disEl.style.display='none'; }
+        document.getElementById('gpModalDesc').textContent = p.desc || 'পণ্যটি সম্পর্কে বিস্তারিত তথ্য শীঘ্রই যোগ করা হবে।';
+        document.getElementById('gpDetailModal').style.display='block';
+        document.body.style.overflow='hidden';
+    } catch(e){ console.error('gpModal error',e); }
+}
+
+function closeGpModal(){
+    document.getElementById('gpDetailModal').style.display='none';
+    document.body.style.overflow='';
+}
+
+function gpRequireLogin(){
+    closeGpModal();
+    showToast('🔐 কার্ট ও অর্ডার করতে আগে লগইন করুন');
+    setTimeout(()=>openM('loginModal'), 600);
+}
+
+// modal backdrop click
+document.addEventListener('click', e=>{
+    const modal = document.getElementById('gpDetailModal');
+    if(modal && e.target === modal){ closeGpModal(); }
+});
 
 /* LOCAL BOARDS */
 function renderLocalBoards(){
@@ -1089,12 +1274,18 @@ function loadPmxFromFirebase(){
                 if(col==='pmx_headers') renderPmxGuestHeaders();
             }).catch(()=>{});
         });
+        // মেইন প্রোডাক্ট লোড
+        db.collection(PKK).get().then(snap=>{
+            const arr=snap.docs.map(d=>d.data());
+            if(arr.length){ localStorage.setItem(PKK,JSON.stringify(arr)); renderGuestProducts(); }
+        }).catch(()=>{});
     });
 }
 
 /* INIT */
 (window.TM_READY||Promise.resolve()).then(()=>{renderLB();renderSironam();
     renderNightBoard();renderLocalBoards();
+    renderGuestProducts();
     renderPmxGuestHeaders(); // localStorage থেকে প্রথমে render
     loadPmxFromFirebase();   // Firebase থেকে fresh data নিয়ে আবার render
 });
