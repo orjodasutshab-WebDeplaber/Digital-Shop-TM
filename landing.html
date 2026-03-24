@@ -169,10 +169,59 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 @media(max-width:1580px){.lb2-grid{grid-template-columns:repeat(3,1fr);}.lb2-card{width:100%;}}
 @media(max-width:900px){.lb2-grid{grid-template-columns:repeat(2,1fr);}.lb2-card{height:250px;}.sir-grid{grid-template-columns:repeat(2,1fr) !important;}}
 @media(max-width:600px){
-    .lb2-grid{grid-template-columns:1fr;}.lb2-card{height:220px;}.sir-grid{grid-template-columns:repeat(2,1fr) !important;}
+    .lb2-grid{grid-template-columns:1fr;}.lb2-card{height:220px;}
     .cta-board{height:270px;}.lb-wrap{height:210px;}.cta-title{font-size:20px;}
-    .top-nav{padding:10px 13px;}.brand-name{font-size:15px;}
-    .btn-ln,.btn-su{padding:7px 11px;font-size:12px;}.two{grid-template-columns:1fr;}
+    .two{grid-template-columns:1fr;}
+
+    /* ── NAV: লোগো ও ব্র্যান্ড নাম বড় ── */
+    .top-nav{padding:12px 14px;}
+    .brand img{width:50px !important;height:50px !important;border-radius:12px !important;}
+    .brand-name{font-size:20px !important;font-weight:800 !important;line-height:1.2;}
+    .brand-slogan{font-size:11px;}
+
+    /* ── লগইন ও সাইন আপ বাটন বড় ── */
+    .nav-btns{gap:8px;}
+    .btn-ln{
+        padding:11px 18px !important;
+        font-size:15px !important;
+        border-radius:12px !important;
+        font-weight:700 !important;
+        border-width:2px !important;
+    }
+    .btn-su{
+        padding:11px 18px !important;
+        font-size:15px !important;
+        border-radius:12px !important;
+        font-weight:700 !important;
+    }
+
+    /* ── স্পেশাল ক্যাটাগরি — এক লাইনে ৩টা ── */
+    .sir-grid{
+        grid-template-columns:repeat(3,1fr) !important;
+        gap:10px !important;
+    }
+    .sir-card{border-radius:10px !important;}
+    .sir-name{font-size:11px !important;}
+    .sir-hint{font-size:10px !important;}
+
+    /* ── প্রিমিয়াম ক্যাটাগরি গেস্ট গ্রিড — এক লাইনে ৩টা ── */
+    #pmxGuestHeaderGrid{
+        grid-template-columns:repeat(3,1fr) !important;
+        gap:10px !important;
+    }
+
+    /* ── Footer বড় ── */
+    .ft{padding:35px 16px 22px !important;}
+    .ft-grid{gap:22px !important;}
+    .ft-logo-text{font-size:20px !important;}
+    .ft-tagline{font-size:13px !important;line-height:1.7 !important;}
+    .ft-col h4{font-size:14px !important;margin-bottom:12px !important;}
+    .ft-col ul{gap:11px !important;}
+    .ft-col ul li a{font-size:14px !important;}
+    .ft-copy{font-size:13px !important;}
+    .ft-hotline{padding:8px 14px !important;}
+    .ft-hotline span,.ft-hotline a{font-size:13px !important;}
+    .ft-social a{width:36px !important;height:36px !important;font-size:14px !important;}
 }
 </style>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
