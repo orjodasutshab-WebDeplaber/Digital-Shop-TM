@@ -516,7 +516,10 @@ function renderProductGrid(productList, isLoadMore = false) {
                 const rand = ((seed * 9301 + 49297) % 233280) / 233280;
                 ratingVal = rand < 0.30 ? 5 : parseFloat((3.5 + rand * 1.5).toFixed(1));
             }
-            const reviewCount = item.reviewCount || item.reviews || (Math.floor(((String(item.id||'').length * 17 + 7) % 120) + 5));
+            // id থেকে consistent কিন্তু আলাদা আলাদা reviewCount
+            const _idStr = String(item.id || item.name || '');
+            const _seed = _idStr.split('').reduce((acc, c, i) => acc + c.charCodeAt(0) * (i + 7), 0);
+            const reviewCount = item.reviewCount || item.reviews || (Math.floor(((_seed * 1373 + 6151) % 196) + 5));
             // তারা রেন্ডার
             const fullStars  = Math.floor(ratingVal);
             const halfStar   = (ratingVal - fullStars) >= 0.5;
