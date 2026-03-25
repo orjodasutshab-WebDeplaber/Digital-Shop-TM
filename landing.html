@@ -54,7 +54,7 @@
 .night-board-wrap{width:580px;flex-shrink:0;border-radius:0;overflow:hidden;border:none;background:#060d1a;box-shadow:none;position:relative;align-self:stretch;min-height:100%;}
 .night-board-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;background:#060d1a;width:100%;height:100%;}
 .night-board-slide.active{opacity:1;}
-.night-board-slide img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;}
+.night-board-slide img{width:100%;height:100%;object-fit:fill;display:block;position:absolute;inset:0;}
 .night-board-slide a{display:block;width:100%;height:100%;}
 .night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:400px;}
 @media(max-width:1100px){.night-board-wrap{display:none;}}
@@ -63,7 +63,7 @@
 .night-board-mobile-wrap{display:none;width:100%;border-radius:14px;overflow:hidden;border:1px solid rgba(99,102,241,.25);background:#060d1a;position:relative;min-height:380px;margin:10px 0 6px;}
 .night-board-mobile-wrap .night-board-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;background:#060d1a;width:100%;height:100%;}
 .night-board-mobile-wrap .night-board-slide.active{opacity:1;}
-.night-board-mobile-wrap .night-board-slide img{width:100%;height:100%;object-fit:cover;display:block;position:absolute;inset:0;}
+.night-board-mobile-wrap .night-board-slide img{width:100%;height:100%;object-fit:fill;display:block;position:absolute;inset:0;}
 .night-board-mobile-wrap .night-board-slide a{display:block;width:100%;height:100%;}
 .night-board-mobile-wrap .night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:380px;}
 
@@ -402,21 +402,22 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
 </div>
 
 <!-- SIRONAM + NIGHT BOARD -->
-<div class="sec" id="sironamSection" style="background:linear-gradient(135deg,#78350f,#92400e,#b45309);border-radius:0;margin-bottom:0;">
-    <div class="sec-hd">
-        <h2 class="sec-title" style="color:#fef3c7;">🌋 স্পেশাল ক্যাটাগরি</h2>
-        <p class="sec-sub" style="color:#fde68a;">আমাদের বিশেষভাবে নির্বাচিত পণ্যসমূহ — ক্লিক করুন</p>
-    </div>
-    <div style="display:flex; gap:16px; align-items:stretch; max-width:1400px; margin:0 auto;">
-        <div style="flex:1; min-width:0;">
+<div id="sironamSection" style="background:linear-gradient(135deg,#78350f,#92400e,#b45309);border-radius:0;margin-bottom:0;display:flex;align-items:stretch;max-width:100%;overflow:hidden;">
+    <!-- বাম দিক: title + grid -->
+    <div style="flex:1;min-width:0;padding:28px 16px;">
+        <div class="sec-hd">
+            <h2 class="sec-title" style="color:#fef3c7;">🌋 স্পেশাল ক্যাটাগরি</h2>
+            <p class="sec-sub" style="color:#fde68a;">আমাদের বিশেষভাবে নির্বাচিত পণ্যসমূহ — ক্লিক করুন</p>
+        </div>
+        <div style="max-width:860px;margin:0 auto;">
             <div class="sir-grid" id="sironamGrid"></div>
         </div>
-        <!-- Night Board -->
-        <div class="night-board-wrap" id="nightBoardWrap">
-            <div id="nightBoardSlider" class="night-board-empty">
-                <i class="fa fa-moon" style="font-size:48px;margin-bottom:12px;opacity:0.3;"></i>
-                <p style="font-size:13px;">নাইট বোর্ড</p>
-            </div>
+    </div>
+    <!-- নাইট বোর্ড: উপর থেকে নিচ পর্যন্ত full height -->
+    <div class="night-board-wrap" id="nightBoardWrap" style="margin-left:16px;">
+        <div id="nightBoardSlider" class="night-board-empty">
+            <i class="fa fa-moon" style="font-size:48px;margin-bottom:12px;opacity:0.3;"></i>
+            <p style="font-size:13px;">নাইট বোর্ড</p>
         </div>
     </div>
 </div>
