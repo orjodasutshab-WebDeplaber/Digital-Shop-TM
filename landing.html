@@ -108,6 +108,27 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 
 /* SIRONAM */
 .sir-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:1400px;margin:0 auto;}
+
+/* PC: scroll wrapper — ৩ লাইন + ৪র্থ লাইনের ১/৩ দেখাবে */
+.sir-grid-pc-wrap{
+    max-height:537px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-right:4px;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(251,191,36,.5) rgba(0,0,0,.2);
+}
+.sir-grid-pc-wrap::-webkit-scrollbar{width:5px;}
+.sir-grid-pc-wrap::-webkit-scrollbar-track{background:rgba(0,0,0,.15);border-radius:4px;}
+.sir-grid-pc-wrap::-webkit-scrollbar-thumb{background:rgba(251,191,36,.45);border-radius:4px;}
+.sir-grid-pc-wrap::-webkit-scrollbar-thumb:hover{background:rgba(251,191,36,.75);}
+
+/* মোবাইলে wrapper এর max-height সরিয়ে দাও */
+body.is-mobile .sir-grid-pc-wrap{
+    max-height:none !important;
+    overflow:visible !important;
+    padding-right:0 !important;
+}
 .sir-card{border-radius:15px;overflow:hidden;cursor:pointer;position:relative;aspect-ratio:4/3;border:1px solid rgba(99,102,241,.18);transition:all .3s;background:#0f172a;}
 .sir-card:hover{border-color:rgba(99,102,241,.65);transform:translateY(-5px);box-shadow:0 14px 35px rgba(99,102,241,.18);}
 .sir-card img{width:100%;height:100%;object-fit:fill;display:block;transition:transform .4s;}
@@ -424,7 +445,10 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
             <p class="sec-sub" style="color:#fde68a;">আমাদের বিশেষভাবে নির্বাচিত পণ্যসমূহ — ক্লিক করুন</p>
         </div>
         <div style="max-width:860px;margin:0 auto;">
+            <!-- PC: ৩ লাইন + ৪র্থ লাইনের ১/৩ দেখা যাবে, বাকিটা scroll -->
+            <div style="max-height:537px;overflow-y:auto;overflow-x:hidden;padding-right:4px;scrollbar-width:thin;scrollbar-color:rgba(251,191,36,.5) rgba(0,0,0,.2);" class="sir-grid-pc-wrap">
             <div class="sir-grid" id="sironamGrid"></div>
+            </div>
         </div>
     </div>
     <!-- নাইট বোর্ড: উপর থেকে নিচ পর্যন্ত full height -->
