@@ -51,19 +51,19 @@
 .or-div::before,.or-div::after{content:'';flex:1;height:1px;background:#334155;}
 
 /* NIGHT BOARD */
-.night-board-wrap{width:600px;min-height:750px;flex-shrink:0;border-radius:20px;overflow:hidden;border:1px solid rgba(99,102,241,.25);background:#060d1a;box-shadow:0 20px 55px rgba(0,0,0,.6);position:relative;}
+.night-board-wrap{width:580px;flex-shrink:0;border-radius:0;overflow:hidden;border:none;background:#060d1a;box-shadow:none;position:relative;align-self:stretch;}
 .night-board-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;background:#060d1a;}
 .night-board-slide.active{opacity:1;}
-.night-board-slide img{width:100%;height:100%;object-fit:fill;display:block;}
+.night-board-slide img{width:100%;height:100%;object-fit:cover;display:block;}
 .night-board-slide a{display:block;width:100%;height:100%;}
-.night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:750px;}
+.night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:400px;}
 @media(max-width:1100px){.night-board-wrap{display:none;}}
 
 /* মোবাইল নাইট বোর্ড */
 .night-board-mobile-wrap{display:none;width:100%;border-radius:14px;overflow:hidden;border:1px solid rgba(99,102,241,.25);background:#060d1a;position:relative;min-height:380px;margin:10px 0 6px;}
 .night-board-mobile-wrap .night-board-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;background:#060d1a;}
 .night-board-mobile-wrap .night-board-slide.active{opacity:1;}
-.night-board-mobile-wrap .night-board-slide img{width:100%;height:100%;object-fit:fill;display:block;}
+.night-board-mobile-wrap .night-board-slide img{width:100%;height:100%;object-fit:cover;display:block;}
 .night-board-mobile-wrap .night-board-slide a{display:block;width:100%;height:100%;}
 .night-board-mobile-wrap .night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:380px;}
 
@@ -407,7 +407,7 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
         <h2 class="sec-title" style="color:#fef3c7;">🌋 স্পেশাল ক্যাটাগরি</h2>
         <p class="sec-sub" style="color:#fde68a;">আমাদের বিশেষভাবে নির্বাচিত পণ্যসমূহ — ক্লিক করুন</p>
     </div>
-    <div style="display:flex; gap:20px; align-items:flex-start; max-width:1400px; margin:0 auto;">
+    <div style="display:flex; gap:0; align-items:stretch; max-width:1400px; margin:0 auto;">
         <div style="flex:1; min-width:0;">
             <div class="sir-grid" id="sironamGrid"></div>
         </div>
