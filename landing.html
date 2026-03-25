@@ -204,17 +204,22 @@ body.is-mobile .night-board-wrap{display:none;}
 body.is-mobile .night-board-mobile-wrap{display:block !important;}
 
 /* ✅ গেস্ট প্রোডাক্ট সেকশন — Daraz Style */
-.gp-section{padding:0 6px 10px;}
-.gp-header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px;}
+.gp-section{padding:0 32px 24px;}
+.gp-header{display:flex;align-items:center;justify-content:space-between;padding:16px 0 12px;}
 .gp-title{font-size:18px;font-weight:900;color:#fff;}
+body.is-mobile .gp-section{padding:0 6px 10px;}
+body.is-mobile .gp-header{padding:14px 0 10px;}
 
-/* GRID — Daraz-এর মতো 2px gap, full width */
-.gp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;max-width:1400px;margin:0 auto;background:#e5e7eb;border:2px solid #e5e7eb;border-radius:0;overflow:hidden;}
-body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:0 14px 14px;background:transparent;border:none;}
+/* GRID — PC: 20px gap, white background on outer */
+.gp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:20px;max-width:1400px;margin:0 auto;background:transparent;border:none;border-radius:0;overflow:visible;padding:0;}
+body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:0 14px 14px;background:transparent;border:none;border-radius:0;}
 
 /* CARD — Daraz সাদা */
 .gp-card{background:#fff;overflow:hidden;cursor:pointer;transition:box-shadow .18s;position:relative;display:flex;flex-direction:column;border-radius:0;}
 .gp-card:hover{box-shadow:0 4px 18px rgba(0,0,0,0.13);}
+/* PC: card border + slight radius */
+body:not(.is-mobile) .gp-card{border-radius:8px;border:1px solid #e5e7eb;}
+body:not(.is-mobile) .gp-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.14);transform:translateY(-2px);}
 
 /* IMAGE */
 .gp-img-wrap{width:100%;aspect-ratio:1/1;overflow:hidden;background:#f8f9fa;position:relative;}
@@ -254,6 +259,10 @@ body.is-mobile .gp-buy-btn{font-size:14px;padding:13px 0;font-weight:800;border-
 
 .gp-loadmore-wrap{text-align:center;padding:18px 0 6px;}
 .gp-loadmore-btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:none;padding:11px 32px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:800;font-family:'Hind Siliguri',sans-serif;}
+
+/* PC: outer wrapper সাদা background */
+.gp-grid-outer{background:#fff;border-radius:14px;padding:20px;}
+body.is-mobile .gp-grid-outer{background:transparent;padding:0;border-radius:0;}
 
 /* ══ Daraz স্টাইল Product Detail Modal ══ */
 .gp-modal{display:none;position:fixed;inset:0;background:#f5f5f5;z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;-webkit-overflow-scrolling:touch;}
@@ -465,7 +474,9 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
     <div class="gp-header">
         <div class="gp-title" style="color:#fff;font-size:19px;font-weight:900;display:flex;align-items:center;gap:8px;">🛍️ সকল পণ্য</div>
     </div>
-    <div class="gp-grid" id="gpGrid"></div>
+    <div class="gp-grid-outer">
+        <div class="gp-grid" id="gpGrid"></div>
+    </div>
     <div class="gp-loadmore-wrap" id="gpLoadMoreWrap" style="display:none;">
         <button class="gp-loadmore-btn" onclick="gpLoadMore()">আরো দেখুন <i class="fa fa-chevron-down" style="margin-left:6px;"></i></button>
     </div>
