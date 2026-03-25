@@ -259,7 +259,7 @@ body.is-mobile .gp-buy-btn{font-size:14px;padding:13px 0;font-weight:800;border-
 .gp-modal{display:none;position:fixed;inset:0;background:#f5f5f5;z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;-webkit-overflow-scrolling:touch;}
 /* top bar */
 .gpd-topbar{position:sticky;top:0;z-index:20;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
-.gpd-back-btn{background:none;border:none;font-size:40px;cursor:pointer;color:#222;padding:0;line-height:1;width:44px;}
+.gpd-back-btn{background:none;border:none;font-size:48px;cursor:pointer;color:#222;padding:0;line-height:1;width:52px;}
 .gpd-topbar-title{flex:1;font-size:40px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .gpd-topbar-icons{display:flex;gap:16px;align-items:center;}
 .gpd-topbar-icons i{font-size:40px;color:#444;cursor:pointer;}
@@ -492,11 +492,11 @@ body.is-mobile .ft-hotline svg{width:18px;height:18px;}
             <span class="gpd-discount-badge" id="gpModalDiscount" style="display:none;"></span>
             <div class="gpd-heart-share">
                 <i class="fa fa-heart-o"></i>
-                <i class="fa fa-share-alt"></i>
+                <i class="fa fa-share-alt" onclick="gpShareProduct()" style="cursor:pointer;"></i>
             </div>
         </div>
         <div class="gpd-name" id="gpModalName"></div>
-        <div class="gpd-stars-row">
+        <div class="gpd-stars-row" style="display:none;">
             <span class="gpd-star-icons" id="gpModalStarIcons">★★★★★</span>
             <span class="gpd-stars-val" id="gpModalStarVal">4.5</span>
             <span class="gpd-review-count" id="gpModalReviewCount">(35)</span>
@@ -1235,6 +1235,13 @@ function openGpModal(safeP){
         // desc
         document.getElementById('gpModalDesc').textContent = p.desc || 'এই পণ্যটি সম্পর্কে বিস্তারিত তথ্য শীঘ্রই যোগ করা হবে।';
 
+        // current product save (share এর জন্য)
+        window._gpdCurrentId   = p.id;
+        window._gpdCurrentName = p.name;
+        // URL update
+        const newUrl = window.location.href.split('?')[0] + '?product=' + encodeURIComponent(p.id||p.name);
+        history.replaceState(null,'',newUrl);
+
         // show modal
         document.getElementById('gpDetailModal').style.display = 'block';
         document.getElementById('gpDetailModal').scrollTop = 0;
@@ -1270,6 +1277,56 @@ function gpdSlide(dir){
 function closeGpModal(){
     document.getElementById('gpDetailModal').style.display='none';
     document.body.style.overflow='';
+    history.replaceState(null,'',window.location.href.split('?')[0]);
+}
+
+function gpShareProduct(){
+    const id = window._gpdCurrentId;
+    if(!id) return;
+    const url = window.location.href.split('?')[0] + '?product=' + encodeURIComponent(id);
+    if(navigator.share){
+        navigator.share({
+            title: window._gpdCurrentName || 'পণ্য',
+            text: window._gpdCurrentName || 'এই পণ্যটি দেখুন',
+            url: url
+        }).catch(()=>{});
+    } else {
+        // fallback — copy to clipboard
+        if(navigator.clipboard){
+            navigator.clipboard.writeText(url).then(()=>{
+                showToast('✅ লিংক কপি হয়েছে!');
+            }).catch(()=>{ showToast('🔗 '+url); });
+        } else {
+            showToast('🔗 লিংক: '+url);
+        }
+    }
+}
+
+// URL এ ?product=ID থাকলে auto-open করা
+function _gpCheckUrlProduct(){
+    const params = new URLSearchParams(window.location.search);
+    const pid = params.get('product');
+    if(!pid) return;
+    // product list ready হওয়ার পর খুঁজবে
+    const tryOpen = ()=>{
+        const prod = _gpAll.find(p=> String(p.id)===String(pid) || String(p.title||p.name)===String(pid));
+        if(prod){
+            const imgs = Array.isArray(prod.images)?prod.images:[prod.images||prod.image||prod.img||''];
+            const price    = prod.price||0;
+            const oldPrice = prod.oldPrice||prod.originalPrice||'';
+            const discount = (oldPrice&&oldPrice>price)?Math.round((1-price/oldPrice)*100)+'%':'';
+            const desc     = prod.description||prod.desc||prod.details||'';
+            const safeP = encodeURIComponent(JSON.stringify({
+                id:prod.id, name:prod.title||prod.name||'পণ্য',
+                rating:prod.rating||prod.stars||prod.avgRating||0,
+                img:imgs[0]||'ko.jpeg', imgs, price, oldPrice, discount,
+                desc:desc.substring(0,400)
+            }));
+            openGpModal(safeP);
+        }
+    };
+    // renderGuestProducts এর পরে চালাবে
+    setTimeout(tryOpen, 800);
 }
 
 function gpRequireLogin(){
@@ -1498,6 +1555,7 @@ function loadPmxFromFirebase(){
 (window.TM_READY||Promise.resolve()).then(()=>{renderLB();renderSironam();
     renderNightBoard();renderLocalBoards();
     renderGuestProducts();
+    _gpCheckUrlProduct();
     renderPmxGuestHeaders(); // localStorage থেকে প্রথমে render
     loadPmxFromFirebase();   // Firebase থেকে fresh data নিয়ে আবার render
 });
