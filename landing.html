@@ -256,45 +256,60 @@ body.is-mobile .gp-buy-btn{font-size:14px;padding:13px 0;font-weight:800;border-
 .gp-loadmore-btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:none;padding:11px 32px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:800;font-family:'Hind Siliguri',sans-serif;}
 
 /* ══ Daraz স্টাইল Product Detail Modal ══ */
-.gp-modal{display:none;position:fixed;inset:0;background:#fff;z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;}
+.gp-modal{display:none;position:fixed;inset:0;background:#f5f5f5;z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;-webkit-overflow-scrolling:touch;}
 /* top bar */
-.gpd-topbar{position:sticky;top:0;z-index:10;background:#fff;display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #f0f0f0;gap:10px;}
-.gpd-back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:#333;padding:0;line-height:1;}
-.gpd-topbar-title{flex:1;font-size:15px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.gpd-topbar-icons{display:flex;gap:14px;color:#333;font-size:18px;}
+.gpd-topbar{position:sticky;top:0;z-index:20;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
+.gpd-back-btn{background:none;border:none;font-size:24px;cursor:pointer;color:#222;padding:0;line-height:1;width:28px;}
+.gpd-topbar-title{flex:1;font-size:16px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gpd-topbar-icons{display:flex;gap:16px;align-items:center;}
+.gpd-topbar-icons i{font-size:20px;color:#444;cursor:pointer;}
 /* image slider */
-.gpd-img-slider{position:relative;width:100%;background:#f5f5f5;}
-.gpd-img-slider img{width:100%;aspect-ratio:1;object-fit:cover;display:block;}
-.gpd-img-counter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.45);color:#fff;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;}
-.gpd-slide-prev,.gpd-slide-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.8);border:none;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);}
-.gpd-slide-prev{left:10px;}
-.gpd-slide-next{right:10px;}
+.gpd-img-slider{position:relative;width:100%;background:#fff;}
+.gpd-main-img{width:100%;aspect-ratio:1/1;object-fit:contain;display:block;background:#fff;}
+.gpd-img-counter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.40);color:#fff;font-size:13px;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:1px;}
+/* thumbnail strip */
+.gpd-thumbs{display:flex;gap:8px;padding:10px 14px;background:#fff;border-bottom:1px solid #f0f0f0;overflow-x:auto;scrollbar-width:none;}
+.gpd-thumbs::-webkit-scrollbar{display:none;}
+.gpd-thumb{width:70px;height:70px;border-radius:4px;overflow:hidden;border:2px solid #ddd;cursor:pointer;flex-shrink:0;}
+.gpd-thumb.active{border-color:#f57224;}
+.gpd-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
 /* price section */
-.gpd-price-sec{background:#fff;padding:14px 16px 10px;}
-.gpd-price-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
-.gpd-price{color:#f57224;font-size:26px;font-weight:900;}
-.gpd-old-price{color:#aaa;font-size:14px;text-decoration:line-through;}
-.gpd-discount-badge{background:#f57224;color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:4px;}
-.gpd-name{font-size:15px;font-weight:600;color:#222;line-height:1.5;margin-bottom:8px;}
-.gpd-stars-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
-.gpd-stars-val{color:#f57224;font-size:13px;font-weight:700;}
-.gpd-review-count{color:#888;font-size:12px;}
+.gpd-price-sec{background:#fff;padding:14px 14px 6px;margin-top:8px;}
+.gpd-price-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+.gpd-taka{color:#f57224;font-size:16px;font-weight:700;}
+.gpd-price{color:#f57224;font-size:26px;font-weight:900;line-height:1;}
+.gpd-old-price{color:#aaa;font-size:15px;text-decoration:line-through;font-weight:500;}
+.gpd-discount-badge{background:#f57224;color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:4px;}
+.gpd-heart-share{margin-left:auto;display:flex;gap:14px;align-items:center;}
+.gpd-heart-share i{font-size:22px;color:#888;cursor:pointer;}
+/* name */
+.gpd-name{font-size:16px;font-weight:600;color:#111;line-height:1.55;margin-bottom:10px;padding:0;}
+/* stars */
+.gpd-stars-row{display:flex;align-items:center;gap:5px;padding-bottom:10px;}
+.gpd-star-icons{color:#f57224;font-size:16px;letter-spacing:2px;}
+.gpd-stars-val{color:#f57224;font-size:14px;font-weight:700;}
+.gpd-review-count{color:#888;font-size:13px;}
 /* divider */
 .gpd-divider{height:8px;background:#f5f5f5;}
+/* product options */
+.gpd-options-sec{background:#fff;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0;}
+.gpd-options-label{color:#888;font-size:13px;font-weight:600;margin-right:10px;flex-shrink:0;}
+.gpd-options-val{color:#222;font-size:13px;font-weight:600;flex:1;}
+.gpd-options-arrow{color:#bbb;font-size:18px;}
 /* desc section */
-.gpd-desc-sec{padding:14px 16px;}
-.gpd-desc-title{font-size:14px;font-weight:800;color:#222;margin-bottom:8px;}
-.gpd-desc-text{font-size:13px;color:#555;line-height:1.7;}
+.gpd-desc-sec{background:#fff;padding:14px 14px;margin-top:8px;}
+.gpd-desc-title{font-size:15px;font-weight:800;color:#111;margin-bottom:10px;}
+.gpd-desc-text{font-size:13px;color:#555;line-height:1.75;}
+/* spacer for action bar */
+.gpd-spacer{height:72px;}
 /* bottom action bar */
-.gpd-action-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;display:flex;align-items:center;padding:8px 10px;gap:8px;z-index:10;}
-.gpd-store-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;gap:2px;background:none;border:none;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
-.gpd-store-btn i{font-size:18px;color:#555;}
-.gpd-store-btn span{font-size:10px;color:#555;}
-.gpd-chat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;gap:2px;background:none;border:none;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
-.gpd-chat-btn i{font-size:18px;color:#555;}
-.gpd-chat-btn span{font-size:10px;color:#555;}
-.gpd-buynow-btn{flex:1;padding:13px 0;background:linear-gradient(90deg,#38bdf8,#0ea5e9);color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
-.gpd-addcart-btn{flex:1;padding:13px 0;background:linear-gradient(90deg,#fb923c,#f97316);color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
+.gpd-action-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ebebeb;display:flex;align-items:stretch;z-index:20;height:60px;}
+.gpd-store-btn,.gpd-chat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:60px;gap:3px;background:none;border:none;border-right:1px solid #f0f0f0;cursor:pointer;font-family:'Hind Siliguri',sans-serif;padding:0 8px;}
+.gpd-store-btn img{width:26px;height:26px;border-radius:50%;object-fit:cover;}
+.gpd-store-btn span,.gpd-chat-btn span{font-size:11px;color:#555;font-weight:600;}
+.gpd-chat-btn i{font-size:20px;color:#555;}
+.gpd-buynow-btn{flex:1;background:#38bdf8;color:#fff;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;border-right:1px solid rgba(255,255,255,0.3);}
+.gpd-addcart-btn{flex:1;background:#f97316;color:#fff;border:none;font-size:15px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
 body.is-mobile .cta-board{height:270px;}
 body.is-mobile .lb-wrap{height:450px;border-radius:0;margin:0;width:100%;}
 body.is-mobile .cta-title{font-size:20px;}
@@ -447,46 +462,69 @@ body.is-mobile .ft-hotline svg{width:18px;height:18px;}
 
 <!-- Daraz স্টাইল Product Detail Modal -->
 <div class="gp-modal" id="gpDetailModal">
+
     <!-- Top Bar -->
     <div class="gpd-topbar">
         <button class="gpd-back-btn" onclick="closeGpModal()">&#8592;</button>
-        <div class="gpd-topbar-title" id="gpModalTitle">পণ্যের বিবরণ</div>
+        <div class="gpd-topbar-title" id="gpModalTitle"></div>
         <div class="gpd-topbar-icons">
-            <i class="fa fa-share-alt" style="cursor:pointer;"></i>
+            <i class="fa fa-shopping-cart"></i>
+            <i class="fa fa-ellipsis-v"></i>
         </div>
     </div>
-    <!-- Image Slider -->
-    <div class="gpd-img-slider" id="gpdImgSlider">
-        <img id="gpModalImg" src="" alt="">
+
+    <!-- Main Image Slider -->
+    <div class="gpd-img-slider">
+        <img class="gpd-main-img" id="gpModalImg" src="" alt="">
         <div class="gpd-img-counter" id="gpdImgCounter">1/1</div>
-        <button class="gpd-slide-prev" id="gpdPrev" onclick="gpdSlide(-1)" style="display:none;">&#8249;</button>
-        <button class="gpd-slide-next" id="gpdNext" onclick="gpdSlide(1)" style="display:none;">&#8250;</button>
     </div>
+
+    <!-- Thumbnail Strip -->
+    <div class="gpd-thumbs" id="gpdThumbs"></div>
+
     <!-- Price Section -->
     <div class="gpd-price-sec">
         <div class="gpd-price-row">
+            <span class="gpd-taka">৳</span>
             <span class="gpd-price" id="gpModalPrice"></span>
             <span class="gpd-old-price" id="gpModalOld" style="display:none;"></span>
             <span class="gpd-discount-badge" id="gpModalDiscount" style="display:none;"></span>
+            <div class="gpd-heart-share">
+                <i class="fa fa-heart-o"></i>
+                <i class="fa fa-share-alt"></i>
+            </div>
         </div>
         <div class="gpd-name" id="gpModalName"></div>
         <div class="gpd-stars-row">
-            <span style="color:#f57224;font-size:14px;" id="gpModalStarIcons">★★★★★</span>
-            <span class="gpd-stars-val" id="gpModalStarVal"></span>
-            <span class="gpd-review-count" id="gpModalReviewCount"></span>
+            <span class="gpd-star-icons" id="gpModalStarIcons">★★★★★</span>
+            <span class="gpd-stars-val" id="gpModalStarVal">4.5</span>
+            <span class="gpd-review-count" id="gpModalReviewCount">(35)</span>
         </div>
     </div>
+
     <div class="gpd-divider"></div>
+
+    <!-- Product Options -->
+    <div class="gpd-options-sec" onclick="gpRequireLogin()">
+        <span class="gpd-options-label">Product Options</span>
+        <span class="gpd-options-val" id="gpModalOptions">লগইন করে দেখুন</span>
+        <span class="gpd-options-arrow">&#62;</span>
+    </div>
+
+    <div class="gpd-divider"></div>
+
     <!-- Description -->
     <div class="gpd-desc-sec">
-        <div class="gpd-desc-title">📋 পণ্যের বিবরণ</div>
+        <div class="gpd-desc-title">Product Details</div>
         <div class="gpd-desc-text" id="gpModalDesc"></div>
     </div>
-    <div style="height:80px;"></div>
+
+    <div class="gpd-spacer"></div>
+
     <!-- Bottom Action Bar -->
     <div class="gpd-action-bar">
         <button class="gpd-store-btn" onclick="gpRequireLogin()">
-            <i class="fa fa-store"></i>
+            <i class="fa fa-store-alt" style="font-size:20px;color:#f57224;"></i>
             <span>Store</span>
         </button>
         <button class="gpd-chat-btn" onclick="gpRequireLogin()">
@@ -496,6 +534,7 @@ body.is-mobile .ft-hotline svg{width:18px;height:18px;}
         <button class="gpd-buynow-btn" onclick="gpRequireLogin()">Buy Now</button>
         <button class="gpd-addcart-btn" onclick="gpRequireLogin()">Add to Cart</button>
     </div>
+
 </div>
 
 <!-- LOCAL BOARDS -->
@@ -1139,27 +1178,32 @@ function openGpModal(safeP){
     try {
         const p = JSON.parse(decodeURIComponent(safeP));
 
+        // images
+        const imgs = (p.imgs && p.imgs.length) ? p.imgs : [p.img || 'ko.jpeg'];
+        window._gpdImgs = imgs;
+        window._gpdIdx  = 0;
+
         // topbar title
         document.getElementById('gpModalTitle').textContent = p.name;
 
-        // images slider setup
-        const imgs = p.imgs && p.imgs.length ? p.imgs : [p.img || 'ko.jpeg'];
-        window._gpdImgs = imgs;
-        window._gpdIdx  = 0;
+        // main image
         _gpdUpdateImg();
 
-        const prevBtn = document.getElementById('gpdPrev');
-        const nextBtn = document.getElementById('gpdNext');
+        // thumbnails
+        const thumbsEl = document.getElementById('gpdThumbs');
         if(imgs.length > 1){
-            prevBtn.style.display = 'flex';
-            nextBtn.style.display = 'flex';
+            thumbsEl.style.display = 'flex';
+            thumbsEl.innerHTML = imgs.map((src, i) => `
+                <div class="gpd-thumb ${i===0?'active':''}" id="gpd-thumb-${i}" onclick="gpdGoTo(${i})">
+                    <img src="${src}" onerror="this.src='ko.jpeg'" alt="">
+                </div>`).join('');
         } else {
-            prevBtn.style.display = 'none';
-            nextBtn.style.display = 'none';
+            thumbsEl.style.display = 'none';
+            thumbsEl.innerHTML = '';
         }
 
         // price
-        document.getElementById('gpModalPrice').textContent = '৳'+p.price;
+        document.getElementById('gpModalPrice').textContent = p.price;
         const oldEl = document.getElementById('gpModalOld');
         const disEl = document.getElementById('gpModalDiscount');
         if(p.oldPrice){ oldEl.textContent='৳'+p.oldPrice; oldEl.style.display='inline'; }
@@ -1170,32 +1214,49 @@ function openGpModal(safeP){
         // name
         document.getElementById('gpModalName').textContent = p.name;
 
+        // product options
+        const optEl = document.getElementById('gpModalOptions');
+        if(optEl) optEl.textContent = p.options || 'অপশন দেখতে লগইন করুন';
+
         // stars
-        const r = parseFloat(p.rating) || 4.2;
-        const cnt = p.cnt || (50 + Math.floor(Math.random()*200));
-        const fullStars = Math.floor(r);
-        const halfStar  = r - fullStars >= 0.5;
+        const r   = parseFloat(p.rating) || 4.2;
+        const cnt = p.cnt || (35 + Math.abs(Math.floor((p.id||'').toString().charCodeAt(0)||0) % 200));
+        const full = Math.floor(r);
+        const half = (r - full) >= 0.5;
         let starHTML = '';
-        for(let i=0;i<fullStars;i++) starHTML += '<span style="color:#f57224;">★</span>';
-        if(halfStar) starHTML += '<span style="color:#f57224;">☆</span>';
-        document.getElementById('gpModalStarIcons').innerHTML = starHTML;
-        document.getElementById('gpModalStarVal').textContent = r.toFixed(1);
-        document.getElementById('gpModalReviewCount').textContent = '('+cnt+' রিভিউ)';
+        for(let i=0;i<full;i++) starHTML += '★';
+        if(half) starHTML += '½';
+        for(let i=full+(half?1:0);i<5;i++) starHTML += '☆';
+        document.getElementById('gpModalStarIcons').textContent = starHTML;
+        document.getElementById('gpModalStarVal').textContent   = r.toFixed(1);
+        document.getElementById('gpModalReviewCount').textContent = '('+cnt+')';
 
         // desc
-        document.getElementById('gpModalDesc').textContent = p.desc || 'পণ্যটি সম্পর্কে বিস্তারিত তথ্য শীঘ্রই যোগ করা হবে।';
+        document.getElementById('gpModalDesc').textContent = p.desc || 'এই পণ্যটি সম্পর্কে বিস্তারিত তথ্য শীঘ্রই যোগ করা হবে।';
 
-        document.getElementById('gpDetailModal').style.display='block';
+        // show modal
+        document.getElementById('gpDetailModal').style.display = 'block';
         document.getElementById('gpDetailModal').scrollTop = 0;
-        document.body.style.overflow='hidden';
+        document.body.style.overflow = 'hidden';
     } catch(e){ console.error('gpModal error',e); }
 }
 
 function _gpdUpdateImg(){
     const imgs = window._gpdImgs || [];
     const idx  = window._gpdIdx  || 0;
-    document.getElementById('gpModalImg').src = imgs[idx] || 'ko.jpeg';
-    document.getElementById('gpdImgCounter').textContent = (idx+1)+'/'+imgs.length;
+    const imgEl = document.getElementById('gpModalImg');
+    if(imgEl) imgEl.src = imgs[idx] || 'ko.jpeg';
+    const ctr = document.getElementById('gpdImgCounter');
+    if(ctr) ctr.textContent = (idx+1)+'/'+imgs.length;
+    // thumbnail active state
+    document.querySelectorAll('.gpd-thumb').forEach((t,i)=>{
+        t.classList.toggle('active', i===idx);
+    });
+}
+
+function gpdGoTo(idx){
+    window._gpdIdx = idx;
+    _gpdUpdateImg();
 }
 
 function gpdSlide(dir){
