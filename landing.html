@@ -225,20 +225,20 @@ body.is-mobile .night-board-wrap{display:none;}
 body.is-mobile .night-board-mobile-wrap{display:block !important;}
 
 /* ✅ গেস্ট প্রোডাক্ট সেকশন — Daraz Style */
-.gp-section{padding:0 0 24px;}
-.gp-header{display:flex;align-items:center;justify-content:space-between;padding:20px 32px 16px;}
-.gp-title{font-size:26px;font-weight:900;color:#fff;display:flex;align-items:center;gap:10px;position:relative;}
-body:not(.is-mobile) .gp-title{font-size:26px;font-weight:900;color:#fff;letter-spacing:.5px;}
+.gp-section{padding:0 0 24px;background:#fff;}
+.gp-header{display:flex;align-items:center;justify-content:space-between;padding:20px 32px 16px;background:#fff;}
+.gp-title{font-size:26px;font-weight:900;color:#222;display:flex;align-items:center;gap:10px;position:relative;}
+body:not(.is-mobile) .gp-title{font-size:26px;font-weight:900;color:#222;letter-spacing:.5px;}
 body:not(.is-mobile) .gp-title::before{content:'';display:inline-block;width:5px;height:28px;background:linear-gradient(180deg,#f57224,#ef4444);border-radius:3px;margin-right:4px;}
-body.is-mobile .gp-section{padding:0 10px 10px;}
-body.is-mobile .gp-header{padding:16px 0 14px;}
-body.is-mobile .gp-title{font-size:52px !important;font-weight:900 !important;color:#fff !important;letter-spacing:1px;display:flex;align-items:center;gap:12px;}
+body.is-mobile .gp-section{padding:0 0 10px;background:#fff;}
+body.is-mobile .gp-header{padding:16px 14px 14px;background:#fff;}
+body.is-mobile .gp-title{font-size:52px !important;font-weight:900 !important;color:#222 !important;letter-spacing:1px;display:flex;align-items:center;gap:12px;}
 body.is-mobile .gp-title::before{display:none;}
 body.is-mobile .gp-title::after{content:'';display:block;height:4px;width:60px;background:linear-gradient(90deg,#f57224,#ef4444);border-radius:2px;margin-top:6px;}
 
 /* GRID — PC: 20px gap, white background on outer */
 .gp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:20px;max-width:1400px;margin:0 auto;background:transparent;border:none;border-radius:0;overflow:visible;padding:0;}
-body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:12px;padding:0;background:transparent;border:none;border-radius:0;}
+body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:12px;padding:0 14px 14px;background:transparent;border:none;border-radius:0;}
 
 /* CARD — Daraz সাদা */
 .gp-card{background:#fff;overflow:hidden;cursor:pointer;transition:box-shadow .18s;position:relative;display:flex;flex-direction:column;border-radius:0;}
@@ -501,7 +501,7 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
 <!-- গেস্ট প্রোডাক্ট সেকশন — নাইট বোর্ডের নিচে -->
 <div class="gp-section" id="gpSection">
     <div class="gp-header">
-        <div class="gp-title" style="color:#fff;font-size:19px;font-weight:900;display:flex;align-items:center;gap:8px;">🛍️ সকল পণ্য</div>
+        <div class="gp-title">🛍️ সকল পণ্য</div>
     </div>
     <div class="gp-grid-outer">
         <div class="gp-grid" id="gpGrid"></div>
