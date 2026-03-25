@@ -209,45 +209,45 @@ body.is-mobile .night-board-mobile-wrap{display:block !important;}
 .gp-title{font-size:18px;font-weight:900;color:#fff;}
 
 /* GRID — Daraz-এর মতো 2px gap, full width */
-.gp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;max-width:1400px;margin:0 auto;background:#e5e7eb;border:3px solid #e5e7eb;border-radius:10px;overflow:hidden;}
-body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:0 14px 14px;}
+.gp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;max-width:1400px;margin:0 auto;background:#e5e7eb;border:2px solid #e5e7eb;border-radius:0;overflow:hidden;}
+body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:0 14px 14px;background:transparent;border:none;}
 
-/* CARD — সাদা, কোনো border নেই, Daraz-এর মতো */
-.gp-card{background:#fff;overflow:hidden;cursor:pointer;transition:opacity .18s;position:relative;display:flex;flex-direction:column;}
-.gp-card:hover{opacity:.93;}
+/* CARD — Daraz সাদা */
+.gp-card{background:#fff;overflow:hidden;cursor:pointer;transition:box-shadow .18s;position:relative;display:flex;flex-direction:column;border-radius:0;}
+.gp-card:hover{box-shadow:0 4px 18px rgba(0,0,0,0.13);}
 
-/* IMAGE — Daraz-এর মতো square, বড় */
+/* IMAGE */
 .gp-img-wrap{width:100%;aspect-ratio:1/1;overflow:hidden;background:#f8f9fa;position:relative;}
 body.is-mobile .gp-img-wrap{aspect-ratio:1/1;}
 .gp-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s;}
-.gp-card:hover .gp-img-wrap img{transform:scale(1.03);}
+.gp-card:hover .gp-img-wrap img{transform:scale(1.04);}
 
-/* DISCOUNT BADGE — image-এ নেই, body-তে */
-.gp-discount-badge{display:none;}
+/* DISCOUNT BADGE — ছবির উপরে বাম দিকে */
+.gp-discount-badge{display:block;position:absolute;top:0;left:0;background:#f57224;color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:0 0 8px 0;z-index:2;}
 
 /* BODY */
-.gp-body{padding:8px 8px 12px;flex:1;display:flex;flex-direction:column;gap:0;}
+.gp-body{padding:8px 8px 10px;flex:1;display:flex;flex-direction:column;gap:0;}
 
-/* NAME — Daraz-এর মতো 2 লাইন, গাঢ় */
-.gp-name{color:#222;font-size:13px;font-weight:600;margin-bottom:5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;min-height:39px;}
+/* NAME */
+.gp-name{color:#222;font-size:13px;font-weight:500;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;min-height:39px;}
 body.is-mobile .gp-name{font-size:35px;min-height:80px;}
 
-/* PRICE — Daraz লাল/কমলা, বড় */
-.gp-price-row{display:flex;flex-direction:column;gap:3px;margin-bottom:2px;}
-.gp-price{color:#f57224;font-size:20px;font-weight:900;line-height:1.1;}
+/* PRICE ROW — দাম + পুরনো দাম + discount% একলাইনে */
+.gp-price-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;}
+.gp-price{color:#f57224;font-size:18px;font-weight:900;line-height:1;}
 body.is-mobile .gp-price{font-size:39px;}
-.gp-price-sub{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.gp-price-sub{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
 .gp-old-price{color:#aaa;font-size:12px;text-decoration:line-through;}
 
-/* STARS — Daraz-এর মতো একটাই তারা + number */
-.gp-stars{font-size:13px;margin-bottom:8px;display:flex;align-items:center;gap:3px;color:#f57224;}
+/* STARS — ★★★★★ (120) Daraz স্টাইল */
+.gp-stars{font-size:12px;margin-bottom:8px;display:flex;align-items:center;gap:3px;color:#f57224;}
 body.is-mobile .gp-stars{font-size:28px;margin-bottom:8px;}
 
-/* BUTTONS — নীল indigo, বড়, Daraz নেই কিন্তু আমাদের আছে */
-.gp-btn-row{display:flex;gap:6px;margin-top:auto;}
-.gp-detail-btn{flex:1;padding:12px 0;border-radius:8px;border:1.5px solid #6366f1;background:#fff;color:#6366f1;font-size:13px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;text-align:center;}
+/* BUTTONS */
+.gp-btn-row{display:flex;gap:5px;margin-top:auto;}
+.gp-detail-btn{flex:1;padding:9px 0;border-radius:6px;border:1.5px solid #6366f1;background:#fff;color:#6366f1;font-size:12px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;text-align:center;}
 .gp-detail-btn:hover{background:#6366f1;color:#fff;}
-.gp-buy-btn{flex:1;padding:12px 0;border-radius:8px;border:none;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;text-align:center;}
+.gp-buy-btn{flex:1;padding:9px 0;border-radius:6px;border:none;background:linear-gradient(135deg,#f57224,#ef4444);color:#fff;font-size:12px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;text-align:center;}
 .gp-buy-btn:hover{opacity:.88;}
 body.is-mobile .gp-detail-btn{font-size:14px;padding:13px 0;font-weight:800;border-radius:9px;}
 body.is-mobile .gp-buy-btn{font-size:14px;padding:13px 0;font-weight:800;border-radius:9px;}
@@ -1164,10 +1164,8 @@ function _gpAppendCards(count){
                 <div class="gp-name" onclick="openGpModal('${safeP}')">${p.title||p.name||'পণ্য'}</div>
                 <div class="gp-price-row">
                     <span class="gp-price">৳${price}</span>
-                    <div class="gp-price-sub">
-                        ${discount?`<span style="background:#fff3e0;color:#f57224;font-size:11px;font-weight:800;padding:2px 8px;border-radius:12px;">-${discount}</span>`:''}
-                        ${oldPrice?`<span class="gp-old-price">৳${oldPrice}</span>`:''}
-                    </div>
+                    ${oldPrice?`<span class="gp-old-price">৳${oldPrice}</span>`:''}
+                    ${discount?`<span style="color:#f57224;font-size:12px;font-weight:800;">-${discount}</span>`:''}
                 </div>
                 <div class="gp-stars">${_gpStars(p)}</div>
                 <div class="gp-btn-row">
