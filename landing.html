@@ -255,25 +255,46 @@ body.is-mobile .gp-buy-btn{font-size:14px;padding:13px 0;font-weight:800;border-
 .gp-loadmore-wrap{text-align:center;padding:18px 0 6px;}
 .gp-loadmore-btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:none;padding:11px 32px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:800;font-family:'Hind Siliguri',sans-serif;}
 
-/* ✅ গেস্ট প্রোডাক্ট ডিটেইল মোডাল */
-.gp-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999999;overflow-y:auto;backdrop-filter:blur(6px);}
-.gp-modal-inner{background:#0f172a;max-width:520px;margin:40px auto;border-radius:18px;overflow:hidden;border:1px solid #1e293b;}
-body.is-mobile .gp-modal-inner{margin:0;border-radius:0;min-height:100vh;}
-.gp-modal-img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#0a0f1e;}
-.gp-modal-body{padding:16px 18px 24px;}
-.gp-modal-name{font-size:17px;font-weight:900;color:#fff;margin-bottom:8px;}
-.gp-modal-price-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.gp-modal-price{color:#ec4899;font-size:22px;font-weight:900;}
-.gp-modal-old{color:#6b7280;font-size:14px;text-decoration:line-through;}
-.gp-modal-discount{background:#ef4444;color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;}
-.gp-modal-stars{color:#f59e0b;font-size:13px;margin-bottom:10px;}
-.gp-modal-desc{color:#94a3b8;font-size:13px;line-height:1.6;margin-bottom:16px;}
-.gp-modal-actions{display:flex;gap:10px;}
-.gp-modal-cart-btn,.gp-modal-order-btn{flex:1;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
-.gp-modal-cart-btn{background:#1e293b;color:#818cf8;border:1px solid #6366f1;}
-.gp-modal-order-btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;}
-.gp-modal-close{position:sticky;top:0;background:#0f172a;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;z-index:10;}
-.gp-modal-close-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+/* ══ Daraz স্টাইল Product Detail Modal ══ */
+.gp-modal{display:none;position:fixed;inset:0;background:#fff;z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;}
+/* top bar */
+.gpd-topbar{position:sticky;top:0;z-index:10;background:#fff;display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #f0f0f0;gap:10px;}
+.gpd-back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:#333;padding:0;line-height:1;}
+.gpd-topbar-title{flex:1;font-size:15px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gpd-topbar-icons{display:flex;gap:14px;color:#333;font-size:18px;}
+/* image slider */
+.gpd-img-slider{position:relative;width:100%;background:#f5f5f5;}
+.gpd-img-slider img{width:100%;aspect-ratio:1;object-fit:cover;display:block;}
+.gpd-img-counter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.45);color:#fff;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;}
+.gpd-slide-prev,.gpd-slide-next{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.8);border:none;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.gpd-slide-prev{left:10px;}
+.gpd-slide-next{right:10px;}
+/* price section */
+.gpd-price-sec{background:#fff;padding:14px 16px 10px;}
+.gpd-price-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.gpd-price{color:#f57224;font-size:26px;font-weight:900;}
+.gpd-old-price{color:#aaa;font-size:14px;text-decoration:line-through;}
+.gpd-discount-badge{background:#f57224;color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:4px;}
+.gpd-name{font-size:15px;font-weight:600;color:#222;line-height:1.5;margin-bottom:8px;}
+.gpd-stars-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+.gpd-stars-val{color:#f57224;font-size:13px;font-weight:700;}
+.gpd-review-count{color:#888;font-size:12px;}
+/* divider */
+.gpd-divider{height:8px;background:#f5f5f5;}
+/* desc section */
+.gpd-desc-sec{padding:14px 16px;}
+.gpd-desc-title{font-size:14px;font-weight:800;color:#222;margin-bottom:8px;}
+.gpd-desc-text{font-size:13px;color:#555;line-height:1.7;}
+/* bottom action bar */
+.gpd-action-bar{position:sticky;bottom:0;background:#fff;border-top:1px solid #eee;display:flex;align-items:center;padding:8px 10px;gap:8px;z-index:10;}
+.gpd-store-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;gap:2px;background:none;border:none;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
+.gpd-store-btn i{font-size:18px;color:#555;}
+.gpd-store-btn span{font-size:10px;color:#555;}
+.gpd-chat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;gap:2px;background:none;border:none;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
+.gpd-chat-btn i{font-size:18px;color:#555;}
+.gpd-chat-btn span{font-size:10px;color:#555;}
+.gpd-buynow-btn{flex:1;padding:13px 0;background:linear-gradient(90deg,#38bdf8,#0ea5e9);color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
+.gpd-addcart-btn{flex:1;padding:13px 0;background:linear-gradient(90deg,#fb923c,#f97316);color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
 body.is-mobile .cta-board{height:270px;}
 body.is-mobile .lb-wrap{height:450px;border-radius:0;margin:0;width:100%;}
 body.is-mobile .cta-title{font-size:20px;}
@@ -424,28 +445,56 @@ body.is-mobile .ft-hotline svg{width:18px;height:18px;}
     </div>
 </div>
 
-<!-- গেস্ট প্রোডাক্ট ডিটেইল মোডাল -->
+<!-- Daraz স্টাইল Product Detail Modal -->
 <div class="gp-modal" id="gpDetailModal">
-    <div class="gp-modal-inner">
-        <div class="gp-modal-close">
-            <span style="color:#fff;font-size:15px;font-weight:700;" id="gpModalTitle">পণ্যের বিবরণ</span>
-            <button class="gp-modal-close-btn" onclick="closeGpModal()">✕</button>
+    <!-- Top Bar -->
+    <div class="gpd-topbar">
+        <button class="gpd-back-btn" onclick="closeGpModal()">&#8592;</button>
+        <div class="gpd-topbar-title" id="gpModalTitle">পণ্যের বিবরণ</div>
+        <div class="gpd-topbar-icons">
+            <i class="fa fa-share-alt" style="cursor:pointer;"></i>
         </div>
-        <img class="gp-modal-img" id="gpModalImg" src="" alt="">
-        <div class="gp-modal-body">
-            <div class="gp-modal-name" id="gpModalName"></div>
-            <div class="gp-modal-price-row">
-                <span class="gp-modal-price" id="gpModalPrice"></span>
-                <span class="gp-modal-old" id="gpModalOld"></span>
-                <span class="gp-modal-discount" id="gpModalDiscount" style="display:none;"></span>
-            </div>
-            <div class="gp-modal-stars" id="gpModalStars">★★★★★</div>
-            <div class="gp-modal-desc" id="gpModalDesc"></div>
-            <div class="gp-modal-actions">
-                <button class="gp-modal-cart-btn" onclick="gpRequireLogin()"><i class="fa fa-shopping-cart" style="margin-right:5px;"></i> কার্টে যোগ</button>
-                <button class="gp-modal-order-btn" onclick="gpRequireLogin()"><i class="fa fa-bolt" style="margin-right:5px;"></i> অর্ডার করুন</button>
-            </div>
+    </div>
+    <!-- Image Slider -->
+    <div class="gpd-img-slider" id="gpdImgSlider">
+        <img id="gpModalImg" src="" alt="">
+        <div class="gpd-img-counter" id="gpdImgCounter">1/1</div>
+        <button class="gpd-slide-prev" id="gpdPrev" onclick="gpdSlide(-1)" style="display:none;">&#8249;</button>
+        <button class="gpd-slide-next" id="gpdNext" onclick="gpdSlide(1)" style="display:none;">&#8250;</button>
+    </div>
+    <!-- Price Section -->
+    <div class="gpd-price-sec">
+        <div class="gpd-price-row">
+            <span class="gpd-price" id="gpModalPrice"></span>
+            <span class="gpd-old-price" id="gpModalOld" style="display:none;"></span>
+            <span class="gpd-discount-badge" id="gpModalDiscount" style="display:none;"></span>
         </div>
+        <div class="gpd-name" id="gpModalName"></div>
+        <div class="gpd-stars-row">
+            <span style="color:#f57224;font-size:14px;" id="gpModalStarIcons">★★★★★</span>
+            <span class="gpd-stars-val" id="gpModalStarVal"></span>
+            <span class="gpd-review-count" id="gpModalReviewCount"></span>
+        </div>
+    </div>
+    <div class="gpd-divider"></div>
+    <!-- Description -->
+    <div class="gpd-desc-sec">
+        <div class="gpd-desc-title">📋 পণ্যের বিবরণ</div>
+        <div class="gpd-desc-text" id="gpModalDesc"></div>
+    </div>
+    <div style="height:80px;"></div>
+    <!-- Bottom Action Bar -->
+    <div class="gpd-action-bar">
+        <button class="gpd-store-btn" onclick="gpRequireLogin()">
+            <i class="fa fa-store"></i>
+            <span>Store</span>
+        </button>
+        <button class="gpd-chat-btn" onclick="gpRequireLogin()">
+            <i class="fa fa-comment-dots"></i>
+            <span>Chat</span>
+        </button>
+        <button class="gpd-buynow-btn" onclick="gpRequireLogin()">Buy Now</button>
+        <button class="gpd-addcart-btn" onclick="gpRequireLogin()">Add to Cart</button>
     </div>
 </div>
 
@@ -1051,7 +1100,7 @@ function _gpAppendCards(count){
         // JSON encode করে onclick এ pass করা
         const safeP = encodeURIComponent(JSON.stringify({
             id:p.id, name:p.title||p.name||'পণ্য', rating:p.rating||p.stars||p.avgRating||0,
-            img, price, oldPrice, discount,
+            img, imgs, price, oldPrice, discount,
             desc: desc.substring(0,400)
         }));
         const card = document.createElement('div');
@@ -1085,26 +1134,75 @@ function _gpAppendCards(count){
 
 function gpLoadMore(){ _gpAppendCards(_gpStep); }
 
+/* safeP তে images array যোগ */
 function openGpModal(safeP){
     try {
         const p = JSON.parse(decodeURIComponent(safeP));
+
+        // topbar title
         document.getElementById('gpModalTitle').textContent = p.name;
-        document.getElementById('gpModalImg').src = p.img || 'ko.jpeg';
-        document.getElementById('gpModalName').textContent = p.name;
+
+        // images slider setup
+        const imgs = p.imgs && p.imgs.length ? p.imgs : [p.img || 'ko.jpeg'];
+        window._gpdImgs = imgs;
+        window._gpdIdx  = 0;
+        _gpdUpdateImg();
+
+        const prevBtn = document.getElementById('gpdPrev');
+        const nextBtn = document.getElementById('gpdNext');
+        if(imgs.length > 1){
+            prevBtn.style.display = 'flex';
+            nextBtn.style.display = 'flex';
+        } else {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+        }
+
+        // price
         document.getElementById('gpModalPrice').textContent = '৳'+p.price;
         const oldEl = document.getElementById('gpModalOld');
         const disEl = document.getElementById('gpModalDiscount');
-        if(p.oldPrice){
-            oldEl.textContent='৳'+p.oldPrice; oldEl.style.display='inline';
-        } else { oldEl.style.display='none'; }
-        if(p.discount){
-            disEl.textContent='-'+p.discount; disEl.style.display='inline-block';
-        } else { disEl.style.display='none'; }
-        document.getElementById('gpModalStars').innerHTML = _gpStars(p);
+        if(p.oldPrice){ oldEl.textContent='৳'+p.oldPrice; oldEl.style.display='inline'; }
+        else { oldEl.style.display='none'; }
+        if(p.discount){ disEl.textContent='-'+p.discount; disEl.style.display='inline-block'; }
+        else { disEl.style.display='none'; }
+
+        // name
+        document.getElementById('gpModalName').textContent = p.name;
+
+        // stars
+        const r = parseFloat(p.rating) || 4.2;
+        const cnt = p.cnt || (50 + Math.floor(Math.random()*200));
+        const fullStars = Math.floor(r);
+        const halfStar  = r - fullStars >= 0.5;
+        let starHTML = '';
+        for(let i=0;i<fullStars;i++) starHTML += '<span style="color:#f57224;">★</span>';
+        if(halfStar) starHTML += '<span style="color:#f57224;">☆</span>';
+        document.getElementById('gpModalStarIcons').innerHTML = starHTML;
+        document.getElementById('gpModalStarVal').textContent = r.toFixed(1);
+        document.getElementById('gpModalReviewCount').textContent = '('+cnt+' রিভিউ)';
+
+        // desc
         document.getElementById('gpModalDesc').textContent = p.desc || 'পণ্যটি সম্পর্কে বিস্তারিত তথ্য শীঘ্রই যোগ করা হবে।';
+
         document.getElementById('gpDetailModal').style.display='block';
+        document.getElementById('gpDetailModal').scrollTop = 0;
         document.body.style.overflow='hidden';
     } catch(e){ console.error('gpModal error',e); }
+}
+
+function _gpdUpdateImg(){
+    const imgs = window._gpdImgs || [];
+    const idx  = window._gpdIdx  || 0;
+    document.getElementById('gpModalImg').src = imgs[idx] || 'ko.jpeg';
+    document.getElementById('gpdImgCounter').textContent = (idx+1)+'/'+imgs.length;
+}
+
+function gpdSlide(dir){
+    const len = (window._gpdImgs||[]).length;
+    if(!len) return;
+    window._gpdIdx = ((window._gpdIdx||0) + dir + len) % len;
+    _gpdUpdateImg();
 }
 
 function closeGpModal(){
