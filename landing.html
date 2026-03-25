@@ -216,16 +216,22 @@ body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
 .gp-discount-badge{position:absolute;top:8px;left:8px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;}
 .gp-body{padding:9px 10px 11px;}
 .gp-name{color:#e2e8f0;font-size:12px;font-weight:700;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-body.is-mobile .gp-name{font-size:11px;}
+body.is-mobile .gp-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+body.is-mobile .gp-img-wrap{aspect-ratio:4/3;}
+body.is-mobile .gp-body{padding:8px 8px 10px;}
+body.is-mobile .gp-stars{font-size:13px;margin-bottom:6px;}
+body.is-mobile .gp-btn-row{gap:5px;}
 .gp-price-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
 .gp-price{color:#ec4899;font-size:15px;font-weight:900;}
-body.is-mobile .gp-price{font-size:14px;}
+body.is-mobile .gp-price{font-size:15px;font-weight:900;}
 .gp-old-price{color:#6b7280;font-size:11px;text-decoration:line-through;}
 .gp-stars{color:#f59e0b;font-size:11px;margin-bottom:8px;}
 .gp-btn-row{display:flex;gap:6px;}
 .gp-detail-btn{flex:1;padding:7px 0;border-radius:8px;border:1px solid #6366f1;background:transparent;color:#818cf8;font-size:11px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
 .gp-detail-btn:hover{background:#6366f1;color:#fff;}
 .gp-buy-btn{flex:1;padding:7px 0;border-radius:8px;border:none;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
+body.is-mobile .gp-detail-btn{font-size:13px;padding:9px 0;border-radius:9px;font-weight:800;}
+body.is-mobile .gp-buy-btn{font-size:13px;padding:9px 0;border-radius:9px;font-weight:800;}
 .gp-loadmore-wrap{text-align:center;padding:18px 0 6px;}
 .gp-loadmore-btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:none;padding:11px 32px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:800;font-family:'Hind Siliguri',sans-serif;}
 
@@ -975,21 +981,28 @@ var _gpAll   = [];
 /* ── Dynamic Star Rating ── */
 function _gpStars(p){
     var r = parseFloat(p.rating || p.stars || p.avgRating || 0);
+    var hash = 0;
     if(!r || isNaN(r)){
+        // seed থেকে deterministic hash
         var seed = String(p.id || p.name || "x");
-        var hash = 0;
         for(var i=0;i<seed.length;i++) hash = (hash*31 + seed.charCodeAt(i)) >>> 0;
-        r = 3.0 + (hash % 20) * 0.1;
+        // hash % 25 → 0..24 → r = 3.0 থেকে 5.4
+        // তারপর min(5,r) করলে কিছু পণ্যে 5.0 (★★★★★) হবে
+        r = 3.0 + (hash % 25) * 0.1;
+    } else {
+        var seed2 = String(p.id || p.name || "x");
+        for(var j=0;j<seed2.length;j++) hash = (hash*31 + seed2.charCodeAt(j)) >>> 0;
     }
-    r = Math.min(5, Math.max(1, r));
+    r = Math.min(5.0, Math.max(1.0, r));
     var full  = Math.floor(r);
-    var half  = (r - full) >= 0.4 ? 1 : 0;
+    // ঠিক 5.0 হলে half ছাড়াই 5টা full star
+    var half  = (r < 5.0 && (r - full) >= 0.4) ? 1 : 0;
     var empty = 5 - full - half;
     var html  = "";
     for(var f=0;f<full;f++)  html += "<span style='color:#f59e0b'>★</span>";
-    if(half)                 html += "<span style='color:#f59e0b;opacity:.55'>★</span>";
+    if(half)                 html += "<span style='color:#f59e0b;opacity:.6'>★</span>";
     for(var e=0;e<empty;e++) html += "<span style='color:#374151'>★</span>";
-    var cnt = 10 + ((hash||0) % 90);
+    var cnt = 15 + ((hash||0) % 85);
     html += " <span style='color:#9ca3af;font-size:10px;'>(" + cnt + ")</span>";
     return html;
 }
