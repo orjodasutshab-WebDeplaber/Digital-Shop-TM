@@ -290,8 +290,81 @@ body.is-mobile .gp-buy-btn{font-size:14px;padding:13px 0;font-weight:800;border-
 .gp-grid-outer{background:#fff;border-radius:0;padding:24px 32px 28px;width:100%;}
 body.is-mobile .gp-grid-outer{background:#fff;padding:14px 10px 18px;border-radius:14px;}
 
-/* ══ Daraz স্টাইল Product Detail Modal ══ */
-.gp-modal{display:none;position:fixed;inset:0;background:#f5f5f5;z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;-webkit-overflow-scrolling:touch;}
+/* ══ Product Detail Modal — PC: Cartup style 2-col, Mobile: full-screen ══ */
+.gp-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;-webkit-overflow-scrolling:touch;}
+
+/* ── PC inner box ── */
+.gpd-pc-box{display:none;max-width:1200px;margin:40px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.35);position:relative;}
+body:not(.is-mobile) .gp-modal{display:none;align-items:flex-start;justify-content:center;padding:20px 16px;}
+body:not(.is-mobile) .gp-modal[style*="block"]{display:flex !important;}
+body:not(.is-mobile) .gpd-pc-box{display:flex;flex-direction:column;}
+body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
+
+/* PC close button */
+.gpd-pc-close{position:absolute;top:16px;right:20px;width:38px;height:38px;border-radius:50%;background:#f5f5f5;border:none;font-size:20px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;z-index:30;transition:.2s;}
+.gpd-pc-close:hover{background:#fee2e2;color:#ef4444;}
+
+/* PC top: left image + right info side by side */
+.gpd-pc-top{display:flex;gap:0;align-items:flex-start;}
+
+/* LEFT: image area */
+.gpd-pc-left{width:480px;flex-shrink:0;background:#fff;padding:20px;}
+.gpd-pc-mainimg-wrap{border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;background:#f9fafb;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;}
+.gpd-pc-mainimg-wrap img{width:100%;height:100%;object-fit:contain;display:block;}
+.gpd-pc-thumbs{display:flex;gap:8px;margin-top:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
+.gpd-pc-thumbs::-webkit-scrollbar{display:none;}
+.gpd-pc-thumb{width:64px;height:64px;border-radius:8px;overflow:hidden;border:2px solid #e5e7eb;cursor:pointer;flex-shrink:0;transition:.2s;}
+.gpd-pc-thumb:hover{border-color:#f57224;}
+.gpd-pc-thumb.active{border-color:#f57224;}
+.gpd-pc-thumb img{width:100%;height:100%;object-fit:contain;display:block;}
+
+/* RIGHT: info area */
+.gpd-pc-right{flex:1;padding:28px 28px 24px 16px;border-left:1px solid #f0f0f0;min-width:0;}
+.gpd-pc-brand{font-size:12px;color:#888;margin-bottom:6px;}
+.gpd-pc-title{font-size:20px;font-weight:700;color:#111;line-height:1.5;margin-bottom:10px;}
+.gpd-pc-stars-row{display:flex;align-items:center;gap:6px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #f0f0f0;}
+.gpd-pc-stars{color:#f57224;font-size:14px;}
+.gpd-pc-rating-val{color:#f57224;font-size:13px;font-weight:700;}
+.gpd-pc-review-cnt{color:#888;font-size:12px;}
+.gpd-pc-price-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.gpd-pc-price{color:#f57224;font-size:32px;font-weight:900;}
+.gpd-pc-old{color:#aaa;font-size:16px;text-decoration:line-through;}
+.gpd-pc-discount{background:#f57224;color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:4px;}
+.gpd-pc-sku{font-size:11px;color:#aaa;margin-bottom:14px;}
+.gpd-pc-share-row{display:flex;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f0f0f0;align-items:center;}
+.gpd-pc-share-btn{background:#f5f5f5;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;color:#555;display:flex;align-items:center;gap:6px;font-family:inherit;transition:.2s;}
+.gpd-pc-share-btn:hover{background:#e5e7eb;}
+.gpd-pc-actions{display:flex;gap:12px;margin-top:18px;}
+.gpd-pc-btn-buy{flex:1;padding:14px;background:#f57224;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
+.gpd-pc-btn-buy:hover{background:#ea6010;}
+.gpd-pc-btn-cart{flex:1;padding:14px;background:#fff;color:#f57224;border:2px solid #f57224;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
+.gpd-pc-btn-cart:hover{background:#fff7ed;}
+
+/* PC TABS section */
+.gpd-pc-tabs-wrap{border-top:1px solid #f0f0f0;padding:0 20px 24px;}
+.gpd-pc-tab-bar{display:flex;border-bottom:2px solid #f0f0f0;margin-bottom:18px;}
+.gpd-pc-tab-btn{padding:13px 22px;border:none;background:none;font-size:14px;font-weight:700;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
+.gpd-pc-tab-btn.active{color:#f57224;border-bottom:2px solid #f57224;}
+.gpd-pc-tab-content{display:none;}
+.gpd-pc-tab-content.active{display:block;}
+
+/* spec table */
+.gpd-spec-table{width:100%;border-collapse:collapse;font-size:14px;}
+.gpd-spec-table tr:nth-child(even){background:#fafafa;}
+.gpd-spec-table td{padding:11px 16px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
+.gpd-spec-table td:first-child{color:#666;font-weight:600;width:40%;white-space:nowrap;}
+.gpd-spec-table td:last-child{color:#111;}
+
+/* seller cards */
+.gpd-pc-seller-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.gpd-pc-seller-card{background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:16px;}
+.gpd-pc-seller-card h5{font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin:0 0 8px;}
+
+/* ── MOBILE VIEW (unchanged) ── */
+body.is-mobile .gpd-pc-box{display:none !important;}
+body.is-mobile .gpd-mobile-view{display:block !important;}
+body.is-mobile .gp-modal{background:#f5f5f5;}
+
 /* top bar */
 .gpd-topbar{position:sticky;top:0;z-index:20;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
 .gpd-back-btn{background:none;border:none;font-size:60px;cursor:pointer;color:#222;padding:4px 8px;line-height:1;width:70px;font-weight:900;}
@@ -317,36 +390,27 @@ body.is-mobile .gp-grid-outer{background:#fff;padding:14px 10px 18px;border-radi
 .gpd-discount-badge{background:#f57224;color:#fff;font-size:26px;font-weight:800;padding:4px 14px;border-radius:4px;}
 .gpd-heart-share{margin-left:auto;display:flex;gap:14px;align-items:center;}
 .gpd-heart-share i{font-size:38px;color:#888;cursor:pointer;}
-/* name */
 .gpd-name{font-size:38px;font-weight:600;color:#111;line-height:1.55;margin-bottom:10px;padding:0;}
-/* stars */
 .gpd-stars-row{display:flex;align-items:center;gap:5px;padding-bottom:10px;}
 .gpd-star-icons{color:#f57224;font-size:34px;letter-spacing:2px;}
 .gpd-stars-val{color:#f57224;font-size:32px;font-weight:700;}
 .gpd-review-count{color:#888;font-size:28px;}
-/* divider */
 .gpd-divider{height:8px;background:#f5f5f5;}
-/* product options */
 .gpd-options-sec{background:#fff;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0;}
 .gpd-options-label{color:#888;font-size:34px;font-weight:600;margin-right:10px;flex-shrink:0;}
 .gpd-options-val{color:#222;font-size:34px;font-weight:600;flex:1;}
 .gpd-options-arrow{color:#bbb;font-size:34px;}
-/* desc section */
 .gpd-desc-sec{background:#fff;padding:14px 14px;margin-top:8px;}
 .gpd-desc-title{font-size:36px;font-weight:800;color:#111;margin-bottom:10px;}
 .gpd-desc-text{font-size:32px;color:#555;line-height:1.75;}
-/* spacer for action bar */
 .gpd-spacer{height:72px;}
-/* bottom action bar */
 .gpd-action-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ebebeb;display:flex;align-items:stretch;z-index:20;height:90px;}
 .gpd-store-btn,.gpd-chat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:80px;gap:3px;background:none;border:none;border-right:1px solid #f0f0f0;cursor:pointer;font-family:'Hind Siliguri',sans-serif;padding:0 8px;}
-.gpd-store-btn img{width:32px;height:32px;border-radius:50%;object-fit:cover;}
 .gpd-store-btn span,.gpd-chat-btn span{font-size:22px;color:#555;font-weight:600;}
 .gpd-chat-btn i{font-size:34px;color:#555;}
 .gpd-buynow-btn{flex:1;background:#38bdf8;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;border-right:1px solid rgba(255,255,255,0.3);}
 .gpd-addcart-btn{flex:1;background:#f97316;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
 .gpd-store-btn i{font-size:34px;color:#f57224;}
-body.is-mobile .cta-board{height:270px;}
 body.is-mobile .lb-wrap{height:450px;border-radius:0;margin:0;width:100%;}
 body.is-mobile .cta-title{font-size:20px;}
 body.is-mobile .top-nav{padding:10px 13px;}
@@ -511,99 +575,167 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
     </div>
 </div>
 
-<!-- Daraz স্টাইল Product Detail Modal -->
+<!-- Product Detail Modal — PC: Cartup 2-col | Mobile: Full-screen -->
 <div class="gp-modal" id="gpDetailModal">
 
-    <!-- Top Bar -->
-    <div class="gpd-topbar">
-        <button class="gpd-back-btn" onclick="closeGpModal()">&#8592;</button>
-        <div class="gpd-topbar-title" id="gpModalTitle"></div>
-        <div class="gpd-topbar-icons">
-            <i class="fa fa-shopping-cart" onclick="gpTopbarLogin()" style="cursor:pointer;"></i>
-            <i class="fa fa-ellipsis-v" onclick="gpTopbarLogin()" style="cursor:pointer;"></i>
-        </div>
-    </div>
+    <!-- ══ PC VIEW ══ -->
+    <div class="gpd-pc-box" id="gpdPcBox">
+        <button class="gpd-pc-close" onclick="closeGpModal()">✕</button>
 
-    <!-- Main Image Slider -->
-    <div class="gpd-img-slider">
-        <img class="gpd-main-img" id="gpModalImg" src="" alt="">
-        <div class="gpd-img-counter" id="gpdImgCounter">1/1</div>
-    </div>
+        <!-- Top: image left + info right -->
+        <div class="gpd-pc-top">
+            <!-- LEFT: images -->
+            <div class="gpd-pc-left">
+                <div class="gpd-pc-mainimg-wrap">
+                    <img id="gpdPcMainImg" src="" alt="">
+                </div>
+                <div class="gpd-pc-thumbs" id="gpdPcThumbs"></div>
+            </div>
 
-    <!-- Thumbnail Strip -->
-    <div class="gpd-thumbs" id="gpdThumbs"></div>
+            <!-- RIGHT: info -->
+            <div class="gpd-pc-right">
+                <div class="gpd-pc-brand">Brand: <span id="gpdPcBrand">Digital Shop TM</span></div>
+                <div class="gpd-pc-title" id="gpdPcTitle"></div>
 
-    <!-- Price Section -->
-    <div class="gpd-price-sec">
-        <div class="gpd-price-row">
-            <span class="gpd-taka">৳</span>
-            <span class="gpd-price" id="gpModalPrice"></span>
-            <span class="gpd-old-price" id="gpModalOld" style="display:none;"></span>
-            <span class="gpd-discount-badge" id="gpModalDiscount" style="display:none;"></span>
-            <div class="gpd-heart-share">
-                <i class="fa fa-heart-o"></i>
-                <i class="fa fa-share-alt" onclick="gpShareProduct()" style="cursor:pointer;"></i>
+                <div class="gpd-pc-stars-row">
+                    <span class="gpd-pc-stars" id="gpdPcStars">★★★★★</span>
+                    <span class="gpd-pc-rating-val" id="gpdPcRatingVal">4.5</span>
+                    <span class="gpd-pc-review-cnt" id="gpdPcReviewCnt">(0)</span>
+                </div>
+
+                <div class="gpd-pc-price-row">
+                    <span style="color:#f57224;font-size:15px;font-weight:700;">৳</span>
+                    <span class="gpd-pc-price" id="gpdPcPrice"></span>
+                    <span class="gpd-pc-old" id="gpdPcOld" style="display:none;"></span>
+                    <span class="gpd-pc-discount" id="gpdPcDiscount" style="display:none;"></span>
+                </div>
+
+                <div class="gpd-pc-sku">SKU: <span id="gpdPcSku">—</span></div>
+
+                <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                    <i class="fa fa-check-circle" style="color:#22c55e;"></i>
+                    <span style="color:#16a34a;font-size:13px;font-weight:600;">In Stock</span>
+                </div>
+
+                <div style="margin-bottom:18px;">
+                    <label style="font-size:13px;color:#888;font-weight:600;">Quantity:</label>
+                    <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+                        <button onclick="gpdPcQty(-1)" style="width:34px;height:34px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;font-size:18px;cursor:pointer;font-weight:700;color:#333;">−</button>
+                        <span id="gpdPcQtyVal" style="font-size:16px;font-weight:700;min-width:28px;text-align:center;">1</span>
+                        <button onclick="gpdPcQty(1)" style="width:34px;height:34px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;font-size:18px;cursor:pointer;font-weight:700;color:#333;">+</button>
+                    </div>
+                </div>
+
+                <div class="gpd-pc-actions">
+                    <button class="gpd-pc-btn-buy" onclick="gpRequireLogin()">⚡ Buy Now</button>
+                    <button class="gpd-pc-btn-cart" onclick="gpRequireLogin()">🛒 Add to Cart</button>
+                </div>
+
+                <div class="gpd-pc-share-row" style="margin-top:16px;">
+                    <button class="gpd-pc-share-btn" onclick="gpShareProduct()"><i class="fa fa-share-alt"></i> Share</button>
+                    <button class="gpd-pc-share-btn" onclick="gpRequireLogin()"><i class="fa fa-heart-o"></i> Wishlist</button>
+                </div>
             </div>
         </div>
-        <div class="gpd-name" id="gpModalName"></div>
-        <div class="gpd-stars-row" style="display:none;">
-            <span class="gpd-star-icons" id="gpModalStarIcons">★★★★★</span>
-            <span class="gpd-stars-val" id="gpModalStarVal">4.5</span>
-            <span class="gpd-review-count" id="gpModalReviewCount">(35)</span>
+
+        <!-- Bottom: Tabs -->
+        <div class="gpd-pc-tabs-wrap">
+            <div class="gpd-pc-tab-bar">
+                <button class="gpd-pc-tab-btn active" onclick="gpdPcTab(this,'gpdPcTabSpec')">📋 Specifications</button>
+                <button class="gpd-pc-tab-btn" onclick="gpdPcTab(this,'gpdPcTabDetails')">📄 Product Details</button>
+                <button class="gpd-pc-tab-btn" onclick="gpdPcTab(this,'gpdPcTabSeller')">🏪 Seller</button>
+            </div>
+            <div id="gpdPcTabSpec" class="gpd-pc-tab-content active">
+                <div id="gpdPcSpecContent"></div>
+            </div>
+            <div id="gpdPcTabDetails" class="gpd-pc-tab-content">
+                <div id="gpdPcDescContent" style="font-size:14px;color:#444;line-height:1.9;white-space:pre-wrap;"></div>
+                <div id="gpdPcTagsContent" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;"></div>
+            </div>
+            <div id="gpdPcTabSeller" class="gpd-pc-tab-content">
+                <div class="gpd-pc-seller-grid" id="gpdPcSellerContent"></div>
+            </div>
         </div>
     </div>
 
-    <div class="gpd-divider"></div>
-
-    <!-- Product Options -->
-    <div class="gpd-options-sec" onclick="gpRequireLogin()">
-        <span class="gpd-options-label">Product Options</span>
-        <span class="gpd-options-val" id="gpModalOptions">লগইন করে দেখুন</span>
-        <span class="gpd-options-arrow">&#62;</span>
-    </div>
-
-    <div class="gpd-divider"></div>
-
-    <!-- TABS: Specifications | Product Details | Seller -->
-    <div style="padding:0 14px;">
-        <div style="display:flex; gap:0; border-bottom:2px solid #f0f0f0; margin-bottom:16px;">
-            <button id="gpTabBtnSpec" onclick="gpTabSwitch('spec')" style="flex:1;padding:11px 4px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;color:#f57224;border-bottom:2px solid #f57224;margin-bottom:-2px;">Specifications</button>
-            <button id="gpTabBtnDetails" onclick="gpTabSwitch('details')" style="flex:1;padding:11px 4px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;">Details</button>
-            <button id="gpTabBtnSeller" onclick="gpTabSwitch('seller')" style="flex:1;padding:11px 4px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;">Seller</button>
+    <!-- ══ MOBILE VIEW ══ -->
+    <div class="gpd-mobile-view" style="display:none;">
+        <!-- Top Bar -->
+        <div class="gpd-topbar">
+            <button class="gpd-back-btn" onclick="closeGpModal()">&#8592;</button>
+            <div class="gpd-topbar-title" id="gpModalTitle"></div>
+            <div class="gpd-topbar-icons">
+                <i class="fa fa-shopping-cart" onclick="gpTopbarLogin()" style="cursor:pointer;"></i>
+                <i class="fa fa-ellipsis-v" onclick="gpTopbarLogin()" style="cursor:pointer;"></i>
+            </div>
         </div>
-
-        <!-- Specifications Tab -->
-        <div id="gpTabSpec" style="display:block; padding-bottom:14px;">
-            <div id="gpModalSpecTable" style="font-size:13px;"></div>
+        <!-- Main Image Slider -->
+        <div class="gpd-img-slider">
+            <img class="gpd-main-img" id="gpModalImg" src="" alt="">
+            <div class="gpd-img-counter" id="gpdImgCounter">1/1</div>
         </div>
-
-        <!-- Product Details Tab -->
-        <div id="gpTabDetails" style="display:none; padding-bottom:14px;">
-            <div class="gpd-desc-title" style="margin-bottom:10px;">Product Details</div>
-            <div class="gpd-desc-text" id="gpModalDesc"></div>
-            <div id="gpModalTagsRow" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;"></div>
+        <!-- Thumbnail Strip -->
+        <div class="gpd-thumbs" id="gpdThumbs"></div>
+        <!-- Price Section -->
+        <div class="gpd-price-sec">
+            <div class="gpd-price-row">
+                <span class="gpd-taka">৳</span>
+                <span class="gpd-price" id="gpModalPrice"></span>
+                <span class="gpd-old-price" id="gpModalOld" style="display:none;"></span>
+                <span class="gpd-discount-badge" id="gpModalDiscount" style="display:none;"></span>
+                <div class="gpd-heart-share">
+                    <i class="fa fa-heart-o"></i>
+                    <i class="fa fa-share-alt" onclick="gpShareProduct()" style="cursor:pointer;"></i>
+                </div>
+            </div>
+            <div class="gpd-name" id="gpModalName"></div>
+            <div class="gpd-stars-row" style="display:none;">
+                <span class="gpd-star-icons" id="gpModalStarIcons">★★★★★</span>
+                <span class="gpd-stars-val" id="gpModalStarVal">4.5</span>
+                <span class="gpd-review-count" id="gpModalReviewCount">(35)</span>
+            </div>
         </div>
-
-        <!-- Seller Tab -->
-        <div id="gpTabSeller" style="display:none; padding-bottom:14px;">
-            <div id="gpModalSellerBox" style="font-size:13px;"></div>
+        <div class="gpd-divider"></div>
+        <!-- Product Options -->
+        <div class="gpd-options-sec" onclick="gpRequireLogin()">
+            <span class="gpd-options-label">Product Options</span>
+            <span class="gpd-options-val" id="gpModalOptions">লগইন করে দেখুন</span>
+            <span class="gpd-options-arrow">&#62;</span>
         </div>
-    </div>
-
-    <div class="gpd-spacer"></div>
-
-    <!-- Bottom Action Bar -->
-    <div class="gpd-action-bar">
-        <button class="gpd-store-btn" onclick="gpRequireLogin()">
-            <i class="fa fa-store-alt" style="font-size:20px;color:#f57224;"></i>
-            <span>Store</span>
-        </button>
-        <button class="gpd-chat-btn" onclick="gpRequireLogin()">
-            <i class="fa fa-comment-dots"></i>
-            <span>Chat</span>
-        </button>
-        <button class="gpd-buynow-btn" onclick="gpRequireLogin()">Buy Now</button>
-        <button class="gpd-addcart-btn" onclick="gpRequireLogin()">Add to Cart</button>
+        <div class="gpd-divider"></div>
+        <!-- TABS -->
+        <div style="padding:0 14px;">
+            <div style="display:flex;border-bottom:2px solid #f0f0f0;margin-bottom:16px;">
+                <button id="gpTabBtnSpec" onclick="gpTabSwitch('spec')" style="flex:1;padding:11px 4px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;color:#f57224;border-bottom:2px solid #f57224;margin-bottom:-2px;">Specifications</button>
+                <button id="gpTabBtnDetails" onclick="gpTabSwitch('details')" style="flex:1;padding:11px 4px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;">Details</button>
+                <button id="gpTabBtnSeller" onclick="gpTabSwitch('seller')" style="flex:1;padding:11px 4px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;">Seller</button>
+            </div>
+            <div id="gpTabSpec" style="display:block;padding-bottom:14px;">
+                <div id="gpModalSpecTable" style="font-size:13px;"></div>
+            </div>
+            <div id="gpTabDetails" style="display:none;padding-bottom:14px;">
+                <div class="gpd-desc-title" style="margin-bottom:10px;">Product Details</div>
+                <div class="gpd-desc-text" id="gpModalDesc"></div>
+                <div id="gpModalTagsRow" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;"></div>
+            </div>
+            <div id="gpTabSeller" style="display:none;padding-bottom:14px;">
+                <div id="gpModalSellerBox" style="font-size:13px;"></div>
+            </div>
+        </div>
+        <div class="gpd-spacer"></div>
+        <!-- Bottom Action Bar -->
+        <div class="gpd-action-bar">
+            <button class="gpd-store-btn" onclick="gpRequireLogin()">
+                <i class="fa fa-store-alt" style="font-size:20px;color:#f57224;"></i>
+                <span>Store</span>
+            </button>
+            <button class="gpd-chat-btn" onclick="gpRequireLogin()">
+                <i class="fa fa-comment-dots"></i>
+                <span>Chat</span>
+            </button>
+            <button class="gpd-buynow-btn" onclick="gpRequireLogin()">Buy Now</button>
+            <button class="gpd-addcart-btn" onclick="gpRequireLogin()">Add to Cart</button>
+        </div>
     </div>
 
 </div>
@@ -1247,131 +1379,175 @@ function _gpAppendCards(count){
 
 function gpLoadMore(){ _gpAppendCards(_gpStep); }
 
-/* safeP তে images array যোগ */
 function openGpModal(safeP){
     try {
         const p = JSON.parse(decodeURIComponent(safeP));
-
-        // images
         const imgs = (p.imgs && p.imgs.length) ? p.imgs : [p.img || 'ko.jpeg'];
         window._gpdImgs = imgs;
         window._gpdIdx  = 0;
-
-        // topbar title
-        document.getElementById('gpModalTitle').textContent = p.name;
-
-        // main image
-        _gpdUpdateImg();
-
-        // thumbnails
-        const thumbsEl = document.getElementById('gpdThumbs');
-        if(imgs.length > 1){
-            thumbsEl.style.display = 'flex';
-            thumbsEl.innerHTML = imgs.map((src, i) => `
-                <div class="gpd-thumb ${i===0?'active':''}" id="gpd-thumb-${i}" onclick="gpdGoTo(${i})">
-                    <img src="${src}" onerror="this.src='ko.jpeg'" alt="">
-                </div>`).join('');
-        } else {
-            thumbsEl.style.display = 'none';
-            thumbsEl.innerHTML = '';
-        }
-
-        // price
-        document.getElementById('gpModalPrice').textContent = p.price;
-        const oldEl = document.getElementById('gpModalOld');
-        const disEl = document.getElementById('gpModalDiscount');
-        if(p.oldPrice){ oldEl.textContent='৳'+p.oldPrice; oldEl.style.display='inline'; }
-        else { oldEl.style.display='none'; }
-        if(p.discount){ disEl.textContent='-'+p.discount; disEl.style.display='inline-block'; }
-        else { disEl.style.display='none'; }
-
-        // name
-        document.getElementById('gpModalName').textContent = p.name;
-
-        // product options
-        const optEl = document.getElementById('gpModalOptions');
-        if(optEl) optEl.textContent = p.options || 'অপশন দেখতে লগইন করুন';
-
-        // stars
-        const r   = parseFloat(p.rating) || 4.2;
-        const cnt = p.cnt || (35 + Math.abs(Math.floor((p.id||'').toString().charCodeAt(0)||0) % 200));
-        const full = Math.floor(r);
-        const half = (r - full) >= 0.5;
-        let starHTML = '';
-        for(let i=0;i<full;i++) starHTML += '★';
-        if(half) starHTML += '½';
-        for(let i=full+(half?1:0);i<5;i++) starHTML += '☆';
-        document.getElementById('gpModalStarIcons').textContent = starHTML;
-        document.getElementById('gpModalStarVal').textContent   = r.toFixed(1);
-        document.getElementById('gpModalReviewCount').textContent = '('+cnt+')';
-
-        // desc
-        const descEl = document.getElementById('gpModalDesc');
-        if(descEl) descEl.textContent = p.desc || 'এই পণ্যটি সম্পর্কে বিস্তারিত তথ্য শীঘ্রই যোগ করা হবে।';
-
-        // tags
-        const tagsRow = document.getElementById('gpModalTagsRow');
-        if(tagsRow){
-            const tags = Array.isArray(p.tags) ? p.tags : [];
-            tagsRow.innerHTML = tags.length ? tags.map(t=>`<span style="background:#fff3e0;color:#f57224;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;">#${t}</span>`).join('') : '';
-        }
-
-        // Specifications Tab
-        const specTable = document.getElementById('gpModalSpecTable');
-        if(specTable){
-            const sp = p.specifications || {};
-            const rows = [
-                ['Product Type', sp.productType],
-                ['Size', sp.size],
-                ['Material', sp.material],
-                ['Features', sp.features],
-                ['Suitable For', sp.suitableFor],
-                ['Closure Type', sp.closureType],
-                ['Absorbency', sp.absorbency],
-                ['Packaging', sp.packaging]
-            ].filter(r=>r[1]);
-            if(!rows.length){
-                specTable.innerHTML = '<div style="text-align:center;padding:28px;color:#bbb;"><i class="fa fa-info-circle" style="font-size:28px;display:block;margin-bottom:8px;"></i>Specifications পাওয়া যায়নি।</div>';
-            } else {
-                specTable.innerHTML = '<table style="width:100%;border-collapse:collapse;">' +
-                    rows.map((r,i)=>`<tr style="background:${i%2===0?'#fafafa':'#fff'};"><td style="padding:10px 12px;color:#666;font-weight:600;width:42%;border-bottom:1px solid #f0f0f0;font-size:12px;">${r[0]}</td><td style="padding:10px 12px;color:#222;border-bottom:1px solid #f0f0f0;font-size:13px;">${r[1]}</td></tr>`).join('') +
-                    '</table>';
-            }
-        }
-
-        // Seller Tab
-        const sellerBox = document.getElementById('gpModalSellerBox');
-        if(sellerBox){
-            const sName = p.sellerName || 'Digital Shop TM';
-            const sRating = p.sellerRating || '';
-            const dCharge = p.deliveryCharge || '150';
-            sellerBox.innerHTML = `
-                <div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;">
-                    <div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Sold By</div>
-                    <div style="color:#1976d2;font-size:15px;font-weight:700;">${sName}</div>
-                    ${sRating ? `<div style="margin-top:8px;"><span style="font-size:11px;color:#888;">Positive Seller Ratings: </span><span style="font-size:18px;font-weight:800;color:#22c55e;">${sRating}%</span></div>
-                    <div style="margin-top:4px;background:#e5e7eb;border-radius:10px;height:6px;overflow:hidden;"><div style="background:linear-gradient(90deg,#22c55e,#16a34a);width:${sRating}%;height:100%;border-radius:10px;"></div></div>` : ''}
-                </div>
-                <div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;">
-                    <div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Delivery</div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <div><div style="font-size:13px;font-weight:700;color:#222;">Standard Delivery</div><div style="font-size:12px;color:#888;">3–5 কার্যদিবস</div></div>
-                        <div style="font-size:16px;font-weight:800;color:#f57224;">৳${dCharge}</div>
-                    </div>
-                </div>
-                <div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;">
-                    <div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Service</div>
-                    <div style="color:#222;font-size:13px;margin-bottom:6px;"><i class="fa fa-undo" style="color:#22c55e;margin-right:6px;"></i>7 Days Returns</div>
-                    <div style="color:#666;font-size:12px;"><i class="fa fa-shield-alt" style="color:#888;margin-right:6px;"></i>Authentic Product</div>
-                </div>`;
-        }
-
-        // Tab reset — প্রতিবার খুললে Spec ট্যাব active
-        gpTabSwitch('spec');
-
-        // current product save (share এর জন্য)
         window._gpdCurrentId   = p.id;
         window._gpdCurrentName = p.name;
+
+        const isMobile = document.body.classList.contains('is-mobile');
+
+        if(!isMobile){
+            /* ══ PC VIEW ══ */
+            const pcBox = document.getElementById('gpdPcBox');
+            const mobileView = document.querySelector('.gpd-mobile-view');
+            if(pcBox) pcBox.style.display = 'flex';
+            if(mobileView) mobileView.style.display = 'none';
+
+            // main image
+            const mainImg = document.getElementById('gpdPcMainImg');
+            if(mainImg){ mainImg.src = imgs[0] || 'ko.jpeg'; mainImg.onerror = ()=>{ mainImg.src='ko.jpeg'; }; }
+
+            // thumbnails
+            const thumbsEl = document.getElementById('gpdPcThumbs');
+            if(thumbsEl){
+                if(imgs.length > 1){
+                    thumbsEl.style.display = 'flex';
+                    thumbsEl.innerHTML = imgs.map((src,i)=>`
+                        <div class="gpd-pc-thumb ${i===0?'active':''}" id="gpdPcThumb-${i}" onclick="gpdPcGoTo(${i})">
+                            <img src="${src}" onerror="this.src='ko.jpeg'" alt="">
+                        </div>`).join('');
+                } else {
+                    thumbsEl.style.display = 'none';
+                }
+            }
+
+            // title, brand
+            const titleEl = document.getElementById('gpdPcTitle');
+            if(titleEl) titleEl.textContent = p.name;
+
+            // price
+            const priceEl = document.getElementById('gpdPcPrice');
+            if(priceEl) priceEl.textContent = p.price;
+            const oldEl = document.getElementById('gpdPcOld');
+            const disEl = document.getElementById('gpdPcDiscount');
+            if(oldEl){ if(p.oldPrice){ oldEl.textContent='৳'+p.oldPrice; oldEl.style.display='inline'; } else { oldEl.style.display='none'; } }
+            if(disEl){ if(p.discount){ disEl.textContent='-'+p.discount; disEl.style.display='inline-block'; } else { disEl.style.display='none'; } }
+
+            // sku
+            const skuEl = document.getElementById('gpdPcSku');
+            if(skuEl) skuEl.textContent = p.id || '—';
+
+            // stars
+            const r = parseFloat(p.rating) || 4.2;
+            const cnt = 35 + Math.abs(Math.floor((String(p.id||'').charCodeAt(0)||0)) % 200);
+            const full = Math.floor(r); const half = (r-full)>=0.5;
+            let starHTML=''; for(let i=0;i<full;i++) starHTML+='★'; if(half) starHTML+='½'; for(let i=full+(half?1:0);i<5;i++) starHTML+='☆';
+            const pcStarsEl = document.getElementById('gpdPcStars'); if(pcStarsEl) pcStarsEl.textContent = starHTML;
+            const pcRvEl = document.getElementById('gpdPcRatingVal'); if(pcRvEl) pcRvEl.textContent = r.toFixed(1);
+            const pcCntEl = document.getElementById('gpdPcReviewCnt'); if(pcCntEl) pcCntEl.textContent = '('+cnt+')';
+
+            // qty reset
+            window._gpdPcQty = 1;
+            const qtyEl = document.getElementById('gpdPcQtyVal'); if(qtyEl) qtyEl.textContent = '1';
+
+            // === TABS ===
+            // Spec tab
+            const specContent = document.getElementById('gpdPcSpecContent');
+            if(specContent){
+                const sp = p.specifications || {};
+                const rows = [['Product Type',sp.productType],['Size',sp.size],['Material',sp.material],['Features',sp.features],['Suitable For',sp.suitableFor],['Closure Type',sp.closureType],['Absorbency',sp.absorbency],['Packaging',sp.packaging]].filter(r=>r[1]);
+                specContent.innerHTML = rows.length
+                    ? `<table class="gpd-spec-table">${rows.map((r,i)=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`
+                    : `<div style="text-align:center;padding:30px;color:#aaa;"><i class="fa fa-info-circle" style="font-size:26px;display:block;margin-bottom:8px;"></i>Specifications পাওয়া যায়নি।</div>`;
+            }
+
+            // Details tab
+            const descContent = document.getElementById('gpdPcDescContent');
+            if(descContent) descContent.textContent = p.desc || 'বিস্তারিত শীঘ্রই যোগ হবে।';
+            const tagsContent = document.getElementById('gpdPcTagsContent');
+            if(tagsContent){ const tags=Array.isArray(p.tags)?p.tags:[]; tagsContent.innerHTML=tags.length?tags.map(t=>`<span style="background:#fff3e0;color:#f57224;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;">#${t}</span>`).join(''):''; }
+
+            // Seller tab
+            const sellerContent = document.getElementById('gpdPcSellerContent');
+            if(sellerContent){
+                const sName=p.sellerName||'Digital Shop TM';
+                const sRating=p.sellerRating||'';
+                const dCharge=p.deliveryCharge||'150';
+                sellerContent.innerHTML = `
+                    <div class="gpd-pc-seller-card">
+                        <h5>Sold By</h5>
+                        <div style="color:#1976d2;font-size:15px;font-weight:700;margin-bottom:${sRating?'10':'0'}px;">${sName}</div>
+                        ${sRating?`<div style="font-size:11px;color:#888;margin-bottom:4px;">Positive Seller Ratings</div>
+                        <div style="font-size:24px;font-weight:800;color:#22c55e;margin-bottom:6px;">${sRating}%</div>
+                        <div style="background:#e5e7eb;border-radius:10px;height:7px;overflow:hidden;"><div style="background:linear-gradient(90deg,#22c55e,#16a34a);width:${sRating}%;height:100%;border-radius:10px;"></div></div>`:''}
+                    </div>
+                    <div class="gpd-pc-seller-card">
+                        <h5>Delivery</h5>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <div><div style="font-size:14px;font-weight:700;color:#222;">Standard Delivery</div><div style="font-size:12px;color:#888;">3–5 কার্যদিবস</div></div>
+                            <div style="font-size:18px;font-weight:800;color:#f57224;">৳${dCharge}</div>
+                        </div>
+                    </div>
+                    <div class="gpd-pc-seller-card">
+                        <h5>Service</h5>
+                        <div style="font-size:13px;color:#222;margin-bottom:8px;"><i class="fa fa-undo" style="color:#22c55e;margin-right:6px;"></i>7 Days Returns</div>
+                        <div style="font-size:12px;color:#666;"><i class="fa fa-shield-alt" style="color:#888;margin-right:6px;"></i>Authentic Product</div>
+                    </div>`;
+            }
+
+            // Tab reset
+            document.querySelectorAll('.gpd-pc-tab-btn').forEach(b=>b.classList.remove('active'));
+            document.querySelectorAll('.gpd-pc-tab-content').forEach(c=>c.classList.remove('active'));
+            const firstBtn = document.querySelector('.gpd-pc-tab-btn');
+            const firstContent = document.getElementById('gpdPcTabSpec');
+            if(firstBtn) firstBtn.classList.add('active');
+            if(firstContent) firstContent.classList.add('active');
+
+        } else {
+            /* ══ MOBILE VIEW ══ */
+            const pcBox = document.getElementById('gpdPcBox');
+            const mobileView = document.querySelector('.gpd-mobile-view');
+            if(pcBox) pcBox.style.display = 'none';
+            if(mobileView) mobileView.style.display = 'block';
+
+            // topbar title
+            document.getElementById('gpModalTitle').textContent = p.name;
+            // main image
+            _gpdUpdateImg();
+            // thumbnails
+            const thumbsEl = document.getElementById('gpdThumbs');
+            if(imgs.length > 1){
+                thumbsEl.style.display = 'flex';
+                thumbsEl.innerHTML = imgs.map((src,i)=>`
+                    <div class="gpd-thumb ${i===0?'active':''}" id="gpd-thumb-${i}" onclick="gpdGoTo(${i})">
+                        <img src="${src}" onerror="this.src='ko.jpeg'" alt="">
+                    </div>`).join('');
+            } else { thumbsEl.style.display='none'; thumbsEl.innerHTML=''; }
+            // price
+            document.getElementById('gpModalPrice').textContent = p.price;
+            const oldEl2 = document.getElementById('gpModalOld');
+            const disEl2 = document.getElementById('gpModalDiscount');
+            if(p.oldPrice){ oldEl2.textContent='৳'+p.oldPrice; oldEl2.style.display='inline'; } else { oldEl2.style.display='none'; }
+            if(p.discount){ disEl2.textContent='-'+p.discount; disEl2.style.display='inline-block'; } else { disEl2.style.display='none'; }
+            document.getElementById('gpModalName').textContent = p.name;
+            const optEl = document.getElementById('gpModalOptions'); if(optEl) optEl.textContent = 'অপশন দেখতে লগইন করুন';
+            // stars
+            const r2=parseFloat(p.rating)||4.2;
+            const cnt2=35+Math.abs(Math.floor((String(p.id||'').charCodeAt(0)||0))%200);
+            const full2=Math.floor(r2); const half2=(r2-full2)>=0.5;
+            let sh=''; for(let i=0;i<full2;i++) sh+='★'; if(half2) sh+='½'; for(let i=full2+(half2?1:0);i<5;i++) sh+='☆';
+            document.getElementById('gpModalStarIcons').textContent=sh;
+            document.getElementById('gpModalStarVal').textContent=r2.toFixed(1);
+            document.getElementById('gpModalReviewCount').textContent='('+cnt2+')';
+            // desc
+            const descEl = document.getElementById('gpModalDesc'); if(descEl) descEl.textContent = p.desc||'বিস্তারিত শীঘ্রই।';
+            // tags
+            const tagsRow=document.getElementById('gpModalTagsRow');
+            if(tagsRow){const tags=Array.isArray(p.tags)?p.tags:[];tagsRow.innerHTML=tags.length?tags.map(t=>`<span style="background:#fff3e0;color:#f57224;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;">#${t}</span>`).join(''):'';}
+            // spec
+            const specTable=document.getElementById('gpModalSpecTable');
+            if(specTable){const sp=p.specifications||{};const rows=[['Product Type',sp.productType],['Size',sp.size],['Material',sp.material],['Features',sp.features],['Suitable For',sp.suitableFor],['Closure Type',sp.closureType],['Absorbency',sp.absorbency],['Packaging',sp.packaging]].filter(r=>r[1]);specTable.innerHTML=rows.length?`<table style="width:100%;border-collapse:collapse;">${rows.map((r,i)=>`<tr style="background:${i%2===0?'#fafafa':'#fff'};"><td style="padding:10px 12px;color:#666;font-weight:600;width:42%;border-bottom:1px solid #f0f0f0;font-size:12px;">${r[0]}</td><td style="padding:10px 12px;color:#222;border-bottom:1px solid #f0f0f0;font-size:13px;">${r[1]}</td></tr>`).join('')}</table>`:'<div style="text-align:center;padding:28px;color:#bbb;">Specifications পাওয়া যায়নি।</div>';}
+            // seller
+            const sellerBox=document.getElementById('gpModalSellerBox');
+            if(sellerBox){const sName=p.sellerName||'Digital Shop TM';const sRating=p.sellerRating||'';const dCharge=p.deliveryCharge||'150';sellerBox.innerHTML=`<div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Sold By</div><div style="color:#1976d2;font-size:15px;font-weight:700;">${sName}</div>${sRating?`<div style="margin-top:8px;"><span style="font-size:11px;color:#888;">Positive Seller Ratings: </span><span style="font-size:18px;font-weight:800;color:#22c55e;">${sRating}%</span></div><div style="margin-top:4px;background:#e5e7eb;border-radius:10px;height:6px;overflow:hidden;"><div style="background:linear-gradient(90deg,#22c55e,#16a34a);width:${sRating}%;height:100%;border-radius:10px;"></div></div>`:''}</div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Delivery</div><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:13px;font-weight:700;color:#222;">Standard Delivery</div><div style="font-size:12px;color:#888;">3–5 কার্যদিবস</div></div><div style="font-size:16px;font-weight:800;color:#f57224;">৳${dCharge}</div></div></div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;"><div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Service</div><div style="color:#222;font-size:13px;margin-bottom:6px;"><i class="fa fa-undo" style="color:#22c55e;margin-right:6px;"></i>7 Days Returns</div><div style="color:#666;font-size:12px;"><i class="fa fa-shield-alt" style="color:#888;margin-right:6px;"></i>Authentic Product</div></div>`;}
+            // tab reset
+            gpTabSwitch('spec');
+        }
+
         // URL update
         const newUrl = window.location.href.split('?')[0] + '?product=' + encodeURIComponent(p.id||p.name);
         history.replaceState(null,'',newUrl);
@@ -1379,7 +1555,8 @@ function openGpModal(safeP){
         // show modal
         document.getElementById('gpDetailModal').style.display = 'block';
         document.getElementById('gpDetailModal').scrollTop = 0;
-        document.body.style.overflow = 'hidden';
+        if(isMobile) document.body.style.overflow = 'hidden';
+
     } catch(e){ console.error('gpModal error',e); }
 }
 
@@ -1406,6 +1583,27 @@ function gpdSlide(dir){
     if(!len) return;
     window._gpdIdx = ((window._gpdIdx||0) + dir + len) % len;
     _gpdUpdateImg();
+}
+
+function gpdPcGoTo(idx){
+    window._gpdIdx = idx;
+    const mainImg = document.getElementById('gpdPcMainImg');
+    if(mainImg) mainImg.src = (window._gpdImgs||[])[idx] || 'ko.jpeg';
+    document.querySelectorAll('.gpd-pc-thumb').forEach((t,i)=>t.classList.toggle('active',i===idx));
+}
+
+function gpdPcTab(btn, tabId){
+    document.querySelectorAll('.gpd-pc-tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.gpd-pc-tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    const tab = document.getElementById(tabId);
+    if(tab) tab.classList.add('active');
+}
+
+function gpdPcQty(dir){
+    window._gpdPcQty = Math.max(1, (window._gpdPcQty||1) + dir);
+    const el = document.getElementById('gpdPcQtyVal');
+    if(el) el.textContent = window._gpdPcQty;
 }
 
 function gpTabSwitch(tab){
