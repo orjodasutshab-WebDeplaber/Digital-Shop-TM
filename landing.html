@@ -360,7 +360,40 @@ body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
 .gpd-pc-seller-card{background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:18px;}
 .gpd-pc-seller-card h5{font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin:0 0 8px;}
 
-/* ── MOBILE VIEW (unchanged) ── */
+/* ── PC Accordion ── */
+.gpd-accord-block{border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;margin-bottom:14px;}
+.gpd-accord-head{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;background:#fafafa;cursor:pointer;font-size:15px;font-weight:800;color:#111;user-select:none;transition:background .2s;}
+.gpd-accord-head:hover{background:#f3f4f6;}
+.gpd-accord-arrow{font-size:13px;color:#aaa;transition:transform .3s;}
+.gpd-accord-arrow.collapsed{transform:rotate(180deg);}
+.gpd-accord-body{padding:20px 22px;background:#fff;border-top:1px solid #f0f0f0;}
+.gpd-accord-body.hidden{display:none;}
+
+/* ── Mobile Accordion ── */
+.gpd-mob-accord-block{border-bottom:1px solid #f0f0f0;margin-bottom:0;}
+.gpd-mob-accord-head{display:flex;align-items:center;justify-content:space-between;padding:16px 0;cursor:pointer;user-select:none;}
+.gpd-mob-accord-arrow{font-size:28px;color:#bbb;transition:transform .3s;flex-shrink:0;}
+.gpd-mob-accord-arrow.collapsed{transform:rotate(180deg);}
+.gpd-mob-accord-body{padding-bottom:16px;background:#fff;}
+.gpd-mob-accord-body.hidden{display:none;}
+
+/* Related product card */
+.gpd-rel-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow .2s;}
+.gpd-rel-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
+.gpd-rel-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#f8f9fa;}
+.gpd-rel-card-body{padding:8px 10px 10px;}
+.gpd-rel-card-name{font-size:12px;font-weight:600;color:#222;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;}
+.gpd-rel-card-price{color:#f57224;font-size:14px;font-weight:900;}
+.gpd-rel-card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.gpd-rel-card-tag{background:#fff3e0;color:#f57224;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
+.gpd-rel-card-cat{background:#e0f2fe;color:#0284c7;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
+
+/* Mobile related card bigger */
+body.is-mobile .gpd-rel-card-name{font-size:25px;min-height:60px;}
+body.is-mobile .gpd-rel-card-price{font-size:28px;}
+body.is-mobile .gpd-rel-card-tag{font-size:19px;padding:4px 10px;}
+body.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
+
 body.is-mobile .gpd-pc-box{display:none !important;}
 body.is-mobile .gpd-mobile-view{display:block !important;}
 body.is-mobile .gp-modal{background:#f5f5f5;}
@@ -644,23 +677,55 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
             </div>
         </div>
 
-        <!-- Bottom: Tabs -->
-        <div class="gpd-pc-tabs-wrap">
-            <div class="gpd-pc-tab-bar">
-                <button class="gpd-pc-tab-btn active" onclick="gpdPcTab(this,'gpdPcTabSpec')">📋 Specifications</button>
-                <button class="gpd-pc-tab-btn" onclick="gpdPcTab(this,'gpdPcTabDetails')">📄 Product Details</button>
-                <button class="gpd-pc-tab-btn" onclick="gpdPcTab(this,'gpdPcTabSeller')">🏪 Seller</button>
+        <!-- Bottom: Accordion Sections — একের পর এক সবসময় দেখা যাবে -->
+        <div class="gpd-pc-tabs-wrap" style="max-width:1400px;margin:0 auto;width:100%;padding:0 40px 60px;">
+
+            <!-- ── Specifications ── -->
+            <div class="gpd-accord-block" id="gpd-accord-spec">
+                <div class="gpd-accord-head" onclick="gpdToggleAccord('spec')">
+                    <span>📋 Specifications</span>
+                    <span class="gpd-accord-arrow" id="gpd-arrow-spec">▲</span>
+                </div>
+                <div class="gpd-accord-body" id="gpd-body-spec">
+                    <div id="gpdPcSpecContent"></div>
+                </div>
             </div>
-            <div id="gpdPcTabSpec" class="gpd-pc-tab-content active">
-                <div id="gpdPcSpecContent"></div>
+
+            <!-- ── Product Details ── -->
+            <div class="gpd-accord-block" id="gpd-accord-details">
+                <div class="gpd-accord-head" onclick="gpdToggleAccord('details')">
+                    <span>📄 Product Details</span>
+                    <span class="gpd-accord-arrow" id="gpd-arrow-details">▲</span>
+                </div>
+                <div class="gpd-accord-body" id="gpd-body-details">
+                    <div id="gpdPcDescContent" style="font-size:14px;color:#444;line-height:1.9;white-space:pre-wrap;"></div>
+                    <div id="gpdPcTagsContent" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;"></div>
+                </div>
             </div>
-            <div id="gpdPcTabDetails" class="gpd-pc-tab-content">
-                <div id="gpdPcDescContent" style="font-size:14px;color:#444;line-height:1.9;white-space:pre-wrap;"></div>
-                <div id="gpdPcTagsContent" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;"></div>
+
+            <!-- ── Seller ── -->
+            <div class="gpd-accord-block" id="gpd-accord-seller">
+                <div class="gpd-accord-head" onclick="gpdToggleAccord('seller')">
+                    <span>🏪 Seller</span>
+                    <span class="gpd-accord-arrow" id="gpd-arrow-seller">▲</span>
+                </div>
+                <div class="gpd-accord-body" id="gpd-body-seller">
+                    <div class="gpd-pc-seller-grid" id="gpdPcSellerContent"></div>
+                </div>
             </div>
-            <div id="gpdPcTabSeller" class="gpd-pc-tab-content">
-                <div class="gpd-pc-seller-grid" id="gpdPcSellerContent"></div>
+
+            <!-- ── Related Products ── -->
+            <div id="gpd-related-wrap" style="margin-top:32px;display:none;">
+                <div style="border-top:3px solid #f0f0f0;padding-top:28px;">
+                    <div style="font-size:20px;font-weight:800;color:#111;margin-bottom:6px;display:flex;align-items:center;gap:10px;">
+                        🔍 সম্পর্কিত পণ্য
+                        <span id="gpd-related-filter-label" style="font-size:13px;font-weight:600;color:#f57224;background:#fff3e0;padding:3px 12px;border-radius:20px;"></span>
+                    </div>
+                    <p style="font-size:13px;color:#aaa;margin-bottom:20px;">একই ক্যাটাগরি / ট্যাগের পণ্যসমূহ</p>
+                    <div id="gpd-related-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px;"></div>
+                </div>
             </div>
+
         </div>
     </div>
 
@@ -709,24 +774,53 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
             <span class="gpd-options-arrow">&#62;</span>
         </div>
         <div class="gpd-divider"></div>
-        <!-- TABS -->
+        <!-- ACCORDION SECTIONS — একের পর এক -->
         <div style="padding:0 14px;">
-            <div style="display:flex;border-bottom:2px solid #f0f0f0;margin-bottom:16px;">
-                <button id="gpTabBtnSpec" onclick="gpTabSwitch('spec')" style="flex:1;padding:11px 4px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;color:#f57224;border-bottom:2px solid #f57224;margin-bottom:-2px;">Specifications</button>
-                <button id="gpTabBtnDetails" onclick="gpTabSwitch('details')" style="flex:1;padding:11px 4px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;">Details</button>
-                <button id="gpTabBtnSeller" onclick="gpTabSwitch('seller')" style="flex:1;padding:11px 4px;border:none;background:none;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;">Seller</button>
+
+            <!-- Specifications -->
+            <div class="gpd-mob-accord-block">
+                <div class="gpd-mob-accord-head" onclick="gpdMobToggle('mspec',this)">
+                    <span style="font-size:32px;font-weight:800;color:#111;">📋 Specifications</span>
+                    <span class="gpd-mob-accord-arrow">▲</span>
+                </div>
+                <div class="gpd-mob-accord-body" id="gpd-mob-mspec">
+                    <div id="gpModalSpecTable" style="font-size:13px;"></div>
+                </div>
             </div>
-            <div id="gpTabSpec" style="display:block;padding-bottom:14px;">
-                <div id="gpModalSpecTable" style="font-size:13px;"></div>
+
+            <!-- Product Details -->
+            <div class="gpd-mob-accord-block">
+                <div class="gpd-mob-accord-head" onclick="gpdMobToggle('mdetails',this)">
+                    <span style="font-size:32px;font-weight:800;color:#111;">📄 Product Details</span>
+                    <span class="gpd-mob-accord-arrow">▲</span>
+                </div>
+                <div class="gpd-mob-accord-body" id="gpd-mob-mdetails">
+                    <div class="gpd-desc-text" id="gpModalDesc"></div>
+                    <div id="gpModalTagsRow" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;"></div>
+                </div>
             </div>
-            <div id="gpTabDetails" style="display:none;padding-bottom:14px;">
-                <div class="gpd-desc-title" style="margin-bottom:10px;">Product Details</div>
-                <div class="gpd-desc-text" id="gpModalDesc"></div>
-                <div id="gpModalTagsRow" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;"></div>
+
+            <!-- Seller -->
+            <div class="gpd-mob-accord-block">
+                <div class="gpd-mob-accord-head" onclick="gpdMobToggle('mseller',this)">
+                    <span style="font-size:32px;font-weight:800;color:#111;">🏪 Seller</span>
+                    <span class="gpd-mob-accord-arrow">▲</span>
+                </div>
+                <div class="gpd-mob-accord-body" id="gpd-mob-mseller">
+                    <div id="gpModalSellerBox" style="font-size:13px;"></div>
+                </div>
             </div>
-            <div id="gpTabSeller" style="display:none;padding-bottom:14px;">
-                <div id="gpModalSellerBox" style="font-size:13px;"></div>
+
+            <!-- Related Products -->
+            <div id="gpd-mob-related-wrap" style="margin-top:20px;display:none;">
+                <div style="font-size:32px;font-weight:800;color:#111;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    🔍 সম্পর্কিত পণ্য
+                    <span id="gpd-mob-related-label" style="font-size:22px;font-weight:600;color:#f57224;background:#fff3e0;padding:3px 10px;border-radius:20px;"></span>
+                </div>
+                <p style="font-size:25px;color:#aaa;margin-bottom:14px;">একই ক্যাটাগরি / ট্যাগের পণ্যসমূহ</p>
+                <div id="gpd-mob-related-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding-bottom:12px;"></div>
             </div>
+
         </div>
         <div class="gpd-spacer"></div>
         <!-- Bottom Action Bar -->
@@ -1354,7 +1448,8 @@ function _gpAppendCards(count){
             sellerName: p.sellerName || '',
             sellerRating: p.sellerRating || '',
             deliveryCharge: p.deliveryCharge || '',
-            tags: p.tags || []
+            tags: p.tags || [],
+            category: p.category || p.cat || ''
         }));
         const card = document.createElement('div');
         card.className = 'gp-card';
@@ -1498,13 +1593,16 @@ function openGpModal(safeP){
                     </div>`;
             }
 
-            // Tab reset
-            document.querySelectorAll('.gpd-pc-tab-btn').forEach(b=>b.classList.remove('active'));
-            document.querySelectorAll('.gpd-pc-tab-content').forEach(c=>c.classList.remove('active'));
-            const firstBtn = document.querySelector('.gpd-pc-tab-btn');
-            const firstContent = document.getElementById('gpdPcTabSpec');
-            if(firstBtn) firstBtn.classList.add('active');
-            if(firstContent) firstContent.classList.add('active');
+            // Accordion reset — সবগুলো open থাকবে
+            ['spec','details','seller'].forEach(k=>{
+                const body = document.getElementById('gpd-body-'+k);
+                const arrow = document.getElementById('gpd-arrow-'+k);
+                if(body) body.classList.remove('hidden');
+                if(arrow) arrow.classList.remove('collapsed');
+            });
+
+            // Related products
+            _gpdRenderRelated(p);
 
         } else {
             /* ══ MOBILE VIEW ══ */
@@ -1553,8 +1651,17 @@ function openGpModal(safeP){
             // seller
             const sellerBox=document.getElementById('gpModalSellerBox');
             if(sellerBox){const sName=p.sellerName||'Digital Shop TM';const sRating=p.sellerRating||'';const dCharge=p.deliveryCharge||'150';sellerBox.innerHTML=`<div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Sold By</div><div style="color:#1976d2;font-size:15px;font-weight:700;">${sName}</div>${sRating?`<div style="margin-top:8px;"><span style="font-size:11px;color:#888;">Positive Seller Ratings: </span><span style="font-size:18px;font-weight:800;color:#22c55e;">${sRating}%</span></div><div style="margin-top:4px;background:#e5e7eb;border-radius:10px;height:6px;overflow:hidden;"><div style="background:linear-gradient(90deg,#22c55e,#16a34a);width:${sRating}%;height:100%;border-radius:10px;"></div></div>`:''}</div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Delivery</div><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:13px;font-weight:700;color:#222;">Standard Delivery</div><div style="font-size:12px;color:#888;">3–5 কার্যদিবস</div></div><div style="font-size:16px;font-weight:800;color:#f57224;">৳${dCharge}</div></div></div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;"><div style="font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Service</div><div style="color:#222;font-size:13px;margin-bottom:6px;"><i class="fa fa-undo" style="color:#22c55e;margin-right:6px;"></i>7 Days Returns</div><div style="color:#666;font-size:12px;"><i class="fa fa-shield-alt" style="color:#888;margin-right:6px;"></i>Authentic Product</div></div>`;}
-            // tab reset
-            gpTabSwitch('spec');
+            // Mobile accordion reset — সবগুলো open
+            ['mspec','mdetails','mseller'].forEach(k=>{
+                const body = document.getElementById('gpd-mob-'+k);
+                if(body) body.classList.remove('hidden');
+                // arrow reset
+                const head = body ? body.previousElementSibling : null;
+                if(head){ const arr=head.querySelector('.gpd-mob-accord-arrow'); if(arr) arr.classList.remove('collapsed'); }
+            });
+
+            // Related products
+            _gpdRenderRelated(p);
         }
 
         // URL update
@@ -1609,23 +1716,147 @@ function gpdPcTab(btn, tabId){
     if(tab) tab.classList.add('active');
 }
 
+/* PC Accordion toggle */
+function gpdToggleAccord(key){
+    const body = document.getElementById('gpd-body-'+key);
+    const arrow = document.getElementById('gpd-arrow-'+key);
+    if(!body) return;
+    const isHidden = body.classList.contains('hidden');
+    body.classList.toggle('hidden', !isHidden);
+    if(arrow) arrow.classList.toggle('collapsed', !isHidden);
+}
+
+/* Mobile Accordion toggle */
+function gpdMobToggle(key, headEl){
+    const body = document.getElementById('gpd-mob-'+key);
+    if(!body) return;
+    const arrow = headEl ? headEl.querySelector('.gpd-mob-accord-arrow') : null;
+    const isHidden = body.classList.contains('hidden');
+    body.classList.toggle('hidden', !isHidden);
+    if(arrow) arrow.classList.toggle('collapsed', !isHidden);
+}
+
+/* Related products render — নাম/ক্যাটাগরি/ট্যাগ দিয়ে ফিল্টার */
+function _gpdRenderRelated(currentP){
+    const allProducts = window._gpAll || [];
+    if(!allProducts.length) return;
+
+    const curId   = String(currentP.id||'');
+    const curName = String(currentP.name||'').toLowerCase();
+    const curCat  = String(currentP.category||currentP.cat||'').toLowerCase();
+    const curTags = Array.isArray(currentP.tags) ? currentP.tags.map(t=>String(t).toLowerCase()) : [];
+
+    // স্কোর করে ফিল্টার
+    const scored = allProducts.filter(p=> String(p.id)!==curId ).map(p=>{
+        let score = 0;
+        const pName = String(p.title||p.name||'').toLowerCase();
+        const pCat  = String(p.category||p.cat||'').toLowerCase();
+        const pTags = Array.isArray(p.tags) ? p.tags.map(t=>String(t).toLowerCase()) : [];
+
+        // ক্যাটাগরি মিলে?
+        if(curCat && pCat && curCat===pCat) score += 4;
+        // ট্যাগ মেলে?
+        curTags.forEach(t=>{ if(pTags.includes(t)) score += 3; });
+        // নামে শব্দ মেলে?
+        const curWords = curName.split(/\s+/).filter(w=>w.length>2);
+        curWords.forEach(w=>{ if(pName.includes(w)) score += 1; });
+
+        return { p, score };
+    }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,12);
+
+    // label তৈরি
+    let filterLabel = '';
+    if(curCat) filterLabel = curCat;
+    else if(curTags.length) filterLabel = '#'+curTags[0];
+    else filterLabel = curName.split(' ')[0];
+
+    const isMobile = document.body.classList.contains('is-mobile');
+
+    if(!isMobile){
+        const wrap = document.getElementById('gpd-related-wrap');
+        const grid = document.getElementById('gpd-related-grid');
+        const label = document.getElementById('gpd-related-filter-label');
+        if(!wrap||!grid) return;
+        if(!scored.length){ wrap.style.display='none'; return; }
+        wrap.style.display='block';
+        if(label) label.textContent = filterLabel;
+        grid.innerHTML = scored.map(({p})=>{
+            const img = Array.isArray(p.images)&&p.images.length ? p.images[0] : (p.image||p.img||'ko.jpeg');
+            const price = p.price||0;
+            const name = p.title||p.name||'পণ্য';
+            const tags = Array.isArray(p.tags)?p.tags:[];
+            const cat  = p.category||p.cat||'';
+            const imgs = Array.isArray(p.images)&&p.images.length?p.images:[img];
+            const oldPrice = p.oldPrice||p.originalPrice||'';
+            const discount = (oldPrice&&oldPrice>price)?Math.round((1-price/oldPrice)*100)+'%':'';
+            const desc = (p.description||p.desc||p.details||'').substring(0,400);
+            const safeP = encodeURIComponent(JSON.stringify({
+                id:p.id, name, rating:p.rating||p.stars||0,
+                img:imgs[0]||'ko.jpeg', imgs, price, oldPrice, discount, desc,
+                specifications:p.specifications||{},
+                sellerName:p.sellerName||'', sellerRating:p.sellerRating||'',
+                deliveryCharge:p.deliveryCharge||'', tags:p.tags||[],
+                category:p.category||p.cat||''
+            }));
+            return `<div class="gpd-rel-card" onclick="openGpModal('${safeP}')">
+                <img src="${img}" onerror="this.src='ko.jpeg'" alt="${name}">
+                <div class="gpd-rel-card-body">
+                    <div class="gpd-rel-card-name">${name}</div>
+                    <div class="gpd-rel-card-price">৳${price}</div>
+                    <div class="gpd-rel-card-tags">
+                        ${cat?`<span class="gpd-rel-card-cat">${cat}</span>`:''}
+                        ${tags.slice(0,2).map(t=>`<span class="gpd-rel-card-tag">#${t}</span>`).join('')}
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    } else {
+        const wrap = document.getElementById('gpd-mob-related-wrap');
+        const grid = document.getElementById('gpd-mob-related-grid');
+        const label = document.getElementById('gpd-mob-related-label');
+        if(!wrap||!grid) return;
+        if(!scored.length){ wrap.style.display='none'; return; }
+        wrap.style.display='block';
+        if(label) label.textContent = filterLabel;
+        grid.innerHTML = scored.map(({p})=>{
+            const img = Array.isArray(p.images)&&p.images.length ? p.images[0] : (p.image||p.img||'ko.jpeg');
+            const price = p.price||0;
+            const name = p.title||p.name||'পণ্য';
+            const tags = Array.isArray(p.tags)?p.tags:[];
+            const cat  = p.category||p.cat||'';
+            const imgs = Array.isArray(p.images)&&p.images.length?p.images:[img];
+            const oldPrice = p.oldPrice||p.originalPrice||'';
+            const discount = (oldPrice&&oldPrice>price)?Math.round((1-price/oldPrice)*100)+'%':'';
+            const desc = (p.description||p.desc||p.details||'').substring(0,400);
+            const safeP = encodeURIComponent(JSON.stringify({
+                id:p.id, name, rating:p.rating||p.stars||0,
+                img:imgs[0]||'ko.jpeg', imgs, price, oldPrice, discount, desc,
+                specifications:p.specifications||{},
+                sellerName:p.sellerName||'', sellerRating:p.sellerRating||'',
+                deliveryCharge:p.deliveryCharge||'', tags:p.tags||[],
+                category:p.category||p.cat||''
+            }));
+            return `<div class="gpd-rel-card" onclick="openGpModal('${safeP}')">
+                <img src="${img}" onerror="this.src='ko.jpeg'" alt="${name}">
+                <div class="gpd-rel-card-body">
+                    <div class="gpd-rel-card-name">${name}</div>
+                    <div class="gpd-rel-card-price">৳${price}</div>
+                    <div class="gpd-rel-card-tags">
+                        ${cat?`<span class="gpd-rel-card-cat">${cat}</span>`:''}
+                        ${tags.slice(0,2).map(t=>`<span class="gpd-rel-card-tag">#${t}</span>`).join('')}
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+}
+
 function gpdPcQty(dir){
     window._gpdPcQty = Math.max(1, (window._gpdPcQty||1) + dir);
     const el = document.getElementById('gpdPcQtyVal');
     if(el) el.textContent = window._gpdPcQty;
 }
 
-function gpTabSwitch(tab){
-    ['spec','details','seller'].forEach(t=>{
-        const content = document.getElementById('gpTab'+t.charAt(0).toUpperCase()+t.slice(1));
-        const btn = document.getElementById('gpTabBtn'+t.charAt(0).toUpperCase()+t.slice(1));
-        if(content) content.style.display = (t===tab)?'block':'none';
-        if(btn){
-            btn.style.color = (t===tab)?'#f57224':'#888';
-            btn.style.borderBottom = (t===tab)?'2px solid #f57224':'2px solid transparent';
-        }
-    });
-}
 
 function closeGpModal(){
     document.getElementById('gpDetailModal').style.display='none';
