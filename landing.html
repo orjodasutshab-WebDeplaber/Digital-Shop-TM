@@ -290,25 +290,25 @@ body.is-mobile .gp-buy-btn{font-size:14px;padding:13px 0;font-weight:800;border-
 .gp-grid-outer{background:#fff;border-radius:0;padding:24px 32px 28px;width:100%;}
 body.is-mobile .gp-grid-outer{background:#fff;padding:14px 10px 18px;border-radius:14px;}
 
-/* ══ Product Detail Modal — PC: Cartup style 2-col, Mobile: full-screen ══ */
-.gp-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;-webkit-overflow-scrolling:touch;}
+/* ══ Product Detail Modal — PC: full-screen, Mobile: full-screen ══ */
+.gp-modal{display:none;position:fixed;inset:0;background:#fff;z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;-webkit-overflow-scrolling:touch;}
 
-/* ── PC inner box ── */
-.gpd-pc-box{display:none;max-width:1200px;margin:40px auto;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.35);position:relative;}
-body:not(.is-mobile) .gp-modal{display:none;align-items:flex-start;justify-content:center;padding:20px 16px;}
-body:not(.is-mobile) .gp-modal[style*="block"]{display:flex !important;}
+/* ── PC inner box — full-screen ── */
+.gpd-pc-box{display:none;width:100%;min-height:100vh;background:#fff;border-radius:0;overflow:hidden;box-shadow:none;position:relative;}
+body:not(.is-mobile) .gp-modal{display:none;}
+body:not(.is-mobile) .gp-modal[style*="block"]{display:block !important;}
 body:not(.is-mobile) .gpd-pc-box{display:flex;flex-direction:column;}
 body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
 
-/* PC close button */
-.gpd-pc-close{position:absolute;top:16px;right:20px;width:38px;height:38px;border-radius:50%;background:#f5f5f5;border:none;font-size:20px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;z-index:30;transition:.2s;}
+/* PC close button — sticky top bar */
+.gpd-pc-close{position:fixed;top:16px;right:28px;width:42px;height:42px;border-radius:50%;background:#f5f5f5;border:none;font-size:22px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;z-index:9999999999;transition:.2s;box-shadow:0 4px 18px rgba(0,0,0,.18);}
 .gpd-pc-close:hover{background:#fee2e2;color:#ef4444;}
 
 /* PC top: left image + right info side by side */
-.gpd-pc-top{display:flex;gap:0;align-items:flex-start;}
+.gpd-pc-top{display:flex;gap:0;align-items:flex-start;max-width:1400px;margin:0 auto;width:100%;padding:0 40px;}
 
 /* LEFT: image area */
-.gpd-pc-left{width:480px;flex-shrink:0;background:#fff;padding:20px;}
+.gpd-pc-left{width:520px;flex-shrink:0;background:#fff;padding:28px 20px;}
 .gpd-pc-mainimg-wrap{border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;background:#f9fafb;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;}
 .gpd-pc-mainimg-wrap img{width:100%;height:100%;object-fit:contain;display:block;}
 .gpd-pc-thumbs{display:flex;gap:8px;margin-top:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
@@ -319,7 +319,7 @@ body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
 .gpd-pc-thumb img{width:100%;height:100%;object-fit:contain;display:block;}
 
 /* RIGHT: info area */
-.gpd-pc-right{flex:1;padding:28px 28px 24px 16px;border-left:1px solid #f0f0f0;min-width:0;}
+.gpd-pc-right{flex:1;padding:28px 40px 24px 24px;border-left:1px solid #f0f0f0;min-width:0;max-width:700px;}
 .gpd-pc-brand{font-size:12px;color:#888;margin-bottom:6px;}
 .gpd-pc-title{font-size:20px;font-weight:700;color:#111;line-height:1.5;margin-bottom:10px;}
 .gpd-pc-stars-row{display:flex;align-items:center;gap:6px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #f0f0f0;}
@@ -340,12 +340,12 @@ body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
 .gpd-pc-btn-cart{flex:1;padding:14px;background:#fff;color:#f57224;border:2px solid #f57224;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
 .gpd-pc-btn-cart:hover{background:#fff7ed;}
 
-/* PC TABS section */
-.gpd-pc-tabs-wrap{border-top:1px solid #f0f0f0;padding:0 20px 24px;}
-.gpd-pc-tab-bar{display:flex;border-bottom:2px solid #f0f0f0;margin-bottom:18px;}
-.gpd-pc-tab-btn{padding:13px 22px;border:none;background:none;font-size:14px;font-weight:700;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
-.gpd-pc-tab-btn.active{color:#f57224;border-bottom:2px solid #f57224;}
-.gpd-pc-tab-content{display:none;}
+/* PC ACCORDION section — always visible below */
+.gpd-pc-tabs-wrap{border-top:3px solid #f0f0f0;padding:0 0 40px;max-width:1400px;margin:0 auto;width:100%;padding:0 40px 40px;}
+.gpd-pc-tab-bar{display:flex;border-bottom:2px solid #f0f0f0;margin-bottom:0;}
+.gpd-pc-tab-btn{padding:15px 28px;border:none;background:none;font-size:15px;font-weight:700;cursor:pointer;color:#888;border-bottom:3px solid transparent;margin-bottom:-2px;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
+.gpd-pc-tab-btn.active{color:#f57224;border-bottom:3px solid #f57224;}
+.gpd-pc-tab-content{display:none;padding:22px 0;}
 .gpd-pc-tab-content.active{display:block;}
 
 /* spec table */
@@ -356,8 +356,8 @@ body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
 .gpd-spec-table td:last-child{color:#111;}
 
 /* seller cards */
-.gpd-pc-seller-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
-.gpd-pc-seller-card{background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:16px;}
+.gpd-pc-seller-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.gpd-pc-seller-card{background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:18px;}
 .gpd-pc-seller-card h5{font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin:0 0 8px;}
 
 /* ── MOBILE VIEW (unchanged) ── */
@@ -580,7 +580,13 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
 
     <!-- ══ PC VIEW ══ -->
     <div class="gpd-pc-box" id="gpdPcBox">
-        <button class="gpd-pc-close" onclick="closeGpModal()">✕</button>
+        <!-- Sticky PC top nav bar -->
+        <div style="position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;padding:12px 40px;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+            <button onclick="closeGpModal()" style="background:#f5f5f5;border:none;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;" onmouseover="this.style.background='#fee2e2';this.style.color='#ef4444'" onmouseout="this.style.background='#f5f5f5';this.style.color='#333'">✕</button>
+            <div id="gpdPcNavTitle" style="font-size:15px;font-weight:700;color:#222;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+            <button onclick="gpShareProduct()" style="background:#f5f5f5;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;color:#555;display:flex;align-items:center;gap:6px;font-family:'Hind Siliguri',sans-serif;transition:.2s;"><i class="fa fa-share-alt"></i> Share</button>
+        </div>
+        <button class="gpd-pc-close" onclick="closeGpModal()" style="display:none;">✕</button>
 
         <!-- Top: image left + info right -->
         <div class="gpd-pc-top">
@@ -1418,6 +1424,9 @@ function openGpModal(safeP){
             // title, brand
             const titleEl = document.getElementById('gpdPcTitle');
             if(titleEl) titleEl.textContent = p.name;
+            // nav bar title
+            const navTitleEl = document.getElementById('gpdPcNavTitle');
+            if(navTitleEl) navTitleEl.textContent = p.name;
 
             // price
             const priceEl = document.getElementById('gpdPcPrice');
@@ -1555,7 +1564,7 @@ function openGpModal(safeP){
         // show modal
         document.getElementById('gpDetailModal').style.display = 'block';
         document.getElementById('gpDetailModal').scrollTop = 0;
-        if(isMobile) document.body.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
 
     } catch(e){ console.error('gpModal error',e); }
 }
