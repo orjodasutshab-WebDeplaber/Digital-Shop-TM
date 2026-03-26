@@ -466,6 +466,36 @@ body.is-mobile .gp-modal{background:#f5f5f5;}
 .gpd-buynow-btn{flex:1;background:#38bdf8;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;border-right:1px solid rgba(255,255,255,0.3);}
 .gpd-addcart-btn{flex:1;background:#f97316;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
 .gpd-store-btn i{font-size:34px;color:#f57224;}
+
+/* ── PC ভার্সন: product detail footer ও action bar ছোট ── */
+body:not(.is-mobile) .gpd-action-bar{height:56px;}
+body:not(.is-mobile) .gpd-buynow-btn{font-size:15px;}
+body:not(.is-mobile) .gpd-addcart-btn{font-size:15px;}
+body:not(.is-mobile) .gpd-store-btn span,
+body:not(.is-mobile) .gpd-chat-btn span{font-size:11px;}
+body:not(.is-mobile) .gpd-store-btn i,
+body:not(.is-mobile) .gpd-chat-btn i{font-size:18px;}
+body:not(.is-mobile) .gpd-store-btn,
+body:not(.is-mobile) .gpd-chat-btn{width:56px;}
+
+/* PC: modal footer ভেতরের সব বড় font ছোট করা */
+body:not(.is-mobile) #gpDetailModal footer{padding:28px 32px 80px !important;}
+body:not(.is-mobile) #gpDetailModal footer h2{font-size:20px !important;}
+body:not(.is-mobile) #gpDetailModal footer img[alt="Logo"]{width:44px !important;height:44px !important;}
+body:not(.is-mobile) #gpDetailModal footer p{font-size:13px !important;}
+body:not(.is-mobile) #gpDetailModal footer h3{font-size:15px !important;}
+body:not(.is-mobile) #gpDetailModal footer ul{font-size:13px !important;line-height:2 !important;}
+body:not(.is-mobile) #gpDetailModal footer li a{font-size:13px !important;}
+body:not(.is-mobile) #gpDetailModal footer div[style*="font-size:24px"],
+body:not(.is-mobile) #gpDetailModal footer p[style*="font-size:24px"],
+body:not(.is-mobile) #gpDetailModal footer p[style*="font-size:26px"],
+body:not(.is-mobile) #gpDetailModal footer p[style*="font-size:22px"]{font-size:13px !important;}
+body:not(.is-mobile) #gpDetailModal footer div[style*="font-size:22px"] span{font-size:13px !important;}
+body:not(.is-mobile) #gpDetailModal footer div[style*="height:50px"]{height:32px !important;}
+body:not(.is-mobile) #gpDetailModal footer div[style*="height:50px"] img{height:22px !important;}
+body:not(.is-mobile) .gpd-desc-text{font-size:15px;}
+body:not(.is-mobile) .gpd-spacer{height:40px;}
+
 body.is-mobile .lb-wrap{height:450px;border-radius:0;margin:0;width:100%;}
 body.is-mobile .cta-title{font-size:20px;}
 body.is-mobile .top-nav{padding:10px 13px;}
