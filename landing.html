@@ -377,6 +377,28 @@ body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
 .gpd-mob-accord-body{padding-bottom:16px;background:#fff;}
 .gpd-mob-accord-body.hidden{display:none;}
 
+/* ── মোবাইল accordion body ভেতরের লেখা বড় ── */
+body.is-mobile .gpd-mob-accord-body{font-size:28px !important;line-height:1.7;}
+
+/* Spec table মোবাইলে বড় */
+body.is-mobile #gpModalSpecTable table{width:100%;border-collapse:collapse;}
+body.is-mobile #gpModalSpecTable td{font-size:26px !important;padding:12px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
+body.is-mobile #gpModalSpecTable td:first-child{color:#666;font-weight:700;width:42%;}
+body.is-mobile #gpModalSpecTable td:last-child{color:#111;}
+
+/* Product Details মোবাইলে বড় */
+body.is-mobile .gpd-desc-text{font-size:28px !important;line-height:1.8;color:#444;}
+body.is-mobile #gpModalTagsRow span{font-size:22px !important;padding:5px 14px !important;}
+
+/* Seller box মোবাইলে বড় */
+body.is-mobile #gpModalSellerBox{font-size:26px !important;}
+body.is-mobile #gpModalSellerBox div[style*="font-size:11px"]{font-size:22px !important;}
+body.is-mobile #gpModalSellerBox div[style*="font-size:13px"]{font-size:26px !important;}
+body.is-mobile #gpModalSellerBox div[style*="font-size:15px"]{font-size:30px !important;}
+body.is-mobile #gpModalSellerBox div[style*="font-size:16px"]{font-size:30px !important;}
+body.is-mobile #gpModalSellerBox div[style*="font-size:18px"]{font-size:32px !important;}
+body.is-mobile #gpModalSellerBox div[style*="font-size:12px"]{font-size:24px !important;}
+
 /* Related product card */
 .gpd-rel-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow .2s;}
 .gpd-rel-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
@@ -769,7 +791,7 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
                     <span class="gpd-mob-accord-arrow">▲</span>
                 </div>
                 <div class="gpd-mob-accord-body" id="gpd-mob-mspec">
-                    <div id="gpModalSpecTable" style="font-size:13px;"></div>
+                    <div id="gpModalSpecTable"></div>
                 </div>
             </div>
 
@@ -792,7 +814,7 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
                     <span class="gpd-mob-accord-arrow">▲</span>
                 </div>
                 <div class="gpd-mob-accord-body" id="gpd-mob-mseller">
-                    <div id="gpModalSellerBox" style="font-size:13px;"></div>
+                    <div id="gpModalSellerBox"></div>
                 </div>
             </div>
 
