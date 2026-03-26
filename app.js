@@ -1029,11 +1029,62 @@ function renderAdminPublish(container) {
                     </div>
 
                     <div class="form-group" style="margin-top: 15px;">
-                        <label style="color: #2ecc71; font-size: 13px; display: block; margin-bottom: 8px; font-weight: 600;">
-                            <i class="fa fa-id-card"></i> সেলার বিস্তারিত
+                        <label style="color: #f59e0b; font-size: 14px; display: block; margin-bottom: 12px; font-weight: 700;">
+                            <i class="fa fa-list-ul"></i> Specifications (পণ্যের বিশেষত্ব)
                         </label>
-                        <textarea id="admSellerInfo" placeholder="সেলার সম্পর্কে তথ্য এখানে লিখুন..." 
-                            style="width: 100%; height: 80px; padding: 12px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 12px; resize: none; outline: none; line-height: 1.6; box-sizing: border-box;"></textarea>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label style="color: #94a3b8; font-size: 11px; display: block; margin-bottom: 5px; font-weight: 600;">Product Type</label>
+                                <input type="text" id="admSpecProductType" placeholder="যেমন: Baby Belt Diaper" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fff; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="color: #94a3b8; font-size: 11px; display: block; margin-bottom: 5px; font-weight: 600;">Size</label>
+                                <input type="text" id="admSpecSize" placeholder="যেমন: Medium, L, XL" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fff; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="color: #94a3b8; font-size: 11px; display: block; margin-bottom: 5px; font-weight: 600;">Material</label>
+                                <input type="text" id="admSpecMaterial" placeholder="যেমন: Soft, breathable fabric" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fff; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="color: #94a3b8; font-size: 11px; display: block; margin-bottom: 5px; font-weight: 600;">Features</label>
+                                <input type="text" id="admSpecFeatures" placeholder="যেমন: Leak-proof, Adjustable" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fff; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="color: #94a3b8; font-size: 11px; display: block; margin-bottom: 5px; font-weight: 600;">Suitable For</label>
+                                <input type="text" id="admSpecSuitableFor" placeholder="যেমন: Babies and toddlers" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fff; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="color: #94a3b8; font-size: 11px; display: block; margin-bottom: 5px; font-weight: 600;">Closure Type</label>
+                                <input type="text" id="admSpecClosureType" placeholder="যেমন: Belt fastening" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fff; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="color: #94a3b8; font-size: 11px; display: block; margin-bottom: 5px; font-weight: 600;">Absorbency</label>
+                                <input type="text" id="admSpecAbsorbency" placeholder="যেমন: High absorbent core" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fff; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="color: #94a3b8; font-size: 11px; display: block; margin-bottom: 5px; font-weight: 600;">Packaging</label>
+                                <input type="text" id="admSpecPackaging" placeholder="যেমন: Pack of 40 pcs" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fff; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label style="color: #2ecc71; font-size: 13px; display: block; margin-bottom: 8px; font-weight: 600;">
+                            <i class="fa fa-id-card"></i> সেলার বিস্তারিত (Sold By)
+                        </label>
+                        <input type="text" id="admSellerName" placeholder="সেলারের নাম বা স্টোর নাম" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fff; outline:none; font-size:13px; margin-bottom:8px; box-sizing:border-box;">
+                        <div style="display:flex; gap:10px; margin-bottom:8px;">
+                            <div style="flex:1;">
+                                <label style="color: #94a3b8; font-size: 11px; display:block; margin-bottom:4px;">সেলার রেটিং (%)</label>
+                                <input type="number" id="admSellerRating" placeholder="যেমন: 96" min="0" max="100" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#2ecc71; outline:none; font-size:14px; font-weight:700; box-sizing:border-box;">
+                            </div>
+                            <div style="flex:1;">
+                                <label style="color: #94a3b8; font-size: 11px; display:block; margin-bottom:4px;">ডেলিভারি চার্জ (৳)</label>
+                                <input type="number" id="admDeliveryCharge" placeholder="যেমন: 40" style="width:100%; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fff; outline:none; font-size:14px; box-sizing:border-box;">
+                            </div>
+                        </div>
+                        <textarea id="admSellerInfo" placeholder="সেলার সম্পর্কে অতিরিক্ত তথ্য..." 
+                            style="width: 100%; height: 60px; padding: 12px; background: #0f172a; color: #fff; border: 1px solid #334155; border-radius: 12px; resize: none; outline: none; line-height: 1.6; box-sizing: border-box;"></textarea>
                     </div>
                 </div>
             </div>
@@ -1121,6 +1172,19 @@ function adminSaveProduct() {
         return alert("এই TM কোডটি ইতিমধ্যে অন্য একটি পণ্যে ব্যবহার করা হয়েছে! নতুন কোড দিন।");
     }
 
+    // --- Specifications ---
+    const specProductType = document.getElementById('admSpecProductType') ? document.getElementById('admSpecProductType').value.trim() : "";
+    const specSize = document.getElementById('admSpecSize') ? document.getElementById('admSpecSize').value.trim() : "";
+    const specMaterial = document.getElementById('admSpecMaterial') ? document.getElementById('admSpecMaterial').value.trim() : "";
+    const specFeatures = document.getElementById('admSpecFeatures') ? document.getElementById('admSpecFeatures').value.trim() : "";
+    const specSuitableFor = document.getElementById('admSpecSuitableFor') ? document.getElementById('admSpecSuitableFor').value.trim() : "";
+    const specClosureType = document.getElementById('admSpecClosureType') ? document.getElementById('admSpecClosureType').value.trim() : "";
+    const specAbsorbency = document.getElementById('admSpecAbsorbency') ? document.getElementById('admSpecAbsorbency').value.trim() : "";
+    const specPackaging = document.getElementById('admSpecPackaging') ? document.getElementById('admSpecPackaging').value.trim() : "";
+    const sellerName = document.getElementById('admSellerName') ? document.getElementById('admSellerName').value.trim() : "";
+    const sellerRating = document.getElementById('admSellerRating') ? document.getElementById('admSellerRating').value.trim() : "";
+    const deliveryCharge = document.getElementById('admDeliveryCharge') ? document.getElementById('admDeliveryCharge').value.trim() : "";
+
     // নতুন পণ্য অবজেক্ট তৈরি
     const newProd = {
         id: 'P-' + Date.now(),
@@ -1132,6 +1196,19 @@ function adminSaveProduct() {
         images: imgArray, 
         description: desc,
         sellerInfo: sellerInfo,
+        sellerName: sellerName,
+        sellerRating: sellerRating,
+        deliveryCharge: deliveryCharge,
+        specifications: {
+            productType: specProductType,
+            size: specSize,
+            material: specMaterial,
+            features: specFeatures,
+            suitableFor: specSuitableFor,
+            closureType: specClosureType,
+            absorbency: specAbsorbency,
+            packaging: specPackaging
+        },
         tags: tagList,
         likes: 0,
         likedBy: []
@@ -2869,6 +2946,62 @@ window.openEditModal = function(productId) {
                         <textarea id="editSellerInfo" style="width:100%; padding:12px; height:80px; border:1.5px solid #e2e8f0; border-radius:12px; outline:none; resize:none; font-size:14px; background:#f9fffb;">${product.sellerInfo || ''}</textarea>
                     </div>
 
+                    <div style="margin-bottom:18px;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:#f59e0b; margin-bottom:10px;"><i class="fa fa-store"></i> Sold By তথ্য</label>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+                            <div>
+                                <label style="display:block; font-size:11px; font-weight:600; color:#64748b; margin-bottom:4px;">সেলারের নাম</label>
+                                <input id="editSellerName" type="text" value="${product.sellerName || ''}" placeholder="স্টোর নাম" style="width:100%; padding:10px; border:1.5px solid #e2e8f0; border-radius:10px; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:11px; font-weight:600; color:#64748b; margin-bottom:4px;">সেলার রেটিং (%)</label>
+                                <input id="editSellerRating" type="number" value="${product.sellerRating || ''}" placeholder="যেমন: 96" min="0" max="100" style="width:100%; padding:10px; border:1.5px solid #e2e8f0; border-radius:10px; outline:none; font-size:13px; font-weight:700; color:#16a34a; box-sizing:border-box;">
+                            </div>
+                        </div>
+                        <div>
+                            <label style="display:block; font-size:11px; font-weight:600; color:#64748b; margin-bottom:4px;">ডেলিভারি চার্জ (৳)</label>
+                            <input id="editDeliveryCharge" type="number" value="${product.deliveryCharge || ''}" placeholder="যেমন: 40" style="width:200px; padding:10px; border:1.5px solid #e2e8f0; border-radius:10px; outline:none; font-size:13px; box-sizing:border-box;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:18px; background:#fffbeb; padding:15px; border-radius:12px; border:1.5px solid #fde68a;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:#92400e; margin-bottom:12px;"><i class="fa fa-list-ul"></i> Specifications</label>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div>
+                                <label style="display:block; font-size:11px; font-weight:600; color:#64748b; margin-bottom:4px;">Product Type</label>
+                                <input id="editSpecProductType" type="text" value="${(product.specifications && product.specifications.productType) || ''}" placeholder="যেমন: Baby Belt Diaper" style="width:100%; padding:10px; border:1.5px solid #e2e8f0; border-radius:10px; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:11px; font-weight:600; color:#64748b; margin-bottom:4px;">Size</label>
+                                <input id="editSpecSize" type="text" value="${(product.specifications && product.specifications.size) || ''}" placeholder="যেমন: Medium" style="width:100%; padding:10px; border:1.5px solid #e2e8f0; border-radius:10px; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:11px; font-weight:600; color:#64748b; margin-bottom:4px;">Material</label>
+                                <input id="editSpecMaterial" type="text" value="${(product.specifications && product.specifications.material) || ''}" placeholder="যেমন: Soft fabric" style="width:100%; padding:10px; border:1.5px solid #e2e8f0; border-radius:10px; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:11px; font-weight:600; color:#64748b; margin-bottom:4px;">Features</label>
+                                <input id="editSpecFeatures" type="text" value="${(product.specifications && product.specifications.features) || ''}" placeholder="যেমন: Leak-proof" style="width:100%; padding:10px; border:1.5px solid #e2e8f0; border-radius:10px; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:11px; font-weight:600; color:#64748b; margin-bottom:4px;">Suitable For</label>
+                                <input id="editSpecSuitableFor" type="text" value="${(product.specifications && product.specifications.suitableFor) || ''}" placeholder="যেমন: Babies" style="width:100%; padding:10px; border:1.5px solid #e2e8f0; border-radius:10px; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:11px; font-weight:600; color:#64748b; margin-bottom:4px;">Closure Type</label>
+                                <input id="editSpecClosureType" type="text" value="${(product.specifications && product.specifications.closureType) || ''}" placeholder="যেমন: Belt fastening" style="width:100%; padding:10px; border:1.5px solid #e2e8f0; border-radius:10px; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:11px; font-weight:600; color:#64748b; margin-bottom:4px;">Absorbency</label>
+                                <input id="editSpecAbsorbency" type="text" value="${(product.specifications && product.specifications.absorbency) || ''}" placeholder="যেমন: High absorbent" style="width:100%; padding:10px; border:1.5px solid #e2e8f0; border-radius:10px; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                            <div>
+                                <label style="display:block; font-size:11px; font-weight:600; color:#64748b; margin-bottom:4px;">Packaging</label>
+                                <input id="editSpecPackaging" type="text" value="${(product.specifications && product.specifications.packaging) || ''}" placeholder="যেমন: Pack of 40" style="width:100%; padding:10px; border:1.5px solid #e2e8f0; border-radius:10px; outline:none; font-size:13px; box-sizing:border-box;">
+                            </div>
+                        </div>
+                    </div>
+
                     <div style="margin-bottom:18px; background: #fff7ed; padding: 15px; border-radius: 12px; border: 1.5px solid #fdba74;">
                         <label style="display:block; font-size:13px; font-weight:700; color:#ea580c; margin-bottom:6px;">
                             <i class="fa fa-heart"></i> পণ্যের লাইক সংখ্যা সেট করুন
@@ -2927,6 +3060,21 @@ window.saveProductEdit = function(productId) {
     product.category = document.getElementById('editCategory').value;
     product.description = document.getElementById('editDesc').value;
     product.sellerInfo = document.getElementById('editSellerInfo').value; // সেলার ইনফো সেভ হচ্ছে
+    product.sellerName = document.getElementById('editSellerName') ? document.getElementById('editSellerName').value : (product.sellerName || '');
+    product.sellerRating = document.getElementById('editSellerRating') ? document.getElementById('editSellerRating').value : (product.sellerRating || '');
+    product.deliveryCharge = document.getElementById('editDeliveryCharge') ? document.getElementById('editDeliveryCharge').value : (product.deliveryCharge || '');
+
+    // Specifications সেভ
+    product.specifications = {
+        productType: document.getElementById('editSpecProductType') ? document.getElementById('editSpecProductType').value.trim() : ((product.specifications && product.specifications.productType) || ''),
+        size: document.getElementById('editSpecSize') ? document.getElementById('editSpecSize').value.trim() : ((product.specifications && product.specifications.size) || ''),
+        material: document.getElementById('editSpecMaterial') ? document.getElementById('editSpecMaterial').value.trim() : ((product.specifications && product.specifications.material) || ''),
+        features: document.getElementById('editSpecFeatures') ? document.getElementById('editSpecFeatures').value.trim() : ((product.specifications && product.specifications.features) || ''),
+        suitableFor: document.getElementById('editSpecSuitableFor') ? document.getElementById('editSpecSuitableFor').value.trim() : ((product.specifications && product.specifications.suitableFor) || ''),
+        closureType: document.getElementById('editSpecClosureType') ? document.getElementById('editSpecClosureType').value.trim() : ((product.specifications && product.specifications.closureType) || ''),
+        absorbency: document.getElementById('editSpecAbsorbency') ? document.getElementById('editSpecAbsorbency').value.trim() : ((product.specifications && product.specifications.absorbency) || ''),
+        packaging: document.getElementById('editSpecPackaging') ? document.getElementById('editSpecPackaging').value.trim() : ((product.specifications && product.specifications.packaging) || '')
+    };
     
     // লাইক সংখ্যা আপডেট (নতুন যোগ করা হয়েছে)
     const likesInput = document.getElementById('editLikes');
@@ -4648,19 +4796,106 @@ function openProductDetails(productId) {
                     
                     ${reportsHtml}
 
-                    <h3 style="color:#fff; margin-bottom:25px; font-size:22px; display:flex; align-items:center; gap:10px;">
-                        <span style="width:5px; height:25px; background:#3498db; border-radius:10px;"></span>
-                        🔥 এই ক্যাটাগরির আরো পণ্য
-                    </h3>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:20px;">
-                        ${relatedProducts.map(p => `
-                            <div onclick="openProductDetails('${p.id}')" class="related-card" style="background:#1e293b; padding:12px; border-radius:16px; cursor:pointer; text-align:center; border:1px solid rgba(255,255,255,0.05); transition:0.3s;">
-                                <img src="${p.image || (p.images && p.images[0])}" style="width:100%; height:130px; object-fit:contain; border-radius:12px; background:#000;">
-                                <h5 style="color:#fff; margin:12px 0 6px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title}</h5>
-                                <p style="color:#2ecc71; margin:0; font-weight:800; font-size:16px;">${SYSTEM_CONFIG.CURRENCY} ${p.price}</p>
-                            </div>
-                        `).join('')}
+                    <!-- ===== TABS ===== -->
+                    <div style="display:flex; gap:8px; margin-bottom:25px; flex-wrap:wrap;">
+                        <button onclick="_pdTab(this,'pdTabSpec')" id="pdBtnSpec" class="pd-tab-btn pd-tab-active" style="padding:10px 20px; border-radius:10px; border:none; cursor:pointer; font-weight:700; font-size:14px; font-family:'Hind Siliguri',sans-serif; transition:0.2s; background:linear-gradient(135deg,#3b82f6,#6366f1); color:#fff;">📋 Specifications</button>
+                        <button onclick="_pdTab(this,'pdTabDetails')" id="pdBtnDetails" class="pd-tab-btn" style="padding:10px 20px; border-radius:10px; border:1px solid #334155; cursor:pointer; font-weight:700; font-size:14px; font-family:'Hind Siliguri',sans-serif; transition:0.2s; background:rgba(255,255,255,0.04); color:#94a3b8;">📄 Product Details</button>
+                        <button onclick="_pdTab(this,'pdTabSeller')" id="pdBtnSeller" class="pd-tab-btn" style="padding:10px 20px; border-radius:10px; border:1px solid #334155; cursor:pointer; font-weight:700; font-size:14px; font-family:'Hind Siliguri',sans-serif; transition:0.2s; background:rgba(255,255,255,0.04); color:#94a3b8;">🏪 Seller</button>
+                        <button onclick="_pdTab(this,'pdTabRelated')" id="pdBtnRelated" class="pd-tab-btn" style="padding:10px 20px; border-radius:10px; border:1px solid #334155; cursor:pointer; font-weight:700; font-size:14px; font-family:'Hind Siliguri',sans-serif; transition:0.2s; background:rgba(255,255,255,0.04); color:#94a3b8;">🔥 আরো পণ্য</button>
                     </div>
+
+                    <!-- TAB: Specifications -->
+                    <div id="pdTabSpec" class="pd-tab-content">
+                        ${(()=>{
+                            const sp = item.specifications || {};
+                            const rows = [
+                                ['Product Type', sp.productType],
+                                ['Size', sp.size],
+                                ['Material', sp.material],
+                                ['Features', sp.features],
+                                ['Suitable For', sp.suitableFor],
+                                ['Closure Type', sp.closureType],
+                                ['Absorbency', sp.absorbency],
+                                ['Packaging', sp.packaging]
+                            ].filter(r => r[1]);
+                            if(rows.length === 0) return `<div style="text-align:center; padding:40px; color:#475569; background:rgba(255,255,255,0.02); border-radius:16px; border:1px dashed #334155;"><i class="fa fa-info-circle" style="font-size:30px; margin-bottom:10px; display:block; color:#334155;"></i>কোনো Specification যোগ করা হয়নি।</div>`;
+                            return `<div style="background:rgba(255,255,255,0.02); border-radius:16px; border:1px solid #334155; overflow:hidden;">
+                                ${rows.map((r,i) => `
+                                    <div style="display:flex; padding:14px 20px; border-bottom:1px solid ${i<rows.length-1?'#1e293b':'transparent'}; align-items:center; ${i%2===0?'background:rgba(255,255,255,0.01);':''}">
+                                        <span style="min-width:160px; color:#64748b; font-size:14px; font-weight:600;">${r[0]}</span>
+                                        <span style="color:#e2e8f0; font-size:14px; flex:1;">${r[1]}</span>
+                                    </div>
+                                `).join('')}
+                            </div>`;
+                        })()}
+                    </div>
+
+                    <!-- TAB: Product Details -->
+                    <div id="pdTabDetails" class="pd-tab-content" style="display:none;">
+                        <div style="background:rgba(255,255,255,0.02); border-radius:16px; border:1px solid #334155; padding:25px; color:#cbd5e1; font-size:15px; line-height:1.9; white-space:pre-wrap;">
+                            ${item.description || '<span style="color:#475569;">কোনো বিবরণ পাওয়া যায়নি।</span>'}
+                        </div>
+                        <div style="margin-top:20px; display:flex; gap:12px; flex-wrap:wrap;">
+                            ${Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.map(t=>`<span style="background:rgba(99,102,241,0.15); color:#818cf8; padding:6px 14px; border-radius:20px; font-size:13px; border:1px solid rgba(99,102,241,0.3);">#${t}</span>`).join('') : ''}
+                        </div>
+                    </div>
+
+                    <!-- TAB: Seller -->
+                    <div id="pdTabSeller" class="pd-tab-content" style="display:none;">
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;">
+                            <div style="background:#1e293b; border-radius:16px; border:1px solid #334155; padding:20px;">
+                                <div style="font-size:12px; color:#64748b; font-weight:700; text-transform:uppercase; margin-bottom:8px;">Sold By</div>
+                                <div style="color:#3b82f6; font-size:16px; font-weight:700;">${item.sellerName || 'Digital Shop TM'}</div>
+                                ${item.sellerInfo ? `<div style="color:#94a3b8; font-size:13px; margin-top:8px; line-height:1.6;">${item.sellerInfo}</div>` : ''}
+                                ${item.sellerRating ? `
+                                    <div style="margin-top:12px; padding-top:12px; border-top:1px solid #334155;">
+                                        <div style="font-size:11px; color:#64748b; margin-bottom:6px;">Positive Seller Ratings</div>
+                                        <div style="font-size:28px; font-weight:800; color:#22c55e;">${item.sellerRating}%</div>
+                                        <div style="margin-top:6px; background:#334155; border-radius:20px; height:8px; overflow:hidden;">
+                                            <div style="background:linear-gradient(90deg,#22c55e,#16a34a); width:${item.sellerRating}%; height:100%; border-radius:20px;"></div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div style="background:#1e293b; border-radius:16px; border:1px solid #334155; padding:20px;">
+                                <div style="font-size:12px; color:#64748b; font-weight:700; text-transform:uppercase; margin-bottom:12px;">Delivery</div>
+                                <div style="display:flex; align-items:center; gap:10px; color:#e2e8f0;">
+                                    <i class="fa fa-shipping-fast" style="color:#3b82f6; font-size:18px;"></i>
+                                    <div>
+                                        <div style="font-size:14px; font-weight:600;">Standard Delivery</div>
+                                        <div style="font-size:13px; color:#64748b;">3–5 কার্যদিবস</div>
+                                    </div>
+                                    <div style="margin-left:auto; font-size:16px; font-weight:700; color:#f59e0b;">৳ ${item.deliveryCharge || SYSTEM_CONFIG.DELIVERY_CHARGE}</div>
+                                </div>
+                            </div>
+                            <div style="background:#1e293b; border-radius:16px; border:1px solid #334155; padding:20px;">
+                                <div style="font-size:12px; color:#64748b; font-weight:700; text-transform:uppercase; margin-bottom:12px;">Service</div>
+                                <div style="display:flex; align-items:center; gap:10px; color:#e2e8f0; margin-bottom:10px;">
+                                    <i class="fa fa-undo" style="color:#22c55e; font-size:16px;"></i>
+                                    <div style="font-size:14px;">7 Days Returns</div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px; color:#94a3b8;">
+                                    <i class="fa fa-shield-alt" style="color:#64748b; font-size:16px;"></i>
+                                    <div style="font-size:13px;">Authentic Product</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: Related Products -->
+                    <div id="pdTabRelated" class="pd-tab-content" style="display:none;">
+                        ${relatedProducts.length > 0 ? `
+                        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:16px;">
+                            ${relatedProducts.map(p => `
+                                <div onclick="openProductDetails('${p.id}')" class="related-card" style="background:#1e293b; padding:12px; border-radius:16px; cursor:pointer; text-align:center; border:1px solid rgba(255,255,255,0.05); transition:0.3s;">
+                                    <img src="${p.image || (p.images && p.images[0])}" style="width:100%; height:120px; object-fit:contain; border-radius:12px; background:#000;">
+                                    <h5 style="color:#fff; margin:10px 0 5px; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title}</h5>
+                                    <p style="color:#2ecc71; margin:0; font-weight:800; font-size:15px;">${SYSTEM_CONFIG.CURRENCY} ${p.price}</p>
+                                </div>
+                            `).join('')}
+                        </div>` : `<div style="text-align:center; padding:40px; color:#475569;"><i class="fa fa-box-open" style="font-size:30px; margin-bottom:10px; display:block;"></i>সম্পর্কিত কোনো পণ্য পাওয়া যায়নি।</div>`}
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -4673,7 +4908,22 @@ function openProductDetails(productId) {
             .related-card:hover { border-color: #3498db !important; transform: translateY(-5px); background: #243147 !important; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
             button:active { transform: scale(0.98); }
             button:hover { filter: brightness(1.15); }
+            .pd-tab-btn:hover { filter: brightness(1.2); }
         </style>
+        <script>
+        function _pdTab(btn, tabId) {
+            document.querySelectorAll('.pd-tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.pd-tab-btn').forEach(b => {
+                b.style.background = 'rgba(255,255,255,0.04)';
+                b.style.color = '#94a3b8';
+                b.style.border = '1px solid #334155';
+            });
+            document.getElementById(tabId).style.display = 'block';
+            btn.style.background = 'linear-gradient(135deg,#3b82f6,#6366f1)';
+            btn.style.color = '#fff';
+            btn.style.border = 'none';
+        }
+        </script>
     `;
 
     modal.style.display = 'flex';
