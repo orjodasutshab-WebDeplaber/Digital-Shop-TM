@@ -636,12 +636,6 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
                 <div class="gpd-pc-brand">Brand: <span id="gpdPcBrand">Digital Shop TM</span></div>
                 <div class="gpd-pc-title" id="gpdPcTitle"></div>
 
-                <div class="gpd-pc-stars-row">
-                    <span class="gpd-pc-stars" id="gpdPcStars">★★★★★</span>
-                    <span class="gpd-pc-rating-val" id="gpdPcRatingVal">4.5</span>
-                    <span class="gpd-pc-review-cnt" id="gpdPcReviewCnt">(0)</span>
-                </div>
-
                 <div class="gpd-pc-price-row">
                     <span style="color:#f57224;font-size:15px;font-weight:700;">৳</span>
                     <span class="gpd-pc-price" id="gpdPcPrice"></span>
@@ -654,15 +648,6 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
                 <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
                     <i class="fa fa-check-circle" style="color:#22c55e;"></i>
                     <span style="color:#16a34a;font-size:13px;font-weight:600;">In Stock</span>
-                </div>
-
-                <div style="margin-bottom:18px;">
-                    <label style="font-size:13px;color:#888;font-weight:600;">Quantity:</label>
-                    <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
-                        <button onclick="gpdPcQty(-1)" style="width:34px;height:34px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;font-size:18px;cursor:pointer;font-weight:700;color:#333;">−</button>
-                        <span id="gpdPcQtyVal" style="font-size:16px;font-weight:700;min-width:28px;text-align:center;">1</span>
-                        <button onclick="gpdPcQty(1)" style="width:34px;height:34px;border-radius:8px;border:1.5px solid #e5e7eb;background:#fff;font-size:18px;cursor:pointer;font-weight:700;color:#333;">+</button>
-                    </div>
                 </div>
 
                 <div class="gpd-pc-actions">
@@ -1534,19 +1519,6 @@ function openGpModal(safeP){
             // sku
             const skuEl = document.getElementById('gpdPcSku');
             if(skuEl) skuEl.textContent = p.id || '—';
-
-            // stars
-            const r = parseFloat(p.rating) || 4.2;
-            const cnt = 35 + Math.abs(Math.floor((String(p.id||'').charCodeAt(0)||0)) % 200);
-            const full = Math.floor(r); const half = (r-full)>=0.5;
-            let starHTML=''; for(let i=0;i<full;i++) starHTML+='★'; if(half) starHTML+='½'; for(let i=full+(half?1:0);i<5;i++) starHTML+='☆';
-            const pcStarsEl = document.getElementById('gpdPcStars'); if(pcStarsEl) pcStarsEl.textContent = starHTML;
-            const pcRvEl = document.getElementById('gpdPcRatingVal'); if(pcRvEl) pcRvEl.textContent = r.toFixed(1);
-            const pcCntEl = document.getElementById('gpdPcReviewCnt'); if(pcCntEl) pcCntEl.textContent = '('+cnt+')';
-
-            // qty reset
-            window._gpdPcQty = 1;
-            const qtyEl = document.getElementById('gpdPcQtyVal'); if(qtyEl) qtyEl.textContent = '1';
 
             // === TABS ===
             // Spec tab
