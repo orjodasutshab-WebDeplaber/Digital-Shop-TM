@@ -479,20 +479,58 @@ body:not(.is-mobile) .gpd-store-btn,
 body:not(.is-mobile) .gpd-chat-btn{width:56px;}
 
 /* PC: modal footer ভেতরের সব বড় font ছোট করা */
-body:not(.is-mobile) #gpDetailModal footer{padding:28px 32px 80px !important;}
-body:not(.is-mobile) #gpDetailModal footer h2{font-size:20px !important;}
-body:not(.is-mobile) #gpDetailModal footer img[alt="Logo"]{width:44px !important;height:44px !important;}
-body:not(.is-mobile) #gpDetailModal footer p{font-size:13px !important;}
-body:not(.is-mobile) #gpDetailModal footer h3{font-size:15px !important;}
-body:not(.is-mobile) #gpDetailModal footer ul{font-size:13px !important;line-height:2 !important;}
-body:not(.is-mobile) #gpDetailModal footer li a{font-size:13px !important;}
+body:not(.is-mobile) #gpDetailModal footer,
+body:not(.is-mobile) #sirFull footer,
+body:not(.is-mobile) #pmxGuestShopModal footer{padding:28px 32px 80px !important;}
+
+body:not(.is-mobile) #gpDetailModal footer h2,
+body:not(.is-mobile) #sirFull footer h2,
+body:not(.is-mobile) #pmxGuestShopModal footer h2{font-size:20px !important;}
+
+body:not(.is-mobile) #gpDetailModal footer img[alt="Logo"],
+body:not(.is-mobile) #sirFull footer img[alt="Logo"],
+body:not(.is-mobile) #pmxGuestShopModal footer img[alt="Logo"]{width:44px !important;height:44px !important;}
+
+body:not(.is-mobile) #gpDetailModal footer p,
+body:not(.is-mobile) #sirFull footer p,
+body:not(.is-mobile) #pmxGuestShopModal footer p{font-size:13px !important;}
+
+body:not(.is-mobile) #gpDetailModal footer h3,
+body:not(.is-mobile) #sirFull footer h3,
+body:not(.is-mobile) #pmxGuestShopModal footer h3{font-size:15px !important;}
+
+body:not(.is-mobile) #gpDetailModal footer ul,
+body:not(.is-mobile) #sirFull footer ul,
+body:not(.is-mobile) #pmxGuestShopModal footer ul{font-size:13px !important;line-height:2 !important;}
+
+body:not(.is-mobile) #gpDetailModal footer li a,
+body:not(.is-mobile) #sirFull footer li a,
+body:not(.is-mobile) #pmxGuestShopModal footer li a{font-size:13px !important;}
+
 body:not(.is-mobile) #gpDetailModal footer div[style*="font-size:24px"],
 body:not(.is-mobile) #gpDetailModal footer p[style*="font-size:24px"],
 body:not(.is-mobile) #gpDetailModal footer p[style*="font-size:26px"],
-body:not(.is-mobile) #gpDetailModal footer p[style*="font-size:22px"]{font-size:13px !important;}
-body:not(.is-mobile) #gpDetailModal footer div[style*="font-size:22px"] span{font-size:13px !important;}
-body:not(.is-mobile) #gpDetailModal footer div[style*="height:50px"]{height:32px !important;}
-body:not(.is-mobile) #gpDetailModal footer div[style*="height:50px"] img{height:22px !important;}
+body:not(.is-mobile) #gpDetailModal footer p[style*="font-size:22px"],
+body:not(.is-mobile) #sirFull footer div[style*="font-size:24px"],
+body:not(.is-mobile) #sirFull footer p[style*="font-size:24px"],
+body:not(.is-mobile) #sirFull footer p[style*="font-size:26px"],
+body:not(.is-mobile) #sirFull footer p[style*="font-size:22px"],
+body:not(.is-mobile) #pmxGuestShopModal footer div[style*="font-size:24px"],
+body:not(.is-mobile) #pmxGuestShopModal footer p[style*="font-size:24px"],
+body:not(.is-mobile) #pmxGuestShopModal footer p[style*="font-size:26px"],
+body:not(.is-mobile) #pmxGuestShopModal footer p[style*="font-size:22px"]{font-size:13px !important;}
+
+body:not(.is-mobile) #gpDetailModal footer div[style*="font-size:22px"] span,
+body:not(.is-mobile) #sirFull footer div[style*="font-size:22px"] span,
+body:not(.is-mobile) #pmxGuestShopModal footer div[style*="font-size:22px"] span{font-size:13px !important;}
+
+body:not(.is-mobile) #gpDetailModal footer div[style*="height:50px"],
+body:not(.is-mobile) #sirFull footer div[style*="height:50px"],
+body:not(.is-mobile) #pmxGuestShopModal footer div[style*="height:50px"]{height:32px !important;}
+
+body:not(.is-mobile) #gpDetailModal footer div[style*="height:50px"] img,
+body:not(.is-mobile) #sirFull footer div[style*="height:50px"] img,
+body:not(.is-mobile) #pmxGuestShopModal footer div[style*="height:50px"] img{height:22px !important;}
 body:not(.is-mobile) .gpd-desc-text{font-size:15px;}
 body:not(.is-mobile) .gpd-spacer{height:40px;}
 
@@ -764,6 +802,7 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
             </div>
 
         </div>
+      
     </div>
 
 
@@ -951,6 +990,50 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
     </div>
     <!-- প্রোডাক্ট গ্রিড -->
     <div id="pmxGuestProductGrid" style="padding:0 20px 30px;max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;"></div>
+    <!-- Footer — প্রিমিয়াম ক্যাটাগরি পপআপের শেষে -->
+    <footer style="background:#111827;color:#d1d5db;padding:60px 28px 130px;border-top:3px solid #374151;font-family:'Hind Siliguri',sans-serif;">
+        <div style="display:flex;align-items:center;gap:18px;margin-bottom:28px;">
+            <img src="ko.jpeg" alt="Logo" style="width:80px;height:80px;border-radius:14px;object-fit:fill;border:3px solid #10b981;" onerror="this.style.display='none'">
+            <h2 style="color:#10b981;margin:0;font-size:38px;font-weight:800;">Digital Shop TM</h2>
+        </div>
+        <p style="font-size:26px;line-height:1.8;color:#9ca3af;margin-bottom:32px;">আপনার বিশ্বস্ত অনলাইন শপ।</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:32px;">
+            <div>
+                <h3 style="color:white;font-size:30px;font-weight:700;margin-bottom:18px;border-bottom:2px solid #374151;padding-bottom:10px;">COMPANY</h3>
+                <ul style="list-style:none;padding:0;font-size:26px;line-height:2.6;">
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">About Us</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">Terms & Conditions</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">Privacy Policy</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">Return Policy</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">FAQs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color:white;font-size:30px;font-weight:700;margin-bottom:18px;border-bottom:2px solid #374151;padding-bottom:10px;">QUICK HELP</h3>
+                <ul style="list-style:none;padding:0;font-size:26px;line-height:2.6;">
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">গ্রাহক সেবা</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">কিভাবে কিনবেন</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">রিটার্ন ও রিফান্ড</a></li>
+                    <li><a href="tel:+8801707498418" style="color:#10b981;text-decoration:none;font-weight:700;">+8801707498418</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="margin-bottom:28px;">
+            <p style="font-size:24px;color:#9ca3af;margin-bottom:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">পেমেন্ট মেথড</p>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o1.jpg" alt="bKash" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#E2136E';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>bKash</span>'"></div>
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o2.png" alt="Nagad" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#F15922';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>Nagad</span>'"></div>
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o3.png" alt="Rocket" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#8B008B';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>Rocket</span>'"></div>
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o4.png" alt="Upay" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#EE3424';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>Upay</span>'"></div>
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o5.jpg" alt="DBBL" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#006838';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>DBBL</span>'"></div>
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o6.png" alt="City Bank" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#003087';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>City Bank</span>'"></div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:28px;font-size:22px;color:#6b7280;border-top:2px solid #374151;padding-top:24px;">
+            <p>© 2026 <strong style="color:#9ca3af;">Digital Shop TM</strong>. সর্বস্বত্ব সংরক্ষিত।</p>
+            <p style="margin-top:10px;">Developed by: <span style="color:#10b981;font-weight:700;">Digital Shop TM Team</span></p>
+        </div>
+    </footer>
 </div>
 
 <!-- CTA -->
@@ -1169,6 +1252,50 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
     <div style="padding:16px;">
         <div id="spGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:13px;max-width:1400px;margin:0 auto;"></div>
     </div>
+    <!-- Footer — স্পেশাল ক্যাটাগরি পপআপের শেষে -->
+    <footer style="background:#111827;color:#d1d5db;padding:60px 28px 130px;border-top:3px solid #374151;font-family:'Hind Siliguri',sans-serif;">
+        <div style="display:flex;align-items:center;gap:18px;margin-bottom:28px;">
+            <img src="ko.jpeg" alt="Logo" style="width:80px;height:80px;border-radius:14px;object-fit:fill;border:3px solid #10b981;" onerror="this.style.display='none'">
+            <h2 style="color:#10b981;margin:0;font-size:38px;font-weight:800;">Digital Shop TM</h2>
+        </div>
+        <p style="font-size:26px;line-height:1.8;color:#9ca3af;margin-bottom:32px;">আপনার বিশ্বস্ত অনলাইন শপ।</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:32px;">
+            <div>
+                <h3 style="color:white;font-size:30px;font-weight:700;margin-bottom:18px;border-bottom:2px solid #374151;padding-bottom:10px;">COMPANY</h3>
+                <ul style="list-style:none;padding:0;font-size:26px;line-height:2.6;">
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">About Us</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">Terms & Conditions</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">Privacy Policy</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">Return Policy</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">FAQs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color:white;font-size:30px;font-weight:700;margin-bottom:18px;border-bottom:2px solid #374151;padding-bottom:10px;">QUICK HELP</h3>
+                <ul style="list-style:none;padding:0;font-size:26px;line-height:2.6;">
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">গ্রাহক সেবা</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">কিভাবে কিনবেন</a></li>
+                    <li><a href="javascript:void(0)" style="color:#9ca3af;text-decoration:none;">রিটার্ন ও রিফান্ড</a></li>
+                    <li><a href="tel:+8801707498418" style="color:#10b981;text-decoration:none;font-weight:700;">+8801707498418</a></li>
+                </ul>
+            </div>
+        </div>
+        <div style="margin-bottom:28px;">
+            <p style="font-size:24px;color:#9ca3af;margin-bottom:16px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">পেমেন্ট মেথড</p>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o1.jpg" alt="bKash" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#E2136E';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>bKash</span>'"></div>
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o2.png" alt="Nagad" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#F15922';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>Nagad</span>'"></div>
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o3.png" alt="Rocket" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#8B008B';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>Rocket</span>'"></div>
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o4.png" alt="Upay" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#EE3424';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>Upay</span>'"></div>
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o5.jpg" alt="DBBL" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#006838';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>DBBL</span>'"></div>
+                <div style="background:#fff;border-radius:10px;padding:6px 10px;height:50px;display:flex;align-items:center;justify-content:center;"><img src="o6.png" alt="City Bank" style="height:36px;width:auto;" onerror="this.parentElement.style.background='#003087';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:22px;padding:0 8px>City Bank</span>'"></div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:28px;font-size:22px;color:#6b7280;border-top:2px solid #374151;padding-top:24px;">
+            <p>© 2026 <strong style="color:#9ca3af;">Digital Shop TM</strong>. সর্বস্বত্ব সংরক্ষিত।</p>
+            <p style="margin-top:10px;">Developed by: <span style="color:#10b981;font-weight:700;">Digital Shop TM Team</span></p>
+        </div>
+    </footer>
 </div>
 
 <div id="toast"></div>
