@@ -1569,15 +1569,17 @@ function openSir(sid,title){
 
             // Auto old price generate if missing
             let dispOldPrice = oldPrice;
-            let dispDiscount = discount;
             if(!dispOldPrice && price){
                 // seed based deterministic fake old price (10%~70% higher)
                 let seed3=0; const s3=String(p.id||p.name||price);
                 for(let k=0;k<s3.length;k++) seed3=(seed3*31+s3.charCodeAt(k))>>>0;
                 const pct = 10 + (seed3 % 61); // 10~70%
                 dispOldPrice = Math.round(price * (1 + pct/100) / 5) * 5;
-                dispDiscount = pct + '%';
             }
+            // % সবসময় পুরাতন মূল্য থেকে নতুন মূল্যের পার্থক্য দিয়ে হিসাব
+            const dispDiscount = (dispOldPrice && dispOldPrice > price)
+                ? Math.round((dispOldPrice - price) / dispOldPrice * 100) + '%'
+                : '';
 
             // Auto rating 2.0~5.0
             let spRating = parseFloat(p.rating||p.stars||p.avgRating||0);
