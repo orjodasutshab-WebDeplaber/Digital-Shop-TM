@@ -478,6 +478,31 @@ body:not(.is-mobile) .gpd-chat-btn i{font-size:18px;}
 body:not(.is-mobile) .gpd-store-btn,
 body:not(.is-mobile) .gpd-chat-btn{width:56px;}
 
+/* PC: sirFull footer ছোট */
+body:not(.is-mobile) #sirFull footer{padding:28px 32px 32px !important;}
+body:not(.is-mobile) #sirFull footer h2{font-size:18px !important;}
+body:not(.is-mobile) #sirFull footer img[alt="Logo"]{width:42px !important;height:42px !important;}
+body:not(.is-mobile) #sirFull footer p{font-size:13px !important;line-height:1.6 !important;margin-bottom:14px !important;}
+body:not(.is-mobile) #sirFull footer h3{font-size:14px !important;margin-bottom:10px !important;padding-bottom:6px !important;}
+body:not(.is-mobile) #sirFull footer ul{font-size:13px !important;line-height:2 !important;}
+body:not(.is-mobile) #sirFull footer li a{font-size:13px !important;}
+body:not(.is-mobile) #sirFull footer div[style*="font-size:24px"],
+body:not(.is-mobile) #sirFull footer div[style*="font-size:26px"],
+body:not(.is-mobile) #sirFull footer div[style*="font-size:22px"]{font-size:13px !important;}
+body:not(.is-mobile) #sirFull footer div[style*="height:50px"]{height:32px !important;}
+body:not(.is-mobile) #sirFull footer div[style*="height:50px"] img{height:22px !important;}
+body:not(.is-mobile) #sirFull footer div[style*="gap:18px"]{margin-bottom:14px !important;}
+body:not(.is-mobile) #sirFull footer div[style*="grid-template-columns"]{margin-bottom:16px !important;gap:18px !important;}
+
+/* PC: main .ft footer — font size ঠিক */
+body:not(.is-mobile) .ft-logo-text{font-size:20px !important;}
+body:not(.is-mobile) .ft-tagline{font-size:13px !important;line-height:1.6 !important;}
+body:not(.is-mobile) .ft-col h4{font-size:13px !important;margin-bottom:10px !important;}
+body:not(.is-mobile) .ft-col ul li a{font-size:13px !important;}
+body:not(.is-mobile) .ft-copy{font-size:13px !important;}
+body:not(.is-mobile) .ft-hotline span{font-size:13px !important;}
+body:not(.is-mobile) .ft-hotline a{font-size:13px !important;}
+
 /* PC: modal footer ভেতরের সব বড় font ছোট করা */
 body:not(.is-mobile) #gpDetailModal footer{padding:28px 32px 80px !important;}
 body:not(.is-mobile) #gpDetailModal footer h2{font-size:20px !important;}
@@ -1497,8 +1522,10 @@ function openSir(sid,title){
             const oldPSz = isMob ? '26px' : '12px';
             const discSz = isMob ? '22px' : '10px';
             const imgH = isMob ? '160px' : '175px';
+            const cardTags=((p.tags||[]).join(' ')).toLowerCase();
+            const cardCat=(p.category||p.cat||'').toLowerCase();
             return `
-            <div class="sp-card" style="background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;transition:box-shadow .2s,transform .2s;cursor:pointer;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,0.12)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none';this.style.transform='none'" onclick="closeM('sirFull');openGpModal('${safeP}')">
+            <div class="sp-card" data-tags="${cardTags}" data-category="${cardCat}" style="background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;transition:box-shadow .2s,transform .2s;cursor:pointer;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,0.12)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none';this.style.transform='none'" onclick="closeM('sirFull');openGpModal('${safeP}')">
                 <div style="position:relative;overflow:hidden;background:#f8f9fa;">
                     ${discount?`<span style="position:absolute;top:0;left:0;background:#f57224;color:#fff;font-size:${discSz};font-weight:800;padding:3px 7px;border-radius:0 0 6px 0;z-index:2;">-${discount}</span>`:''}
                     <img src="${img}" alt="${p.name||''}" style="width:100%;height:${imgH};object-fit:cover;display:block;transition:transform .3s;" onerror="this.src='ko.jpeg'" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
@@ -1518,9 +1545,20 @@ function openSir(sid,title){
     document.getElementById('sirFull').scrollTop=0;
 }
 function spFilter(){
-    const q=(document.getElementById('spSearch')?.value||'').toLowerCase();
+    let q=(document.getElementById('spSearch')?.value||'').trim().toLowerCase();
+    // #tag support: strip leading # for tag search
+    const isTag = q.startsWith('#');
+    const searchQ = isTag ? q.slice(1) : q;
     document.querySelectorAll('#spGrid .sp-card').forEach(c=>{
-        const n=c.querySelector('[data-name]');c.style.display=(!n||n.dataset.name.includes(q))?'':'none';
+        const nameEl=c.querySelector('[data-name]');
+        const name=(nameEl?nameEl.dataset.name:'');
+        const tags=(c.dataset.tags||'').toLowerCase();
+        const category=(c.dataset.category||'').toLowerCase();
+        let match=false;
+        if(!searchQ){match=true;}
+        else if(isTag){match=tags.includes(searchQ)||category.includes(searchQ);}
+        else{match=name.includes(searchQ)||tags.includes(searchQ)||category.includes(searchQ);}
+        c.style.display=match?'':'none';
     });
 }
 
