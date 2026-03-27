@@ -1237,8 +1237,13 @@ body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !im
             <button onclick="spFilter()" class="sir-search-btn" style="background:#f59e0b;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:800;font-family:'Hind Siliguri',sans-serif;font-size:13px;white-space:nowrap;box-shadow:0 2px 6px rgba(245,158,11,0.3);">খুঁজুন</button>
         </div>
     </div>
-    <!-- Deli Ad -->
-    <div id="sirDeliAd" style="display:none;width:100%;max-width:100%;height:400px;margin:0 auto;border-radius:0;overflow:hidden;border:none;border-bottom:1px solid #e5e7eb;"></div>
+    <!-- Deli Ad Slider -->
+    <div id="sirDeliAd" style="display:none;width:100%;max-width:100%;height:400px;margin:0 auto;border-radius:0;overflow:hidden;border:none;border-bottom:1px solid #e5e7eb;position:relative;">
+        <div id="sirDeliSlides" style="width:100%;height:100%;position:relative;"></div>
+        <button id="sirDeliPrev" onclick="sirDeliSlide(-1)" style="display:none;position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);color:#fff;border:2px solid rgba(255,255,255,0.35);width:46px;height:46px;border-radius:50%;cursor:pointer;font-size:24px;z-index:20;align-items:center;justify-content:center;transition:.2s;" onmouseover="this.style.background='rgba(99,102,241,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.55)'">&#8249;</button>
+        <button id="sirDeliNext" onclick="sirDeliSlide(1)"  style="display:none;position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.55);color:#fff;border:2px solid rgba(255,255,255,0.35);width:46px;height:46px;border-radius:50%;cursor:pointer;font-size:24px;z-index:20;align-items:center;justify-content:center;transition:.2s;" onmouseover="this.style.background='rgba(99,102,241,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.55)'">&#8250;</button>
+        <div id="sirDeliDots" style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:20;"></div>
+    </div>
     <!-- স্পেশাল পণ্য লেবেল -->
     <div id="sirProductLabel" style="background:#fff;padding:14px 16px 10px;border-bottom:2px solid #f0f0f0;">
         <div style="display:flex;align-items:center;gap:10px;">
@@ -1530,12 +1535,41 @@ function openSir(sid,title){
         const txtSz = isMobTitle ? '38px' : '22px';
         titleEl.innerHTML = `<span style="font-size:${iconSz};line-height:1;">${icon}</span><span style="background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:${txtSz};font-weight:900;font-family:'Hind Siliguri',sans-serif;">${title}</span>`;
     }
-    // Deli Ad
+    // Deli Ad Slider
     const ads=JSON.parse(localStorage.getItem(DELIK))||[];
-    const ad=ads.find(a=>String(a.sironamId)===String(sid));
+    const sidAds=ads.filter(a=>String(a.sironamId)===String(sid));
     const adBox=document.getElementById('sirDeliAd');
-    if(ad&&ad.img){adBox.style.display='block';adBox.innerHTML=`<a href="${ad.link||'#'}" target="_blank" style="display:block;width:100%;height:100%;"><img src="${ad.img}" style="width:100%;height:100%;object-fit:fill;"></a>`;}
-    else{adBox.style.display='none';}
+    const slidesEl=document.getElementById('sirDeliSlides');
+    const dotsEl=document.getElementById('sirDeliDots');
+    const prevBtn=document.getElementById('sirDeliPrev');
+    const nextBtn=document.getElementById('sirDeliNext');
+    if(window._sirDeliTimer){clearInterval(window._sirDeliTimer);window._sirDeliTimer=null;}
+    if(sidAds.length){
+        adBox.style.display='block';
+        window._sirDeliIdx=0;
+        window._sirDeliTotal=sidAds.length;
+        slidesEl.innerHTML=sidAds.map((a,i)=>`
+            <div style="position:absolute;inset:0;opacity:${i===0?1:0};transition:opacity .6s ease;">
+                <a href="${a.link||'#'}" target="_blank" style="display:block;width:100%;height:100%;">
+                    <img src="${a.img}" style="width:100%;height:100%;object-fit:fill;" onerror="this.style.opacity='0'">
+                </a>
+            </div>`).join('');
+        dotsEl.innerHTML=sidAds.map((_,i)=>`<div id="sirDeliDot${i}" style="width:${i===0?'22':'9'}px;height:9px;border-radius:5px;background:${i===0?'#6366f1':'rgba(255,255,255,0.45)'};transition:all .3s;cursor:pointer;" onclick="sirDeliGo(${i})"></div>`).join('');
+        if(sidAds.length>1){
+            prevBtn.style.display='flex';
+            nextBtn.style.display='flex';
+            window._sirDeliTimer=setInterval(()=>sirDeliSlide(1),5000);
+        } else {
+            prevBtn.style.display='none';
+            nextBtn.style.display='none';
+        }
+    } else {
+        adBox.style.display='none';
+        slidesEl.innerHTML='';
+        dotsEl.innerHTML='';
+        prevBtn.style.display='none';
+        nextBtn.style.display='none';
+    }
     // Products
     const prods=JSON.parse(localStorage.getItem(PKK))||[];
     const tagged=prods.filter(p=>String(p.sironamTag)===String(sid));
@@ -1649,6 +1683,28 @@ function openSir(sid,title){
     openM('sirFull');
     // scroll to top of modal
     document.getElementById('sirFull').scrollTop=0;
+}
+function sirDeliSlide(dir){
+    const slides=document.querySelectorAll('#sirDeliSlides > div');
+    if(!slides||!slides.length)return;
+    slides[window._sirDeliIdx].style.opacity='0';
+    const oldDot=document.getElementById('sirDeliDot'+window._sirDeliIdx);
+    if(oldDot){oldDot.style.width='9px';oldDot.style.background='rgba(255,255,255,0.45)';}
+    window._sirDeliIdx=(window._sirDeliIdx+dir+window._sirDeliTotal)%window._sirDeliTotal;
+    slides[window._sirDeliIdx].style.opacity='1';
+    const newDot=document.getElementById('sirDeliDot'+window._sirDeliIdx);
+    if(newDot){newDot.style.width='22px';newDot.style.background='#6366f1';}
+}
+function sirDeliGo(i){
+    const slides=document.querySelectorAll('#sirDeliSlides > div');
+    if(!slides||!slides.length)return;
+    slides[window._sirDeliIdx].style.opacity='0';
+    const oldDot=document.getElementById('sirDeliDot'+window._sirDeliIdx);
+    if(oldDot){oldDot.style.width='9px';oldDot.style.background='rgba(255,255,255,0.45)';}
+    window._sirDeliIdx=i;
+    slides[window._sirDeliIdx].style.opacity='1';
+    const newDot=document.getElementById('sirDeliDot'+window._sirDeliIdx);
+    if(newDot){newDot.style.width='22px';newDot.style.background='#6366f1';}
 }
 function spFilter(){
     let q=(document.getElementById('spSearch')?.value||'').trim().toLowerCase();
