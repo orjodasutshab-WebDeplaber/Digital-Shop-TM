@@ -618,6 +618,177 @@ body.is-mobile .pmx-cat-body{padding:14px 14px 16px !important;}
 body.is-mobile .pmx-cat-name{font-size:30px !important;margin-bottom:6px !important;}
 body.is-mobile .pmx-cat-hint{font-size:23px !important;}
 body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !important;}
+
+/* ════════════════════════════════════════════
+   ✅ মোবাইল: লগইন / রেজিস্ট্রেশন / রিসেট মডাল
+   ════════════════════════════════════════════ */
+
+/* Overlay — full screen, scroll থেকে শুরু */
+body.is-mobile .mo {
+    align-items: flex-start !important;
+    padding: 0 !important;
+    overflow-y: auto !important;
+}
+
+/* মোডাল বক্স — পুরো width, top থেকে */
+body.is-mobile .mb {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0 0 28px 28px !important;
+    max-height: none !important;
+    overflow: visible !important; /* নিজের scrollbar বন্ধ */
+    margin: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+}
+
+/* রেজিস্ট্রেশন মডালের নিজস্ব scrollbar সম্পূর্ণ অদৃশ্য */
+body.is-mobile #regModal .mb {
+    overflow-y: auto !important;
+    scrollbar-width: none !important;        /* Firefox */
+    -ms-overflow-style: none !important;    /* IE/Edge */
+}
+body.is-mobile #regModal .mb::-webkit-scrollbar {
+    display: none !important;               /* Chrome/Safari */
+}
+
+/* বন্ধ (×) বাটন বড় */
+body.is-mobile .mclose {
+    font-size: 56px !important;
+    right: 24px !important;
+    top: 18px !important;
+    line-height: 1 !important;
+    width: 60px !important;
+    height: 60px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Top colour bar মোটা */
+body.is-mobile .mbar {
+    height: 8px !important;
+}
+
+/* Head section */
+body.is-mobile .mhead {
+    padding: 44px 28px 18px !important;
+}
+
+/* আইকন বড় */
+body.is-mobile .micon {
+    width: 110px !important;
+    height: 110px !important;
+    font-size: 48px !important;
+    margin-bottom: 18px !important;
+}
+body.is-mobile .micon i {
+    font-size: 48px !important;
+}
+
+/* Title ও subtitle বড় */
+body.is-mobile .mtitle {
+    font-size: 46px !important;
+    margin-bottom: 8px !important;
+}
+body.is-mobile .msub {
+    font-size: 26px !important;
+}
+
+/* Body padding */
+body.is-mobile .mbody {
+    padding: 0 28px 40px !important;
+}
+
+/* Google বাটন বড় */
+body.is-mobile .g-btn {
+    font-size: 28px !important;
+    padding: 20px !important;
+    border-radius: 16px !important;
+    gap: 14px !important;
+    margin-bottom: 18px !important;
+}
+body.is-mobile .g-btn img {
+    width: 36px !important;
+    height: 36px !important;
+}
+
+/* "অথবা" divider */
+body.is-mobile .or-div {
+    font-size: 26px !important;
+    margin-bottom: 18px !important;
+}
+
+/* Label ও input group */
+body.is-mobile .ig {
+    margin-bottom: 22px !important;
+}
+body.is-mobile .il {
+    font-size: 28px !important;
+    margin-bottom: 10px !important;
+}
+
+/* Input icon */
+body.is-mobile .iw i {
+    font-size: 28px !important;
+    left: 18px !important;
+}
+
+/* Input field বড় */
+body.is-mobile .fi {
+    font-size: 28px !important;
+    padding: 20px 18px 20px 58px !important;
+    border-radius: 14px !important;
+    border-width: 2px !important;
+}
+body.is-mobile .fi::placeholder {
+    font-size: 26px !important;
+}
+
+body.is-mobile .fi-np {
+    font-size: 28px !important;
+    padding: 20px 18px !important;
+    border-radius: 14px !important;
+    border-width: 2px !important;
+}
+body.is-mobile .fi-np::placeholder {
+    font-size: 26px !important;
+}
+
+/* Eye toggle বাটন */
+body.is-mobile .ptog {
+    width: 64px !important;
+    height: 64px !important;
+    font-size: 26px !important;
+    border-radius: 14px !important;
+    flex-shrink: 0 !important;
+}
+
+/* পাসওয়ার্ড ভুলে গেছেন */
+body.is-mobile .fgt a {
+    font-size: 26px !important;
+}
+body.is-mobile .fgt {
+    margin-bottom: 22px !important;
+}
+
+/* Submit বাটন */
+body.is-mobile .bsub {
+    font-size: 30px !important;
+    padding: 22px !important;
+    border-radius: 16px !important;
+    gap: 12px !important;
+}
+
+/* Switch link */
+body.is-mobile .mswitch {
+    font-size: 26px !important;
+    margin-top: 24px !important;
+}
+body.is-mobile .mswitch a {
+    font-size: 26px !important;
+}
 </style>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script>emailjs.init('DgZTRCxGcsfC2gTRf');</script>
