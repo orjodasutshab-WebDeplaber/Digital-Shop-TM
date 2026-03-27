@@ -2431,15 +2431,35 @@ function openPmxGuestShop(headerId, headerName, headerImg){
     if(!products.length){
         productGrid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:40px;color:#4b5563;"><i class="fa fa-box-open" style="font-size:36px;display:block;margin-bottom:10px;"></i><p>এই ক্যাটাগরিতে কোনো প্রোডাক্ট নেই</p></div>`;
     } else {
-        productGrid.innerHTML=products.map(p=>`
+        productGrid.innerHTML=products.map(p=>{
+            const newPrice = parseFloat(p.price)||0;
+            // পুরাতন মূল্য: থাকলে সেটা, না থাকলে অটো জেনারেট (১৫-৩৫% বেশি)
+            let oldPrice = parseFloat(p.oldPrice)||0;
+            if(!oldPrice && newPrice>0){
+                // সিডভিত্তিক ধারাবাহিক অটো % (১৫–৩৫%)
+                const seed = (p.name||'').split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+                const autoPct = 15 + (seed % 21); // ১৫ থেকে ৩৫
+                oldPrice = Math.round(newPrice * 100 / (100 - autoPct));
+            }
+            // ছাড়ের % হিসাব (পুরাতন থেকে নতুনের পার্থক্য)
+            const discountPct = oldPrice>0 ? Math.round((oldPrice-newPrice)/oldPrice*100) : 0;
+            const priceHtml = oldPrice>0 ? `
+                <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                    <span style="color:#10b981;font-size:15px;font-weight:800;">৳${newPrice}</span>
+                    <span style="color:#64748b;font-size:11px;font-weight:600;text-decoration:line-through;">৳${oldPrice}</span>
+                    <span style="background:#ef4444;color:#fff;font-size:10px;font-weight:800;padding:2px 6px;border-radius:20px;">${discountPct}% ছাড়</span>
+                </div>` :
+                `<div style="color:#10b981;font-size:15px;font-weight:800;margin-bottom:6px;">৳${newPrice}</div>`;
+            return `
             <div style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;text-align:center;transition:.25s;" onmouseover="this.style.borderColor='#7c3aed';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#334155';this.style.transform='none'">
                 <img src="${p.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:fill;" onerror="this.src='ko.jpeg'">
                 <div style="padding:10px 8px;">
                     <div style="color:#e2e8f0;font-size:12px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name||''}</div>
-                    <div style="color:#10b981;font-size:15px;font-weight:800;margin-bottom:10px;">৳${p.price||0}</div>
+                    ${priceHtml}
                     <button onclick="closePmxGuestShop();openM('loginModal');" style="width:100%;background:linear-gradient(135deg,#7c3aed,#a78bfa);color:#fff;border:none;padding:9px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Hind Siliguri',sans-serif;">🔐 কিনতে লগইন করুন</button>
                 </div>
-            </div>`).join('');
+            </div>`;
+        }).join('');
     }
 
     modal.style.display='block';
