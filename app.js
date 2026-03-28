@@ -547,10 +547,7 @@ function renderProductGrid(productList, isLoadMore = false) {
                     <div class="slides-container scroll-custom">
                         ${images.map(img => `<img src="${img}" class="slide-img" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">`).join('')}
                     </div>
-                    ${images.length > 1 ? `
-                        <button class="slide-prev" onclick="moveSlide('${item.id}', -1)">&#10094;</button>
-                        <button class="slide-next" onclick="moveSlide('${item.id}', 1)">&#10095;</button>
-                    ` : ''}
+
                 </div>
                 <h4 class="product-title" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">${item.title}</h4>
                 <span class="product-price">${currency} ${item.price}</span>
