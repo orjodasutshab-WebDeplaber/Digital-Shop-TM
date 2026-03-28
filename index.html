@@ -423,14 +423,14 @@ document.addEventListener('click', function(event) {
     </div>
 
     <!-- ডান: সুন্দর ফিল্টার বাটন -->
-    <div class="pb-filter-wrap" style="position: relative; z-index: 999999;">
+    <div class="pb-filter-wrap" style="position: relative; z-index: 9999999; isolation: isolate;">
         <button id="filterBtn" onclick="toggleFilterMenu()" class="pb-filter-btn">
             <span class="pb-filter-icon"><i class="fa fa-sliders-h"></i></span>
             <span class="pb-filter-text">ফিল্টার</span>
             <span class="pb-filter-arrow"><i class="fa fa-chevron-down"></i></span>
         </button>
 
-        <div id="filterMenu" style="position: fixed; right: 20px; top: auto; background: rgba(15,23,42,0.97); backdrop-filter: blur(20px); border: 1px solid rgba(99,102,241,0.25); padding: 22px; width: 270px; border-radius: 20px; display: none; z-index: 9999999; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); transform-origin: top right; animation: scaleUp 0.2s ease-out;">
+        <div id="filterMenu" style="position: absolute; right: 0; top: 55px; background: rgba(15,23,42,0.97); backdrop-filter: blur(20px); border: 1px solid rgba(99,102,241,0.25); padding: 22px; width: 270px; border-radius: 20px; display: none; z-index: 9999999; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7); transform-origin: top right; animation: scaleUp 0.2s ease-out;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%; box-shadow: 0 0 6px #fbbf24;"></div>
