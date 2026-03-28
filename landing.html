@@ -176,6 +176,10 @@ body.is-mobile .sir-grid-pc-wrap{
 .mo.open{display:flex;}
 .mb{background:#0f172a;border-radius:24px;width:95%;max-width:480px;overflow:hidden;position:relative;animation:si .3s ease;max-height:95vh;overflow-y:auto;}
 
+/* PC: রেজিস্ট্রেশন মডালের scrollbar অদৃশ্য */
+#regModal .mb{scrollbar-width:none;-ms-overflow-style:none;}
+#regModal .mb::-webkit-scrollbar{display:none;}
+
 /* SIRONAM FULL SCREEN MODAL */
 .sir-full{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:99999;overflow-y:auto;font-family:inherit;}
 .sir-full.open{display:block;}
@@ -250,7 +254,7 @@ body:not(.is-mobile) .gp-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.14);trans
 /* IMAGE */
 .gp-img-wrap{width:100%;aspect-ratio:1/1;overflow:hidden;background:#f8f9fa;position:relative;}
 body.is-mobile .gp-img-wrap{aspect-ratio:1/1;}
-.gp-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s;}
+.gp-img-wrap img{width:100%;height:100%;object-fit:fill;display:block;transition:transform .35s;}
 .gp-card:hover .gp-img-wrap img{transform:scale(1.04);}
 
 /* DISCOUNT BADGE — ছবির উপরে বাম দিকে */
@@ -402,7 +406,7 @@ body.is-mobile #gpModalSellerBox div[style*="font-size:18px"]{font-size:38px !im
 /* Related product card */
 .gpd-rel-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow .2s;}
 .gpd-rel-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
-.gpd-rel-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#f8f9fa;}
+.gpd-rel-card img{width:100%;aspect-ratio:1/1;object-fit:fill;display:block;background:#f8f9fa;}
 .gpd-rel-card-body{padding:8px 10px 10px;}
 .gpd-rel-card-name{font-size:12px;font-weight:600;color:#222;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;}
 .gpd-rel-card-price{color:#f57224;font-size:14px;font-weight:900;}
@@ -435,7 +439,7 @@ body.is-mobile .gp-modal{background:#f5f5f5;}
 .gpd-thumbs::-webkit-scrollbar{display:none;}
 .gpd-thumb{width:100px;height:100px;border-radius:6px;overflow:hidden;border:2px solid #ddd;cursor:pointer;flex-shrink:0;}
 .gpd-thumb.active{border-color:#f57224;}
-.gpd-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.gpd-thumb img{width:100%;height:100%;object-fit:fill;display:block;}
 /* price section */
 .gpd-price-sec{background:#fff;padding:14px 14px 6px;margin-top:8px;}
 .gpd-price-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
@@ -630,6 +634,11 @@ body.is-mobile .mo {
     overflow-y: auto !important;
 }
 
+/* লগইন মডাল — মোবাইলে একটু নিচে নামানো */
+body.is-mobile #loginModal {
+    padding-top: 60px !important;
+}
+
 /* মোডাল বক্স — পুরো width, top থেকে */
 body.is-mobile .mb {
     width: 100% !important;
@@ -655,12 +664,12 @@ body.is-mobile #regModal .mb::-webkit-scrollbar {
 
 /* বন্ধ (×) বাটন বড় */
 body.is-mobile .mclose {
-    font-size: 56px !important;
-    right: 24px !important;
-    top: 18px !important;
+    font-size: 72px !important;
+    right: 20px !important;
+    top: 14px !important;
     line-height: 1 !important;
-    width: 60px !important;
-    height: 60px !important;
+    width: 76px !important;
+    height: 76px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1379,7 +1388,7 @@ body.is-mobile #pmxGuestProductGrid > div div[style*="padding:10px 8px"] {
 .ft-logo{display:flex;align-items:center;gap:10px;}
 .ft-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:8px;display:flex;align-items:center;justify-content:center;}
 .ft-logo-icon{display:none;}
-.ft-logo-img{width:70px;height:70px;border-radius:12px;object-fit:cover;border:2px solid #22c55e;margin-bottom:10px;}
+.ft-logo-img{width:70px;height:70px;border-radius:12px;object-fit:fill;border:2px solid #22c55e;margin-bottom:10px;}
 .ft-logo-text{font-size:30px;font-weight:800;color:#f1f5f9;letter-spacing:-0.3px;}
 .ft-tagline{font-size:20px;color:#94a3b8;line-height:1.7;max-width:280px;margin-top:6px;}
 .ft-social{display:flex;gap:10px;margin-top:10px;}
@@ -2004,7 +2013,7 @@ function openSir(sid,title){
                 <div style="position:relative;overflow:hidden;background:#f8f9fa;">
                     ${freeDlvBadge}
                     ${!showFreeDelivery&&dispDiscount?`<span style="position:absolute;top:0;left:0;background:#f57224;color:#fff;font-size:${discSz};font-weight:800;padding:3px 7px;border-radius:0 0 6px 0;z-index:2;">-${dispDiscount}</span>`:''}
-                    <img src="${img}" alt="${p.name||''}" style="width:100%;height:${imgH};object-fit:cover;display:block;transition:transform .3s;" onerror="this.src='ko.jpeg'" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                    <img src="${img}" alt="${p.name||''}" style="width:100%;height:${imgH};object-fit:fill;display:block;transition:transform .3s;" onerror="this.src='ko.jpeg'" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
                 </div>
                 <div style="padding:8px 10px 10px;flex:1;display:flex;flex-direction:column;gap:3px;">
                     ${topBadges}
@@ -2854,7 +2863,7 @@ function openPmxGuestShop(headerId, headerName, headerImg){
             return `
             <div style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;text-align:center;transition:.25s;display:flex;flex-direction:column;" onmouseover="this.style.borderColor='#7c3aed';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(124,58,237,0.2)'" onmouseout="this.style.borderColor='#334155';this.style.transform='none';this.style.boxShadow='none'">
                 <div style="width:100%;aspect-ratio:1/1;overflow:hidden;background:#0f172a;flex-shrink:0;">
-                    <img src="${p.img||'ko.jpeg'}" style="width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s;" onerror="this.src='ko.jpeg'" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <img src="${p.img||'ko.jpeg'}" style="width:100%;height:100%;object-fit:fill;display:block;transition:transform 0.3s;" onerror="this.src='ko.jpeg'" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                 </div>
                 <div style="padding:10px 8px;flex:1;display:flex;flex-direction:column;justify-content:space-between;">
                     <div style="color:#e2e8f0;font-size:12px;font-weight:700;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45;min-height:32px;">${p.name||''}</div>
