@@ -1357,4 +1357,189 @@ window.addEventListener('load',function(){
     }
 });
 </script>
+
+<!-- ════════════════════════════════════════════
+     ✅ CUSTOM OVERRIDES — বাটন, ব্যাকগ্রাউন্ড, গ্রিড, ক্লিক
+     ════════════════════════════════════════════ -->
+<style>
+/* ── ১. কিনুন ও বিস্তারিত বাটন সম্পূর্ণ লুকানো ── */
+.product-card .card-actions,
+.product-card .action-buttons,
+.product-card .btn-buy,
+.product-card .btn-detail,
+.product-card .buy-btn,
+.product-card .detail-btn,
+.product-card [class*="buy"],
+.product-card [class*="detail"],
+.product-card [class*="action"],
+.product-card .card-footer-btns,
+.product-card .product-actions,
+.product-card .card-btn-group,
+.products-grid .card-actions,
+.products-grid .action-buttons,
+.products-grid [class*="buy"],
+.products-grid [class*="detail"],
+#productDisplayArea .card-actions,
+#productDisplayArea .action-buttons,
+#productDisplayArea [class*="-actions"],
+#productDisplayArea [class*="card-btn"],
+#productDisplayArea .product-footer,
+#productDisplayArea .card-footer { display: none !important; }
+
+/* ── ২. ইমেজ স্লাইডার বাটন লুকানো ── */
+.product-card .img-prev,
+.product-card .img-next,
+.product-card .slide-prev,
+.product-card .slide-next,
+.product-card .img-nav,
+.product-card .img-slider-btn,
+.product-card [class*="img-arr"],
+.product-card [class*="slide-btn"],
+.product-card [class*="img-nav"],
+.product-card [class*="prev-btn"],
+.product-card [class*="next-btn"],
+#productDisplayArea .img-prev,
+#productDisplayArea .img-next,
+#productDisplayArea [class*="slide-btn"],
+#productDisplayArea [class*="img-arr"],
+#productDisplayArea [class*="img-nav"] { display: none !important; }
+
+/* ── ৩. সাদা ব্যাকগ্রাউন্ড — জনপ্রিয় পণ্য হেডার থেকে ফিল্টার পর্যন্ত ── */
+.main-content-area {
+    background: #ffffff !important;
+}
+.main-content-area > .container > div:first-child {
+    background: #ffffff !important;
+    padding-top: 22px !important;
+    padding-bottom: 10px !important;
+}
+.main-content-area > .container {
+    background: #ffffff !important;
+}
+/* জনপ্রিয় পণ্যসমূহ হেডার টেক্সট রঙ ঠিক রাখা */
+.main-content-area .section-title h2 {
+    color: #111827 !important;
+}
+
+/* ── ৪. পণ্য গ্রিড — দুই পাশে খালি জায়গা ── */
+#productDisplayArea {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    max-width: 1500px !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
+}
+
+/* ── ৫. কার্ড — cursor pointer (ক্লিকযোগ্য মনে হবে) ── */
+.product-card {
+    cursor: pointer !important;
+}
+
+/* ── ৬. মোবাইল — ২টা করে পণ্য ── */
+@media (max-width: 799px) {
+    #productDisplayArea,
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+}
+
+/* is-mobile class দিয়ে ও কভার করা */
+body.is-mobile #productDisplayArea,
+body.is-mobile .products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+</style>
+
+<script>
+/* ════════════════════════════════════════════
+   ✅ কার্ডের যেকোনো জায়গায় ক্লিক → বিস্তারিত
+   ════════════════════════════════════════════ */
+(function(){
+    // app.js রেন্ডার হওয়ার পরে চালাই
+    function patchCardClicks(){
+        var grid = document.getElementById('productDisplayArea');
+        if(!grid) return;
+
+        // Event delegation — grid এ ক্লিক হলে কার্ড খুঁজি
+        grid.addEventListener('click', function(e){
+            // বাটন বা লিঙ্কে ক্লিক হলে ignore
+            var tag = e.target.tagName;
+            if(tag === 'BUTTON' || tag === 'A' || tag === 'INPUT' || tag === 'SELECT') return;
+            if(e.target.closest('button') || e.target.closest('a')) return;
+
+            // সবচেয়ে কাছের product-card খুঁজি
+            var card = e.target.closest('.product-card');
+            if(!card) return;
+
+            // কার্ডের ছবিতে যে onclick ছিল সেটা আমরা card-level এ তুলে আনি
+            // কার্ডে data-id বা onclick আছে কিনা দেখি
+            var imgEl = card.querySelector('img');
+            if(imgEl && imgEl.onclick){
+                imgEl.onclick.call(imgEl, e);
+                return;
+            }
+            // app.js openProductDetail / viewProductDetail / openDetail call খুঁজি
+            var existingClick = card.getAttribute('data-onclick') || card.getAttribute('onclick');
+            if(existingClick){
+                try{ eval(existingClick); } catch(err){}
+                return;
+            }
+            // ছবিতে click event fire করি
+            if(imgEl){ imgEl.click(); }
+        }, false);
+
+        // ইতিমধ্যে রেন্ডার হওয়া কার্ডেও লাগাই
+        applyCardStyles();
+    }
+
+    function applyCardStyles(){
+        // কিনুন / বিস্তারিত বাটন লুকানো — text দিয়ে খুঁজি
+        document.querySelectorAll('#productDisplayArea button, #productDisplayArea .btn').forEach(function(btn){
+            var t = btn.textContent.trim();
+            if(t.includes('কিনুন') || t.includes('বিস্তারিত') || t.includes('Buy') || t.includes('Detail')){
+                btn.style.setProperty('display','none','important');
+            }
+        });
+        // স্লাইডার arrow বাটন লুকানো — prev/next চিহ্ন দিয়ে
+        document.querySelectorAll('#productDisplayArea button').forEach(function(btn){
+            var t = btn.textContent.trim();
+            if(t === '‹' || t === '›' || t === '<' || t === '>' || t === '❮' || t === '❯' || t === '←' || t === '→' || t === '◀' || t === '▶'){
+                btn.style.setProperty('display','none','important');
+            }
+            // icon-only বাটন (fa-chevron, fa-arrow ইত্যাদি)
+            var icon = btn.querySelector('i');
+            if(icon && !btn.textContent.replace(/\s/g,'') && (
+                icon.className.includes('chevron') || icon.className.includes('arrow') ||
+                icon.className.includes('caret') || icon.className.includes('angle')
+            )){
+                btn.style.setProperty('display','none','important');
+            }
+        });
+    }
+
+    // MutationObserver দিয়ে নতুন কার্ড আসলেও কাজ করবে
+    function observe(){
+        var grid = document.getElementById('productDisplayArea');
+        if(!grid){ setTimeout(observe, 300); return; }
+        patchCardClicks();
+        var obs = new MutationObserver(function(){ applyCardStyles(); });
+        obs.observe(grid, {childList:true, subtree:true});
+    }
+
+    if(document.readyState === 'loading'){
+        document.addEventListener('DOMContentLoaded', observe);
+    } else {
+        observe();
+    }
+    // app.js দেরিতে render করলেও ধরার জন্য
+    setTimeout(function(){ applyCardStyles(); }, 1500);
+    setTimeout(function(){ applyCardStyles(); }, 3000);
+})();
+</script>
 </body>
