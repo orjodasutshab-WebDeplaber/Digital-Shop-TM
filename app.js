@@ -5237,15 +5237,19 @@ function toggleFilterMenu() {
 // ১. মেনু খোলা বা বন্ধ করার উন্নত ফাংশন
 function toggleFilterMenu(show = null) {
     const menu = document.getElementById('filterMenu');
+    const btn  = document.getElementById('filterBtn');
     if (!menu) return;
 
+    let isOpen;
     if (show === true) {
-        menu.style.display = 'block';
+        menu.style.display = 'block'; isOpen = true;
     } else if (show === false) {
-        menu.style.display = 'none';
+        menu.style.display = 'none'; isOpen = false;
     } else {
-        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        isOpen = (menu.style.display !== 'block');
+        menu.style.display = isOpen ? 'block' : 'none';
     }
+    if (btn) btn.classList.toggle('open', isOpen);
 }
 
 // ২. বাইরে ক্লিক করলে মেনু বন্ধ হওয়ার লজিক
