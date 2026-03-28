@@ -402,7 +402,7 @@ document.addEventListener('click', function(event) {
 
 <section id="leaderboardAdArea">
     </section>
-<main class="main-content-area" style="background: #0f172a; padding: 20px 0;">
+<main class="main-content-area" style="padding: 20px 0;">
     <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 15px; flex-wrap: wrap; gap: 10px;">
             
@@ -1362,66 +1362,89 @@ window.addEventListener('load',function(){
      ✅ CUSTOM OVERRIDES — বাটন, ব্যাকগ্রাউন্ড, গ্রিড, ক্লিক
      ════════════════════════════════════════════ -->
 <style>
-/* ── ১. কিনুন ও বিস্তারিত বাটন সম্পূর্ণ লুকানো ── */
-.product-card .card-actions,
-.product-card .action-buttons,
-.product-card .btn-buy,
-.product-card .btn-detail,
-.product-card .buy-btn,
-.product-card .detail-btn,
-.product-card [class*="buy"],
-.product-card [class*="detail"],
-.product-card [class*="action"],
-.product-card .card-footer-btns,
-.product-card .product-actions,
-.product-card .card-btn-group,
-.products-grid .card-actions,
-.products-grid .action-buttons,
-.products-grid [class*="buy"],
-.products-grid [class*="detail"],
-#productDisplayArea .card-actions,
-#productDisplayArea .action-buttons,
-#productDisplayArea [class*="-actions"],
-#productDisplayArea [class*="card-btn"],
-#productDisplayArea .product-footer,
-#productDisplayArea .card-footer { display: none !important; }
+/* ════════════════════════════════════════════════════════
+   ১. কিনুন ও বিস্তারিত বাটন সম্পূর্ণ লুকানো
+   ════════════════════════════════════════════════════════ */
+.product-card-actions,
+.product-card .product-card-actions { display: none !important; }
 
-/* ── ২. ইমেজ স্লাইডার বাটন লুকানো ── */
-.product-card .img-prev,
-.product-card .img-next,
+/* ════════════════════════════════════════════════════════
+   ২. ইমেজ স্লাইডার prev/next বাটন লুকানো
+   ════════════════════════════════════════════════════════ */
 .product-card .slide-prev,
-.product-card .slide-next,
-.product-card .img-nav,
-.product-card .img-slider-btn,
-.product-card [class*="img-arr"],
-.product-card [class*="slide-btn"],
-.product-card [class*="img-nav"],
-.product-card [class*="prev-btn"],
-.product-card [class*="next-btn"],
-#productDisplayArea .img-prev,
-#productDisplayArea .img-next,
-#productDisplayArea [class*="slide-btn"],
-#productDisplayArea [class*="img-arr"],
-#productDisplayArea [class*="img-nav"] { display: none !important; }
+.product-card .slide-next { display: none !important; }
 
-/* ── ৩. সাদা ব্যাকগ্রাউন্ড — জনপ্রিয় পণ্য হেডার থেকে ফিল্টার পর্যন্ত ── */
+/* ════════════════════════════════════════════════════════
+   ৩. main-content-area ব্যাকগ্রাউন্ড — Light Mode: সাদা
+   ════════════════════════════════════════════════════════ */
 .main-content-area {
     background: #ffffff !important;
+    transition: background 0.4s ease !important;
+}
+.main-content-area > .container {
+    background: #ffffff !important;
+    transition: background 0.4s ease !important;
 }
 .main-content-area > .container > div:first-child {
     background: #ffffff !important;
     padding-top: 22px !important;
     padding-bottom: 10px !important;
 }
-.main-content-area > .container {
-    background: #ffffff !important;
-}
-/* জনপ্রিয় পণ্যসমূহ হেডার টেক্সট রঙ ঠিক রাখা */
+/* হেডার টেক্সট রঙ */
 .main-content-area .section-title h2 {
     color: #111827 !important;
 }
 
-/* ── ৪. পণ্য গ্রিড — দুই পাশে খালি জায়গা ── */
+/* ── Light Mode: product-card হালকা কালো ব্যাকগ্রাউন্ড ── */
+body:not(.dark-theme) .products-grid .product-card {
+    background: #f1f3f5 !important;
+    border: 1px solid #dee2e6 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+}
+body:not(.dark-theme) .products-grid .product-card .product-title {
+    color: #1a1a2e !important;
+}
+body:not(.dark-theme) .products-grid .product-card .product-price {
+    color: #00856a !important;
+}
+
+/* ════════════════════════════════════════════════════════
+   ৪. Dark Mode: main-content-area কালো, card সাদা
+   ════════════════════════════════════════════════════════ */
+body.dark-theme .main-content-area {
+    background: #0f172a !important;
+}
+body.dark-theme .main-content-area > .container {
+    background: #0f172a !important;
+}
+body.dark-theme .main-content-area > .container > div:first-child {
+    background: #0f172a !important;
+}
+body.dark-theme .main-content-area .section-title h2 {
+    color: #f1f5f9 !important;
+}
+
+/* Dark Mode: product-card সাদা */
+body.dark-theme .products-grid .product-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.35) !important;
+}
+body.dark-theme .products-grid .product-card .product-title {
+    color: #111827 !important;
+}
+body.dark-theme .products-grid .product-card .product-price {
+    color: #00856a !important;
+}
+body.dark-theme .products-grid .product-card .product-stars,
+body.dark-theme .products-grid .product-card span[class*="star"],
+body.dark-theme .products-grid .product-card [class*="rating"] {
+    color: #f59e0b !important;
+}
+
+/* ════════════════════════════════════════════════════════
+   ৫. পণ্য গ্রিড — দুই পাশে padding / max-width
+   ════════════════════════════════════════════════════════ */
 #productDisplayArea {
     padding-left: 24px !important;
     padding-right: 24px !important;
@@ -1430,23 +1453,22 @@ window.addEventListener('load',function(){
     box-sizing: border-box !important;
 }
 
-/* ── ৫. কার্ড — cursor pointer (ক্লিকযোগ্য মনে হবে) ── */
-.product-card {
-    cursor: pointer !important;
-}
+/* ════════════════════════════════════════════════════════
+   ৬. কার্ড cursor pointer
+   ════════════════════════════════════════════════════════ */
+.product-card { cursor: pointer !important; }
 
-/* ── ৬. মোবাইল — ২টা করে পণ্য ── */
+/* ════════════════════════════════════════════════════════
+   ৭. মোবাইল — ২টা করে পণ্য
+   ════════════════════════════════════════════════════════ */
 @media (max-width: 799px) {
-    #productDisplayArea,
-    .products-grid {
+    #productDisplayArea, .products-grid {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 10px !important;
         padding-left: 10px !important;
         padding-right: 10px !important;
     }
 }
-
-/* is-mobile class দিয়ে ও কভার করা */
 body.is-mobile #productDisplayArea,
 body.is-mobile .products-grid {
     grid-template-columns: repeat(2, 1fr) !important;
