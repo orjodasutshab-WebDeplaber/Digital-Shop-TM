@@ -555,6 +555,16 @@ function renderProductGrid(productList, isLoadMore = false) {
                 </div>`;
             // ─────────────────────────────────────────────────────────
 
+            // ── Badge Logic ───────────────────────────────────────────
+            const hasFast     = item.badges && item.badges.fast;
+            const hasVerified = item.badges && item.badges.verified;
+            const badgeHTML   = (hasFast || hasVerified) ? `
+                <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:5px 0 3px;">
+                    ${hasFast     ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#15803d;border:1px solid #86efac;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;"><span>⚡</span>FAST</span>` : ''}
+                    ${hasVerified ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;"><span>✔</span>Verified</span>` : ''}
+                </div>` : '';
+            // ─────────────────────────────────────────────────────────
+
             return `
             <div class="product-card" style="position: relative;">
                 ${checkAdmin ? `
@@ -571,6 +581,7 @@ function renderProductGrid(productList, isLoadMore = false) {
                 </div>
                 <h4 class="product-title" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">${item.title}</h4>
                 ${priceHTML}
+                ${badgeHTML}
                 ${ratingHTML}
             </div>`;
         }).join('');
@@ -1098,6 +1109,22 @@ function renderAdminPublish(container) {
                 </div>
             </div>
 
+                <div style="background: #1e293b; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-top: 15px;">
+                    <label style="color: #a78bfa; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+                        <i class="fa fa-certificate"></i> পণ্য ব্যাজ (Badge)
+                    </label>
+                    <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+                        <label style="display: flex; align-items: center; gap: 10px; background: rgba(34,197,94,0.08); border: 1.5px solid rgba(34,197,94,0.25); padding: 10px 18px; border-radius: 30px; cursor: pointer;">
+                            <input type="checkbox" id="admBadgeFast" style="width:16px; height:16px; accent-color:#22c55e; cursor:pointer;">
+                            <span style="color:#22c55e; font-size:13px; font-weight:700;">⚡ FAST DELIVERY</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; background: rgba(99,102,241,0.08); border: 1.5px solid rgba(99,102,241,0.25); padding: 10px 18px; border-radius: 30px; cursor: pointer;">
+                            <input type="checkbox" id="admBadgeVerified" style="width:16px; height:16px; accent-color:#6366f1; cursor:pointer;">
+                            <span style="color:#818cf8; font-size:13px; font-weight:700;">✔ VERIFIED</span>
+                        </label>
+                    </div>
+                </div>
+
             <div style="margin-top: 30px; background: #0f172a; padding: 20px; border-radius: 20px; border: 1px solid rgba(52, 152, 219, 0.3); text-align: center;">
                 <p style="color: #94a3b8; font-size: 12px; margin-bottom: 15px;">সব তথ্য চেক করে পাবলিশ বাটনে ক্লিক করুন</p>
                 <button class="btn-primary" onclick="adminSaveProduct()" 
@@ -1194,6 +1221,10 @@ function adminSaveProduct() {
     const sellerRating = document.getElementById('admSellerRating') ? document.getElementById('admSellerRating').value.trim() : "";
     const deliveryCharge = document.getElementById('admDeliveryCharge') ? document.getElementById('admDeliveryCharge').value.trim() : "";
 
+    // --- Badge ডাটা ---
+    const badgeFast     = document.getElementById('admBadgeFast')     ? document.getElementById('admBadgeFast').checked     : false;
+    const badgeVerified = document.getElementById('admBadgeVerified') ? document.getElementById('admBadgeVerified').checked : false;
+
     // নতুন পণ্য অবজেক্ট তৈরি
     const newProd = {
         id: 'P-' + Date.now(),
@@ -1220,7 +1251,8 @@ function adminSaveProduct() {
         },
         tags: tagList,
         likes: 0,
-        likedBy: []
+        likedBy: [],
+        badges: { fast: badgeFast, verified: badgeVerified }
     };
 
     // ডাটাবেসে পণ্য যুক্ত করা
@@ -3021,6 +3053,22 @@ window.openEditModal = function(productId) {
                         </div>
                     </div>
 
+                    <div style="margin-bottom:18px; background:#f5f3ff; padding:15px; border-radius:12px; border:1.5px solid #c4b5fd;">
+                        <label style="display:block; font-size:13px; font-weight:700; color:#7c3aed; margin-bottom:12px;">
+                            <i class="fa fa-certificate"></i> পণ্য ব্যাজ (Badge)
+                        </label>
+                        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                            <label style="display:flex; align-items:center; gap:9px; background:rgba(34,197,94,0.08); border:1.5px solid rgba(34,197,94,0.3); padding:9px 16px; border-radius:30px; cursor:pointer;">
+                                <input type="checkbox" id="editBadgeFast" ${(product.badges && product.badges.fast) ? 'checked' : ''} style="width:15px; height:15px; accent-color:#22c55e; cursor:pointer;">
+                                <span style="color:#16a34a; font-size:13px; font-weight:700;">⚡ FAST DELIVERY</span>
+                            </label>
+                            <label style="display:flex; align-items:center; gap:9px; background:rgba(99,102,241,0.08); border:1.5px solid rgba(99,102,241,0.3); padding:9px 16px; border-radius:30px; cursor:pointer;">
+                                <input type="checkbox" id="editBadgeVerified" ${(product.badges && product.badges.verified) ? 'checked' : ''} style="width:15px; height:15px; accent-color:#6366f1; cursor:pointer;">
+                                <span style="color:#6366f1; font-size:13px; font-weight:700;">✔ VERIFIED</span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div style="margin-bottom:18px;">
                         <label style="display:block; font-size:13px; font-weight:600; color:#3b82f6; margin-bottom:10px;">বিদ্যমান ছবিসমূহ</label>
                         <div id="currentImagesList" style="display:flex; gap:12px; flex-wrap:wrap; background:#f8fafc; padding:12px; border-radius:16px; border:1px solid #f1f5f9;">
@@ -3091,6 +3139,12 @@ window.saveProductEdit = function(productId) {
         product.likes = parseInt(likesInput.value) || 0;
     }
 
+
+    // Badge আপডেট
+    product.badges = {
+        fast:     document.getElementById('editBadgeFast')     ? document.getElementById('editBadgeFast').checked     : ((product.badges && product.badges.fast)     || false),
+        verified: document.getElementById('editBadgeVerified') ? document.getElementById('editBadgeVerified').checked : ((product.badges && product.badges.verified) || false)
+    };
     product.images = finalImages;
 
     // ডাটাবেস আপডেট
