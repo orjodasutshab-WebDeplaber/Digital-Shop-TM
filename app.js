@@ -5236,18 +5236,29 @@ function toggleFilterMenu() {
 
 // ১. মেনু খোলা বা বন্ধ করার উন্নত ফাংশন
 function toggleFilterMenu(show = null) {
-    const menu = document.getElementById('filterMenu');
+    let menu = document.getElementById('filterMenu');
     const btn  = document.getElementById('filterBtn');
-    if (!menu) return;
+    if (!menu || !btn) return;
+
+    // প্রথমবার — menu টা body তে move করি
+    if (menu.parentElement !== document.body) {
+        document.body.appendChild(menu);
+        menu.style.position = 'fixed';
+        menu.style.zIndex   = '99999';
+    }
 
     let isOpen;
-    if (show === true) {
-        isOpen = true;
-    } else if (show === false) {
-        isOpen = false;
-    } else {
-        isOpen = (menu.style.display !== 'block');
+    if (show === true)       isOpen = true;
+    else if (show === false) isOpen = false;
+    else                     isOpen = (menu.style.display !== 'block');
+
+    if (isOpen) {
+        const rect = btn.getBoundingClientRect();
+        menu.style.top   = (rect.bottom + 8) + 'px';
+        menu.style.right = (window.innerWidth - rect.right) + 'px';
+        menu.style.left  = 'auto';
     }
+
     menu.style.display = isOpen ? 'block' : 'none';
     if (btn) btn.classList.toggle('open', isOpen);
 }
