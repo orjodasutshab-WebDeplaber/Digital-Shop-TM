@@ -402,9 +402,126 @@ document.addEventListener('click', function(event) {
 
 <section id="leaderboardAdArea">
     </section>
-<main class="main-content-area" style="background: #0f172a; padding: 20px 0;">
+<!-- ══════════════════════════════════════════════════
+     ✅ জনপ্রিয় পণ্য ব্যানার — বিজ্ঞাপনের সাথে লাগানো
+     ══════════════════════════════════════════════════ -->
+<div id="popularBanner" class="popular-banner-wrap">
+    <div class="pb-left">
+        <span class="pb-icon">🛍️</span>
+        <div class="pb-texts">
+            <span class="pb-label">আমাদের</span>
+            <span class="pb-main">জনপ্রিয় পণ্যসমূহ</span>
+            <span class="pb-sub">সেরা মানের পণ্য · সর্বোচ্চ বিশ্বাস · দ্রুত ডেলিভারি</span>
+        </div>
+    </div>
+    <div class="pb-right">
+        <span class="pb-badge"><i class="fa fa-star"></i> Top Rated</span>
+        <span class="pb-badge pb-badge-2"><i class="fa fa-bolt"></i> Fast Delivery</span>
+    </div>
+</div>
+
+<style>
+.popular-banner-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0;
+    padding: 11px 32px;
+    border-radius: 0;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    transition: background 0.4s ease;
+}
+body:not(.dark-theme) .popular-banner-wrap {
+    background: linear-gradient(110deg, #e0f2fe 0%, #ede9fe 55%, #fce7f3 100%);
+    border-top: 1px solid rgba(99,102,241,0.12);
+    border-bottom: 1px solid rgba(99,102,241,0.12);
+}
+body:not(.dark-theme) .pb-label { color: #6366f1; }
+body:not(.dark-theme) .pb-main  { color: #1e1b4b; }
+body:not(.dark-theme) .pb-sub   { color: #64748b; }
+body:not(.dark-theme) .pb-badge {
+    background: rgba(99,102,241,0.11);
+    color: #4f46e5;
+    border: 1px solid rgba(99,102,241,0.22);
+}
+body:not(.dark-theme) .pb-badge-2 {
+    background: rgba(168,85,247,0.09);
+    color: #7c3aed;
+    border: 1px solid rgba(168,85,247,0.20);
+}
+body.dark-theme .popular-banner-wrap {
+    background: linear-gradient(110deg, #0f172a 0%, #1e1b4b 50%, #1a0533 100%);
+    border-top: 1px solid rgba(139,92,246,0.18);
+    border-bottom: 1px solid rgba(139,92,246,0.18);
+}
+body.dark-theme .pb-label { color: #a5b4fc; }
+body.dark-theme .pb-main  { color: #e0e7ff; }
+body.dark-theme .pb-sub   { color: #94a3b8; }
+body.dark-theme .pb-badge {
+    background: rgba(99,102,241,0.20);
+    color: #a5b4fc;
+    border: 1px solid rgba(99,102,241,0.35);
+}
+body.dark-theme .pb-badge-2 {
+    background: rgba(168,85,247,0.18);
+    color: #c4b5fd;
+    border: 1px solid rgba(168,85,247,0.30);
+}
+.popular-banner-wrap::before {
+    content: '';
+    position: absolute;
+    top: -80%;
+    right: 3%;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    pointer-events: none;
+    transition: background 0.4s;
+}
+body:not(.dark-theme) .popular-banner-wrap::before {
+    background: radial-gradient(circle, #6366f1, transparent);
+    opacity: 0.07;
+}
+body.dark-theme .popular-banner-wrap::before {
+    background: radial-gradient(circle, #a78bfa, transparent);
+    opacity: 0.16;
+}
+.pb-left  { display: flex; align-items: center; gap: 12px; }
+.pb-icon  { font-size: 28px; line-height: 1; flex-shrink: 0; }
+.pb-texts { display: flex; flex-direction: column; gap: 1px; }
+.pb-label {
+    font-size: 10px; font-weight: 800; letter-spacing: 2px;
+    text-transform: uppercase; font-family: 'Hind Siliguri', sans-serif;
+}
+.pb-main {
+    font-size: 17px; font-weight: 900; line-height: 1.2;
+    font-family: 'Hind Siliguri', sans-serif;
+}
+.pb-sub {
+    font-size: 11px; font-weight: 500; margin-top: 1px;
+    font-family: 'Hind Siliguri', sans-serif;
+}
+.pb-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.pb-badge {
+    padding: 5px 13px; border-radius: 30px; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; gap: 5px;
+    font-family: 'Hind Siliguri', sans-serif;
+    transition: background 0.4s ease, color 0.4s ease, border 0.4s ease;
+}
+body.is-mobile .popular-banner-wrap { padding: 9px 14px; }
+body.is-mobile .pb-main  { font-size: 14px; }
+body.is-mobile .pb-icon  { font-size: 20px; }
+body.is-mobile .pb-right { display: none; }
+body.is-mobile .pb-sub   { display: none; }
+</style>
+
+<main class="main-content-area" style="padding: 0 0 30px;">
     <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 15px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding: 10px 15px 0; flex-wrap: wrap; gap: 10px;">
             
             <div class="section-title" style="margin: 0; display: none;">
 
@@ -448,181 +565,6 @@ document.addEventListener('click', function(event) {
                 </div>
             </div>
         </div>
-
-        <!-- ══════════════════════════════════════════════
-             ✅ জনপ্রিয় পণ্য ব্যানার — Light/Dark থিম
-             ══════════════════════════════════════════════ -->
-        <div id="popularBanner" class="popular-banner-wrap">
-            <div class="pb-left">
-                <span class="pb-icon">🛍️</span>
-                <div class="pb-texts">
-                    <span class="pb-label">আমাদের</span>
-                    <span class="pb-main">জনপ্রিয় পণ্যসমূহ</span>
-                    <span class="pb-sub">সেরা মানের পণ্য · সর্বোচ্চ বিশ্বাস · দ্রুত ডেলিভারি</span>
-                </div>
-            </div>
-            <div class="pb-right">
-                <span class="pb-badge"><i class="fa fa-star"></i> Top Rated</span>
-                <span class="pb-badge pb-badge-2"><i class="fa fa-bolt"></i> Fast Delivery</span>
-            </div>
-        </div>
-
-        <style>
-        /* ── ব্যানার বেস ── */
-        .popular-banner-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 14px;
-            margin: 0 0 22px 0;
-            padding: 20px 28px;
-            border-radius: 18px;
-            position: relative;
-            overflow: hidden;
-            transition: background 0.4s ease, box-shadow 0.4s ease;
-        }
-
-        /* ── Light Mode ── */
-        body:not(.dark-theme) .popular-banner-wrap {
-            background: linear-gradient(120deg, #e0f2fe 0%, #ede9fe 50%, #fce7f3 100%);
-            box-shadow: 0 4px 24px rgba(99,102,241,0.10);
-            border: 1px solid rgba(99,102,241,0.13);
-        }
-        body:not(.dark-theme) .pb-label {
-            color: #6366f1;
-        }
-        body:not(.dark-theme) .pb-main {
-            color: #1e1b4b;
-        }
-        body:not(.dark-theme) .pb-sub {
-            color: #64748b;
-        }
-        body:not(.dark-theme) .pb-badge {
-            background: rgba(99,102,241,0.12);
-            color: #4f46e5;
-            border: 1px solid rgba(99,102,241,0.25);
-        }
-        body:not(.dark-theme) .pb-badge-2 {
-            background: rgba(168,85,247,0.10);
-            color: #7c3aed;
-            border: 1px solid rgba(168,85,247,0.22);
-        }
-        body:not(.dark-theme) .pb-icon {
-            filter: none;
-        }
-
-        /* ── Dark Mode ── */
-        body.dark-theme .popular-banner-wrap {
-            background: linear-gradient(120deg, #0f172a 0%, #1e1b4b 45%, #1a0533 100%);
-            box-shadow: 0 4px 30px rgba(99,102,241,0.22);
-            border: 1px solid rgba(139,92,246,0.25);
-        }
-        body.dark-theme .pb-label {
-            color: #a5b4fc;
-        }
-        body.dark-theme .pb-main {
-            color: #e0e7ff;
-        }
-        body.dark-theme .pb-sub {
-            color: #94a3b8;
-        }
-        body.dark-theme .pb-badge {
-            background: rgba(99,102,241,0.20);
-            color: #a5b4fc;
-            border: 1px solid rgba(99,102,241,0.35);
-        }
-        body.dark-theme .pb-badge-2 {
-            background: rgba(168,85,247,0.18);
-            color: #c4b5fd;
-            border: 1px solid rgba(168,85,247,0.30);
-        }
-
-        /* ── Shimmer decoration ── */
-        .popular-banner-wrap::before {
-            content: '';
-            position: absolute;
-            top: -40%;
-            right: -5%;
-            width: 280px;
-            height: 280px;
-            border-radius: 50%;
-            opacity: 0.06;
-            pointer-events: none;
-            transition: background 0.4s;
-        }
-        body:not(.dark-theme) .popular-banner-wrap::before {
-            background: radial-gradient(circle, #6366f1, transparent);
-        }
-        body.dark-theme .popular-banner-wrap::before {
-            background: radial-gradient(circle, #a78bfa, transparent);
-            opacity: 0.14;
-        }
-
-        /* ── Left side ── */
-        .pb-left {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .pb-icon {
-            font-size: 38px;
-            line-height: 1;
-            flex-shrink: 0;
-        }
-        .pb-texts {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        .pb-label {
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-family: 'Hind Siliguri', sans-serif;
-        }
-        .pb-main {
-            font-size: 22px;
-            font-weight: 900;
-            line-height: 1.2;
-            font-family: 'Hind Siliguri', sans-serif;
-        }
-        .pb-sub {
-            font-size: 12px;
-            font-weight: 500;
-            margin-top: 2px;
-            font-family: 'Hind Siliguri', sans-serif;
-        }
-
-        /* ── Right side badges ── */
-        .pb-right {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .pb-badge {
-            padding: 7px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Hind Siliguri', sans-serif;
-            transition: background 0.4s ease, color 0.4s ease, border 0.4s ease;
-        }
-
-        /* ── মোবাইল ── */
-        body.is-mobile .popular-banner-wrap {
-            padding: 16px 16px;
-            border-radius: 14px;
-        }
-        body.is-mobile .pb-main { font-size: 18px; }
-        body.is-mobile .pb-icon { font-size: 28px; }
-        body.is-mobile .pb-right { display: none; }
-        </style>
 
         <div id="productDisplayArea" class="products-grid scroll-custom">
             <div class="loading-spinner">
