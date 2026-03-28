@@ -402,13 +402,11 @@ document.addEventListener('click', function(event) {
 
 <section id="leaderboardAdArea">
     </section>
-<main class="main-content-area" style="padding: 20px 0;">
+<main class="main-content-area" style="background: #0f172a; padding: 20px 0;">
     <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 15px; flex-wrap: wrap; gap: 10px;">
             
-            <div class="section-title" style="margin: 0;">
-                <h2 style="color: #fff; margin: 0; font-family: 'Hind Siliguri', sans-serif;">আমাদের জনপ্রিয় পণ্যসমূহ</h2>
-            </div>
+            <div class="section-title" style="margin: 0; display: none;">
 
             <div style="position: relative; display: inline-block; font-family: 'Hind Siliguri', sans-serif;">
                 <button id="filterBtn" onclick="toggleFilterMenu()" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; padding: 10px 22px; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2); transition: 0.3s;">
@@ -450,6 +448,181 @@ document.addEventListener('click', function(event) {
                 </div>
             </div>
         </div>
+
+        <!-- ══════════════════════════════════════════════
+             ✅ জনপ্রিয় পণ্য ব্যানার — Light/Dark থিম
+             ══════════════════════════════════════════════ -->
+        <div id="popularBanner" class="popular-banner-wrap">
+            <div class="pb-left">
+                <span class="pb-icon">🛍️</span>
+                <div class="pb-texts">
+                    <span class="pb-label">আমাদের</span>
+                    <span class="pb-main">জনপ্রিয় পণ্যসমূহ</span>
+                    <span class="pb-sub">সেরা মানের পণ্য · সর্বোচ্চ বিশ্বাস · দ্রুত ডেলিভারি</span>
+                </div>
+            </div>
+            <div class="pb-right">
+                <span class="pb-badge"><i class="fa fa-star"></i> Top Rated</span>
+                <span class="pb-badge pb-badge-2"><i class="fa fa-bolt"></i> Fast Delivery</span>
+            </div>
+        </div>
+
+        <style>
+        /* ── ব্যানার বেস ── */
+        .popular-banner-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin: 0 0 22px 0;
+            padding: 20px 28px;
+            border-radius: 18px;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        /* ── Light Mode ── */
+        body:not(.dark-theme) .popular-banner-wrap {
+            background: linear-gradient(120deg, #e0f2fe 0%, #ede9fe 50%, #fce7f3 100%);
+            box-shadow: 0 4px 24px rgba(99,102,241,0.10);
+            border: 1px solid rgba(99,102,241,0.13);
+        }
+        body:not(.dark-theme) .pb-label {
+            color: #6366f1;
+        }
+        body:not(.dark-theme) .pb-main {
+            color: #1e1b4b;
+        }
+        body:not(.dark-theme) .pb-sub {
+            color: #64748b;
+        }
+        body:not(.dark-theme) .pb-badge {
+            background: rgba(99,102,241,0.12);
+            color: #4f46e5;
+            border: 1px solid rgba(99,102,241,0.25);
+        }
+        body:not(.dark-theme) .pb-badge-2 {
+            background: rgba(168,85,247,0.10);
+            color: #7c3aed;
+            border: 1px solid rgba(168,85,247,0.22);
+        }
+        body:not(.dark-theme) .pb-icon {
+            filter: none;
+        }
+
+        /* ── Dark Mode ── */
+        body.dark-theme .popular-banner-wrap {
+            background: linear-gradient(120deg, #0f172a 0%, #1e1b4b 45%, #1a0533 100%);
+            box-shadow: 0 4px 30px rgba(99,102,241,0.22);
+            border: 1px solid rgba(139,92,246,0.25);
+        }
+        body.dark-theme .pb-label {
+            color: #a5b4fc;
+        }
+        body.dark-theme .pb-main {
+            color: #e0e7ff;
+        }
+        body.dark-theme .pb-sub {
+            color: #94a3b8;
+        }
+        body.dark-theme .pb-badge {
+            background: rgba(99,102,241,0.20);
+            color: #a5b4fc;
+            border: 1px solid rgba(99,102,241,0.35);
+        }
+        body.dark-theme .pb-badge-2 {
+            background: rgba(168,85,247,0.18);
+            color: #c4b5fd;
+            border: 1px solid rgba(168,85,247,0.30);
+        }
+
+        /* ── Shimmer decoration ── */
+        .popular-banner-wrap::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -5%;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            opacity: 0.06;
+            pointer-events: none;
+            transition: background 0.4s;
+        }
+        body:not(.dark-theme) .popular-banner-wrap::before {
+            background: radial-gradient(circle, #6366f1, transparent);
+        }
+        body.dark-theme .popular-banner-wrap::before {
+            background: radial-gradient(circle, #a78bfa, transparent);
+            opacity: 0.14;
+        }
+
+        /* ── Left side ── */
+        .pb-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .pb-icon {
+            font-size: 38px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .pb-texts {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .pb-label {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+        .pb-main {
+            font-size: 22px;
+            font-weight: 900;
+            line-height: 1.2;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+        .pb-sub {
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 2px;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        /* ── Right side badges ── */
+        .pb-right {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .pb-badge {
+            padding: 7px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Hind Siliguri', sans-serif;
+            transition: background 0.4s ease, color 0.4s ease, border 0.4s ease;
+        }
+
+        /* ── মোবাইল ── */
+        body.is-mobile .popular-banner-wrap {
+            padding: 16px 16px;
+            border-radius: 14px;
+        }
+        body.is-mobile .pb-main { font-size: 18px; }
+        body.is-mobile .pb-icon { font-size: 28px; }
+        body.is-mobile .pb-right { display: none; }
+        </style>
 
         <div id="productDisplayArea" class="products-grid scroll-custom">
             <div class="loading-spinner">
@@ -1362,89 +1535,66 @@ window.addEventListener('load',function(){
      ✅ CUSTOM OVERRIDES — বাটন, ব্যাকগ্রাউন্ড, গ্রিড, ক্লিক
      ════════════════════════════════════════════ -->
 <style>
-/* ════════════════════════════════════════════════════════
-   ১. কিনুন ও বিস্তারিত বাটন সম্পূর্ণ লুকানো
-   ════════════════════════════════════════════════════════ */
-.product-card-actions,
-.product-card .product-card-actions { display: none !important; }
+/* ── ১. কিনুন ও বিস্তারিত বাটন সম্পূর্ণ লুকানো ── */
+.product-card .card-actions,
+.product-card .action-buttons,
+.product-card .btn-buy,
+.product-card .btn-detail,
+.product-card .buy-btn,
+.product-card .detail-btn,
+.product-card [class*="buy"],
+.product-card [class*="detail"],
+.product-card [class*="action"],
+.product-card .card-footer-btns,
+.product-card .product-actions,
+.product-card .card-btn-group,
+.products-grid .card-actions,
+.products-grid .action-buttons,
+.products-grid [class*="buy"],
+.products-grid [class*="detail"],
+#productDisplayArea .card-actions,
+#productDisplayArea .action-buttons,
+#productDisplayArea [class*="-actions"],
+#productDisplayArea [class*="card-btn"],
+#productDisplayArea .product-footer,
+#productDisplayArea .card-footer { display: none !important; }
 
-/* ════════════════════════════════════════════════════════
-   ২. ইমেজ স্লাইডার prev/next বাটন লুকানো
-   ════════════════════════════════════════════════════════ */
+/* ── ২. ইমেজ স্লাইডার বাটন লুকানো ── */
+.product-card .img-prev,
+.product-card .img-next,
 .product-card .slide-prev,
-.product-card .slide-next { display: none !important; }
+.product-card .slide-next,
+.product-card .img-nav,
+.product-card .img-slider-btn,
+.product-card [class*="img-arr"],
+.product-card [class*="slide-btn"],
+.product-card [class*="img-nav"],
+.product-card [class*="prev-btn"],
+.product-card [class*="next-btn"],
+#productDisplayArea .img-prev,
+#productDisplayArea .img-next,
+#productDisplayArea [class*="slide-btn"],
+#productDisplayArea [class*="img-arr"],
+#productDisplayArea [class*="img-nav"] { display: none !important; }
 
-/* ════════════════════════════════════════════════════════
-   ৩. main-content-area ব্যাকগ্রাউন্ড — Light Mode: সাদা
-   ════════════════════════════════════════════════════════ */
+/* ── ৩. সাদা ব্যাকগ্রাউন্ড — জনপ্রিয় পণ্য হেডার থেকে ফিল্টার পর্যন্ত ── */
 .main-content-area {
     background: #ffffff !important;
-    transition: background 0.4s ease !important;
-}
-.main-content-area > .container {
-    background: #ffffff !important;
-    transition: background 0.4s ease !important;
 }
 .main-content-area > .container > div:first-child {
     background: #ffffff !important;
     padding-top: 22px !important;
     padding-bottom: 10px !important;
 }
-/* হেডার টেক্সট রঙ */
+.main-content-area > .container {
+    background: #ffffff !important;
+}
+/* জনপ্রিয় পণ্যসমূহ হেডার টেক্সট রঙ ঠিক রাখা */
 .main-content-area .section-title h2 {
     color: #111827 !important;
 }
 
-/* ── Light Mode: product-card হালকা কালো ব্যাকগ্রাউন্ড ── */
-body:not(.dark-theme) .products-grid .product-card {
-    background: #f1f3f5 !important;
-    border: 1px solid #dee2e6 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
-}
-body:not(.dark-theme) .products-grid .product-card .product-title {
-    color: #1a1a2e !important;
-}
-body:not(.dark-theme) .products-grid .product-card .product-price {
-    color: #00856a !important;
-}
-
-/* ════════════════════════════════════════════════════════
-   ৪. Dark Mode: main-content-area কালো, card সাদা
-   ════════════════════════════════════════════════════════ */
-body.dark-theme .main-content-area {
-    background: #0f172a !important;
-}
-body.dark-theme .main-content-area > .container {
-    background: #0f172a !important;
-}
-body.dark-theme .main-content-area > .container > div:first-child {
-    background: #0f172a !important;
-}
-body.dark-theme .main-content-area .section-title h2 {
-    color: #f1f5f9 !important;
-}
-
-/* Dark Mode: product-card সাদা */
-body.dark-theme .products-grid .product-card {
-    background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.35) !important;
-}
-body.dark-theme .products-grid .product-card .product-title {
-    color: #111827 !important;
-}
-body.dark-theme .products-grid .product-card .product-price {
-    color: #00856a !important;
-}
-body.dark-theme .products-grid .product-card .product-stars,
-body.dark-theme .products-grid .product-card span[class*="star"],
-body.dark-theme .products-grid .product-card [class*="rating"] {
-    color: #f59e0b !important;
-}
-
-/* ════════════════════════════════════════════════════════
-   ৫. পণ্য গ্রিড — দুই পাশে padding / max-width
-   ════════════════════════════════════════════════════════ */
+/* ── ৪. পণ্য গ্রিড — দুই পাশে খালি জায়গা ── */
 #productDisplayArea {
     padding-left: 24px !important;
     padding-right: 24px !important;
@@ -1453,22 +1603,23 @@ body.dark-theme .products-grid .product-card [class*="rating"] {
     box-sizing: border-box !important;
 }
 
-/* ════════════════════════════════════════════════════════
-   ৬. কার্ড cursor pointer
-   ════════════════════════════════════════════════════════ */
-.product-card { cursor: pointer !important; }
+/* ── ৫. কার্ড — cursor pointer (ক্লিকযোগ্য মনে হবে) ── */
+.product-card {
+    cursor: pointer !important;
+}
 
-/* ════════════════════════════════════════════════════════
-   ৭. মোবাইল — ২টা করে পণ্য
-   ════════════════════════════════════════════════════════ */
+/* ── ৬. মোবাইল — ২টা করে পণ্য ── */
 @media (max-width: 799px) {
-    #productDisplayArea, .products-grid {
+    #productDisplayArea,
+    .products-grid {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 10px !important;
         padding-left: 10px !important;
         padding-right: 10px !important;
     }
 }
+
+/* is-mobile class দিয়ে ও কভার করা */
 body.is-mobile #productDisplayArea,
 body.is-mobile .products-grid {
     grid-template-columns: repeat(2, 1fr) !important;
