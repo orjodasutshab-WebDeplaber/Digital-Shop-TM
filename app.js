@@ -5242,13 +5242,21 @@ function toggleFilterMenu(show = null) {
 
     let isOpen;
     if (show === true) {
-        menu.style.display = 'block'; isOpen = true;
+        isOpen = true;
     } else if (show === false) {
-        menu.style.display = 'none'; isOpen = false;
+        isOpen = false;
     } else {
         isOpen = (menu.style.display !== 'block');
-        menu.style.display = isOpen ? 'block' : 'none';
     }
+
+    if (isOpen && btn) {
+        // বাটনের নিচে fixed position এ রাখা
+        const rect = btn.getBoundingClientRect();
+        menu.style.top  = (rect.bottom + 10) + 'px';
+        menu.style.right = (window.innerWidth - rect.right) + 'px';
+    }
+
+    menu.style.display = isOpen ? 'block' : 'none';
     if (btn) btn.classList.toggle('open', isOpen);
 }
 
