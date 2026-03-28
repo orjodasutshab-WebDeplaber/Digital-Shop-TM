@@ -6,12 +6,15 @@
 <script>
 (function(){
     function setScale(){
-        var sw = window.screen.width;
+        var sw = window.innerWidth || window.screen.width;
         var dw = 800;
         if(sw < dw){
             var scale = sw / dw;
             var vp = document.querySelector('meta[name=viewport]');
             if(vp) vp.content = 'width='+dw+',initial-scale='+scale.toFixed(4)+',minimum-scale='+scale.toFixed(4)+',maximum-scale=3,user-scalable=yes';
+        } else {
+            var vp = document.querySelector('meta[name=viewport]');
+            if(vp) vp.content = 'width=device-width,initial-scale=1';
         }
     }
     setScale();
@@ -22,7 +25,7 @@
 /* ✅ মোবাইল detect — setScale এর পরে চলে, body.is-mobile class লাগায় */
 (function(){
     function applyMobile(){
-        var sw = window.screen.width;
+        var sw = window.innerWidth || window.screen.width;
         if(sw < 800){
             document.body.classList.add('is-mobile');
         } else {
@@ -241,7 +244,7 @@ body.is-mobile .gp-title::before{display:none;}
 body.is-mobile .gp-title::after{content:'';display:block;height:4px;width:60px;background:linear-gradient(90deg,#f57224,#ef4444);border-radius:2px;margin-top:6px;}
 
 /* GRID — PC: 20px gap, white background on outer */
-.gp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:20px;max-width:1400px;margin:0 auto;background:transparent;border:none;border-radius:0;overflow:visible;padding:0;}
+.gp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;max-width:1400px;margin:0 auto;background:transparent;border:none;border-radius:0;overflow:visible;padding:0;}
 body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:12px;padding:0 14px 14px;background:transparent;border:none;border-radius:0;}
 
 /* CARD — Daraz সাদা */
