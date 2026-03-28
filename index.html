@@ -402,17 +402,32 @@ document.addEventListener('click', function(event) {
 
 <section id="leaderboardAdArea">
     </section>
-<main class="main-content-area" style="background: #0f172a; padding: 20px 0;">
-    <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 15px; flex-wrap: wrap; gap: 10px;">
-            
-            <div class="section-title" style="margin: 0;">
-                <h2 style="color: #fff; margin: 0; font-family: 'Hind Siliguri', sans-serif;">আমাদের জনপ্রিয় পণ্যসমূহ</h2>
-            </div>
 
-            <div style="position: relative; display: inline-block; font-family: 'Hind Siliguri', sans-serif;">
-                <button id="filterBtn" onclick="toggleFilterMenu()" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; border: none; padding: 10px 22px; border-radius: 12px; cursor: pointer; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2); transition: 0.3s;">
-                    <i class="fa fa-sliders-h"></i> ফিল্টার করুন
+<!-- ══════════════════════════════════════════════════
+     ✅ জনপ্রিয় পণ্য ব্যানার
+     ══════════════════════════════════════════════════ -->
+<div id="popularBanner" class="popular-banner-wrap">
+
+    <!-- বাম: আইকন + টেক্সট + ব্যাজ -->
+    <div class="pb-left">
+        <span class="pb-icon">🛍️</span>
+        <div class="pb-texts">
+            <span class="pb-label">আমাদের</span>
+            <span class="pb-main">জনপ্রিয় পণ্যসমূহ</span>
+            <span class="pb-sub">সেরা মানের পণ্য · সর্বোচ্চ বিশ্বাস · দ্রুত ডেলিভারি</span>
+        </div>
+        <div class="pb-badges-inline">
+            <span class="pb-badge"><i class="fa fa-star"></i> Top Rated</span>
+            <span class="pb-badge pb-badge-2"><i class="fa fa-bolt"></i> Fast Delivery</span>
+        </div>
+    </div>
+
+    <!-- ডান: ফিল্টার বাটন (অপরিবর্তিত) -->
+    <div class="pb-filter-wrap" style="position: relative; display: inline-block; font-family: 'Hind Siliguri', sans-serif;">
+                <button id="filterBtn" onclick="toggleFilterMenu()" class="pb-filter-btn">
+                    <span class="pb-filter-icon"><i class="fa fa-sliders-h"></i></span>
+                    <span class="pb-filter-text">ফিল্টার</span>
+                    <span class="pb-filter-arrow"><i class="fa fa-chevron-down"></i></span>
                 </button>
 
                 <div id="filterMenu" style="position: absolute; right: 0; top: 55px; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; width: 260px; border-radius: 20px; display: none; z-index: 1000; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); transform-origin: top right; animation: scaleUp 0.2s ease-out;">
@@ -448,8 +463,12 @@ document.addEventListener('click', function(event) {
                         <i class="fa fa-undo"></i> রিসেট অল
                     </button>
                 </div>
-            </div>
-        </div>
+        </div><!-- /.pb-filter-wrap -->
+
+</div><!-- /#popularBanner -->
+
+<main class="main-content-area" style="padding: 20px 0;">
+    <div class="container">
 
         <div id="productDisplayArea" class="products-grid scroll-custom">
             <div class="loading-spinner">
@@ -479,6 +498,134 @@ document.addEventListener('click', function(event) {
             #filterBtn { padding: 8px 15px; font-size: 13px; }
         }
     </style>
+
+<style>
+/* ── Popular Banner ── */
+.popular-banner-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0;
+    padding: 11px 32px;
+    border-radius: 0;
+    position: relative;
+    overflow: visible;
+    width: 100%;
+    transition: background 0.4s ease;
+}
+body:not(.dark-theme) .popular-banner-wrap {
+    background: linear-gradient(110deg, #e0f2fe 0%, #ede9fe 55%, #fce7f3 100%);
+    border-top: 1px solid rgba(99,102,241,0.12);
+    border-bottom: 1px solid rgba(99,102,241,0.12);
+}
+body.dark-theme .popular-banner-wrap {
+    background: linear-gradient(110deg, #0f172a 0%, #1e1b4b 50%, #1a0533 100%);
+    border-top: 1px solid rgba(139,92,246,0.18);
+    border-bottom: 1px solid rgba(139,92,246,0.18);
+}
+.popular-banner-wrap::before {
+    content: '';
+    position: absolute;
+    top: -80%; right: 3%;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    pointer-events: none;
+    transition: background 0.4s;
+}
+body:not(.dark-theme) .popular-banner-wrap::before {
+    background: radial-gradient(circle, #6366f1, transparent);
+    opacity: 0.07;
+}
+body.dark-theme .popular-banner-wrap::before {
+    background: radial-gradient(circle, #a78bfa, transparent);
+    opacity: 0.16;
+}
+.pb-left  { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.pb-icon  { font-size: 28px; line-height: 1; flex-shrink: 0; }
+.pb-texts { display: flex; flex-direction: column; gap: 1px; }
+.pb-label {
+    font-size: 10px; font-weight: 800; letter-spacing: 2px;
+    text-transform: uppercase; font-family: 'Hind Siliguri', sans-serif;
+}
+body:not(.dark-theme) .pb-label { color: #6366f1; }
+body.dark-theme .pb-label        { color: #a5b4fc; }
+.pb-main {
+    font-size: 17px; font-weight: 900; line-height: 1.2;
+    font-family: 'Hind Siliguri', sans-serif;
+}
+body:not(.dark-theme) .pb-main { color: #1e1b4b; }
+body.dark-theme .pb-main        { color: #e0e7ff; }
+.pb-sub {
+    font-size: 11px; font-weight: 500; margin-top: 1px;
+    font-family: 'Hind Siliguri', sans-serif;
+}
+body:not(.dark-theme) .pb-sub { color: #64748b; }
+body.dark-theme .pb-sub        { color: #94a3b8; }
+.pb-badges-inline {
+    display: flex; gap: 7px; flex-wrap: wrap; align-items: center;
+    margin-left: 4px;
+}
+.pb-badge {
+    padding: 5px 13px; border-radius: 30px; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; gap: 5px;
+    font-family: 'Hind Siliguri', sans-serif;
+    transition: background 0.4s ease, color 0.4s ease, border 0.4s ease;
+}
+body:not(.dark-theme) .pb-badge {
+    background: rgba(99,102,241,0.11); color: #4f46e5;
+    border: 1px solid rgba(99,102,241,0.22);
+}
+body:not(.dark-theme) .pb-badge-2 {
+    background: rgba(168,85,247,0.09); color: #7c3aed;
+    border: 1px solid rgba(168,85,247,0.20);
+}
+body.dark-theme .pb-badge {
+    background: rgba(99,102,241,0.20); color: #a5b4fc;
+    border: 1px solid rgba(99,102,241,0.35);
+}
+body.dark-theme .pb-badge-2 {
+    background: rgba(168,85,247,0.18); color: #c4b5fd;
+    border: 1px solid rgba(168,85,247,0.30);
+}
+/* ── ফিল্টার বাটন ── */
+.pb-filter-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    color: #fff; border: none;
+    padding: 9px 18px 9px 14px;
+    border-radius: 50px; cursor: pointer;
+    font-size: 14px; font-weight: 700;
+    font-family: 'Hind Siliguri', sans-serif;
+    box-shadow: 0 4px 18px rgba(99,102,241,0.35), 0 0 0 1px rgba(255,255,255,0.08) inset;
+    transition: all 0.25s ease; white-space: nowrap;
+}
+.pb-filter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(99,102,241,0.5);
+}
+.pb-filter-btn:active { transform: scale(0.96); }
+.pb-filter-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+}
+.pb-filter-text  { font-size: 14px; font-weight: 700; }
+.pb-filter-arrow { font-size: 10px; opacity: 0.75; transition: transform 0.2s; }
+.pb-filter-btn.open .pb-filter-arrow { transform: rotate(180deg); }
+
+/* মোবাইল */
+body.is-mobile .popular-banner-wrap { padding: 9px 14px; }
+body.is-mobile .pb-main             { font-size: 14px; }
+body.is-mobile .pb-icon             { font-size: 20px; }
+body.is-mobile .pb-badges-inline    { display: none; }
+body.is-mobile .pb-sub              { display: none; }
+body.is-mobile .pb-filter-text      { display: none; }
+body.is-mobile .pb-filter-btn       { padding: 9px 12px; border-radius: 50%; }
+body.is-mobile .pb-filter-arrow     { display: none; }
+</style>
      
 <div class="load-more-section">
     <div id="beli-board-left" class="beli-board"></div>
