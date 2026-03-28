@@ -524,15 +524,35 @@ function renderProductGrid(productList, isLoadMore = false) {
             const fullStars  = Math.floor(ratingVal);
             const halfStar   = (ratingVal - fullStars) >= 0.5;
             const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-            const starsHTML  = '<span style="color:#f59e0b;font-size:13px;">'
+            // 🌙 dark-theme এ তারা লাল, light-theme এ হলুদ
+            const isDarkMode = document.body.classList.contains('dark-theme');
+            const starColor  = isDarkMode ? '#ef4444' : '#f59e0b';
+            const starsHTML  = `<span style="color:${starColor};font-size:13px;">`
                 + '★'.repeat(fullStars)
                 + (halfStar ? '½' : '')
-                + '<span style="color:#d1d5db;">' + '★'.repeat(emptyStars) + '</span>'
+                + `<span style="color:#d1d5db;">` + '★'.repeat(emptyStars) + '</span>'
                 + '</span>';
-            const ratingHTML = `<div class="product-rating" style="display:flex;align-items:center;gap:4px;justify-content:center;margin:5px 0 10px;">
+            const ratingHTML = `<div class="product-rating tm-rating" style="display:flex;align-items:center;gap:4px;justify-content:center;margin:5px 0 6px;">
                 ${starsHTML}
                 <span style="font-size:11px;color:var(--text-muted);">${ratingVal.toFixed(1)} (${reviewCount})</span>
             </div>`;
+            // ─────────────────────────────────────────────────────────
+
+            // ── Old Price & Discount % Logic ──────────────────────────
+            const newPrice = parseFloat(item.price) || 0;
+            let oldPrice = parseFloat(item.oldPrice || item.originalPrice || item.mrp || 0);
+            if (!oldPrice || oldPrice <= newPrice) {
+                const _opSeed = _seed % 1000;
+                const multiplier = 1.15 + (_opSeed / 1000) * 0.20;
+                oldPrice = Math.ceil(newPrice * multiplier / 10) * 10;
+            }
+            const discountPct = Math.round(((oldPrice - newPrice) / oldPrice) * 100);
+            const priceHTML = `
+                <div class="tm-price-row" style="display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap;margin:4px 0 2px;">
+                    <span class="product-price" style="font-size:16px;font-weight:900;color:#16a34a;">${currency} ${newPrice.toLocaleString('bn-BD')}</span>
+                    <span style="font-size:12px;color:#94a3b8;text-decoration:line-through;">${currency} ${oldPrice.toLocaleString('bn-BD')}</span>
+                    <span style="font-size:11px;font-weight:700;background:#ef4444;color:#fff;padding:1px 6px;border-radius:20px;">${discountPct}% ছাড়</span>
+                </div>`;
             // ─────────────────────────────────────────────────────────
 
             return `
@@ -550,7 +570,7 @@ function renderProductGrid(productList, isLoadMore = false) {
 
                 </div>
                 <h4 class="product-title" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">${item.title}</h4>
-                <span class="product-price">${currency} ${item.price}</span>
+                ${priceHTML}
                 ${ratingHTML}
             </div>`;
         }).join('');
