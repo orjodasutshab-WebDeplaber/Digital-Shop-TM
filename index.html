@@ -1520,20 +1520,29 @@ window.addEventListener('load',function(){
 #productDisplayArea [class*="img-nav"] { display: none !important; }
 
 /* ── ৩. সাদা ব্যাকগ্রাউন্ড — জনপ্রিয় পণ্য হেডার থেকে ফিল্টার পর্যন্ত ── */
-.main-content-area {
+body:not(.dark-theme) .main-content-area {
     background: #ffffff !important;
 }
-.main-content-area > .container > div:first-child {
+body:not(.dark-theme) .main-content-area > .container > div:first-child {
     background: #ffffff !important;
     padding-top: 22px !important;
     padding-bottom: 10px !important;
 }
-.main-content-area > .container {
+body:not(.dark-theme) .main-content-area > .container {
     background: #ffffff !important;
 }
+/* ডার্ক মোডে কালো ব্যাকগ্রাউন্ড */
+body.dark-theme .main-content-area,
+body.dark-theme .main-content-area > .container,
+body.dark-theme .main-content-area > .container > div:first-child {
+    background: #0d0d0d !important;
+}
 /* জনপ্রিয় পণ্যসমূহ হেডার টেক্সট রঙ ঠিক রাখা */
-.main-content-area .section-title h2 {
+body:not(.dark-theme) .main-content-area .section-title h2 {
     color: #111827 !important;
+}
+body.dark-theme .main-content-area .section-title h2 {
+    color: #f1f5f9 !important;
 }
 
 /* ── ৪. পণ্য গ্রিড — দুই পাশে খালি জায়গা ── */

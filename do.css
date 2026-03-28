@@ -1929,3 +1929,85 @@ body.is-mobile .gp-name {
 body.is-mobile .gp-name { font-size: 13.8px; }
 body.is-mobile .gp-price { font-size: 17px; }
 body.is-mobile .gp-stars { font-size: 15px; }
+
+/* ══════════════════════════════════════════════════════
+   🌙 NIGHT MODE (dark-theme) — Background & Product Cards
+   ══════════════════════════════════════════════════════ */
+
+/* ডার্ক মোডে মেইন ব্যাকগ্রাউন্ড কালো */
+body.dark-theme {
+    background-color: #0d0d0d !important;
+}
+
+/* ডার্ক মোডে main-content-area সাদা override বাতিল */
+body.dark-theme .main-content-area,
+body.dark-theme .main-content-area > .container,
+body.dark-theme .main-content-area > .container > div:first-child {
+    background: #0d0d0d !important;
+}
+
+/* ডার্ক মোডে section title টেক্সট সাদা */
+body.dark-theme .main-content-area .section-title h2 {
+    color: #f1f5f9 !important;
+}
+
+/* ডার্ক মোডে product-card হালকা সাদা/off-white */
+body.dark-theme .product-card {
+    background: #f0f4f8 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1e293b !important;
+}
+
+body.dark-theme .product-card .product-name,
+body.dark-theme .product-card .product-title,
+body.dark-theme .product-card h3,
+body.dark-theme .product-card h4,
+body.dark-theme .product-card p,
+body.dark-theme .product-card span:not(.badge):not([class*="price"]) {
+    color: #1e293b !important;
+}
+
+/* ডার্ক মোডে gp-card (guest product card) হালকা সাদা */
+body.dark-theme .gp-card {
+    background: #f0f4f8 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+body.dark-theme .gp-name {
+    color: #1e293b !important;
+}
+
+/* ডার্ক মোডে product-card-box হালকা সাদা */
+body.dark-theme .product-card-box {
+    background: #f0f4f8 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1e293b !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   ☀️ LIGHT MODE (default) — Product Cards হালকা কালো/ধূসর
+   ══════════════════════════════════════════════════════ */
+
+/* লাইট মোডে product-card হালকা কালো/slate */
+body:not(.dark-theme) .product-card {
+    background: #e2e8f0 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1e293b !important;
+}
+
+/* লাইট মোডে gp-card হালকা ধূসর-কালো */
+body:not(.dark-theme) .gp-card {
+    background: #e2e8f0 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+body:not(.dark-theme) .gp-name {
+    color: #1e293b !important;
+}
+
+/* লাইট মোডে product-card-box */
+body:not(.dark-theme) .product-card-box {
+    background: #e2e8f0 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1e293b !important;
+}
