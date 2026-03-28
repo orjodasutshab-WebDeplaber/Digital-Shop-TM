@@ -425,7 +425,7 @@ button { cursor: pointer; border: none; font-family: inherit; }
 /* Product Grid System */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 10px;
 }
 
@@ -1743,13 +1743,17 @@ html, body {
 
 /* Product grid — desktop columns maintain */
 .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
 }
 
 @media (max-width: 640px) {
     .products-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
+        gap: 8px !important;
+    }
+    .main-content-area .container {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
     }
     .product-card .product-slider,
     .product-card .slide-img,
