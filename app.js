@@ -507,50 +507,32 @@ function renderProductGrid(productList, isLoadMore = false) {
             const images = Array.isArray(item.images) ? item.images : [item.images || item.image];
 
             // ── Rating Logic ──────────────────────────────────────────
+            // item.rating থাকলে সেটি ব্যবহার করো, না থাকলে id-based seed দিয়ে ডায়নামিক রেটিং
             let ratingVal = parseFloat(item.rating) || 0;
             if (!ratingVal) {
+                // id থেকে একটি consistent seed তৈরি করা হচ্ছে
                 const seed = String(item.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+                // ৩০% পণ্যে ৫ তারা, বাকিগুলোতে ৩.৫–৪.৮ এর মধ্যে ভ্যারিয়েশন
                 const rand = ((seed * 9301 + 49297) % 233280) / 233280;
                 ratingVal = rand < 0.30 ? 5 : parseFloat((3.5 + rand * 1.5).toFixed(1));
             }
+            // id থেকে consistent কিন্তু আলাদা আলাদা reviewCount
             const _idStr = String(item.id || item.name || '');
             const _seed = _idStr.split('').reduce((acc, c, i) => acc + c.charCodeAt(0) * (i + 7), 0);
             const reviewCount = item.reviewCount || item.reviews || (Math.floor(((_seed * 1373 + 6151) % 196) + 5));
+            // তারা রেন্ডার
             const fullStars  = Math.floor(ratingVal);
             const halfStar   = (ratingVal - fullStars) >= 0.5;
             const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-            // 🌙 dark-theme এ তারা লাল, light-theme এ হলুদ
-            const isDarkMode = document.body.classList.contains('dark-theme');
-            const starColor  = isDarkMode ? '#ef4444' : '#f59e0b';
-            const starsHTML  = `<span style="color:${starColor};font-size:13px;">`
+            const starsHTML  = '<span style="color:#f59e0b;font-size:13px;">'
                 + '★'.repeat(fullStars)
                 + (halfStar ? '½' : '')
-                + `<span style="color:#d1d5db;">` + '★'.repeat(emptyStars) + '</span>'
+                + '<span style="color:#d1d5db;">' + '★'.repeat(emptyStars) + '</span>'
                 + '</span>';
-            const ratingHTML = `<div class="product-rating tm-rating" style="display:flex;align-items:center;gap:4px;justify-content:center;margin:5px 0 6px;">
+            const ratingHTML = `<div class="product-rating" style="display:flex;align-items:center;gap:4px;justify-content:center;margin:5px 0 10px;">
                 ${starsHTML}
                 <span style="font-size:11px;color:var(--text-muted);">${ratingVal.toFixed(1)} (${reviewCount})</span>
             </div>`;
-            // ─────────────────────────────────────────────────────────
-
-            // ── Old Price & Discount % Logic ──────────────────────────
-            const newPrice = parseFloat(item.price) || 0;
-            // পুরাতন মূল্য: item এ থাকলে সেটি, না থাকলে অটো জেনারেট (১৫%–৩৫% বেশি)
-            let oldPrice = parseFloat(item.oldPrice || item.originalPrice || item.mrp || 0);
-            if (!oldPrice || oldPrice <= newPrice) {
-                // id-based consistent multiplier: ১.১৫ থেকে ১.৩৫
-                const _opSeed = _seed % 1000;
-                const multiplier = 1.15 + (_opSeed / 1000) * 0.20; // ১.১৫ ~ ১.৩৫
-                oldPrice = Math.ceil(newPrice * multiplier / 10) * 10; // ১০ টাকার ঘরে রাউন্ড
-            }
-            // % হিসাব: (পুরাতন - নতুন) / পুরাতন × ১০০
-            const discountPct = Math.round(((oldPrice - newPrice) / oldPrice) * 100);
-            const priceHTML = `
-                <div class="tm-price-row" style="display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap;margin:4px 0 2px;">
-                    <span class="product-price" style="font-size:16px;font-weight:900;color:#16a34a;">${currency} ${newPrice.toLocaleString('bn-BD')}</span>
-                    <span style="font-size:12px;color:#94a3b8;text-decoration:line-through;">${currency} ${oldPrice.toLocaleString('bn-BD')}</span>
-                    <span style="font-size:11px;font-weight:700;background:#ef4444;color:#fff;padding:1px 6px;border-radius:20px;">${discountPct}% ছাড়</span>
-                </div>`;
             // ─────────────────────────────────────────────────────────
 
             return `
@@ -571,7 +553,7 @@ function renderProductGrid(productList, isLoadMore = false) {
                     ` : ''}
                 </div>
                 <h4 class="product-title" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">${item.title}</h4>
-                ${priceHTML}
+                <span class="product-price">${currency} ${item.price}</span>
                 ${ratingHTML}
                 <div class="product-card-actions">
                     <button class="btn-buy-now" onclick="initiateCheckout('${item.id}')">
@@ -2515,11 +2497,6 @@ function toggleThemeMode() {
     document.body.classList.toggle('dark-theme');
     const isDark = document.body.classList.contains('dark-theme');
     localStorage.setItem(DB_KEYS.THEME, isDark ? 'dark' : 'light');
-    // 🌙 তারার রং আপডেট — dark: লাল, light: হলুদ
-    const newStarColor = isDark ? '#ef4444' : '#f59e0b';
-    document.querySelectorAll('.tm-rating > span[style*="color"]').forEach(el => {
-        el.style.color = newStarColor;
-    });
 }
 
 function loadTheme() {
@@ -5236,31 +5213,16 @@ function toggleFilterMenu() {
 
 // ১. মেনু খোলা বা বন্ধ করার উন্নত ফাংশন
 function toggleFilterMenu(show = null) {
-    let menu = document.getElementById('filterMenu');
-    const btn  = document.getElementById('filterBtn');
-    if (!menu || !btn) return;
+    const menu = document.getElementById('filterMenu');
+    if (!menu) return;
 
-    // প্রথমবার — menu টা body তে move করি
-    if (menu.parentElement !== document.body) {
-        document.body.appendChild(menu);
-        menu.style.position = 'fixed';
-        menu.style.zIndex   = '99999';
+    if (show === true) {
+        menu.style.display = 'block';
+    } else if (show === false) {
+        menu.style.display = 'none';
+    } else {
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
     }
-
-    let isOpen;
-    if (show === true)       isOpen = true;
-    else if (show === false) isOpen = false;
-    else                     isOpen = (menu.style.display !== 'block');
-
-    if (isOpen) {
-        const rect = btn.getBoundingClientRect();
-        menu.style.top   = (rect.bottom + 8) + 'px';
-        menu.style.right = (window.innerWidth - rect.right) + 'px';
-        menu.style.left  = 'auto';
-    }
-
-    menu.style.display = isOpen ? 'block' : 'none';
-    if (btn) btn.classList.toggle('open', isOpen);
 }
 
 // ২. বাইরে ক্লিক করলে মেনু বন্ধ হওয়ার লজিক
