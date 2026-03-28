@@ -1518,4 +1518,27 @@ window.addEventListener('load',function(){
     }
 });
 </script>
+
+<!-- ══════════════════════════════════════════════
+     PC: product grid width = 270px (final override)
+     Mobile: 2 column layout
+     ══════════════════════════════════════════════ -->
+<style>
+/* PC ভার্সন — সব CSS এর পরে থাকায় জিতবে */
+html:not(.is-mobile) #productDisplayArea.products-grid,
+html:not(.is-mobile) .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)) !important;
+}
+
+/* মোবাইল ভার্সন — ২ কলাম */
+html.is-mobile #productDisplayArea.products-grid,
+html.is-mobile .products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+}
+html.is-mobile .main-content-area .container {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+}
+</style>
 </body>
