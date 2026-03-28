@@ -555,14 +555,6 @@ function renderProductGrid(productList, isLoadMore = false) {
                 <h4 class="product-title" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">${item.title}</h4>
                 <span class="product-price">${currency} ${item.price}</span>
                 ${ratingHTML}
-                <div class="product-card-actions">
-                    <button class="btn-buy-now" onclick="initiateCheckout('${item.id}')">
-                        <i class="fa fa-shopping-cart"></i> কিনুন
-                    </button>
-                    <button class="btn-details" onclick="openProductDetails('${item.id}')">
-                        <i class="fa fa-eye"></i> বিস্তারিত
-                    </button>
-                </div>
             </div>`;
         }).join('');
 
