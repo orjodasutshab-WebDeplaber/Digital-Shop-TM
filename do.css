@@ -453,7 +453,7 @@ button { cursor: pointer; border: none; font-family: inherit; }
 /* স্লাইডার ছবির উচ্চতা বাড়ানো */
 .product-card .product-slider {
     width: 100%;
-    height: 180px;
+    height: 170px;
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 10px;
@@ -463,7 +463,7 @@ button { cursor: pointer; border: none; font-family: inherit; }
 .product-card .slide-img,
 .product-card img {
     width: 100%;
-    height: 180px;
+    height: 170px;
     object-fit: cover;
     border-radius: 10px;
     transition: 0.5s;
@@ -2023,4 +2023,45 @@ body.dark-theme .product-card-box {
 /* ── index.html inline override ── */
 body.dark-theme #mainBody > .main-content-area {
     background: #0d0d0d !important;
+}
+
+/* ══════════════════════════════════════════════════
+   মোবাইল ভিউ — is-mobile class দিয়ে কন্ট্রোল
+   (viewport width=800 lock bypass করার জন্য)
+   screen.width < 600px হলে html.is-mobile লাগে
+   ══════════════════════════════════════════════════ */
+html.is-mobile .products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+}
+
+html.is-mobile .main-content-area .container {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+}
+
+html.is-mobile .product-card .product-slider,
+html.is-mobile .product-card .slide-img,
+html.is-mobile .product-card img {
+    height: 130px !important;
+}
+
+html.is-mobile .product-card {
+    padding: 8px;
+    border-radius: 12px;
+}
+
+html.is-mobile .product-title {
+    font-size: 12px;
+}
+
+html.is-mobile .product-price {
+    font-size: 13px;
+}
+
+html.is-mobile .btn-buy-now,
+html.is-mobile .btn-details {
+    font-size: 10px;
+    padding: 7px 3px;
+    border-radius: 7px;
 }

@@ -19,6 +19,20 @@
         setScale();
         window.addEventListener('resize', setScale);
     })();
+
+    // মোবাইল ডিটেক্ট করে html তে class যোগ করা (viewport lock bypass)
+    (function(){
+        function detectMobile(){
+            var sw = window.screen.width;
+            if(sw < 600){
+                document.documentElement.classList.add('is-mobile');
+            } else {
+                document.documentElement.classList.remove('is-mobile');
+            }
+        }
+        detectMobile();
+        window.addEventListener('resize', detectMobile);
+    })();
     </script>
     <title>Digital Shop TM | Premium Business Portal</title>
     <link rel="icon" type="image/x-icon" href="ko.jpeg">
