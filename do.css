@@ -555,11 +555,17 @@ button { cursor: pointer; border: none; font-family: inherit; }
 @media (max-width: 640px) {
     .products-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
+        gap: 8px !important;
+    }
+
+    /* container এর দুই পাশে padding কমানো যাতে দুটো কার্ড ঠিকমতো ফিট হয় */
+    .main-content-area .container {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
     }
 
     .product-card {
-        padding: 10px;
+        padding: 8px;
         border-radius: 12px;
     }
 
