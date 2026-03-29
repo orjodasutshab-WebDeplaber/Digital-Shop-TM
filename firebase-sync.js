@@ -8,7 +8,7 @@
 // ── Config ──────────────────────────────────────────────────
 const FB_CONFIG = {
   apiKey: "AIzaSyCRJ6kN1nvr1RxKdIiBnxWVJGXm6U2kRr0",
-  authDomain: "orjodasutshab-webdeplaber.github.io",
+  authDomain: "digitalshoptm-2008.firebaseapp.com",
   projectId: "digitalshoptm-2008",
   storageBucket: "digitalshoptm-2008.firebasestorage.app",
   messagingSenderId: "627378095856",

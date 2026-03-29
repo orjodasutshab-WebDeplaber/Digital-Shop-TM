@@ -2688,7 +2688,6 @@ function renderLocalBoards(){
 const G_CLIENT_ID='569016323527-0e5o5mn4rs8713fgv132vj80uvl42onk.apps.googleusercontent.com';
 
 function googleSignIn(){
-    // firebase-sync.js আগেই initialize করে — শুধু app() reuse করি
     if(!window.firebase||!firebase.apps||!firebase.apps.length){
         showToast('❌ Firebase লোড হয়নি, একটু পরে চেষ্টা করুন');
         return;
@@ -2700,42 +2699,45 @@ function googleSignIn(){
     provider.addScope('profile');
 
     showToast('⏳ Google লগইন হচ্ছে...');
-
-    auth.signInWithPopup(provider)
-        .then(result=>{
-            const gUser=result.user;
-            const users=JSON.parse(localStorage.getItem(UK))||[];
-            let u=users.find(x=>x.email===gUser.email||x.googleId===gUser.uid);
-            if(!u){
-                u={id:'TM'+Date.now(),name:gUser.displayName,email:gUser.email,
-                   googleId:gUser.uid,picture:gUser.photoURL||'',
-                   mobile:'',pass:'',role:'user',
-                   isUserBlocked:false,isOrderBlocked:false,isCodBlocked:false,isDiscountBlocked:false,
-                   loginMethod:'google',createdAt:new Date().toISOString()};
-                users.push(u);
-                localStorage.setItem(UK,JSON.stringify(users));
-                // Firebase এ save করার পর redirect
-                (window.FB_READY||Promise.resolve()).then(async()=>{
-                    await window.saveUserToFirebase(u);
-                    _doGoogleLogin(u,gUser.displayName);
-                });
-                return;
-            }
-            _doGoogleLogin(u,gUser.displayName);
-        })
-        .catch(err=>{
-            if(err.code==='auth/popup-blocked'){
-                showToast('⚠️ Popup block হয়েছে! Browser এর address bar এ popup allow করুন');
-            } else if(err.code==='auth/popup-closed-by-user'){
-                showToast('ℹ️ লগইন বাতিল করা হয়েছে');
-            } else if(err.code==='auth/cancelled-popup-request'){
-                // চুপ থাকি — user আবার click করবে
-            } else {
-                showToast('❌ Google লগইন সমস্যা: '+err.message);
-                console.error('[Google]',err);
-            }
-        });
+    // GitHub Pages এ popup কাজ করে না, তাই redirect ব্যবহার করছি
+    auth.signInWithRedirect(provider).catch(err=>{
+        showToast('❌ Google লগইন সমস্যা: '+err.message);
+        console.error('[Google]',err);
+    });
 }
+
+// পেজ লোড হলে redirect result চেক করো
+function checkGoogleRedirect(){
+    if(!window.firebase||!firebase.apps||!firebase.apps.length) return;
+    const auth=firebase.auth();
+    auth.getRedirectResult().then(result=>{
+        if(!result||!result.user) return;
+        const gUser=result.user;
+        const users=JSON.parse(localStorage.getItem(UK))||[];
+        let u=users.find(x=>x.email===gUser.email||x.googleId===gUser.uid);
+        if(!u){
+            u={id:'TM'+Date.now(),name:gUser.displayName,email:gUser.email,
+               googleId:gUser.uid,picture:gUser.photoURL||'',
+               mobile:'',pass:'',role:'user',
+               isUserBlocked:false,isOrderBlocked:false,isCodBlocked:false,isDiscountBlocked:false,
+               loginMethod:'google',createdAt:new Date().toISOString()};
+            users.push(u);
+            localStorage.setItem(UK,JSON.stringify(users));
+            (window.FB_READY||Promise.resolve()).then(async()=>{
+                await window.saveUserToFirebase(u);
+                _doGoogleLogin(u,gUser.displayName);
+            });
+            return;
+        }
+        _doGoogleLogin(u,gUser.displayName);
+    }).catch(err=>{
+        if(err.code&&err.code!=='auth/no-current-user'){
+            console.error('[Google Redirect]',err);
+        }
+    });
+}
+// Firebase ready হওয়ার পরে চালাও
+(window.FB_READY||Promise.resolve()).then(checkGoogleRedirect);
 
 function _doGoogleLogin(u, name){
     if(u.isUserBlocked){showToast('🚫 অ্যাকাউন্টটি ব্লক করা আছে।');return;}
