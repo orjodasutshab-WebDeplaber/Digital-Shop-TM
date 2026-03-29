@@ -1894,7 +1894,7 @@ html.is-mobile .profile-trigger {
     padding: 0 10px !important;
 }
 
-/* ═══ কার্ড ডিজাইন ═══ */
+/* ═══ কার্ড ডিজাইন — Light: হালকা কালো, Dark: হালকা সাদা ═══ */
 #sironam-portal-display .sironam-card {
     position: relative !important;
     border-radius: 10px !important;
@@ -1903,11 +1903,16 @@ html.is-mobile .profile-trigger {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    border: 1px solid #e2e8f0 !important;
+    border: 1px solid rgba(0,0,0,0.10) !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.10) !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-    background: #ffffff !important;
+    background: rgba(0, 0, 0, 0.07) !important; /* Light: হালকা কালো */
     aspect-ratio: unset !important;
+}
+/* Dark mode */
+body.dark-theme #sironam-portal-display .sironam-card {
+    background: rgba(255, 255, 255, 0.10) !important; /* Dark: হালকা সাদা */
+    border: 1px solid rgba(255,255,255,0.12) !important;
 }
 #sironam-portal-display .sironam-card:hover {
     transform: translateY(-5px) !important;

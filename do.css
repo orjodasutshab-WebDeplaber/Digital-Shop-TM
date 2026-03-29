@@ -1603,11 +1603,17 @@ body, html {
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0,0,0,0.10);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
+    background: rgba(0, 0, 0, 0.07); /* Light mode: হালকা কালো */
+    border: 1px solid rgba(0,0,0,0.10);
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* Dark mode: হালকা সাদা */
+body.dark-theme .sironam-card {
+    background: rgba(255, 255, 255, 0.10) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
 }
 
 .sironam-card:hover {
