@@ -313,6 +313,11 @@
      <button class="pc-nav-btn" onclick="pcScrollTo('site-footer')">
          <i class="fa fa-info-circle"></i> আমাদের সম্পর্কে
      </button>
+     <!-- নাইট মোড টগল বাটন -->
+     <button class="pc-nav-btn pc-nav-theme-btn" id="pcThemeToggleBtn" onclick="pcToggleTheme()">
+         <i class="fa fa-moon" id="pcThemeIcon"></i>
+         <span id="pcThemeLabel">নাইট মোড</span>
+     </button>
  </nav>
 
  <style>
@@ -320,10 +325,11 @@
  html:not(.is-mobile) #pcQuickNav { display: flex !important; }
  html.is-mobile #pcQuickNav { display: none !important; }
 
- .pc-nav-btn {
-     background: transparent;
-     border: 1px solid rgba(255,255,255,0.15);
-     color: #cbd5e1;
+ /* ── Light mode: সাদা ব্যাকগ্রাউন্ড, কালো লেখা ── */
+ body:not(.dark-theme) .pc-nav-btn {
+     background: #ffffff;
+     border: 1px solid #e2e8f0;
+     color: #1e293b;
      padding: 7px 13px;
      border-radius: 20px;
      font-size: 12.5px;
@@ -336,13 +342,54 @@
      white-space: nowrap;
      transition: all 0.2s ease;
  }
- .pc-nav-btn i { font-size: 11px; color: #818cf8; }
- .pc-nav-btn:hover {
-     background: rgba(99,102,241,0.18);
-     border-color: rgba(99,102,241,0.5);
+ body:not(.dark-theme) .pc-nav-btn i { font-size: 11px; color: #6366f1; }
+ body:not(.dark-theme) .pc-nav-btn:hover {
+     background: #f1f5f9;
+     border-color: #6366f1;
+     color: #1e293b;
+ }
+
+ /* ── Dark mode: কালো ব্যাকগ্রাউন্ড, সাদা লেখা ── */
+ body.dark-theme .pc-nav-btn {
+     background: #1e293b;
+     border: 1px solid #334155;
+     color: #f1f5f9;
+     padding: 7px 13px;
+     border-radius: 20px;
+     font-size: 12.5px;
+     font-weight: 600;
+     font-family: 'Hind Siliguri', sans-serif;
+     cursor: pointer;
+     display: flex;
+     align-items: center;
+     gap: 5px;
+     white-space: nowrap;
+     transition: all 0.2s ease;
+ }
+ body.dark-theme .pc-nav-btn i { font-size: 11px; color: #a5b4fc; }
+ body.dark-theme .pc-nav-btn:hover {
+     background: #334155;
+     border-color: #6366f1;
      color: #fff;
  }
- .pc-nav-btn:hover i { color: #a5b4fc; }
+
+ /* নাইট মোড বাটন আলাদা accent */
+ body:not(.dark-theme) .pc-nav-theme-btn {
+     background: #f8f0ff;
+     border-color: #c084fc;
+     color: #7c3aed;
+ }
+ body:not(.dark-theme) .pc-nav-theme-btn i { color: #7c3aed; }
+ body:not(.dark-theme) .pc-nav-theme-btn:hover { background: #ede9fe; }
+
+ body.dark-theme .pc-nav-theme-btn {
+     background: #2d1b69;
+     border-color: #7c3aed;
+     color: #c4b5fd;
+ }
+ body.dark-theme .pc-nav-theme-btn i { color: #c4b5fd; }
+ body.dark-theme .pc-nav-theme-btn:hover { background: #3b1f8c; }
+
  .pc-nav-btn:active { transform: scale(0.96); }
  </style>
 
@@ -355,6 +402,40 @@
          window.scrollTo({ top: top, behavior: 'smooth' });
      }
  }
+
+ function pcToggleTheme() {
+     /* app.js এর toggleThemeMode() কল করি */
+     if (typeof toggleThemeMode === 'function') {
+         toggleThemeMode();
+     } else {
+         document.body.classList.toggle('dark-theme');
+         var isDark = document.body.classList.contains('dark-theme');
+         try { localStorage.setItem('TM_THEME', isDark ? 'dark' : 'light'); } catch(e){}
+     }
+     _pcUpdateThemeBtn();
+ }
+
+ function _pcUpdateThemeBtn() {
+     var isDark = document.body.classList.contains('dark-theme');
+     var icon  = document.getElementById('pcThemeIcon');
+     var label = document.getElementById('pcThemeLabel');
+     if (!icon || !label) return;
+     if (isDark) {
+         icon.className  = 'fa fa-sun';
+         label.textContent = 'লাইট মোড';
+     } else {
+         icon.className  = 'fa fa-moon';
+         label.textContent = 'নাইট মোড';
+     }
+ }
+
+ /* পেজ লোডের সময় বাটন লেবেল sync করা */
+ document.addEventListener('DOMContentLoaded', function() {
+     _pcUpdateThemeBtn();
+ });
+ window.addEventListener('load', function() {
+     _pcUpdateThemeBtn();
+ });
  </script>
 
  <div class="user-controls" style="font-family: 'Hind Siliguri', sans-serif; display:flex; align-items:center; gap:8px;">
