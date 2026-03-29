@@ -8868,31 +8868,26 @@ function deleteSironam(id) {
 }
 
 function displaySironamOnPortal() {
-    _reloadSironamData(); // ✅ hydration শেষে fresh data নেওয়া
+    _reloadSironamData();
     const container = document.getElementById('sironam-portal-display');
     if (!container) return;
 
-    // কার্ডে ক্লিক করলে openSironamShop ফাংশন কল হবে
-    // থিম ডিটেক্ট করে inline style সেট করা
-    function getSironamOverlayStyle() {
-        const isDark = document.body.classList.contains('dark-theme');
-        if (isDark) {
-            return 'position:static;width:100%;background:rgba(255,255,255,0.10);padding:8px 6px 10px;text-align:center;color:#e2e8f0;font-weight:600;font-size:13px;line-height:1.35;display:block;border-top:1px solid rgba(255,255,255,0.08);font-family:Hind Siliguri,sans-serif;transition:background 0.3s,color 0.3s;';
-        } else {
-            return 'position:static;width:100%;background:rgba(0,0,0,0.08);padding:8px 6px 10px;text-align:center;color:#1e293b;font-weight:600;font-size:13px;line-height:1.35;display:block;border-top:1px solid rgba(0,0,0,0.07);font-family:Hind Siliguri,sans-serif;transition:background 0.3s,color 0.3s;';
-        }
-    }
-    function getSironamCardStyle() {
-        const isDark = document.body.classList.contains('dark-theme');
-        return isDark
-            ? 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #334155;box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:transform 0.2s,box-shadow 0.2s;background:#1e293b;'
-            : 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.10);transition:transform 0.2s,box-shadow 0.2s;background:#ffffff;';
-    }
+    const isDark = document.body.classList.contains('dark-theme');
+
+    // Card style
+    const cardStyle = isDark
+        ? 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #334155;box-shadow:0 2px 8px rgba(0,0,0,0.4);background:#1e293b;'
+        : 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #dde3ec;box-shadow:0 2px 8px rgba(0,0,0,0.10);background:#ffffff;';
+
+    // Name label background — clearly visible
+    const overlayStyle = isDark
+        ? 'position:static;width:100%;background:#253347;padding:9px 6px 11px;text-align:center;color:#e2e8f0;font-weight:600;font-size:13px;line-height:1.35;display:block;border-top:1px solid #334155;font-family:Hind Siliguri,sans-serif;'
+        : 'position:static;width:100%;background:#e8eaed;padding:9px 6px 11px;text-align:center;color:#1e293b;font-weight:600;font-size:13px;line-height:1.35;display:block;border-top:1px solid #d1d5db;font-family:Hind Siliguri,sans-serif;';
 
     container.innerHTML = sironamData.map(item => `
-        <div class="sironam-card" style="${getSironamCardStyle()}" onclick="openSironamShop('${item.id}', '${item.name}')">
+        <div class="sironam-card" style="${cardStyle}" onclick="openSironamShop('${item.id}', '${item.name}')">
             <img src="${item.img}" alt="${item.name}" style="width:100%;height:120px;object-fit:cover;display:block;border-radius:10px 10px 0 0;">
-            <div class="sironam-overlay" style="${getSironamOverlayStyle()}">
+            <div class="sironam-overlay" style="${overlayStyle}">
                 <span>${item.name}</span>
             </div>
         </div>
