@@ -46,7 +46,7 @@
                         '.product-card img,',
                         '.product-slider,',
                         '.slide-img {',
-                        '  height: 320px !important;',
+                        '  height: 270px !important;',
                         '}',
                         '.product-title {',
                         '  font-size: 30px !important;',
@@ -142,7 +142,7 @@
              <div class="header-search-box">
                   <div class="search-wrapper">
                    <i class="fa fa-search"></i>
-                   <input type="text" id="productSearchInput" onkeyup="searchProducts()" placeholder="পণ্য খুঁজুন...">
+                   <input type="text" id="productSearchInput" onkeyup="searchProducts()" onfocus="if(this.value.trim().length===0)_setSearchMode&&_setSearchMode(false)" placeholder="পণ্য খুঁজুন...">
                   </div>
              </div>
 
@@ -1592,7 +1592,7 @@ html.is-mobile .main-content-area .container {
 html.is-mobile .product-card .product-slider,
 html.is-mobile .product-card .slide-img,
 html.is-mobile .product-card img {
-    height: 320px !important;
+    height: 170px !important;
 }
 </style>
 </body>

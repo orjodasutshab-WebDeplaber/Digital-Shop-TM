@@ -561,26 +561,26 @@ function renderProductGrid(productList, isLoadMore = false) {
             const hasVerified = item.badges && item.badges.verified;
             const badgeHTML   = (hasFast || hasVerified) ? `
                 <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:5px 0 3px;">
-                    ${hasFast     ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#15803d;border:1px solid #86efac;padding:3px 9px;border-radius:20px;font-size:${isMob?'30px':'11px'};font-weight:700;"><span>⚡</span>FAST</span>` : ''}
-                    ${hasVerified ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;padding:3px 9px;border-radius:20px;font-size:${isMob?'30px':'11px'};font-weight:700;"><span>✔</span>Verified</span>` : ''}
+                    ${hasFast     ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#15803d;border:1px solid #86efac;padding:3px 9px;border-radius:20px;font-size:${isMob?'26px':'11px'};font-weight:700;"><span>⚡</span>FAST</span>` : ''}
+                    ${hasVerified ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;padding:3px 9px;border-radius:20px;font-size:${isMob?'26px':'11px'};font-weight:700;"><span>✔</span>Verified</span>` : ''}
                 </div>` : '';
             // ─────────────────────────────────────────────────────────
 
             return `
-            <div class="product-card" style="position: relative; cursor:pointer;" onclick="openProductDetails('${item.id}')">
+            <div class="product-card" style="position: relative;">
                 ${checkAdmin ? `
                     <div class="admin-actions-overlay">
-                        <button class="admin-btn btn-edit" onclick="event.stopPropagation();openEditModal('${item.id}')">EDIT</button>
-                        <button class="admin-btn btn-delete" onclick="event.stopPropagation();adminDeleteProduct('${item.id}')">DELETE</button>
+                        <button class="admin-btn btn-edit" onclick="openEditModal('${item.id}')">EDIT</button>
+                        <button class="admin-btn btn-delete" onclick="adminDeleteProduct('${item.id}')">DELETE</button>
                     </div>
                 ` : ''}
                 <div class="product-slider" id="slider-${item.id}">
                     <div class="slides-container scroll-custom">
-                        ${images.map(img => `<img src="${img}" class="slide-img" style="cursor:pointer;">`).join('')}
+                        ${images.map(img => `<img src="${img}" class="slide-img" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">`).join('')}
                     </div>
 
                 </div>
-                <h4 class="product-title" style="cursor:pointer;">${item.title}</h4>
+                <h4 class="product-title" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">${item.title}</h4>
                 ${priceHTML}
                 ${badgeHTML}
                 ${ratingHTML}
@@ -5240,26 +5240,41 @@ function openProductBySKU(skuCode, fallbackId) {
         alert("দুঃখিত, এই পণ্যের তথ্য ডাটাবেজে পাওয়া যায়নি! (SKU: " + skuCode + ")");
     }
 }
-function searchProducts() {
-    const term = document.getElementById('productSearchInput').value.toLowerCase().trim();
-    
-    if (typeof appState !== 'undefined' && appState.products) {
-        const filtered = appState.products.filter(p => {
-            // ১. টাইটেল দিয়ে খোঁজা
-            const matchesTitle = p.title.toLowerCase().includes(term);
-            
-            // ২. ট্যাগ দিয়ে খোঁজা (শক্তিশালী ফিল্টার)
-            const matchesTags = p.tags && p.tags.some(tag => tag.includes(term));
-            
-            return matchesTitle || matchesTags;
-        });
-
-        renderProductGrid(filtered); // ফিল্টার করা রেজাল্ট দেখানো
+// সার্চ মোড — শিরোনাম ও বিজ্ঞাপন বোর্ড লুকানো/দেখানো
+function _setSearchMode(active) {
+    const adArea = document.getElementById('leaderboardAdArea');
+    const banner = document.getElementById('popularBanner');
+    if (active) {
+        if (adArea)  { adArea.style.transition = 'max-height 0.35s ease, margin 0.35s ease, opacity 0.3s ease'; adArea.style.maxHeight = '0'; adArea.style.overflow = 'hidden'; adArea.style.marginBottom = '0'; adArea.style.opacity = '0'; }
+        if (banner)  { banner.style.transition = 'max-height 0.35s ease, margin 0.35s ease, opacity 0.3s ease'; banner.style.maxHeight = '0'; banner.style.overflow = 'hidden'; banner.style.marginBottom = '0'; banner.style.opacity = '0'; }
+    } else {
+        if (adArea)  { adArea.style.maxHeight = '2000px'; adArea.style.overflow = ''; adArea.style.marginBottom = ''; adArea.style.opacity = '1'; }
+        if (banner)  { banner.style.maxHeight = '2000px'; banner.style.overflow = ''; banner.style.marginBottom = ''; banner.style.opacity = '1'; }
     }
 }
-// ২. ইনপুট বক্সটি ক্লিয়ার করার বা অতিরিক্ত ফিচারের জন্য (ঐচ্ছিক)
+
+function searchProducts() {
+    const term = document.getElementById('productSearchInput').value.toLowerCase().trim();
+
+    // সার্চে কিছু লেখা থাকলে banner/ad লুকাও, না থাকলে দেখাও
+    _setSearchMode(term.length > 0);
+
+    if (typeof appState !== 'undefined' && appState.products) {
+        const filtered = term.length === 0
+            ? appState.products
+            : appState.products.filter(p => {
+                const matchesTitle = p.title.toLowerCase().includes(term);
+                const matchesTags = p.tags && p.tags.some(tag => tag.includes(term));
+                return matchesTitle || matchesTags;
+            });
+
+        renderProductGrid(filtered);
+    }
+}
+// ২. ইনপুট বক্সটি ক্লিয়ার করার বা অতিরিক্ত ফিচারের জন্য (ঐচ্ছিক)
 document.getElementById('productSearchInput').addEventListener('search', function() {
     if(this.value === "") {
+        _setSearchMode(false);
         renderProductGrid(appState.products); // বক্স খালি করলে সব পণ্য ফিরে আসবে
     }
 });
