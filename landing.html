@@ -2,7 +2,25 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="viewport" content="width=800">
+<script>
+(function(){
+    function setScale(){
+        var sw = window.innerWidth || window.screen.width;
+        var dw = 800;
+        if(sw < dw){
+            var scale = sw / dw;
+            var vp = document.querySelector('meta[name=viewport]');
+            if(vp) vp.content = 'width='+dw+',initial-scale='+scale.toFixed(4)+',minimum-scale='+scale.toFixed(4)+',maximum-scale=3,user-scalable=yes';
+        } else {
+            var vp = document.querySelector('meta[name=viewport]');
+            if(vp) vp.content = 'width=device-width,initial-scale=1';
+        }
+    }
+    setScale();
+    window.addEventListener('resize', setScale);
+})();
+</script>
 <script>
 /* ✅ মোবাইল detect — setScale এর পরে চলে, body.is-mobile class লাগায় */
 (function(){
