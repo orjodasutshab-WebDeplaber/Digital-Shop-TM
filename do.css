@@ -1588,11 +1588,20 @@ body, html {
 /* শিরোনাম গ্রিড কন্টেইনার */
 .sironam-grid-container {
     display: grid;
-    grid-template-columns: repeat(8, 1fr);
+    /* ২ লাইন, প্রতি লাইনে ৭টা পূর্ণ + ৮ম টার ১/৩ দেখাবে */
+    grid-template-rows: repeat(2, auto);
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - 7.33 * 12px) / 7.33);
     gap: 12px;
-    margin: 20px auto 40px auto;
-    max-width: 98%;
-    padding: 0 10px;
+    margin: 20px 0 20px 0;
+    padding: 0 10px 10px 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 transparent;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
 }
 
 /* আপনার অরিজিনাল কার্ড ডিজাইন (আপডেটেড) */
