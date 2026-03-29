@@ -134,7 +134,16 @@ window.onload = function() {
                 appState.productLoadSequence = Array.isArray(parsed) ? parsed : (parsed._arr || [35, 50]);
             }
 
-            if (typeof renderProductGrid === 'function') renderProductGrid(appState.products);
+            if (typeof renderProductGrid === 'function') {
+                // যদি ইউজার আগে "আরো দেখুন" ক্লিক করে থাকে তাহলে reset করব না
+                const alreadyLoadedMore = window.currentStepIndex > 0;
+                if (!alreadyLoadedMore) {
+                    renderProductGrid(appState.products);
+                } else {
+                    // শুধু data update করি, grid reset করি না
+                    window.currentlyDisplayedProducts = appState.products;
+                }
+            }
             if (typeof startAdBoard === 'function') startAdBoard();
 
             // বেলি বোর্ড reload
