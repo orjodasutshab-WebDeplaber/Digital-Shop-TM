@@ -976,6 +976,7 @@ body.is-mobile .pb-filter-arrow     { display: none; }
 
     <div id="beli-board-right" class="beli-board"></div>
 </div>
+<div id="sironam-section-wrapper" class="sironam-section-wrapper">
 <div id="special-category-container" class="special-category-container">
     <h2 class="special-category-title">
         <span class="emoji-left">🌋</span>
@@ -985,6 +986,7 @@ body.is-mobile .pb-filter-arrow     { display: none; }
     
 </div>
 <div id="sironam-portal-display" class="sironam-grid-container"></div>
+</div>
 
 <!-- প্রিমিয়াম প্রোডাক্ট হেডার -->
 <div id="pmx-header-display" style="padding:0 0 10px;"></div>
@@ -1879,6 +1881,26 @@ html.is-mobile .profile-trigger > div:first-child {
 html.is-mobile .profile-trigger {
     padding: 5px 8px !important;
     gap: 0 !important;
+}
+</style>
+
+<!-- ══ Sironam Section Wrapper Background ══ -->
+<style>
+/* পুরো সেকশনের ব্যাকগ্রাউন্ড — Light Mode */
+#sironam-section-wrapper {
+    background: #f1f2f6 !important;
+    border-radius: 18px !important;
+    padding: 0 0 20px 0 !important;
+    margin: 10px auto 20px auto !important;
+    max-width: 100% !important;
+    transition: background 0.3s !important;
+    border: 1px solid rgba(0,0,0,0.06) !important;
+}
+
+/* Dark Mode */
+body.dark-theme #sironam-section-wrapper {
+    background: #1a2236 !important;
+    border: 1px solid rgba(255,255,255,0.06) !important;
 }
 </style>
 
