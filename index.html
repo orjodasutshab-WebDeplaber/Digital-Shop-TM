@@ -145,12 +145,125 @@
                 </div>
             </div>
 
-             <div class="header-search-box">
-                  <div class="search-wrapper">
-                   <i class="fa fa-search"></i>
-                   <input type="text" id="productSearchInput" onkeyup="searchProducts()" onfocus="if(this.value.trim().length===0)_setSearchMode&&_setSearchMode(false)" placeholder="পণ্য খুঁজুন...">
-                  </div>
+             <!-- ══════════════════════════════════
+                  সার্চ আইকন → এক্সপান্ড সার্চ বার
+                  ══════════════════════════════════ -->
+             <div class="header-search-box" id="headerSearchBox">
+
+                 <!-- আইকন বাটন (collapsed অবস্থায় দেখায়) -->
+                 <button class="search-icon-btn" id="searchIconBtn" onclick="openHeaderSearch()" aria-label="সার্চ">
+                     <i class="fa fa-search"></i>
+                 </button>
+
+                 <!-- এক্সপান্ড হওয়া সার্চ বার -->
+                 <div class="search-expanded" id="searchExpanded">
+                     <div class="search-wrapper">
+                         <i class="fa fa-search"></i>
+                         <input type="text" id="productSearchInput"
+                                onkeyup="searchProducts()"
+                                onfocus="if(this.value.trim().length===0)_setSearchMode&&_setSearchMode(false)"
+                                placeholder="পণ্য খুঁজুন..."
+                                onkeydown="if(event.key==='Escape')closeHeaderSearch()">
+                     </div>
+                     <button class="search-close-btn" onclick="closeHeaderSearch()" aria-label="বন্ধ">
+                         <i class="fa fa-times"></i>
+                     </button>
+                 </div>
+
              </div>
+
+             <style>
+             /* ══ Search Icon + Expand ══ */
+             .search-icon-btn {
+                 background: rgba(255,255,255,0.08);
+                 border: 1px solid rgba(255,255,255,0.15);
+                 color: #fff;
+                 width: 40px; height: 40px;
+                 border-radius: 50%;
+                 display: flex; align-items: center; justify-content: center;
+                 cursor: pointer;
+                 font-size: 16px;
+                 transition: background 0.2s;
+                 flex-shrink: 0;
+             }
+             .search-icon-btn:hover { background: rgba(255,255,255,0.16); }
+
+             .search-expanded {
+                 display: none;
+                 align-items: center;
+                 gap: 6px;
+                 animation: srchSlide 0.25s ease;
+             }
+             .search-expanded.open { display: flex; }
+
+             @keyframes srchSlide {
+                 from { opacity:0; transform: scaleX(0.7); }
+                 to   { opacity:1; transform: scaleX(1); }
+             }
+
+             .search-expanded .search-wrapper {
+                 width: 220px;
+                 max-width: 260px;
+             }
+
+             /* PC তে একটু বড় */
+             @media (min-width: 800px) {
+                 .search-expanded .search-wrapper { width: 280px; }
+             }
+
+             .search-close-btn {
+                 background: rgba(255,255,255,0.08);
+                 border: 1px solid rgba(255,255,255,0.15);
+                 color: #aaa;
+                 width: 34px; height: 34px;
+                 border-radius: 50%;
+                 display: flex; align-items: center; justify-content: center;
+                 cursor: pointer;
+                 font-size: 14px;
+                 flex-shrink: 0;
+                 transition: background 0.2s, color 0.2s;
+             }
+             .search-close-btn:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+             /* header-search-box এর flex ঠিক রাখা */
+             #headerSearchBox {
+                 display: flex !important;
+                 align-items: center;
+                 justify-content: center;
+                 flex: 1;
+                 padding: 0 10px;
+             }
+             </style>
+
+             <script>
+             function openHeaderSearch() {
+                 document.getElementById('searchIconBtn').style.display  = 'none';
+                 document.getElementById('searchExpanded').classList.add('open');
+                 setTimeout(() => document.getElementById('productSearchInput').focus(), 50);
+             }
+             function closeHeaderSearch() {
+                 document.getElementById('searchExpanded').classList.remove('open');
+                 document.getElementById('searchIconBtn').style.display  = 'flex';
+                 // ইনপুট খালি করে পণ্য রিসেট
+                 const inp = document.getElementById('productSearchInput');
+                 if (inp.value.trim().length > 0) {
+                     inp.value = '';
+                     if(typeof _setSearchMode === 'function') _setSearchMode(false);
+                     if(typeof renderProductGrid === 'function' && appState && appState.products)
+                         renderProductGrid(appState.products);
+                 }
+             }
+             // বাইরে ক্লিক করলে বন্ধ
+             document.addEventListener('click', function(e) {
+                 const box = document.getElementById('headerSearchBox');
+                 if (box && !box.contains(e.target)) {
+                     const expanded = document.getElementById('searchExpanded');
+                     if (expanded && expanded.classList.contains('open')) {
+                         closeHeaderSearch();
+                     }
+                 }
+             });
+             </script>
 
 
 
