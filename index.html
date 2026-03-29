@@ -145,35 +145,10 @@
                 </div>
             </div>
 
-             <!-- ══════════════════════════════════
-                  সার্চ আইকন → এক্সপান্ড সার্চ বার
-                  ══════════════════════════════════ -->
-             <div class="header-search-box" id="headerSearchBox">
 
-                 <!-- আইকন বাটন (collapsed অবস্থায় দেখায়) -->
-                 <button class="search-icon-btn" id="searchIconBtn" onclick="openHeaderSearch()" aria-label="সার্চ">
-                     <i class="fa fa-search"></i>
-                 </button>
-
-                 <!-- এক্সপান্ড হওয়া সার্চ বার -->
-                 <div class="search-expanded" id="searchExpanded">
-                     <div class="search-wrapper">
-                         <i class="fa fa-search"></i>
-                         <input type="text" id="productSearchInput"
-                                onkeyup="searchProducts()"
-                                onfocus="if(this.value.trim().length===0)_setSearchMode&&_setSearchMode(false)"
-                                placeholder="পণ্য খুঁজুন..."
-                                onkeydown="if(event.key==='Escape')closeHeaderSearch()">
-                     </div>
-                     <button class="search-close-btn" onclick="closeHeaderSearch()" aria-label="বন্ধ">
-                         <i class="fa fa-times"></i>
-                     </button>
-                 </div>
-
-             </div>
 
              <style>
-             /* ══ Search Icon + Expand ══ */
+             /* ══ Search Icon ══ */
              .search-icon-btn {
                  background: rgba(255,255,255,0.08);
                  border: 1px solid rgba(255,255,255,0.15);
@@ -186,53 +161,64 @@
                  transition: background 0.2s;
                  flex-shrink: 0;
              }
-             .search-icon-btn:hover { background: rgba(255,255,255,0.16); }
+             .search-icon-btn:hover { background: rgba(255,255,255,0.18); }
 
+             /* ══ Expanded Search ══ */
              .search-expanded {
                  display: none;
+                 position: absolute;
+                 right: 0;
+                 top: 50%;
+                 transform: translateY(-50%);
                  align-items: center;
                  gap: 6px;
+                 z-index: 9999;
+                 background: #0f172a;
+                 border: 1px solid #334155;
+                 border-radius: 30px;
+                 padding: 4px 6px 4px 4px;
+                 box-shadow: 0 8px 30px rgba(0,0,0,0.4);
                  animation: srchSlide 0.25s ease;
+                 /* ডানদিক থেকে বাম দিকে প্রসারিত হবে */
+                 right: 0;
+                 width: max-content;
              }
              .search-expanded.open { display: flex; }
 
              @keyframes srchSlide {
-                 from { opacity:0; transform: scaleX(0.7); }
-                 to   { opacity:1; transform: scaleX(1); }
+                 from { opacity:0; transform: translateY(-50%) scaleX(0.6); transform-origin: right center; }
+                 to   { opacity:1; transform: translateY(-50%) scaleX(1); }
              }
 
              .search-expanded .search-wrapper {
-                 width: 220px;
-                 max-width: 260px;
+                 width: 200px;
+                 max-width: 200px;
              }
-
-             /* PC তে একটু বড় */
              @media (min-width: 800px) {
-                 .search-expanded .search-wrapper { width: 280px; }
+                 .search-expanded .search-wrapper { width: 260px; max-width: 260px; }
+             }
+             .search-expanded .search-wrapper input {
+                 background: rgba(255,255,255,0.07) !important;
+                 border: none !important;
+                 border-radius: 20px !important;
              }
 
              .search-close-btn {
-                 background: rgba(255,255,255,0.08);
-                 border: 1px solid rgba(255,255,255,0.15);
+                 background: rgba(255,255,255,0.06);
+                 border: 1px solid rgba(255,255,255,0.1);
                  color: #aaa;
-                 width: 34px; height: 34px;
+                 width: 30px; height: 30px;
                  border-radius: 50%;
                  display: flex; align-items: center; justify-content: center;
                  cursor: pointer;
-                 font-size: 14px;
+                 font-size: 13px;
                  flex-shrink: 0;
                  transition: background 0.2s, color 0.2s;
              }
              .search-close-btn:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
 
-             /* header-search-box এর flex ঠিক রাখা */
-             #headerSearchBox {
-                 display: flex !important;
-                 align-items: center;
-                 justify-content: center;
-                 flex: 1;
-                 padding: 0 10px;
-             }
+             /* header-search-box আর লাগবে না — remove flex:1 */
+             .header-search-box { display: none !important; }
              </style>
 
              <script>
@@ -270,7 +256,32 @@
 
              
             
- <div class="user-controls" style="font-family: 'Hind Siliguri', sans-serif;">
+ <div class="user-controls" style="font-family: 'Hind Siliguri', sans-serif; display:flex; align-items:center; gap:8px;">
+
+    <!-- ══ সার্চ আইকন + এক্সপান্ড (account বাটনের পাশে) ══ -->
+    <div id="headerSearchBox" style="position:relative; display:flex; align-items:center;">
+
+        <!-- আইকন বাটন -->
+        <button class="search-icon-btn" id="searchIconBtn" onclick="openHeaderSearch()" aria-label="সার্চ">
+            <i class="fa fa-search"></i>
+        </button>
+
+        <!-- এক্সপান্ড হওয়া সার্চ বার — account এর উপরে overlay -->
+        <div class="search-expanded" id="searchExpanded">
+            <div class="search-wrapper">
+                <i class="fa fa-search"></i>
+                <input type="text" id="productSearchInput"
+                       onkeyup="searchProducts()"
+                       onfocus="if(this.value.trim().length===0)_setSearchMode&&_setSearchMode(false)"
+                       placeholder="পণ্য খুঁজুন..."
+                       onkeydown="if(event.key==='Escape')closeHeaderSearch()">
+            </div>
+            <button class="search-close-btn" onclick="closeHeaderSearch()" aria-label="বন্ধ">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+
+    </div>
     
     <div id="authButtonsGroup" class="auth-buttons" style="display: flex; gap: 10px; align-items: center;">
         
