@@ -296,6 +296,67 @@
 
              
             
+ <!-- ══ PC Quick Nav Buttons (মোবাইলে লুকানো) ══ -->
+ <nav id="pcQuickNav" style="display:flex; align-items:center; gap:6px; margin-left:100px; flex:1;">
+     <button class="pc-nav-btn" onclick="pcScrollTo('productDisplayArea')">
+         <i class="fa fa-box-open"></i> পণ্য
+     </button>
+     <button class="pc-nav-btn" onclick="pcScrollTo('beli-board-left')">
+         <i class="fa fa-trophy"></i> বেলি বোর্ড
+     </button>
+     <button class="pc-nav-btn" onclick="pcScrollTo('special-category-container')">
+         <i class="fa fa-star"></i> স্পেশাল ক্যাটাগরি
+     </button>
+     <button class="pc-nav-btn" onclick="pcScrollTo('pmx-header-display')">
+         <i class="fa fa-crown"></i> প্রিমিয়াম ক্যাটাগরি
+     </button>
+     <button class="pc-nav-btn" onclick="pcScrollTo('site-footer')">
+         <i class="fa fa-info-circle"></i> আমাদের সম্পর্কে
+     </button>
+ </nav>
+
+ <style>
+ /* PC Quick Nav — শুধু পিসিতে দেখাবে */
+ html:not(.is-mobile) #pcQuickNav { display: flex !important; }
+ html.is-mobile #pcQuickNav { display: none !important; }
+
+ .pc-nav-btn {
+     background: transparent;
+     border: 1px solid rgba(255,255,255,0.15);
+     color: #cbd5e1;
+     padding: 7px 13px;
+     border-radius: 20px;
+     font-size: 12.5px;
+     font-weight: 600;
+     font-family: 'Hind Siliguri', sans-serif;
+     cursor: pointer;
+     display: flex;
+     align-items: center;
+     gap: 5px;
+     white-space: nowrap;
+     transition: all 0.2s ease;
+ }
+ .pc-nav-btn i { font-size: 11px; color: #818cf8; }
+ .pc-nav-btn:hover {
+     background: rgba(99,102,241,0.18);
+     border-color: rgba(99,102,241,0.5);
+     color: #fff;
+ }
+ .pc-nav-btn:hover i { color: #a5b4fc; }
+ .pc-nav-btn:active { transform: scale(0.96); }
+ </style>
+
+ <script>
+ function pcScrollTo(id) {
+     var el = document.getElementById(id);
+     if (!el) el = document.querySelector('.' + id);
+     if (el) {
+         var top = el.getBoundingClientRect().top + window.pageYOffset - 80;
+         window.scrollTo({ top: top, behavior: 'smooth' });
+     }
+ }
+ </script>
+
  <div class="user-controls" style="font-family: 'Hind Siliguri', sans-serif; display:flex; align-items:center; gap:8px;">
 
     <!-- ══ সার্চ আইকন + এক্সপান্ড (account বাটনের পাশে) ══ -->
@@ -867,7 +928,7 @@ body.is-mobile .pb-filter-arrow     { display: none; }
 
     <div id="beli-board-right" class="beli-board"></div>
 </div>
-<div class="special-category-container">
+<div id="special-category-container" class="special-category-container">
     <h2 class="special-category-title">
         <span class="emoji-left">🌋</span>
         আপনার স্পেশাল ক্যাটাগরির পণ্য
@@ -1070,7 +1131,7 @@ body.is-mobile .pb-filter-arrow     { display: none; }
         </div>
     </div>
 </div>
-   <footer style="background: #111827; color: #d1d5db; padding: 50px 20px 20px; border-top: 1px solid #374151; font-family: sans-serif;">
+   <footer id="site-footer" style="background: #111827; color: #d1d5db; padding: 50px 20px 20px; border-top: 1px solid #374151; font-family: sans-serif;">
     <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;">
         <div>
             <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
