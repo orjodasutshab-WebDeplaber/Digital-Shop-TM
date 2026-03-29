@@ -2065,3 +2065,65 @@ html.is-mobile .btn-details {
     padding: 7px 3px;
     border-radius: 7px;
 }
+
+/* ══════════════════════════════════════════════
+   মোবাইল হেডার — বড় ফন্ট ও বাটন (30–48px)
+   ══════════════════════════════════════════════ */
+
+/* Digital Shop TM লেখা */
+html.is-mobile .company-name {
+    font-size: 38px !important;
+    line-height: 1.15 !important;
+}
+
+/* বিশ্বাস ও আস্থার ডিজিটাল বাজার */
+html.is-mobile .company-slogan {
+    font-size: 30px !important;
+    line-height: 1.3 !important;
+}
+
+/* লোগো একটু বড় */
+html.is-mobile .brand-logo {
+    width: 72px !important;
+    height: 72px !important;
+}
+
+/* সার্চ আইকন বাটন */
+html.is-mobile .search-icon-btn {
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 28px !important;
+}
+
+/* লগইন বাটন */
+html.is-mobile .btn-login {
+    font-size: 28px !important;
+    padding: 12px 20px !important;
+    border-radius: 12px !important;
+}
+
+/* সাইন আপ বাটন */
+html.is-mobile .btn-register {
+    font-size: 28px !important;
+    padding: 12px 20px !important;
+    border-radius: 12px !important;
+}
+
+/* প্রোফাইল ট্রিগার (লগড ইন অবস্থায় একাউন্ট বাটন) */
+html.is-mobile .profile-trigger {
+    padding: 10px 14px !important;
+    gap: 8px !important;
+}
+
+html.is-mobile #headerUserImageWrapper {
+    width: 52px !important;
+    height: 52px !important;
+}
+
+html.is-mobile #headerUserPlaceholder {
+    font-size: 30px !important;
+}
+
+html.is-mobile #headerUserName {
+    font-size: 30px !important;
+}
