@@ -2127,3 +2127,30 @@ html.is-mobile #headerUserPlaceholder {
 html.is-mobile #headerUserName {
     font-size: 30px !important;
 }
+
+/* ══════════════════════════════════════════════
+   মোবাইল হেডার — হাইট বড় + নীল ব্যাকগ্রাউন্ড রিমুভ
+   শুধু মোবাইলে, পিসিতে কোনো পরিবর্তন নেই
+   ══════════════════════════════════════════════ */
+
+/* হেডারের হাইট বাড়ানো — বড় লেখা ও বাটন ঢাকা না পড়ে */
+html.is-mobile .site-header {
+    height: auto !important;
+    min-height: 110px !important;
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+}
+
+html.is-mobile .header-wrapper {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    align-items: center !important;
+}
+
+/* একাউন্ট বাটনের নীল ব্যাকগ্রাউন্ড রিমুভ */
+html.is-mobile .profile-trigger,
+html.is-mobile #userProfileGroup .profile-trigger {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
