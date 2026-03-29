@@ -2548,6 +2548,8 @@ function toggleThemeMode() {
     document.body.classList.toggle('dark-theme');
     const isDark = document.body.classList.contains('dark-theme');
     localStorage.setItem(DB_KEYS.THEME, isDark ? 'dark' : 'light');
+    // থিম বদলালে সিরোনাম কার্ড রি-রেন্ডার
+    if (typeof displaySironamOnPortal === 'function') displaySironamOnPortal();
 }
 
 function loadTheme() {
@@ -8871,10 +8873,26 @@ function displaySironamOnPortal() {
     if (!container) return;
 
     // কার্ডে ক্লিক করলে openSironamShop ফাংশন কল হবে
+    // থিম ডিটেক্ট করে inline style সেট করা
+    function getSironamOverlayStyle() {
+        const isDark = document.body.classList.contains('dark-theme');
+        if (isDark) {
+            return 'position:static;width:100%;background:rgba(255,255,255,0.10);padding:8px 6px 10px;text-align:center;color:#e2e8f0;font-weight:600;font-size:13px;line-height:1.35;display:block;border-top:1px solid rgba(255,255,255,0.08);font-family:Hind Siliguri,sans-serif;transition:background 0.3s,color 0.3s;';
+        } else {
+            return 'position:static;width:100%;background:rgba(0,0,0,0.08);padding:8px 6px 10px;text-align:center;color:#1e293b;font-weight:600;font-size:13px;line-height:1.35;display:block;border-top:1px solid rgba(0,0,0,0.07);font-family:Hind Siliguri,sans-serif;transition:background 0.3s,color 0.3s;';
+        }
+    }
+    function getSironamCardStyle() {
+        const isDark = document.body.classList.contains('dark-theme');
+        return isDark
+            ? 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #334155;box-shadow:0 2px 8px rgba(0,0,0,0.3);transition:transform 0.2s,box-shadow 0.2s;background:#1e293b;'
+            : 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.10);transition:transform 0.2s,box-shadow 0.2s;background:#ffffff;';
+    }
+
     container.innerHTML = sironamData.map(item => `
-        <div class="sironam-card" onclick="openSironamShop('${item.id}', '${item.name}')">
-            <img src="${item.img}" alt="${item.name}">
-            <div class="sironam-overlay">
+        <div class="sironam-card" style="${getSironamCardStyle()}" onclick="openSironamShop('${item.id}', '${item.name}')">
+            <img src="${item.img}" alt="${item.name}" style="width:100%;height:120px;object-fit:cover;display:block;border-radius:10px 10px 0 0;">
+            <div class="sironam-overlay" style="${getSironamOverlayStyle()}">
                 <span>${item.name}</span>
             </div>
         </div>
