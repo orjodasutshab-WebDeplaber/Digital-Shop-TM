@@ -185,25 +185,23 @@
              .search-expanded.open { display: flex; }
 
              /* মোবাইলে সার্চ বার আরো বড় */
-             @media (max-width: 600px) {
-                 .search-expanded {
-                     height: 100px !important;
-                 }
-                 .search-expanded .search-wrapper {
-                     height: 100px !important;
-                 }
-                 .search-submit-btn {
-                     height: 100px !important;
-                     font-size: 28px !important;
-                     padding: 0 28px !important;
-                 }
-                 .search-expanded .search-wrapper input {
-                     font-size: 24px !important;
-                 }
-                 .search-expanded .search-wrapper i {
-                     font-size: 26px !important;
-                     padding: 0 14px 0 18px !important;
-                 }
+             html.is-mobile .search-expanded {
+                 height: 100px !important;
+             }
+             html.is-mobile .search-expanded .search-wrapper {
+                 height: 100px !important;
+             }
+             html.is-mobile .search-submit-btn {
+                 height: 100px !important;
+                 font-size: 28px !important;
+                 padding: 0 28px !important;
+             }
+             html.is-mobile .search-expanded .search-wrapper input {
+                 font-size: 24px !important;
+             }
+             html.is-mobile .search-expanded .search-wrapper i {
+                 font-size: 26px !important;
+                 padding: 0 14px 0 18px !important;
              }
 
              @keyframes srchDropDown {
