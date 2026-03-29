@@ -8253,7 +8253,7 @@ let limitSteps = [35, 50, 50, 100]; // এটি ডাটাবেস থেক
 let currentStepIndex = 0;
 let totalLoaded = 0;
 
-function loadMoreProducts() {
+function loadMoreProducts_OLD_UNUSED() {
     const btn = document.getElementById('loadMoreBtn');
     
     // বর্তমান স্টেপে কয়টি পন্য লোড করতে হবে তা নির্ধারণ
@@ -8274,6 +8274,11 @@ function loadMoreProducts() {
                 document.getElementById('loadMoreContainer').style.display = 'none';
             }
         });
+}
+
+// ✅ পরিষ্কার ফাংশন — onLoadMoreClick() এ কাজ করে
+function loadMoreProducts() {
+    onLoadMoreClick();
 }
 
 let stepCount = 1;
