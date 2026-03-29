@@ -1626,7 +1626,7 @@ body, html {
 .sironam-overlay {
     position: static;
     width: 100%;
-    background: #ffffff;
+    background: rgba(0, 0, 0, 0.08); /* Light mode: হালকা কালো */
     padding: 8px 6px 10px 6px;
     text-align: center;
     color: #2d3436;
@@ -1634,18 +1634,26 @@ body, html {
     font-size: 13px;
     line-height: 1.35;
     display: block !important;
-    border-top: 1px solid #f1f2f6;
+    border-top: 1px solid rgba(0,0,0,0.08);
     font-family: 'Hind Siliguri', sans-serif;
+    transition: background 0.3s, color 0.3s;
 }
 
+/* Light mode কার্ড */
+.sironam-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+
+/* Dark mode কার্ড */
 body.dark-theme .sironam-card {
-    background: #2d3436;
-    border-color: #636e72;
+    background: #1e293b;
+    border-color: #334155;
 }
 body.dark-theme .sironam-overlay {
-    background: #2d3436;
-    color: #dfe6e9;
-    border-top-color: #4a5568;
+    background: rgba(255, 255, 255, 0.07); /* Dark mode: হালকা সাদা */
+    color: #e2e8f0;
+    border-top-color: rgba(255,255,255,0.08);
 }
 
 
