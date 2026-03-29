@@ -2179,6 +2179,19 @@ html.is-mobile #userProfileGroup .profile-trigger {
 }
 
 /* ══════════════════════════════════════════════
+   মোবাইল — বেলি বোর্ড একটার নিচে একটা
+   ══════════════════════════════════════════════ */
+html.is-mobile .load-more-section {
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+html.is-mobile .beli-board {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* ══════════════════════════════════════════════
    মোবাইল নেভ — শিরোনাম বোল্ড ও বড়
    ══════════════════════════════════════════════ */
 html.is-mobile .nav-text {
