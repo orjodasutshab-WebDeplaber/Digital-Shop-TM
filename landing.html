@@ -176,6 +176,10 @@ body.is-mobile .sir-grid-pc-wrap{
 .mo.open{display:flex;}
 .mb{background:#0f172a;border-radius:24px;width:95%;max-width:480px;overflow:hidden;position:relative;animation:si .3s ease;max-height:95vh;overflow-y:auto;}
 
+/* PC: রেজিস্ট্রেশন মডালের scrollbar অদৃশ্য */
+#regModal .mb{scrollbar-width:none;-ms-overflow-style:none;}
+#regModal .mb::-webkit-scrollbar{display:none;}
+
 /* SIRONAM FULL SCREEN MODAL */
 .sir-full{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:99999;overflow-y:auto;font-family:inherit;}
 .sir-full.open{display:block;}
@@ -237,7 +241,7 @@ body.is-mobile .gp-title::before{display:none;}
 body.is-mobile .gp-title::after{content:'';display:block;height:4px;width:60px;background:linear-gradient(90deg,#f57224,#ef4444);border-radius:2px;margin-top:6px;}
 
 /* GRID — PC: 20px gap, white background on outer */
-.gp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:20px;max-width:1400px;margin:0 auto;background:transparent;border:none;border-radius:0;overflow:visible;padding:0;}
+.gp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;max-width:1400px;margin:0 auto;background:transparent;border:none;border-radius:0;overflow:visible;padding:0;}
 body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:12px;padding:0 14px 14px;background:transparent;border:none;border-radius:0;}
 
 /* CARD — Daraz সাদা */
@@ -630,6 +634,11 @@ body.is-mobile .mo {
     overflow-y: auto !important;
 }
 
+/* লগইন মডাল — মোবাইলে একটু নিচে নামানো */
+body.is-mobile #loginModal {
+    padding-top: 60px !important;
+}
+
 /* মোডাল বক্স — পুরো width, top থেকে */
 body.is-mobile .mb {
     width: 100% !important;
@@ -655,12 +664,12 @@ body.is-mobile #regModal .mb::-webkit-scrollbar {
 
 /* বন্ধ (×) বাটন বড় */
 body.is-mobile .mclose {
-    font-size: 56px !important;
-    right: 24px !important;
-    top: 18px !important;
+    font-size: 72px !important;
+    right: 20px !important;
+    top: 14px !important;
     line-height: 1 !important;
-    width: 60px !important;
-    height: 60px !important;
+    width: 76px !important;
+    height: 76px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
