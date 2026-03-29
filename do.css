@@ -1588,36 +1588,11 @@ body, html {
 /* শিরোনাম গ্রিড কন্টেইনার */
 .sironam-grid-container {
     display: grid;
-    grid-template-rows: repeat(2, 160px);
-    grid-auto-flow: column;
-    grid-auto-columns: calc((100% - 6 * 10px) / 7.33);
-    gap: 10px;
-    margin: 15px 0 15px 0;
-    padding: 10px 12px 14px 12px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: #94a3b8 transparent;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    box-sizing: border-box;
-}
-.sironam-grid-container .sironam-card {
-    min-width: 0;
-    width: 100%;
-    height: 160px;
-    display: flex;
-    flex-direction: column;
-}
-.sironam-grid-container .sironam-card img {
-    flex: 1;
-    height: 0;
-    min-height: 0;
-    width: 100%;
-    object-fit: cover;
-}
-.sironam-grid-container .sironam-overlay {
-    flex-shrink: 0;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 12px;
+    margin: 20px auto 40px auto;
+    max-width: 98%;
+    padding: 0 10px;
 }
 
 /* আপনার অরিজিনাল কার্ড ডিজাইন (আপডেটেড) */
@@ -1628,17 +1603,11 @@ body, html {
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0,0,0,0.10);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    background: rgba(0, 0, 0, 0.07); /* Light mode: হালকা কালো */
-    border: 1px solid rgba(0,0,0,0.10);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-/* Dark mode: হালকা সাদা */
-body.dark-theme .sironam-card {
-    background: rgba(255, 255, 255, 0.10) !important;
-    border: 1px solid rgba(255,255,255,0.12) !important;
 }
 
 .sironam-card:hover {
