@@ -11,14 +11,14 @@
         if(sw < dw){
             var scale = sw / dw;
             var vp = document.querySelector('meta[name=viewport]');
-            if(vp) vp.content = 'width='+dw+',initial-scale='+scale.toFixed(4)+',minimum-scale=0.1,maximum-scale=3,user-scalable=yes';
+            if(vp) vp.content = 'width='+dw+',initial-scale='+scale.toFixed(4)+',minimum-scale='+scale.toFixed(4)+',maximum-scale=3,user-scalable=yes';
         } else {
             var vp = document.querySelector('meta[name=viewport]');
             if(vp) vp.content = 'width=device-width,initial-scale=1';
         }
     }
     setScale();
-    window.addEventListener('resize', setScale);
+    /* resize এ আর চলবে না — শুধু একবার page load এ চলবে */
 })();
 </script>
 <script>
