@@ -18,7 +18,7 @@
         }
     }
     setScale();
-    /* resize এ আর চলবে না — শুধু একবার page load এ চলবে */
+    window.addEventListener('resize', setScale);
 })();
 </script>
 <script>
