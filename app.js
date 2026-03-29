@@ -573,9 +573,9 @@ function renderProductGrid(productList, isLoadMore = false) {
                         <button class="admin-btn btn-delete" onclick="adminDeleteProduct('${item.id}')">DELETE</button>
                     </div>
                 ` : ''}
-                <div class="product-slider" id="slider-${item.id}">
-                    <div class="slides-container scroll-custom">
-                        ${images.map(img => `<img src="${img}" class="slide-img" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">`).join('')}
+                <div class="product-slider" id="slider-${item.id}" style="height:${window.screen.width < 800 ? '270px' : '170px'} !important;">
+                    <div class="slides-container scroll-custom" style="height:${window.screen.width < 800 ? '270px' : '170px'} !important;">
+                        ${images.map(img => `<img src="${img}" class="slide-img" style="cursor:pointer; height:${window.screen.width < 800 ? '270px' : '170px'} !important;" onclick="openProductDetails('${item.id}')">`).join('')}
                     </div>
 
                 </div>
