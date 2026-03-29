@@ -69,6 +69,12 @@
                         '  font-size: 28px !important;',
                         '}'
                     ].join('\n');
+                    // মোবাইলে profile trigger এর টেক্সট লুকানো (শুধু আইকন)
+                    s.innerHTML += [
+                        '\n.profile-trigger > div:first-child {',
+                        '  display: none !important;',
+                        '}'
+                    ].join('\n');
                     document.head.appendChild(s);
                 }
             } else {
@@ -1593,6 +1599,14 @@ html.is-mobile .product-card .product-slider,
 html.is-mobile .product-card .slide-img,
 html.is-mobile .product-card img {
     height: 320px !important;
+}
+/* মোবাইলে profile trigger টেক্সট লুকানো — শুধু আইকন দেখাবে */
+html.is-mobile .profile-trigger > div:first-child {
+    display: none !important;
+}
+html.is-mobile .profile-trigger {
+    padding: 5px 8px !important;
+    gap: 0 !important;
 }
 </style>
 </body>
