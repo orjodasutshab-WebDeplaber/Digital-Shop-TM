@@ -1881,4 +1881,87 @@ html.is-mobile .profile-trigger {
     gap: 0 !important;
 }
 </style>
+
+<!-- ══ Sironam Category Cards — Light/Dark Background Fix ══ -->
+<style>
+/* ═══ Sironam Grid — PC Layout ═══ */
+#sironam-portal-display.sironam-grid-container {
+    display: grid !important;
+    grid-template-columns: repeat(8, 1fr) !important;
+    gap: 12px !important;
+    margin: 20px auto 40px auto !important;
+    max-width: 98% !important;
+    padding: 0 10px !important;
+}
+
+/* ═══ কার্ড ডিজাইন ═══ */
+#sironam-portal-display .sironam-card {
+    position: relative !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    background: #ffffff !important;
+    aspect-ratio: unset !important;
+}
+#sironam-portal-display .sironam-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.16) !important;
+}
+
+/* ═══ ছবি ═══ */
+#sironam-portal-display .sironam-card img {
+    width: 100% !important;
+    height: 120px !important;
+    object-fit: cover !important;
+    display: block !important;
+    border-radius: 10px 10px 0 0 !important;
+}
+
+/* ═══ নামের নিচে ব্যাকগ্রাউন্ড — Light Mode ═══ */
+#sironam-portal-display .sironam-overlay {
+    position: static !important;
+    width: 100% !important;
+    background: rgba(0, 0, 0, 0.07) !important;  /* হালকা কালো */
+    padding: 8px 6px 10px 6px !important;
+    text-align: center !important;
+    color: #1e293b !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+    display: block !important;
+    border-top: 1px solid rgba(0,0,0,0.06) !important;
+    font-family: 'Hind Siliguri', sans-serif !important;
+    transition: background 0.3s, color 0.3s !important;
+}
+
+/* ═══ Dark Mode ═══ */
+body.dark-theme #sironam-portal-display .sironam-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+body.dark-theme #sironam-portal-display .sironam-overlay {
+    background: rgba(255, 255, 255, 0.08) !important;  /* হালকা সাদা */
+    color: #e2e8f0 !important;
+    border-top-color: rgba(255,255,255,0.06) !important;
+}
+
+/* ═══ Mobile — ৪ কলাম ═══ */
+html.is-mobile #sironam-portal-display.sironam-grid-container {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+}
+html.is-mobile #sironam-portal-display .sironam-card img {
+    height: 80px !important;
+}
+html.is-mobile #sironam-portal-display .sironam-overlay {
+    font-size: 11px !important;
+    padding: 5px 4px 7px !important;
+}
+</style>
 </body>
