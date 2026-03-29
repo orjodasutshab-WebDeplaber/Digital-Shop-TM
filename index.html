@@ -164,59 +164,100 @@
              }
              .search-icon-btn:hover { opacity: 0.85; transform: scale(1.08); }
 
-             /* ══ Expanded Search ══ */
+             /* ══ Expanded Search — Cartup Style ══ */
              .search-expanded {
                  display: none;
-                 position: absolute;
-                 right: 0;
-                 top: 50%;
-                 transform: translateY(-50%);
+                 position: fixed;
+                 top: 0; left: 0;
+                 width: 100%;
+                 height: 64px;
                  align-items: center;
-                 gap: 6px;
-                 z-index: 9999;
-                 background: #0f172a;
-                 border: 1px solid #334155;
-                 border-radius: 30px;
-                 padding: 4px 6px 4px 4px;
-                 box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-                 animation: srchSlide 0.25s ease;
-                 /* ডানদিক থেকে বাম দিকে প্রসারিত হবে */
-                 right: 0;
-                 width: max-content;
+                 justify-content: center;
+                 gap: 0;
+                 z-index: 99999;
+                 background: #ffffff;
+                 border-bottom: 2px solid #e2e8f0;
+                 box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+                 animation: srchDropDown 0.22s ease;
+                 padding: 0 16px;
+                 box-sizing: border-box;
              }
              .search-expanded.open { display: flex; }
 
-             @keyframes srchSlide {
-                 from { opacity:0; transform: translateY(-50%) scaleX(0.6); transform-origin: right center; }
-                 to   { opacity:1; transform: translateY(-50%) scaleX(1); }
+             @keyframes srchDropDown {
+                 from { opacity:0; transform: translateY(-100%); }
+                 to   { opacity:1; transform: translateY(0); }
              }
 
+             /* সার্চ ইনপুট র‍্যাপার */
              .search-expanded .search-wrapper {
-                 width: 200px;
-                 max-width: 200px;
+                 flex: 1;
+                 max-width: 700px;
+                 display: flex;
+                 align-items: center;
+                 background: #f1f5f9;
+                 border: 1.5px solid #e2e8f0;
+                 border-radius: 12px 0 0 12px;
+                 overflow: hidden;
+                 height: 44px;
              }
-             @media (min-width: 800px) {
-                 .search-expanded .search-wrapper { width: 260px; max-width: 260px; }
+             .search-expanded .search-wrapper i {
+                 color: #94a3b8;
+                 font-size: 15px;
+                 padding: 0 10px 0 14px;
+                 flex-shrink: 0;
              }
              .search-expanded .search-wrapper input {
-                 background: rgba(255,255,255,0.07) !important;
+                 flex: 1;
+                 background: transparent !important;
                  border: none !important;
-                 border-radius: 20px !important;
+                 border-radius: 0 !important;
+                 color: #1e293b !important;
+                 font-size: 15px;
+                 padding: 0 10px 0 0 !important;
+                 outline: none;
+                 height: 100%;
+                 font-family: 'Hind Siliguri', sans-serif;
+             }
+             .search-expanded .search-wrapper input::placeholder {
+                 color: #94a3b8;
              }
 
+             /* সার্চ বাটন — Cartup এর মতো */
+             .search-submit-btn {
+                 background: #e91e8c;
+                 border: none;
+                 color: #fff;
+                 height: 44px;
+                 padding: 0 22px;
+                 border-radius: 0 12px 12px 0;
+                 font-size: 15px;
+                 font-weight: 700;
+                 cursor: pointer;
+                 display: flex;
+                 align-items: center;
+                 gap: 6px;
+                 font-family: 'Hind Siliguri', sans-serif;
+                 flex-shrink: 0;
+                 transition: background 0.2s;
+             }
+             .search-submit-btn:hover { background: #c41878; }
+
+             /* ক্রস বাটন */
              .search-close-btn {
-                 background: rgba(255,255,255,0.06);
-                 border: 1px solid rgba(255,255,255,0.1);
-                 color: #aaa;
-                 width: 30px; height: 30px;
+                 background: none;
+                 border: none;
+                 color: #64748b;
+                 width: 38px; height: 38px;
                  border-radius: 50%;
                  display: flex; align-items: center; justify-content: center;
                  cursor: pointer;
-                 font-size: 13px;
+                 font-size: 20px;
                  flex-shrink: 0;
+                 margin-left: 10px;
                  transition: background 0.2s, color 0.2s;
              }
-             .search-close-btn:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+             .search-close-btn:hover { background: #fee2e2; color: #ef4444; }
 
              /* header-search-box আর লাগবে না — remove flex:1 */
              .header-search-box { display: none !important; }
@@ -240,10 +281,9 @@
                          renderProductGrid(appState.products);
                  }
              }
-             // বাইরে ক্লিক করলে বন্ধ
-             document.addEventListener('click', function(e) {
-                 const box = document.getElementById('headerSearchBox');
-                 if (box && !box.contains(e.target)) {
+             // Escape দিয়ে বন্ধ (input এ onkeydown এ আছে, এখানে global হিসেবেও)
+             document.addEventListener('keydown', function(e) {
+                 if (e.key === 'Escape') {
                      const expanded = document.getElementById('searchExpanded');
                      if (expanded && expanded.classList.contains('open')) {
                          closeHeaderSearch();
@@ -267,7 +307,7 @@
             <i class="fa fa-search"></i>
         </button>
 
-        <!-- এক্সপান্ড হওয়া সার্চ বার — account এর উপরে overlay -->
+        <!-- এক্সপান্ড হওয়া সার্চ বার — Cartup স্টাইল fullwidth overlay -->
         <div class="search-expanded" id="searchExpanded">
             <div class="search-wrapper">
                 <i class="fa fa-search"></i>
@@ -277,6 +317,9 @@
                        placeholder="পণ্য খুঁজুন..."
                        onkeydown="if(event.key==='Escape')closeHeaderSearch()">
             </div>
+            <button class="search-submit-btn" onclick="searchProducts()" aria-label="সার্চ">
+                <i class="fa fa-search"></i> Search
+            </button>
             <button class="search-close-btn" onclick="closeHeaderSearch()" aria-label="বন্ধ">
                 <i class="fa fa-times"></i>
             </button>
