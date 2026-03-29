@@ -45,9 +45,28 @@
                         '.product-card .slide-img,',
                         '.product-card img,',
                         '.product-slider,',
-                        '.slides-container,',
                         '.slide-img {',
                         '  height: 270px !important;',
+                        '}',
+                        '.product-title {',
+                        '  font-size: 30px !important;',
+                        '  white-space: normal !important;',
+                        '  display: -webkit-box !important;',
+                        '  -webkit-line-clamp: 2 !important;',
+                        '  -webkit-box-orient: vertical !important;',
+                        '  overflow: hidden !important;',
+                        '}',
+                        '.product-price, .product-card .product-price {',
+                        '  font-size: 38px !important;',
+                        '}',
+                        '.btn-buy-now, .btn-details {',
+                        '  font-size: 28px !important;',
+                        '}',
+                        '.tm-price-row span {',
+                        '  font-size: 26px !important;',
+                        '}',
+                        '.product-rating span, .tm-rating span {',
+                        '  font-size: 28px !important;',
                         '}'
                     ].join('\n');
                     document.head.appendChild(s);
@@ -59,10 +78,7 @@
             }
         }
         // DOM তৈরির আগে ও পরে দুইবার চালাই
-        // head ready না থাকলে DOMContentLoaded এ চালাবে
-        if(document.head) {
-            detectMobile();
-        }
+        detectMobile();
         window.addEventListener('DOMContentLoaded', detectMobile);
         window.addEventListener('resize', detectMobile);
     })();
