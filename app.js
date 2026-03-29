@@ -527,14 +527,15 @@ function renderProductGrid(productList, isLoadMore = false) {
             // 🌙 dark-theme এ তারা লাল, light-theme এ হলুদ
             const isDarkMode = document.body.classList.contains('dark-theme');
             const starColor  = isDarkMode ? '#ef4444' : '#f59e0b';
-            const starsHTML  = `<span style="color:${starColor};font-size:13px;">`
+            const isMob = window.screen.width < 800;
+            const starsHTML  = `<span style="color:${starColor};font-size:${isMob?'30px':'13px'};">`
                 + '★'.repeat(fullStars)
                 + (halfStar ? '½' : '')
                 + `<span style="color:#d1d5db;">` + '★'.repeat(emptyStars) + '</span>'
                 + '</span>';
             const ratingHTML = `<div class="product-rating tm-rating" style="display:flex;align-items:center;gap:4px;justify-content:center;margin:5px 0 6px;">
                 ${starsHTML}
-                <span style="font-size:11px;color:var(--text-muted);">${ratingVal.toFixed(1)} (${reviewCount})</span>
+                <span style="font-size:${isMob?'26px':'11px'};color:var(--text-muted);">${ratingVal.toFixed(1)} (${reviewCount})</span>
             </div>`;
             // ─────────────────────────────────────────────────────────
 
@@ -549,9 +550,9 @@ function renderProductGrid(productList, isLoadMore = false) {
             const discountPct = Math.round(((oldPrice - newPrice) / oldPrice) * 100);
             const priceHTML = `
                 <div class="tm-price-row" style="display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap;margin:4px 0 2px;">
-                    <span class="product-price" style="font-size:16px;font-weight:900;color:#16a34a;">${currency} ${newPrice.toLocaleString('bn-BD')}</span>
-                    <span style="font-size:12px;color:#94a3b8;text-decoration:line-through;">${currency} ${oldPrice.toLocaleString('bn-BD')}</span>
-                    <span style="font-size:11px;font-weight:700;background:#ef4444;color:#fff;padding:1px 6px;border-radius:20px;">${discountPct}% ছাড়</span>
+                    <span class="product-price" style="font-size:${isMob?'38px':'16px'};font-weight:900;color:#16a34a;">${currency} ${newPrice.toLocaleString('bn-BD')}</span>
+                    <span style="font-size:${isMob?'28px':'12px'};color:#94a3b8;text-decoration:line-through;">${currency} ${oldPrice.toLocaleString('bn-BD')}</span>
+                    <span style="font-size:${isMob?'26px':'11px'};font-weight:700;background:#ef4444;color:#fff;padding:1px 6px;border-radius:20px;">${discountPct}% ছাড়</span>
                 </div>`;
             // ─────────────────────────────────────────────────────────
 
@@ -560,8 +561,8 @@ function renderProductGrid(productList, isLoadMore = false) {
             const hasVerified = item.badges && item.badges.verified;
             const badgeHTML   = (hasFast || hasVerified) ? `
                 <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:5px 0 3px;">
-                    ${hasFast     ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#15803d;border:1px solid #86efac;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;"><span>⚡</span>FAST</span>` : ''}
-                    ${hasVerified ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;"><span>✔</span>Verified</span>` : ''}
+                    ${hasFast     ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#15803d;border:1px solid #86efac;padding:3px 9px;border-radius:20px;font-size:${isMob?'26px':'11px'};font-weight:700;"><span>⚡</span>FAST</span>` : ''}
+                    ${hasVerified ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;padding:3px 9px;border-radius:20px;font-size:${isMob?'26px':'11px'};font-weight:700;"><span>✔</span>Verified</span>` : ''}
                 </div>` : '';
             // ─────────────────────────────────────────────────────────
 
@@ -573,9 +574,9 @@ function renderProductGrid(productList, isLoadMore = false) {
                         <button class="admin-btn btn-delete" onclick="adminDeleteProduct('${item.id}')">DELETE</button>
                     </div>
                 ` : ''}
-                <div class="product-slider" id="slider-${item.id}" style="height:${window.screen.width < 800 ? '270px' : '170px'} !important;">
-                    <div class="slides-container scroll-custom" style="height:${window.screen.width < 800 ? '270px' : '170px'} !important;">
-                        ${images.map(img => `<img src="${img}" class="slide-img" style="cursor:pointer; height:${window.screen.width < 800 ? '270px' : '170px'} !important;" onclick="openProductDetails('${item.id}')">`).join('')}
+                <div class="product-slider" id="slider-${item.id}">
+                    <div class="slides-container scroll-custom">
+                        ${images.map(img => `<img src="${img}" class="slide-img" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">`).join('')}
                     </div>
 
                 </div>

@@ -576,16 +576,16 @@ button { cursor: pointer; border: none; font-family: inherit; }
     }
 
     .product-title {
-        font-size: 13px;
+        font-size: 30px;
     }
 
     .product-price {
-        font-size: 15px;
+        font-size: 38px;
     }
 
     .btn-buy-now,
     .btn-details {
-        font-size: 11px;
+        font-size: 28px;
         padding: 8px 4px;
         border-radius: 7px;
     }
@@ -2052,16 +2052,16 @@ html.is-mobile .product-card {
 }
 
 html.is-mobile .product-title {
-    font-size: 12px;
+    font-size: 30px !important;
 }
 
 html.is-mobile .product-price {
-    font-size: 13px;
+    font-size: 38px !important;
 }
 
 html.is-mobile .btn-buy-now,
 html.is-mobile .btn-details {
-    font-size: 10px;
+    font-size: 28px !important;
     padding: 7px 3px;
     border-radius: 7px;
 }
