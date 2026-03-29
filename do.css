@@ -572,7 +572,7 @@ button { cursor: pointer; border: none; font-family: inherit; }
     .product-card .product-slider,
     .product-card .slide-img,
     .product-card img {
-        height: 150px !important;
+        height: 270px !important;
     }
 
     .product-title {
@@ -1758,7 +1758,7 @@ html, body {
     .product-card .product-slider,
     .product-card .slide-img,
     .product-card img {
-        height: 140px !important;
+        height: 270px !important;
     }
 }
 
@@ -2043,7 +2043,7 @@ html.is-mobile .main-content-area .container {
 html.is-mobile .product-card .product-slider,
 html.is-mobile .product-card .slide-img,
 html.is-mobile .product-card img {
-    height: 130px !important;
+    height: 270px !important;
 }
 
 html.is-mobile .product-card {
