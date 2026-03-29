@@ -45,6 +45,7 @@
                         '.product-card .slide-img,',
                         '.product-card img,',
                         '.product-slider,',
+                        '.slides-container,',
                         '.slide-img {',
                         '  height: 270px !important;',
                         '}'
@@ -58,7 +59,10 @@
             }
         }
         // DOM তৈরির আগে ও পরে দুইবার চালাই
-        detectMobile();
+        // head ready না থাকলে DOMContentLoaded এ চালাবে
+        if(document.head) {
+            detectMobile();
+        }
         window.addEventListener('DOMContentLoaded', detectMobile);
         window.addEventListener('resize', detectMobile);
     })();
