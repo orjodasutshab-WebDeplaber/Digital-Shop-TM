@@ -561,26 +561,26 @@ function renderProductGrid(productList, isLoadMore = false) {
             const hasVerified = item.badges && item.badges.verified;
             const badgeHTML   = (hasFast || hasVerified) ? `
                 <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:5px 0 3px;">
-                    ${hasFast     ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#15803d;border:1px solid #86efac;padding:3px 9px;border-radius:20px;font-size:${isMob?'26px':'11px'};font-weight:700;"><span>⚡</span>FAST</span>` : ''}
-                    ${hasVerified ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;padding:3px 9px;border-radius:20px;font-size:${isMob?'26px':'11px'};font-weight:700;"><span>✔</span>Verified</span>` : ''}
+                    ${hasFast     ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#15803d;border:1px solid #86efac;padding:3px 9px;border-radius:20px;font-size:${isMob?'30px':'11px'};font-weight:700;"><span>⚡</span>FAST</span>` : ''}
+                    ${hasVerified ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;padding:3px 9px;border-radius:20px;font-size:${isMob?'30px':'11px'};font-weight:700;"><span>✔</span>Verified</span>` : ''}
                 </div>` : '';
             // ─────────────────────────────────────────────────────────
 
             return `
-            <div class="product-card" style="position: relative;">
+            <div class="product-card" style="position: relative; cursor:pointer;" onclick="openProductDetails('${item.id}')">
                 ${checkAdmin ? `
                     <div class="admin-actions-overlay">
-                        <button class="admin-btn btn-edit" onclick="openEditModal('${item.id}')">EDIT</button>
-                        <button class="admin-btn btn-delete" onclick="adminDeleteProduct('${item.id}')">DELETE</button>
+                        <button class="admin-btn btn-edit" onclick="event.stopPropagation();openEditModal('${item.id}')">EDIT</button>
+                        <button class="admin-btn btn-delete" onclick="event.stopPropagation();adminDeleteProduct('${item.id}')">DELETE</button>
                     </div>
                 ` : ''}
                 <div class="product-slider" id="slider-${item.id}">
                     <div class="slides-container scroll-custom">
-                        ${images.map(img => `<img src="${img}" class="slide-img" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">`).join('')}
+                        ${images.map(img => `<img src="${img}" class="slide-img" style="cursor:pointer;">`).join('')}
                     </div>
 
                 </div>
-                <h4 class="product-title" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">${item.title}</h4>
+                <h4 class="product-title" style="cursor:pointer;">${item.title}</h4>
                 ${priceHTML}
                 ${badgeHTML}
                 ${ratingHTML}
