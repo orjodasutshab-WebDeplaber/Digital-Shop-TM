@@ -8874,10 +8874,10 @@ function displaySironamOnPortal() {
 
     const isDark = document.body.classList.contains('dark-theme');
 
-    // Card style
+    // Card style — Light: হালকা কালো, Dark: হালকা সাদা
     const cardStyle = isDark
-        ? 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #334155;box-shadow:0 2px 8px rgba(0,0,0,0.4);background:#1e293b;'
-        : 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #dde3ec;box-shadow:0 2px 8px rgba(0,0,0,0.10);background:#ffffff;';
+        ? 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #4a5568;box-shadow:0 2px 8px rgba(0,0,0,0.4);background:rgba(255,255,255,0.12);'
+        : 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #c8cdd5;box-shadow:0 2px 8px rgba(0,0,0,0.10);background:rgba(0,0,0,0.08);';
 
     // Name label background — clearly visible
     const overlayStyle = isDark
