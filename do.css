@@ -2177,3 +2177,11 @@ html.is-mobile #userProfileGroup .profile-trigger {
     border-color: transparent !important;
     box-shadow: none !important;
 }
+
+/* ══════════════════════════════════════════════
+   মোবাইল নেভ — শিরোনাম বোল্ড ও বড়
+   ══════════════════════════════════════════════ */
+html.is-mobile .nav-text {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+}
