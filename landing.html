@@ -52,7 +52,7 @@
 .g-btn img{width:20px;height:20px;}
 .or-div{display:flex;align-items:center;gap:10px;margin-bottom:12px;color:#475569;font-size:13px;}
 .or-div::before,.or-div::after{content:'';flex:1;height:1px;background:#334155;}
-
+ 
 /* NIGHT BOARD */
 .night-board-wrap{width:580px;flex-shrink:0;border-radius:0;overflow:hidden;border:none;background:#060d1a;box-shadow:none;position:relative;align-self:stretch;min-height:100%;}
 .night-board-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;background:#060d1a;width:100%;height:100%;}
@@ -61,7 +61,7 @@
 .night-board-slide a{display:block;width:100%;height:100%;}
 .night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:400px;}
 @media(max-width:1100px){.night-board-wrap{display:none;}}
-
+ 
 /* মোবাইল নাইট বোর্ড */
 .night-board-mobile-wrap{display:none;width:100%;border-radius:14px;overflow:hidden;border:1px solid rgba(99,102,241,.25);background:#060d1a;position:relative;min-height:380px;margin:10px 0 6px;}
 .night-board-mobile-wrap .night-board-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;background:#060d1a;width:100%;height:100%;}
@@ -69,12 +69,12 @@
 .night-board-mobile-wrap .night-board-slide img{width:100%;height:100%;object-fit:fill;display:block;position:absolute;inset:0;}
 .night-board-mobile-wrap .night-board-slide a{display:block;width:100%;height:100%;}
 .night-board-mobile-wrap .night-board-empty{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;min-height:380px;}
-
+ 
 </style>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;color:#fff;overflow-x:hidden;}
-
+ 
 /* NAV */
 .top-nav{position:sticky;top:0;z-index:500;background:rgba(10,15,30,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(99,102,241,.2);padding:12px 26px;display:flex;justify-content:space-between;align-items:center;}
 .brand{display:flex;align-items:center;gap:12px;}
@@ -86,14 +86,14 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 .btn-ln:hover{background:rgba(99,102,241,.15);}
 .btn-su{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:none;padding:8px 18px;border-radius:10px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit;display:flex;align-items:center;gap:6px;box-shadow:0 4px 16px rgba(99,102,241,.35);transition:.2s;}
 .btn-su:hover{opacity:.88;transform:translateY(-1px);}
-
+ 
 /* SECTION */
 .sec{padding:28px 16px;}
 .sec-hd{text-align:center;margin-bottom:18px;}
 .badge{background:rgba(99,102,241,.12);color:#a5b4fc;border:1px solid rgba(99,102,241,.3);padding:5px 15px;border-radius:30px;font-size:12px;font-weight:700;display:inline-block;margin-bottom:8px;}
 .sec-title{font-size:22px;font-weight:800;color:#fff;}
 .sec-sub{color:#475569;font-size:13px;margin-top:5px;}
-
+ 
 /* LEADERBOARD */
 .lb-wrap{width:100%;margin:0 auto;height:500px;border-radius:0;overflow:hidden;border:none;box-shadow:none;position:relative;background:#050a14;}
 .lb-slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;}
@@ -108,10 +108,10 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 .lb-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10;}
 .lb-dot{height:9px;width:9px;border-radius:5px;background:rgba(255,255,255,.28);cursor:pointer;transition:all .3s;}
 .lb-dot.active{width:22px;background:#6366f1;}
-
+ 
 /* SIRONAM */
 .sir-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:1400px;margin:0 auto;}
-
+ 
 /* PC: scroll wrapper — ৩ লাইন + ৪র্থ লাইনের ১/৩ দেখাবে */
 .sir-grid-pc-wrap{
     max-height:537px;
@@ -125,7 +125,7 @@ body{font-family:'Hind Siliguri',sans-serif;background:#0a0f1e;min-height:100vh;
 .sir-grid-pc-wrap::-webkit-scrollbar-track{background:rgba(0,0,0,.15);border-radius:4px;}
 .sir-grid-pc-wrap::-webkit-scrollbar-thumb{background:rgba(251,191,36,.45);border-radius:4px;}
 .sir-grid-pc-wrap::-webkit-scrollbar-thumb:hover{background:rgba(251,191,36,.75);}
-
+ 
 /* মোবাইলে wrapper এর max-height সরিয়ে দাও */
 body.is-mobile .sir-grid-pc-wrap{
     max-height:none !important;
@@ -140,7 +140,7 @@ body.is-mobile .sir-grid-pc-wrap{
 .sir-overlay{position:absolute;bottom:0;left:0;right:0;padding:28px 12px 12px;background:linear-gradient(transparent,rgba(0,0,0,.88));}
 .sir-name{color:#fff;font-size:14px;font-weight:700;}
 .sir-hint{color:rgba(255,255,255,.48);font-size:12px;margin-top:3px;}
-
+ 
 /* LOCAL BOARDS */
 .lb2-grid{display:grid;grid-template-columns:repeat(3,500px);gap:18px;max-width:1580px;margin:0 auto;justify-content:center;}
 .lb2-card{width:500px;height:350px;border-radius:16px;overflow:hidden;border:1px solid rgba(99,102,241,.14);position:relative;background:#0a0f1e;transition:all .3s;flex-shrink:0;}
@@ -151,7 +151,7 @@ body.is-mobile .sir-grid-pc-wrap{
 .lb2-details-btn{background:rgba(99,102,241,.9);color:#fff;border:none;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(0,0,0,.4);backdrop-filter:blur(6px);}
 .lb2-details-btn:hover{background:#6366f1;}
 .lb2-empty{grid-column:1/-1;text-align:center;padding:48px;color:#1e293b;border:2px dashed #1e293b;border-radius:15px;}
-
+ 
 /* CTA */
 .cta-section{padding:16px 16px 50px;display:flex;justify-content:center;}
 .cta-board{width:100%;max-width:1400px;height:390px;border-radius:25px;overflow:hidden;position:relative;box-shadow:0 28px 65px rgba(0,0,0,.55);}
@@ -167,30 +167,30 @@ body.is-mobile .sir-grid-pc-wrap{
 .cta-btn{background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;padding:15px 44px;border-radius:50px;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 13px 36px rgba(16,185,129,.4);display:flex;align-items:center;gap:10px;transition:all .3s;}
 .cta-btn:hover{transform:scale(1.05) translateY(-3px);}
 .cta-hint{color:rgba(255,255,255,.3);font-size:12px;}
-
+ 
 /* FOOTER */
 .l-footer{background:#070d1a;border-top:1px solid rgba(255,255,255,.05);padding:24px 16px;text-align:center;}
 .l-footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px;margin-bottom:13px;}
 .l-footer-links a{color:#1e2d45;text-decoration:none;font-size:12px;transition:.2s;}
 .l-footer-links a:hover{color:#a5b4fc;}
-
+ 
 /* === MODALS === */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);z-index:9000;justify-content:center;align-items:center;font-family:inherit;}
 .mo.open{display:flex;}
 .mb{background:#0f172a;border-radius:24px;width:95%;max-width:480px;overflow:hidden;position:relative;animation:si .3s ease;max-height:95vh;overflow-y:auto;}
-
+ 
 /* PC: রেজিস্ট্রেশন মডালের scrollbar অদৃশ্য */
 #regModal .mb{scrollbar-width:none;-ms-overflow-style:none;}
 #regModal .mb::-webkit-scrollbar{display:none;}
-
+ 
 /* SIRONAM FULL SCREEN MODAL */
 .sir-full{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:99999;overflow-y:auto;font-family:inherit;}
 .sir-full.open{display:block;}
-
+ 
 @keyframes si{from{transform:translateY(26px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes bf{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-25px) scale(1.04)}}
 @keyframes gm{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-
+ 
 .mclose{position:absolute;right:18px;top:13px;font-size:27px;color:#475569;cursor:pointer;z-index:10;line-height:1;transition:.2s;}
 .mclose:hover{color:#fff;}
 .mbar{height:5px;width:100%;}
@@ -216,21 +216,21 @@ body.is-mobile .sir-grid-pc-wrap{
 .fgt a{color:#ef4444;font-size:13px;font-weight:600;text-decoration:none;border-bottom:1px dashed #ef4444;}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
 .ptog{width:38px;height:38px;flex-shrink:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#64748b;font-size:13px;}
-
+ 
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 24px;border-radius:50px;font-size:14px;font-weight:600;border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 28px rgba(0,0,0,.4);z-index:9999999;display:none;white-space:nowrap;}
-
+ 
 /* setScale() কারণে media query কাজ করে না — JS দিয়ে body.is-mobile class লাগানো হয় */
 @media(max-width:1580px){.lb2-grid{grid-template-columns:repeat(3,1fr);}.lb2-card{width:100%;}}
 @media(max-width:900px){.lb2-grid{grid-template-columns:repeat(2,1fr);}.lb2-card{height:250px;}.sir-grid{grid-template-columns:repeat(2,1fr) !important;}}
-
+ 
 /* ✅ মোবাইল স্টাইল — body.is-mobile class দিয়ে কাজ করে */
 body.is-mobile .lb2-grid{grid-template-columns:repeat(2,1fr);}
 body.is-mobile .lb2-card{height:180px;}
-
+ 
 /* ✅ মোবাইল নাইট বোর্ড */
 body.is-mobile .night-board-wrap{display:none;}
 body.is-mobile .night-board-mobile-wrap{display:block !important;}
-
+ 
 /* ✅ গেস্ট প্রোডাক্ট সেকশন — Daraz Style */
 .gp-section{padding:0 0 24px;background:#fff;}
 .gp-header{display:flex;align-items:center;justify-content:space-between;padding:20px 32px 16px;background:#fff;}
@@ -242,45 +242,45 @@ body.is-mobile .gp-header{padding:16px 14px 14px;background:#fff;}
 body.is-mobile .gp-title{font-size:52px !important;font-weight:900 !important;color:#222 !important;letter-spacing:1px;display:flex;align-items:center;gap:12px;}
 body.is-mobile .gp-title::before{display:none;}
 body.is-mobile .gp-title::after{content:'';display:block;height:4px;width:60px;background:linear-gradient(90deg,#f57224,#ef4444);border-radius:2px;margin-top:6px;}
-
+ 
 /* GRID — PC: 20px gap, white background on outer */
 .gp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:20px;max-width:1400px;margin:0 auto;background:transparent;border:none;border-radius:0;overflow:visible;padding:0;}
 body.is-mobile .gp-grid{grid-template-columns:repeat(2,1fr);gap:12px;padding:0 14px 14px;background:transparent;border:none;border-radius:0;}
-
+ 
 /* CARD — Daraz সাদা */
 .gp-card{background:#fff;overflow:hidden;cursor:pointer;transition:box-shadow .18s;position:relative;display:flex;flex-direction:column;border-radius:0;}
 .gp-card:hover{box-shadow:0 4px 18px rgba(0,0,0,0.13);}
 /* PC: card border + slight radius */
 body:not(.is-mobile) .gp-card{border-radius:8px;border:1px solid #e5e7eb;}
 body:not(.is-mobile) .gp-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.14);transform:translateY(-2px);}
-
+ 
 /* IMAGE */
 .gp-img-wrap{width:100%;aspect-ratio:1/1;overflow:hidden;background:#f8f9fa;position:relative;}
 body.is-mobile .gp-img-wrap{aspect-ratio:1/1;}
 .gp-img-wrap img{width:100%;height:100%;object-fit:fill;display:block;transition:transform .35s;}
 .gp-card:hover .gp-img-wrap img{transform:scale(1.04);}
-
+ 
 /* DISCOUNT BADGE — ছবির উপরে বাম দিকে */
 .gp-discount-badge{display:block;position:absolute;top:0;left:0;background:#f57224;color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:0 0 8px 0;z-index:2;}
-
+ 
 /* BODY */
 .gp-body{padding:8px 8px 10px;flex:1;display:flex;flex-direction:column;gap:0;}
-
+ 
 /* NAME */
 .gp-name{color:#222;font-size:13px;font-weight:500;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;min-height:39px;}
 body.is-mobile .gp-name{font-size:35px;min-height:80px;}
-
+ 
 /* PRICE ROW — দাম + পুরনো দাম + discount% একলাইনে */
 .gp-price-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;}
 .gp-price{color:#f57224;font-size:18px;font-weight:900;line-height:1;}
 body.is-mobile .gp-price{font-size:39px;}
 .gp-price-sub{display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
 .gp-old-price{color:#aaa;font-size:12px;text-decoration:line-through;}
-
+ 
 /* STARS — ★★★★★ (120) Daraz স্টাইল */
 .gp-stars{font-size:12px;margin-bottom:8px;display:flex;align-items:center;gap:3px;color:#f57224;}
 body.is-mobile .gp-stars{font-size:28px;margin-bottom:8px;}
-
+ 
 /* BUTTONS */
 .gp-btn-row{display:flex;gap:5px;margin-top:auto;}
 .gp-detail-btn{flex:1;padding:9px 0;border-radius:6px;border:1.5px solid #6366f1;background:#fff;color:#6366f1;font-size:12px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;text-align:center;}
@@ -289,31 +289,31 @@ body.is-mobile .gp-stars{font-size:28px;margin-bottom:8px;}
 .gp-buy-btn:hover{opacity:.88;}
 body.is-mobile .gp-detail-btn{font-size:14px;padding:13px 0;font-weight:800;border-radius:9px;}
 body.is-mobile .gp-buy-btn{font-size:14px;padding:13px 0;font-weight:800;border-radius:9px;}
-
+ 
 .gp-loadmore-wrap{text-align:center;padding:18px 0 6px;}
 .gp-loadmore-btn{background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;border:none;padding:11px 32px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:800;font-family:'Hind Siliguri',sans-serif;}
-
+ 
 /* PC: outer wrapper সাদা background — full width */
 .gp-grid-outer{background:#fff;border-radius:0;padding:24px 32px 28px;width:100%;}
 body.is-mobile .gp-grid-outer{background:#fff;padding:14px 10px 18px;border-radius:14px;}
-
+ 
 /* ══ Product Detail Modal — PC: full-screen, Mobile: full-screen ══ */
 .gp-modal{display:none;position:fixed;inset:0;background:#fff;z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;-webkit-overflow-scrolling:touch;}
-
+ 
 /* ── PC inner box — full-screen ── */
 .gpd-pc-box{display:none;width:100%;min-height:100vh;background:#fff;border-radius:0;overflow:hidden;box-shadow:none;position:relative;}
 body:not(.is-mobile) .gp-modal{display:none;}
 body:not(.is-mobile) .gp-modal[style*="block"]{display:block !important;}
 body:not(.is-mobile) .gpd-pc-box{display:flex;flex-direction:column;}
 body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
-
+ 
 /* PC close button — sticky top bar */
 .gpd-pc-close{position:fixed;top:16px;right:28px;width:42px;height:42px;border-radius:50%;background:#f5f5f5;border:none;font-size:22px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;z-index:9999999999;transition:.2s;box-shadow:0 4px 18px rgba(0,0,0,.18);}
 .gpd-pc-close:hover{background:#fee2e2;color:#ef4444;}
-
+ 
 /* PC top: left image + right info side by side */
 .gpd-pc-top{display:flex;gap:0;align-items:flex-start;max-width:1400px;margin:0 auto;width:100%;padding:0 40px;}
-
+ 
 /* LEFT: image area */
 .gpd-pc-left{width:520px;flex-shrink:0;background:#fff;padding:28px 20px;}
 .gpd-pc-mainimg-wrap{border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;background:#f9fafb;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;}
@@ -324,7 +324,7 @@ body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
 .gpd-pc-thumb:hover{border-color:#f57224;}
 .gpd-pc-thumb.active{border-color:#f57224;}
 .gpd-pc-thumb img{width:100%;height:100%;object-fit:contain;display:block;}
-
+ 
 /* RIGHT: info area */
 .gpd-pc-right{flex:1;padding:28px 40px 24px 24px;border-left:1px solid #f0f0f0;min-width:0;max-width:700px;}
 .gpd-pc-brand{font-size:12px;color:#888;margin-bottom:6px;}
@@ -346,7 +346,7 @@ body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
 .gpd-pc-btn-buy:hover{background:#ea6010;}
 .gpd-pc-btn-cart{flex:1;padding:14px;background:#fff;color:#f57224;border:2px solid #f57224;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
 .gpd-pc-btn-cart:hover{background:#fff7ed;}
-
+ 
 /* PC ACCORDION section — always visible below */
 .gpd-pc-tabs-wrap{border-top:3px solid #f0f0f0;padding:0 0 40px;max-width:1400px;margin:0 auto;width:100%;padding:0 40px 40px;}
 .gpd-pc-tab-bar{display:flex;border-bottom:2px solid #f0f0f0;margin-bottom:0;}
@@ -354,19 +354,19 @@ body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
 .gpd-pc-tab-btn.active{color:#f57224;border-bottom:3px solid #f57224;}
 .gpd-pc-tab-content{display:none;padding:22px 0;}
 .gpd-pc-tab-content.active{display:block;}
-
+ 
 /* spec table */
 .gpd-spec-table{width:100%;border-collapse:collapse;font-size:14px;}
 .gpd-spec-table tr:nth-child(even){background:#fafafa;}
 .gpd-spec-table td{padding:11px 16px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
 .gpd-spec-table td:first-child{color:#666;font-weight:600;width:40%;white-space:nowrap;}
 .gpd-spec-table td:last-child{color:#111;}
-
+ 
 /* seller cards */
 .gpd-pc-seller-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
 .gpd-pc-seller-card{background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:18px;}
 .gpd-pc-seller-card h5{font-size:11px;color:#888;font-weight:700;text-transform:uppercase;margin:0 0 8px;}
-
+ 
 /* ── PC Accordion ── */
 .gpd-accord-block{border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;margin-bottom:14px;}
 .gpd-accord-head{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;background:#fafafa;cursor:pointer;font-size:15px;font-weight:800;color:#111;user-select:none;transition:background .2s;}
@@ -375,7 +375,7 @@ body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
 .gpd-accord-arrow.collapsed{transform:rotate(180deg);}
 .gpd-accord-body{padding:20px 22px;background:#fff;border-top:1px solid #f0f0f0;}
 .gpd-accord-body.hidden{display:none;}
-
+ 
 /* ── Mobile Accordion ── */
 .gpd-mob-accord-block{border-bottom:1px solid #f0f0f0;margin-bottom:0;}
 .gpd-mob-accord-head{display:flex;align-items:center;justify-content:space-between;padding:16px 0;cursor:pointer;user-select:none;}
@@ -383,20 +383,20 @@ body:not(.is-mobile) .gpd-mobile-view{display:none !important;}
 .gpd-mob-accord-arrow.collapsed{transform:rotate(180deg);}
 .gpd-mob-accord-body{padding-bottom:16px;background:#fff;}
 .gpd-mob-accord-body.hidden{display:none;}
-
+ 
 /* ── মোবাইল accordion body ভেতরের লেখা বড় ── */
 body.is-mobile .gpd-mob-accord-body{font-size:30px !important;line-height:1.7;}
-
+ 
 /* Spec table মোবাইলে বড় */
 body.is-mobile #gpModalSpecTable table{width:100%;border-collapse:collapse;}
 body.is-mobile #gpModalSpecTable td{font-size:30px !important;padding:14px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
 body.is-mobile #gpModalSpecTable td:first-child{color:#666;font-weight:700;width:42%;}
 body.is-mobile #gpModalSpecTable td:last-child{color:#111;}
-
+ 
 /* Product Details মোবাইলে বড় */
 body.is-mobile .gpd-desc-text{font-size:32px !important;line-height:1.8;color:#444;}
 body.is-mobile #gpModalTagsRow span{font-size:26px !important;padding:5px 14px !important;}
-
+ 
 /* Seller box মোবাইলে বড় */
 body.is-mobile #gpModalSellerBox{font-size:29px !important;}
 body.is-mobile #gpModalSellerBox div[style*="font-size:11px"]{font-size:29px !important;}
@@ -405,7 +405,7 @@ body.is-mobile #gpModalSellerBox div[style*="font-size:13px"]{font-size:32px !im
 body.is-mobile #gpModalSellerBox div[style*="font-size:15px"]{font-size:34px !important;}
 body.is-mobile #gpModalSellerBox div[style*="font-size:16px"]{font-size:35px !important;}
 body.is-mobile #gpModalSellerBox div[style*="font-size:18px"]{font-size:38px !important;}
-
+ 
 /* Related product card */
 .gpd-rel-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow .2s;}
 .gpd-rel-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
@@ -416,17 +416,17 @@ body.is-mobile #gpModalSellerBox div[style*="font-size:18px"]{font-size:38px !im
 .gpd-rel-card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
 .gpd-rel-card-tag{background:#fff3e0;color:#f57224;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 .gpd-rel-card-cat{background:#e0f2fe;color:#0284c7;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
-
+ 
 /* Mobile related card bigger */
 body.is-mobile .gpd-rel-card-name{font-size:25px;min-height:60px;}
 body.is-mobile .gpd-rel-card-price{font-size:28px;}
 body.is-mobile .gpd-rel-card-tag{font-size:19px;padding:4px 10px;}
 body.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
-
+ 
 body.is-mobile .gpd-pc-box{display:none !important;}
 body.is-mobile .gpd-mobile-view{display:block !important;}
 body.is-mobile .gp-modal{background:#f5f5f5;}
-
+ 
 /* top bar */
 .gpd-topbar{position:sticky;top:0;z-index:20;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
 .gpd-back-btn{background:none;border:none;font-size:60px;cursor:pointer;color:#222;padding:4px 8px;line-height:1;width:70px;font-weight:900;}
@@ -473,7 +473,7 @@ body.is-mobile .gp-modal{background:#f5f5f5;}
 .gpd-buynow-btn{flex:1;background:#38bdf8;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;border-right:1px solid rgba(255,255,255,0.3);}
 .gpd-addcart-btn{flex:1;background:#f97316;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
 .gpd-store-btn i{font-size:34px;color:#f57224;}
-
+ 
 /* ── PC ভার্সন: product detail footer ও action bar ছোট ── */
 body:not(.is-mobile) .gpd-action-bar{height:56px;}
 body:not(.is-mobile) .gpd-buynow-btn{font-size:15px;}
@@ -484,7 +484,7 @@ body:not(.is-mobile) .gpd-store-btn i,
 body:not(.is-mobile) .gpd-chat-btn i{font-size:18px;}
 body:not(.is-mobile) .gpd-store-btn,
 body:not(.is-mobile) .gpd-chat-btn{width:56px;}
-
+ 
 /* PC: sirFull footer ছোট */
 body:not(.is-mobile) #sirFull footer{padding:28px 32px 32px !important;}
 body:not(.is-mobile) #sirFull footer h2{font-size:18px !important;}
@@ -500,7 +500,7 @@ body:not(.is-mobile) #sirFull footer div[style*="height:50px"]{height:32px !impo
 body:not(.is-mobile) #sirFull footer div[style*="height:50px"] img{height:22px !important;}
 body:not(.is-mobile) #sirFull footer div[style*="gap:18px"]{margin-bottom:14px !important;}
 body:not(.is-mobile) #sirFull footer div[style*="grid-template-columns"]{margin-bottom:16px !important;gap:18px !important;}
-
+ 
 /* PC: main .ft footer — font size ঠিক */
 body:not(.is-mobile) .ft-logo-text{font-size:20px !important;}
 body:not(.is-mobile) .ft-tagline{font-size:13px !important;line-height:1.6 !important;}
@@ -509,7 +509,7 @@ body:not(.is-mobile) .ft-col ul li a{font-size:13px !important;}
 body:not(.is-mobile) .ft-copy{font-size:13px !important;}
 body:not(.is-mobile) .ft-hotline span{font-size:13px !important;}
 body:not(.is-mobile) .ft-hotline a{font-size:13px !important;}
-
+ 
 /* PC: modal footer ভেতরের সব বড় font ছোট করা */
 body:not(.is-mobile) #gpDetailModal footer{padding:28px 32px 80px !important;}
 body:not(.is-mobile) #gpDetailModal footer h2{font-size:20px !important;}
@@ -527,21 +527,21 @@ body:not(.is-mobile) #gpDetailModal footer div[style*="height:50px"]{height:32px
 body:not(.is-mobile) #gpDetailModal footer div[style*="height:50px"] img{height:22px !important;}
 body:not(.is-mobile) .gpd-desc-text{font-size:15px;}
 body:not(.is-mobile) .gpd-spacer{height:40px;}
-
+ 
 body.is-mobile .lb-wrap{height:450px;border-radius:0;margin:0;width:100%;}
 body.is-mobile .cta-title{font-size:20px;}
 body.is-mobile .top-nav{padding:10px 13px;}
-
+ 
 /* ✅ ব্র্যান্ড নাম বড় */
 body.is-mobile .brand-name{font-size:26px !important;font-weight:900 !important;}
 body.is-mobile .brand-slogan{font-size:13px !important;color:#a5b4fc !important;font-weight:600 !important;}
 body.is-mobile .brand img{width:42px;height:42px;}
-
+ 
 /* ✅ লগইন ও সাইন আপ বাটন বড় */
 body.is-mobile .btn-ln,
 body.is-mobile .btn-su{padding:13px 20px !important;font-size:17px !important;font-weight:800 !important;border-radius:12px !important;}
 body.is-mobile .nav-btns{gap:10px;}
-
+ 
 /* ✅ স্পেশাল ক্যাটাগরি ৩ কলাম */
 body.is-mobile .sir-grid{
     display:flex !important;
@@ -563,7 +563,7 @@ body.is-mobile .sir-card{
 body.is-mobile .sir-name{font-size:11px;}
 body.is-mobile .sir-hint{font-size:10px;}
 body.is-mobile .two{grid-template-columns:1fr;}
-
+ 
 /* ✅ মোবাইলে sirFull — title বড়, বন্ধ বাটন বড়, সার্চ লম্বা */
 body.is-mobile #sirFull .sir-close-btn{
     padding:18px 32px !important;
@@ -600,7 +600,7 @@ body.is-mobile #sirFull .sir-search-btn{
     border-radius:12px !important;
     white-space:nowrap !important;
 }
-
+ 
 /* ✅ Footer মোবাইলে বড় */
 body.is-mobile .ft{padding:40px 18px 30px;}
 body.is-mobile .ft-grid{grid-template-columns:1fr !important;gap:28px;}
@@ -617,7 +617,7 @@ body.is-mobile .ft-copy{font-size:20px;}
 body.is-mobile .ft-hotline{padding:12px 18px;border-radius:12px;}
 body.is-mobile .ft-hotline span,body.is-mobile .ft-hotline a{font-size:20px;}
 body.is-mobile .ft-hotline svg{width:22px;height:22px;}
-
+ 
 /* ── প্রিমিয়াম ক্যাটাগরি — মোবাইলে বড় ── */
 body.is-mobile .pmx-cat-card{width:220px !important;border-radius:16px !important;}
 body.is-mobile .pmx-cat-img{height:185px !important;}
@@ -625,23 +625,23 @@ body.is-mobile .pmx-cat-body{padding:14px 14px 16px !important;}
 body.is-mobile .pmx-cat-name{font-size:30px !important;margin-bottom:6px !important;}
 body.is-mobile .pmx-cat-hint{font-size:23px !important;}
 body.is-mobile .pmx-cat-pro-badge{font-size:18px !important;padding:4px 12px !important;}
-
+ 
 /* ════════════════════════════════════════════
    ✅ মোবাইল: লগইন / রেজিস্ট্রেশন / রিসেট মডাল
    ════════════════════════════════════════════ */
-
+ 
 /* Overlay — full screen, scroll থেকে শুরু */
 body.is-mobile .mo {
     align-items: flex-start !important;
     padding: 0 !important;
     overflow-y: auto !important;
 }
-
+ 
 /* লগইন মডাল — মোবাইলে একটু নিচে নামানো */
 body.is-mobile #loginModal {
     padding-top: 60px !important;
 }
-
+ 
 /* মোডাল বক্স — পুরো width, top থেকে */
 body.is-mobile .mb {
     width: 100% !important;
@@ -654,7 +654,7 @@ body.is-mobile .mb {
     border-right: none !important;
     border-top: none !important;
 }
-
+ 
 /* রেজিস্ট্রেশন মডালের নিজস্ব scrollbar সম্পূর্ণ অদৃশ্য */
 body.is-mobile #regModal .mb {
     overflow-y: auto !important;
@@ -664,7 +664,7 @@ body.is-mobile #regModal .mb {
 body.is-mobile #regModal .mb::-webkit-scrollbar {
     display: none !important;               /* Chrome/Safari */
 }
-
+ 
 /* বন্ধ (×) বাটন বড় */
 body.is-mobile .mclose {
     font-size: 72px !important;
@@ -677,17 +677,17 @@ body.is-mobile .mclose {
     align-items: center !important;
     justify-content: center !important;
 }
-
+ 
 /* Top colour bar মোটা */
 body.is-mobile .mbar {
     height: 8px !important;
 }
-
+ 
 /* Head section */
 body.is-mobile .mhead {
     padding: 44px 28px 18px !important;
 }
-
+ 
 /* আইকন বড় */
 body.is-mobile .micon {
     width: 110px !important;
@@ -698,7 +698,7 @@ body.is-mobile .micon {
 body.is-mobile .micon i {
     font-size: 48px !important;
 }
-
+ 
 /* Title ও subtitle বড় */
 body.is-mobile .mtitle {
     font-size: 46px !important;
@@ -707,12 +707,12 @@ body.is-mobile .mtitle {
 body.is-mobile .msub {
     font-size: 26px !important;
 }
-
+ 
 /* Body padding */
 body.is-mobile .mbody {
     padding: 0 28px 40px !important;
 }
-
+ 
 /* Google বাটন বড় */
 body.is-mobile .g-btn {
     font-size: 28px !important;
@@ -725,13 +725,13 @@ body.is-mobile .g-btn img {
     width: 36px !important;
     height: 36px !important;
 }
-
+ 
 /* "অথবা" divider */
 body.is-mobile .or-div {
     font-size: 26px !important;
     margin-bottom: 18px !important;
 }
-
+ 
 /* Label ও input group */
 body.is-mobile .ig {
     margin-bottom: 22px !important;
@@ -740,13 +740,13 @@ body.is-mobile .il {
     font-size: 28px !important;
     margin-bottom: 10px !important;
 }
-
+ 
 /* Input icon */
 body.is-mobile .iw i {
     font-size: 28px !important;
     left: 18px !important;
 }
-
+ 
 /* Input field বড় */
 body.is-mobile .fi {
     font-size: 28px !important;
@@ -757,7 +757,7 @@ body.is-mobile .fi {
 body.is-mobile .fi::placeholder {
     font-size: 26px !important;
 }
-
+ 
 body.is-mobile .fi-np {
     font-size: 28px !important;
     padding: 20px 18px !important;
@@ -767,7 +767,7 @@ body.is-mobile .fi-np {
 body.is-mobile .fi-np::placeholder {
     font-size: 26px !important;
 }
-
+ 
 /* Eye toggle বাটন */
 body.is-mobile .ptog {
     width: 64px !important;
@@ -776,7 +776,7 @@ body.is-mobile .ptog {
     border-radius: 14px !important;
     flex-shrink: 0 !important;
 }
-
+ 
 /* পাসওয়ার্ড ভুলে গেছেন */
 body.is-mobile .fgt a {
     font-size: 26px !important;
@@ -784,7 +784,7 @@ body.is-mobile .fgt a {
 body.is-mobile .fgt {
     margin-bottom: 22px !important;
 }
-
+ 
 /* Submit বাটন */
 body.is-mobile .bsub {
     font-size: 30px !important;
@@ -792,7 +792,7 @@ body.is-mobile .bsub {
     border-radius: 16px !important;
     gap: 12px !important;
 }
-
+ 
 /* Switch link */
 body.is-mobile .mswitch {
     font-size: 26px !important;
@@ -806,7 +806,7 @@ body.is-mobile .mswitch a {
     <script>emailjs.init('DgZTRCxGcsfC2gTRf');</script>
 </head>
 <body>
-
+ 
 <!-- NAV -->
 <nav class="top-nav">
     <div class="brand">
@@ -818,7 +818,7 @@ body.is-mobile .mswitch a {
         <button class="btn-su" onclick="openM('regModal')"><i class="fa fa-user-plus"></i> সাইন আপ</button>
     </div>
 </nav>
-
+ 
 <!-- LEADERBOARD -->
 <div class="sec" style="padding:0;margin:0;">
     <div class="lb-wrap">
@@ -829,7 +829,7 @@ body.is-mobile .mswitch a {
         <div class="lb-dots" id="lbDots"></div>
     </div>
 </div>
-
+ 
 <!-- SIRONAM + NIGHT BOARD -->
 <div id="sironamSection" style="background:linear-gradient(135deg,#78350f,#92400e,#b45309);border-radius:0;margin-bottom:0;display:flex;align-items:stretch;max-width:100%;overflow:hidden;">
     <!-- বাম দিক: title + grid -->
@@ -853,7 +853,7 @@ body.is-mobile .mswitch a {
         </div>
     </div>
 </div>
-
+ 
 <!-- প্রিমিয়াম ক্যাটাগরি — Flash Sale Style -->
 <div id="pmxGuestSection" style="display:none;margin:0 0 10px;">
 <style>
@@ -883,7 +883,7 @@ body.is-mobile .mswitch a {
     <div class="pmx-scroll-track" id="pmxGuestHeaderGrid"></div>
 </div>
 </div>
-
+ 
 <!-- মোবাইল নাইট বোর্ড — প্রিমিয়াম ক্যাটাগরির নিচে -->
 <div class="night-board-mobile-wrap" id="nightBoardMobileWrap">
     <div id="nightBoardMobileSlider" class="night-board-empty">
@@ -891,7 +891,7 @@ body.is-mobile .mswitch a {
         <p style="font-size:13px;">নাইট বোর্ড</p>
     </div>
 </div>
-
+ 
 <!-- গেস্ট প্রোডাক্ট সেকশন — নাইট বোর্ডের নিচে -->
 <div class="gp-section" id="gpSection">
     <div class="gp-header">
@@ -904,10 +904,10 @@ body.is-mobile .mswitch a {
         <button class="gp-loadmore-btn" onclick="gpLoadMore()">আরো দেখুন <i class="fa fa-chevron-down" style="margin-left:6px;"></i></button>
     </div>
 </div>
-
+ 
 <!-- Product Detail Modal — PC: Cartup 2-col | Mobile: Full-screen -->
 <div class="gp-modal" id="gpDetailModal">
-
+ 
     <!-- ══ PC VIEW ══ -->
     <div class="gpd-pc-box" id="gpdPcBox">
         <!-- Sticky PC top nav bar -->
@@ -917,7 +917,7 @@ body.is-mobile .mswitch a {
             <button onclick="gpShareProduct()" style="background:#f5f5f5;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;color:#555;display:flex;align-items:center;gap:6px;font-family:'Hind Siliguri',sans-serif;transition:.2s;"><i class="fa fa-share-alt"></i> Share</button>
         </div>
         <button class="gpd-pc-close" onclick="closeGpModal()" style="display:none;">✕</button>
-
+ 
         <!-- Top: image left + info right -->
         <div class="gpd-pc-top">
             <!-- LEFT: images -->
@@ -927,41 +927,41 @@ body.is-mobile .mswitch a {
                 </div>
                 <div class="gpd-pc-thumbs" id="gpdPcThumbs"></div>
             </div>
-
+ 
             <!-- RIGHT: info -->
             <div class="gpd-pc-right">
                 <div class="gpd-pc-brand">Brand: <span id="gpdPcBrand">Digital Shop TM</span></div>
                 <div class="gpd-pc-title" id="gpdPcTitle"></div>
-
+ 
                 <div class="gpd-pc-price-row">
                     <span style="color:#f57224;font-size:15px;font-weight:700;">৳</span>
                     <span class="gpd-pc-price" id="gpdPcPrice"></span>
                     <span class="gpd-pc-old" id="gpdPcOld" style="display:none;"></span>
                     <span class="gpd-pc-discount" id="gpdPcDiscount" style="display:none;"></span>
                 </div>
-
+ 
                 <div class="gpd-pc-sku">SKU: <span id="gpdPcSku">—</span></div>
-
+ 
                 <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
                     <i class="fa fa-check-circle" style="color:#22c55e;"></i>
                     <span style="color:#16a34a;font-size:13px;font-weight:600;">In Stock</span>
                 </div>
-
+ 
                 <div class="gpd-pc-actions">
                     <button class="gpd-pc-btn-buy" onclick="gpRequireLogin()">⚡ Buy Now</button>
                     <button class="gpd-pc-btn-cart" onclick="gpRequireLogin()">🛒 Add to Cart</button>
                 </div>
-
+ 
                 <div class="gpd-pc-share-row" style="margin-top:16px;">
                     <button class="gpd-pc-share-btn" onclick="gpShareProduct()"><i class="fa fa-share-alt"></i> Share</button>
                     <button class="gpd-pc-share-btn" onclick="gpRequireLogin()"><i class="fa fa-heart-o"></i> Wishlist</button>
                 </div>
             </div>
         </div>
-
+ 
         <!-- Bottom: Accordion Sections — একের পর এক সবসময় দেখা যাবে -->
         <div class="gpd-pc-tabs-wrap" style="max-width:1400px;margin:0 auto;width:100%;padding:0 40px 60px;">
-
+ 
             <!-- ── Specifications ── -->
             <div class="gpd-accord-block" id="gpd-accord-spec">
                 <div class="gpd-accord-head" onclick="gpdToggleAccord('spec')">
@@ -972,7 +972,7 @@ body.is-mobile .mswitch a {
                     <div id="gpdPcSpecContent"></div>
                 </div>
             </div>
-
+ 
             <!-- ── Product Details ── -->
             <div class="gpd-accord-block" id="gpd-accord-details">
                 <div class="gpd-accord-head" onclick="gpdToggleAccord('details')">
@@ -984,7 +984,7 @@ body.is-mobile .mswitch a {
                     <div id="gpdPcTagsContent" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;"></div>
                 </div>
             </div>
-
+ 
             <!-- ── Seller ── -->
             <div class="gpd-accord-block" id="gpd-accord-seller">
                 <div class="gpd-accord-head" onclick="gpdToggleAccord('seller')">
@@ -995,7 +995,7 @@ body.is-mobile .mswitch a {
                     <div class="gpd-pc-seller-grid" id="gpdPcSellerContent"></div>
                 </div>
             </div>
-
+ 
             <!-- ── Related Products ── -->
             <div id="gpd-related-wrap" style="margin-top:32px;display:none;">
                 <div style="border-top:3px solid #f0f0f0;padding-top:28px;">
@@ -1007,11 +1007,11 @@ body.is-mobile .mswitch a {
                     <div id="gpd-related-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px;"></div>
                 </div>
             </div>
-
+ 
         </div>
     </div>
-
-
+ 
+ 
     <!-- ══ MOBILE VIEW ══ -->
     <div class="gpd-mobile-view" style="display:none;">
         <!-- Top Bar -->
@@ -1059,7 +1059,7 @@ body.is-mobile .mswitch a {
         <div class="gpd-divider"></div>
         <!-- ACCORDION SECTIONS — একের পর এক -->
         <div style="padding:0 14px;">
-
+ 
             <!-- Specifications -->
             <div class="gpd-mob-accord-block">
                 <div class="gpd-mob-accord-head" onclick="gpdMobToggle('mspec',this)">
@@ -1070,7 +1070,7 @@ body.is-mobile .mswitch a {
                     <div id="gpModalSpecTable"></div>
                 </div>
             </div>
-
+ 
             <!-- Product Details -->
             <div class="gpd-mob-accord-block">
                 <div class="gpd-mob-accord-head" onclick="gpdMobToggle('mdetails',this)">
@@ -1082,7 +1082,7 @@ body.is-mobile .mswitch a {
                     <div id="gpModalTagsRow" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;"></div>
                 </div>
             </div>
-
+ 
             <!-- Seller -->
             <div class="gpd-mob-accord-block">
                 <div class="gpd-mob-accord-head" onclick="gpdMobToggle('mseller',this)">
@@ -1093,7 +1093,7 @@ body.is-mobile .mswitch a {
                     <div id="gpModalSellerBox"></div>
                 </div>
             </div>
-
+ 
             <!-- Related Products -->
             <div id="gpd-mob-related-wrap" style="margin-top:20px;display:none;">
                 <div style="font-size:32px;font-weight:800;color:#111;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -1103,9 +1103,9 @@ body.is-mobile .mswitch a {
                 <p style="font-size:25px;color:#aaa;margin-bottom:14px;">একই ক্যাটাগরি / ট্যাগের পণ্যসমূহ</p>
                 <div id="gpd-mob-related-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding-bottom:12px;"></div>
             </div>
-
+ 
         </div>
-
+ 
         <div class="gpd-spacer"></div>
         <!-- Bottom Action Bar -->
         <div class="gpd-action-bar">
@@ -1165,10 +1165,10 @@ body.is-mobile .mswitch a {
                 <p style="margin-top:10px;">Developed by: <span style="color:#10b981;font-weight:700;">Digital Shop TM Team</span></p>
             </div>
         </footer>
-
-
+ 
+ 
 </div>
-
+ 
 <!-- LOCAL BOARDS -->
 <div class="sec">
     <div class="sec-hd">
@@ -1177,7 +1177,7 @@ body.is-mobile .mswitch a {
     </div>
     <div class="lb2-grid" id="localBoardGrid"></div>
 </div>
-
+ 
 <!-- Premium Guest Shop Modal -->
 <div id="pmxGuestShopModal" style="display:none;position:fixed;inset:0;background:#0f172a;z-index:999999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;">
     <!-- Header Bar -->
@@ -1200,9 +1200,9 @@ body.is-mobile .mswitch a {
     </div>
     <!-- প্রোডাক্ট গ্রিড -->
     <div id="pmxGuestProductGrid" style="padding:0 16px 30px;max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;"></div>
-
+ 
     <!-- ✅ প্রিমিয়াম মডাল Footer — PC ও মোবাইল দুটো আলাদা -->
-
+ 
     <!-- PC Footer -->
     <footer class="pmxg-footer-pc" style="background:linear-gradient(135deg,#0d0a1e,#1a0533,#0f172a);color:#c4b5fd;padding:36px 48px 28px;border-top:2px solid rgba(167,139,250,0.3);font-family:'Hind Siliguri',sans-serif;">
         <div style="max-width:1200px;margin:0 auto;">
@@ -1259,7 +1259,7 @@ body.is-mobile .mswitch a {
             </div>
         </div>
     </footer>
-
+ 
     <!-- Mobile Footer -->
     <footer class="pmxg-footer-mobile" style="background:linear-gradient(180deg,#0d0a1e,#1a0533);color:#c4b5fd;padding:32px 18px 28px;border-top:3px solid rgba(167,139,250,0.35);font-family:'Hind Siliguri',sans-serif;display:none;">
         <!-- Logo + Title -->
@@ -1310,14 +1310,14 @@ body.is-mobile .mswitch a {
         </div>
     </footer>
 </div>
-
+ 
 <style>
 /* মোবাইলে প্রিমিয়াম মডাল: টাইটেল ও বন্ধ বাটন বড়, পণ্য ৩ কলাম */
 body.is-mobile .pmxg-footer-pc { display: none !important; }
 body.is-mobile .pmxg-footer-mobile { display: block !important; }
 body:not(.is-mobile) .pmxg-footer-pc { display: block !important; }
 body:not(.is-mobile) .pmxg-footer-mobile { display: none !important; }
-
+ 
 body.is-mobile .pmxg-title {
     font-size: 32px !important;
     letter-spacing: 0.5px !important;
@@ -1369,7 +1369,7 @@ body.is-mobile #pmxGuestProductGrid > div div[style*="padding:10px 8px"] {
     padding: 10px 6px !important;
 }
 </style>
-
+ 
 <!-- CTA -->
 <div class="cta-section">
     <div class="cta-board">
@@ -1383,7 +1383,7 @@ body.is-mobile #pmxGuestProductGrid > div div[style*="padding:10px 8px"] {
         </div>
     </div>
 </div>
-
+ 
 <style>
 .ft{background:#0f172a;padding:40px 24px 20px;font-family:'Hind Siliguri',sans-serif;color:#94a3b8;}
 .ft-grid{display:grid;grid-template-columns:1.8fr 1fr 1fr;gap:32px;max-width:1000px;margin:0 auto 32px;}
@@ -1455,8 +1455,8 @@ body.is-mobile #pmxGuestProductGrid > div div[style*="padding:10px 8px"] {
     </div>
   </div>
 </footer>
-
-
+ 
+ 
 <!-- LOGIN MODAL -->
 <div class="mo" id="loginModal">
     <div class="mb" style="border:2px solid #27ae60;box-shadow:0 0 45px rgba(39,174,96,.2);">
@@ -1477,7 +1477,7 @@ body.is-mobile #pmxGuestProductGrid > div div[style*="padding:10px 8px"] {
         </div>
     </div>
 </div>
-
+ 
 <!-- REGISTER MODAL -->
 <div class="mo" id="regModal">
     <div class="mb" style="border:2px solid #6366f1;box-shadow:0 0 45px rgba(99,102,241,.25);">
@@ -1502,7 +1502,7 @@ body.is-mobile #pmxGuestProductGrid > div div[style*="padding:10px 8px"] {
         </div>
     </div>
 </div>
-
+ 
 <!-- RESET MODAL -->
 <div class="mo" id="resetModal">
     <div class="mb" style="border:2px solid #ef4444;box-shadow:0 0 45px rgba(239,68,68,.18);">
@@ -1570,7 +1570,7 @@ body.is-mobile #pmxGuestProductGrid > div div[style*="padding:10px 8px"] {
         </div>
     </div>
 </div>
-
+ 
 <!-- SIRONAM FULLSCREEN -->
 <div class="sir-full" id="sirFull">
     <div style="position:sticky;top:0;background:#fff;padding:0;display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;border-bottom:2px solid #f0f0f0;z-index:10;box-shadow:0 2px 10px rgba(0,0,0,0.08);">
@@ -1656,7 +1656,7 @@ body.is-mobile #pmxGuestProductGrid > div div[style*="padding:10px 8px"] {
         </div>
     </footer>
 </div>
-
+ 
 <style>
 /* Mobile: sironam popup 2 columns */
 body.is-mobile #spGrid {
@@ -1671,17 +1671,17 @@ body.is-mobile #sirProductLabel > div > span:nth-child(2) { font-size: 34px !imp
 body.is-mobile #sirProductLabel > div > span:nth-child(3) { font-size: 24px !important; }
 body.is-mobile #sirProductLabel { padding: 18px 16px 14px !important; }
 </style>
-
+ 
 <div id="toast"></div>
-
+ 
 <script>
 const SK='TM_SESSION_USER',UK='TM_DB_USERS_V2',LBK='TM_LOGIN_LEADERBOARDS',
       SIK='sironam_list',PKK='TM_DB_PRODUCTS_V2',DELIK='deli_ads',NIK='night_boards',
       LOCLK='TM_LOCAL_BOARDS',
       AID='DigitalShopOrjo',APW='Orjo@1010',APH='01822963824',MP='index.html';
-
+ 
 (window.TM_READY||Promise.resolve()).then(()=>{if(localStorage.getItem(SK))window.location.replace(MP);});
-
+ 
 function openM(id){document.getElementById(id).classList.add('open');}
 function closeM(id){document.getElementById(id).classList.remove('open');}
 function switchM(a,b){closeM(a);openM(b);}
@@ -1691,10 +1691,10 @@ document.addEventListener('click',e=>{
         if(el&&el.classList.contains('open')&&e.target===el)closeM(id);
     });
 });
-
+ 
 function showToast(msg,d=2800){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',d);}
 function tp(id,btn){const i=document.getElementById(id),ic=btn.querySelector('i');i.type=i.type==='password'?'text':'password';ic.className=i.type==='password'?'fa fa-eye-slash':'fa fa-eye';}
-
+ 
 function doLogin(){
     const uid=document.getElementById('lnId').value.trim(),pw=document.getElementById('lnPass').value.trim();
     if(!uid||!pw){showToast('❌ আইডি এবং পাসওয়ার্ড দিন');return;}
@@ -1851,7 +1851,7 @@ function doReset(){
     users[idx].pass=np;localStorage.setItem(UK,JSON.stringify(users));
     showToast('✅ পাসওয়ার্ড আপডেট হয়েছে!');setTimeout(()=>switchM('resetModal','loginModal'),1500);
 }
-
+ 
 /* LEADERBOARD */
 let lbI=0,lbT=null;
 function renderLB(){
@@ -1867,7 +1867,7 @@ function renderLB(){
 function lbMove(d){const s=document.querySelectorAll('.lb-slide');if(!s.length)return;s[lbI].classList.remove('active');lbI=(lbI+d+s.length)%s.length;s[lbI].classList.add('active');updDots();}
 function lbGo(i){const s=document.querySelectorAll('.lb-slide');if(!s.length)return;s[lbI].classList.remove('active');lbI=i;s[lbI].classList.add('active');updDots();}
 function updDots(){document.querySelectorAll('.lb-dot').forEach((d,i)=>d.classList.toggle('active',i===lbI));}
-
+ 
 /* SIRONAM */
 function renderSironam(){
     const list=JSON.parse(localStorage.getItem(SIK))||[];
@@ -1879,7 +1879,7 @@ function renderSironam(){
             <div class="sir-overlay"><div class="sir-name">${s.name}</div><div class="sir-hint"><i class="fa fa-eye" style="margin-right:4px;"></i>পণ্য দেখুন</div></div>
         </div>`).join('');
 }
-
+ 
 function openSir(sid,title){
     const titleEl = document.getElementById('sirFullTitle');
     if(titleEl){
@@ -1955,7 +1955,7 @@ function openSir(sid,title){
             const cardCat=(p.category||p.cat||'').toLowerCase();
             const cardTitle=(p.title||p.name||'').toLowerCase();
             const cardName=(p.name||p.title||'').toLowerCase();
-
+ 
             // Auto old price generate if missing
             let dispOldPrice = oldPrice;
             if(!dispOldPrice && price){
@@ -1969,7 +1969,7 @@ function openSir(sid,title){
             const dispDiscount = (dispOldPrice && dispOldPrice > price)
                 ? Math.round((dispOldPrice - price) / dispOldPrice * 100) + '%'
                 : '';
-
+ 
             // Auto rating 2.0~5.0
             let spRating = parseFloat(p.rating||p.stars||p.avgRating||0);
             let spHash=0; const spSeed=String(p.id||p.name||'x');
@@ -1992,14 +1992,14 @@ function openSir(sid,title){
                 '</span>'+
                 '<span style="color:#f57224;font-size:'+ratingValSz+';font-weight:700;margin-left:2px;">'+spRating.toFixed(1)+'</span>'+
                 '<span style="color:#888;font-size:'+ratingValSz+';margin-left:2px;">('+spRatingCnt+')</span>';
-
+ 
             // FREE DELIVERY badge (show for ~40% products based on hash)
             const showFreeDelivery = (spHash % 10) < 4;
             const freeDlvSz = isMob ? '18px' : '9px';
             const freeDlvBadge = showFreeDelivery
                 ? `<span style="position:absolute;top:0;left:0;background:#00b5ad;color:#fff;font-size:${freeDlvSz};font-weight:800;padding:3px 7px;border-radius:0 0 6px 0;z-index:2;display:flex;align-items:center;gap:3px;">🚚 FREE DELIVERY</span>`
                 : '';
-
+ 
             // FAST+Verified badge (~50% products)
             const showFast = (spHash % 10) >= 4 && (spHash % 10) < 9;
             const showVerified = (spHash % 5) >= 2;
@@ -2010,7 +2010,7 @@ function openSir(sid,title){
                 ? `<span style="background:#0095d9;color:#fff;font-size:${badgeSz};font-weight:800;padding:2px 5px;border-radius:3px;">✔ Verified</span>`:'';
             const topBadges = (fastBadge||verBadge)
                 ? `<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px;">${fastBadge}${verBadge}</div>` : '';
-
+ 
             return `
             <div class="sp-card" data-title="${cardTitle}" data-name="${cardName}" data-tags="${cardTags}" data-category="${cardCat}" style="background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e5e7eb;transition:box-shadow .2s,transform .2s;cursor:pointer;display:flex;flex-direction:column;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,0.13)';this.style.transform='translateY(-2px)'" onmouseout="this.style.boxShadow='none';this.style.transform='none'" onclick="closeM('sirFull');openGpModal('${safeP}')">
                 <div style="position:relative;overflow:hidden;background:#f8f9fa;">
@@ -2080,11 +2080,11 @@ function spFilter(){
         c.style.display=match?'':'none';
     });
 }
-
+ 
 /* NIGHT BOARD */
 function renderNightBoard(){
     const list = JSON.parse(localStorage.getItem(NIK)) || [];
-
+ 
     // ডেস্কটপ slider
     const slider = document.getElementById('nightBoardSlider');
     if (slider) {
@@ -2101,7 +2101,7 @@ function renderNightBoard(){
                 </div>`).join('');
         }
     }
-
+ 
     // মোবাইল slider
     const mobileSlider = document.getElementById('nightBoardMobileSlider');
     if (mobileSlider) {
@@ -2118,7 +2118,7 @@ function renderNightBoard(){
                 </div>`).join('');
         }
     }
-
+ 
     // auto slider
     if (list.length > 1) {
         clearInterval(window._nightBoardTimer);
@@ -2134,14 +2134,14 @@ function renderNightBoard(){
         }, 5000);
     }
 }
-
+ 
 /* ══════════════════════════════════════════
    গেস্ট প্রোডাক্ট সেকশন
 ══════════════════════════════════════════ */
 var _gpShown = 0;
 var _gpStep  = 10;
 var _gpAll   = [];
-
+ 
 /* ── Dynamic Star Rating ── */
 function _gpStars(p){
     var r = parseFloat(p.rating || p.stars || p.avgRating || 0);
@@ -2162,7 +2162,7 @@ function _gpStars(p){
              + "<span style='color:#888;font-size:22px;margin-left:3px;'>(" + cnt + ")</span>";
     return html;
 }
-
+ 
 function renderGuestProducts(){
     const prods = JSON.parse(localStorage.getItem(PKK)||'[]');
     // শুধু visible/approved পণ্য
@@ -2179,7 +2179,7 @@ function renderGuestProducts(){
     grid.innerHTML = '';
     _gpAppendCards(_gpStep);
 }
-
+ 
 function _gpAppendCards(count){
     const grid = document.getElementById('gpGrid');
     const items = _gpAll.slice(_gpShown, _gpShown + count);
@@ -2229,9 +2229,9 @@ function _gpAppendCards(count){
     const wrap = document.getElementById('gpLoadMoreWrap');
     if(wrap) wrap.style.display = _gpShown < _gpAll.length ? 'block' : 'none';
 }
-
+ 
 function gpLoadMore(){ _gpAppendCards(_gpStep); }
-
+ 
 function openGpModal(safeP){
     try {
         const p = JSON.parse(decodeURIComponent(safeP));
@@ -2240,20 +2240,20 @@ function openGpModal(safeP){
         window._gpdIdx  = 0;
         window._gpdCurrentId   = p.id;
         window._gpdCurrentName = p.name;
-
+ 
         const isMobile = document.body.classList.contains('is-mobile');
-
+ 
         if(!isMobile){
             /* ══ PC VIEW ══ */
             const pcBox = document.getElementById('gpdPcBox');
             const mobileView = document.querySelector('.gpd-mobile-view');
             if(pcBox) pcBox.style.display = 'flex';
             if(mobileView) mobileView.style.display = 'none';
-
+ 
             // main image
             const mainImg = document.getElementById('gpdPcMainImg');
             if(mainImg){ mainImg.src = imgs[0] || 'ko.jpeg'; mainImg.onerror = ()=>{ mainImg.src='ko.jpeg'; }; }
-
+ 
             // thumbnails
             const thumbsEl = document.getElementById('gpdPcThumbs');
             if(thumbsEl){
@@ -2267,14 +2267,14 @@ function openGpModal(safeP){
                     thumbsEl.style.display = 'none';
                 }
             }
-
+ 
             // title, brand
             const titleEl = document.getElementById('gpdPcTitle');
             if(titleEl) titleEl.textContent = p.name;
             // nav bar title
             const navTitleEl = document.getElementById('gpdPcNavTitle');
             if(navTitleEl) navTitleEl.textContent = p.name;
-
+ 
             // price
             const priceEl = document.getElementById('gpdPcPrice');
             if(priceEl) priceEl.textContent = p.price;
@@ -2282,11 +2282,11 @@ function openGpModal(safeP){
             const disEl = document.getElementById('gpdPcDiscount');
             if(oldEl){ if(p.oldPrice){ oldEl.textContent='৳'+p.oldPrice; oldEl.style.display='inline'; } else { oldEl.style.display='none'; } }
             if(disEl){ if(p.discount){ disEl.textContent='-'+p.discount; disEl.style.display='inline-block'; } else { disEl.style.display='none'; } }
-
+ 
             // sku
             const skuEl = document.getElementById('gpdPcSku');
             if(skuEl) skuEl.textContent = p.id || '—';
-
+ 
             // === TABS ===
             // Spec tab
             const specContent = document.getElementById('gpdPcSpecContent');
@@ -2297,13 +2297,13 @@ function openGpModal(safeP){
                     ? `<table class="gpd-spec-table">${rows.map((r,i)=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`
                     : `<div style="text-align:center;padding:30px;color:#aaa;"><i class="fa fa-info-circle" style="font-size:26px;display:block;margin-bottom:8px;"></i>Specifications পাওয়া যায়নি।</div>`;
             }
-
+ 
             // Details tab
             const descContent = document.getElementById('gpdPcDescContent');
             if(descContent) descContent.textContent = p.desc || 'বিস্তারিত শীঘ্রই যোগ হবে।';
             const tagsContent = document.getElementById('gpdPcTagsContent');
             if(tagsContent){ const tags=Array.isArray(p.tags)?p.tags:[]; tagsContent.innerHTML=tags.length?tags.map(t=>`<span style="background:#fff3e0;color:#f57224;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;">#${t}</span>`).join(''):''; }
-
+ 
             // Seller tab
             const sellerContent = document.getElementById('gpdPcSellerContent');
             if(sellerContent){
@@ -2331,7 +2331,7 @@ function openGpModal(safeP){
                         <div style="font-size:12px;color:#666;"><i class="fa fa-shield-alt" style="color:#888;margin-right:6px;"></i>Authentic Product</div>
                     </div>`;
             }
-
+ 
             // Accordion reset — সবগুলো open থাকবে
             ['spec','details','seller'].forEach(k=>{
                 const body = document.getElementById('gpd-body-'+k);
@@ -2339,17 +2339,17 @@ function openGpModal(safeP){
                 if(body) body.classList.remove('hidden');
                 if(arrow) arrow.classList.remove('collapsed');
             });
-
+ 
             // Related products
             _gpdRenderRelated(p);
-
+ 
         } else {
             /* ══ MOBILE VIEW ══ */
             const pcBox = document.getElementById('gpdPcBox');
             const mobileView = document.querySelector('.gpd-mobile-view');
             if(pcBox) pcBox.style.display = 'none';
             if(mobileView) mobileView.style.display = 'block';
-
+ 
             // topbar title
             document.getElementById('gpModalTitle').textContent = p.name;
             // main image
@@ -2398,23 +2398,23 @@ function openGpModal(safeP){
                 const head = body ? body.previousElementSibling : null;
                 if(head){ const arr=head.querySelector('.gpd-mob-accord-arrow'); if(arr) arr.classList.remove('collapsed'); }
             });
-
+ 
             // Related products
             _gpdRenderRelated(p);
         }
-
+ 
         // URL update
         const newUrl = window.location.href.split('?')[0] + '?product=' + encodeURIComponent(p.id||p.name);
         history.replaceState(null,'',newUrl);
-
+ 
         // show modal
         document.getElementById('gpDetailModal').style.display = 'block';
         document.getElementById('gpDetailModal').scrollTop = 0;
         document.body.style.overflow = 'hidden';
-
+ 
     } catch(e){ console.error('gpModal error',e); }
 }
-
+ 
 function _gpdUpdateImg(){
     const imgs = window._gpdImgs || [];
     const idx  = window._gpdIdx  || 0;
@@ -2427,26 +2427,26 @@ function _gpdUpdateImg(){
         t.classList.toggle('active', i===idx);
     });
 }
-
+ 
 function gpdGoTo(idx){
     window._gpdIdx = idx;
     _gpdUpdateImg();
 }
-
+ 
 function gpdSlide(dir){
     const len = (window._gpdImgs||[]).length;
     if(!len) return;
     window._gpdIdx = ((window._gpdIdx||0) + dir + len) % len;
     _gpdUpdateImg();
 }
-
+ 
 function gpdPcGoTo(idx){
     window._gpdIdx = idx;
     const mainImg = document.getElementById('gpdPcMainImg');
     if(mainImg) mainImg.src = (window._gpdImgs||[])[idx] || 'ko.jpeg';
     document.querySelectorAll('.gpd-pc-thumb').forEach((t,i)=>t.classList.toggle('active',i===idx));
 }
-
+ 
 function gpdPcTab(btn, tabId){
     document.querySelectorAll('.gpd-pc-tab-btn').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.gpd-pc-tab-content').forEach(c=>c.classList.remove('active'));
@@ -2454,7 +2454,7 @@ function gpdPcTab(btn, tabId){
     const tab = document.getElementById(tabId);
     if(tab) tab.classList.add('active');
 }
-
+ 
 /* PC Accordion toggle */
 function gpdToggleAccord(key){
     const body = document.getElementById('gpd-body-'+key);
@@ -2464,7 +2464,7 @@ function gpdToggleAccord(key){
     body.classList.toggle('hidden', !isHidden);
     if(arrow) arrow.classList.toggle('collapsed', !isHidden);
 }
-
+ 
 /* Mobile Accordion toggle */
 function gpdMobToggle(key, headEl){
     const body = document.getElementById('gpd-mob-'+key);
@@ -2474,24 +2474,24 @@ function gpdMobToggle(key, headEl){
     body.classList.toggle('hidden', !isHidden);
     if(arrow) arrow.classList.toggle('collapsed', !isHidden);
 }
-
+ 
 /* Related products render — নাম/ক্যাটাগরি/ট্যাগ দিয়ে ফিল্টার */
 function _gpdRenderRelated(currentP){
     const allProducts = window._gpAll || [];
     if(!allProducts.length) return;
-
+ 
     const curId   = String(currentP.id||'');
     const curName = String(currentP.name||'').toLowerCase();
     const curCat  = String(currentP.category||currentP.cat||'').toLowerCase();
     const curTags = Array.isArray(currentP.tags) ? currentP.tags.map(t=>String(t).toLowerCase()) : [];
-
+ 
     // স্কোর করে ফিল্টার
     const scored = allProducts.filter(p=> String(p.id)!==curId ).map(p=>{
         let score = 0;
         const pName = String(p.title||p.name||'').toLowerCase();
         const pCat  = String(p.category||p.cat||'').toLowerCase();
         const pTags = Array.isArray(p.tags) ? p.tags.map(t=>String(t).toLowerCase()) : [];
-
+ 
         // ক্যাটাগরি মিলে?
         if(curCat && pCat && curCat===pCat) score += 4;
         // ট্যাগ মেলে?
@@ -2499,18 +2499,18 @@ function _gpdRenderRelated(currentP){
         // নামে শব্দ মেলে?
         const curWords = curName.split(/\s+/).filter(w=>w.length>2);
         curWords.forEach(w=>{ if(pName.includes(w)) score += 1; });
-
+ 
         return { p, score };
     }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,12);
-
+ 
     // label তৈরি
     let filterLabel = '';
     if(curCat) filterLabel = curCat;
     else if(curTags.length) filterLabel = '#'+curTags[0];
     else filterLabel = curName.split(' ')[0];
-
+ 
     const isMobile = document.body.classList.contains('is-mobile');
-
+ 
     if(!isMobile){
         const wrap = document.getElementById('gpd-related-wrap');
         const grid = document.getElementById('gpd-related-grid');
@@ -2589,20 +2589,20 @@ function _gpdRenderRelated(currentP){
         }).join('');
     }
 }
-
+ 
 function gpdPcQty(dir){
     window._gpdPcQty = Math.max(1, (window._gpdPcQty||1) + dir);
     const el = document.getElementById('gpdPcQtyVal');
     if(el) el.textContent = window._gpdPcQty;
 }
-
-
+ 
+ 
 function closeGpModal(){
     document.getElementById('gpDetailModal').style.display='none';
     document.body.style.overflow='';
     history.replaceState(null,'',window.location.href.split('?')[0]);
 }
-
+ 
 function gpShareProduct(){
     const id = window._gpdCurrentId;
     if(!id) return;
@@ -2624,7 +2624,7 @@ function gpShareProduct(){
         }
     }
 }
-
+ 
 // URL এ ?product=ID থাকলে auto-open করা
 function _gpCheckUrlProduct(){
     const params = new URLSearchParams(window.location.search);
@@ -2656,7 +2656,7 @@ function _gpCheckUrlProduct(){
     // renderGuestProducts এর পরে চালাবে
     setTimeout(tryOpen, 800);
 }
-
+ 
 function gpTopbarLogin(){
     // modal বন্ধ না করে সরাসরি login popup দেখাই
     showToast('🔐 লগইন করুন');
@@ -2668,13 +2668,13 @@ function gpRequireLogin(){
     showToast('🔐 কার্ট ও অর্ডার করতে আগে লগইন করুন');
     setTimeout(()=>openM('loginModal'), 600);
 }
-
+ 
 // modal backdrop click
 document.addEventListener('click', e=>{
     const modal = document.getElementById('gpDetailModal');
     if(modal && e.target === modal){ closeGpModal(); }
 });
-
+ 
 /* LOCAL BOARDS */
 function renderLocalBoards(){
     const items=JSON.parse(localStorage.getItem(LOCLK))||[];
@@ -2686,10 +2686,10 @@ function renderLocalBoards(){
             ${it.link?`<div class="lb2-btn-area"><button class="lb2-details-btn" onclick="window.open('${it.link}','_blank')"><i class="fa fa-external-link-alt"></i> বিস্তারিত</button></div>`:''}
         </div>`).join('');
 }
-
+ 
 /* GOOGLE SIGN-IN */
 const G_CLIENT_ID='569016323527-0e5o5mn4rs8713fgv132vj80uvl42onk.apps.googleusercontent.com';
-
+ 
 function googleSignIn(){
     // Firebase config
     const cfg={apiKey:"AIzaSyCRJ6kN1nvr1RxKdIiBnxWVJGXm6U2kRr0",authDomain:"digitalshoptm-2008.firebaseapp.com",projectId:"digitalshoptm-2008",storageBucket:"digitalshoptm-2008.appspot.com",messagingSenderId:"627378095856",appId:"1:627378095856:web:digitalshoptm"};
@@ -2700,9 +2700,9 @@ function googleSignIn(){
     const provider=new firebase.auth.GoogleAuthProvider();
     provider.addScope('email');
     provider.addScope('profile');
-
+ 
     showToast('⏳ Google লগইন হচ্ছে...');
-
+ 
     auth.signInWithPopup(provider)
         .then(result=>{
             const gUser=result.user;
@@ -2738,14 +2738,14 @@ function googleSignIn(){
             }
         });
 }
-
+ 
 function _doGoogleLogin(u, name){
     if(u.isUserBlocked){showToast('🚫 অ্যাকাউন্টটি ব্লক করা আছে।');return;}
     localStorage.setItem(SK,JSON.stringify(u));
     showToast('✅ স্বাগতম, '+name+'!');
     setTimeout(()=>window.location.replace(MP),700);
 }
-
+ 
 function handleGoogleResp(response){
     try{
         const p=JSON.parse(atob(response.credential.split('.')[1]));
@@ -2765,18 +2765,18 @@ function handleGoogleResp(response){
         _doGoogleLogin(u,p.name);
     }catch(e){showToast('❌ Google Login এ সমস্যা হয়েছে');console.error(e);}
 }
-
+ 
 window.addEventListener('load',()=>{
     if(typeof google!=='undefined'){
         google.accounts.id.initialize({client_id:G_CLIENT_ID,callback:handleGoogleResp});
     }
 });
-
+ 
 /* ══════════════════════════════
    PMX PREMIUM — গেস্ট ভিউ
 ══════════════════════════════ */
 const PMXHK='pmx_headers', PMXPK='pmx_products', PMXLK='pmx_holders';
-
+ 
 function renderPmxGuestHeaders(){
     const headers = JSON.parse(localStorage.getItem(PMXHK)||'[]');
     const sec = document.getElementById('pmxGuestSection');
@@ -2793,17 +2793,17 @@ function renderPmxGuestHeaders(){
             </div>
         </div>`).join('');
 }
-
-
+ 
+ 
 function openPmxGuestShop(headerId, headerName, headerImg){
     const modal = document.getElementById('pmxGuestShopModal');
     const titleEl = document.getElementById('pmxGuestShopTitle');
     const holderArea = document.getElementById('pmxGuestHolderArea');
     const productGrid = document.getElementById('pmxGuestProductGrid');
     if(!modal) return;
-
+ 
     titleEl.textContent = '⭐ ' + headerName;
-
+ 
     // হোল্ডার বোর্ড
     const allHolders = JSON.parse(localStorage.getItem(PMXLK)||'[]');
     const holders = allHolders.filter(h=>!h.headerId||String(h.headerId)===String(headerId));
@@ -2837,7 +2837,7 @@ function openPmxGuestShop(headerId, headerName, headerImg){
     } else {
         holderArea.style.display='none';
     }
-
+ 
     // প্রোডাক্ট
     const allProducts = JSON.parse(localStorage.getItem(PMXPK)||'[]');
     const products = allProducts.filter(p=>String(p.headerId)===String(headerId));
@@ -2876,17 +2876,17 @@ function openPmxGuestShop(headerId, headerName, headerImg){
             </div>`;
         }).join('');
     }
-
+ 
     modal.style.display='block';
     modal.scrollTop=0;
 }
-
+ 
 function closePmxGuestShop(){
     const m=document.getElementById('pmxGuestShopModal');
     if(m)m.style.display='none';
     if(window._pmxGLTimer)clearInterval(window._pmxGLTimer);
 }
-
+ 
 // Firebase থেকে pmx data load করা
 function loadPmxFromFirebase(){
     (window.FB_READY||Promise.resolve()).then(()=>{
@@ -2906,7 +2906,7 @@ function loadPmxFromFirebase(){
         }).catch(()=>{});
     });
 }
-
+ 
 /* INIT */
 (window.TM_READY||Promise.resolve()).then(()=>{renderLB();renderSironam();
     renderNightBoard();renderLocalBoards();
