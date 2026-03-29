@@ -1909,27 +1909,33 @@ body.dark-theme #sironam-section-wrapper {
 /* ═══ Sironam Grid — ২ লাইন, horizontal scroll ═══ */
 #sironam-portal-display.sironam-grid-container {
     display: grid !important;
-    /* ২ লাইন, প্রতি লাইনে ৭টা পূর্ণ + ৮ম টার ১/৩ দেখাবে */
-    grid-template-rows: repeat(2, auto) !important;
+    grid-template-rows: repeat(2, 170px) !important;
     grid-auto-flow: column !important;
-    grid-auto-columns: calc((100% - 7.33 * 12px) / 7.33) !important;
-    gap: 12px !important;
-    margin: 20px 0 20px 0 !important;
-    padding: 0 10px 10px 10px !important;
-    overflow-x: auto !important;
+    /* প্রতি কার্ড width = viewport এর ১/৭.৩৩ — ৭টা পূর্ণ + ৮ম এর ১/৩ দেখাবে */
+    grid-auto-columns: calc((100vw - 280px) / 7.33) !important;
+    gap: 10px !important;
+    margin: 15px 0 15px 0 !important;
+    padding: 10px 12px 12px 12px !important;
+    overflow-x: scroll !important;
     overflow-y: hidden !important;
-    /* scrollbar সুন্দর করা */
     scrollbar-width: thin !important;
     scrollbar-color: #94a3b8 transparent !important;
-    /* scroll snap */
-    scroll-snap-type: x mandatory !important;
+    scroll-snap-type: x proximity !important;
     -webkit-overflow-scrolling: touch !important;
     width: 100% !important;
     max-width: 100% !important;
+    box-sizing: border-box !important;
 }
 #sironam-portal-display.sironam-grid-container .sironam-card {
     scroll-snap-align: start !important;
     min-width: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+#sironam-portal-display.sironam-grid-container .sironam-card img {
+    height: 120px !important;
+    width: 100% !important;
+    object-fit: cover !important;
 }
 
 /* ═══ কার্ড ডিজাইন — Light: হালকা কালো, Dark: হালকা সাদা ═══ */
