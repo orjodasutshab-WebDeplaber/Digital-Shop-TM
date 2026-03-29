@@ -214,7 +214,7 @@
                  border-radius: 0 !important;
                  color: #1e293b !important;
                  font-size: 15px;
-                 padding: 0 10px 0 0 !important;
+                 padding: 0 10px !important;
                  outline: none;
                  height: 100%;
                  font-family: 'Hind Siliguri', sans-serif;
@@ -223,25 +223,24 @@
                  color: #94a3b8;
              }
 
-             /* সার্চ বাটন — Cartup এর মতো */
+             /* ক্রস বাটন — লাল */
              .search-submit-btn {
-                 background: #e91e8c;
+                 background: #ef4444;
                  border: none;
                  color: #fff;
                  height: 44px;
                  padding: 0 22px;
                  border-radius: 0 12px 12px 0;
-                 font-size: 15px;
+                 font-size: 20px;
                  font-weight: 700;
                  cursor: pointer;
                  display: flex;
                  align-items: center;
-                 gap: 6px;
-                 font-family: 'Hind Siliguri', sans-serif;
+                 justify-content: center;
                  flex-shrink: 0;
                  transition: background 0.2s;
              }
-             .search-submit-btn:hover { background: #c41878; }
+             .search-submit-btn:hover { background: #b91c1c; }
 
              /* ক্রস বাটন */
              .search-close-btn {
@@ -310,17 +309,13 @@
         <!-- এক্সপান্ড হওয়া সার্চ বার — Cartup স্টাইল fullwidth overlay -->
         <div class="search-expanded" id="searchExpanded">
             <div class="search-wrapper">
-                <i class="fa fa-search"></i>
                 <input type="text" id="productSearchInput"
                        onkeyup="searchProducts()"
                        onfocus="if(this.value.trim().length===0)_setSearchMode&&_setSearchMode(false)"
                        placeholder="পণ্য খুঁজুন..."
                        onkeydown="if(event.key==='Escape')closeHeaderSearch()">
             </div>
-            <button class="search-submit-btn" onclick="searchProducts()" aria-label="সার্চ">
-                <i class="fa fa-search"></i> Search
-            </button>
-            <button class="search-close-btn" onclick="closeHeaderSearch()" aria-label="বন্ধ">
+            <button class="search-submit-btn" onclick="closeHeaderSearch()" aria-label="বন্ধ">
                 <i class="fa fa-times"></i>
             </button>
         </div>
