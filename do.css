@@ -2090,11 +2090,11 @@ html.is-mobile .brand-logo {
 
 /* সার্চ আইকন বাটন */
 html.is-mobile .search-icon-btn {
-    width: 88px !important;
-    height: 88px !important;
-    min-width: 88px !important;
-    min-height: 88px !important;
-    font-size: 42px !important;
+    width: 110px !important;
+    height: 110px !important;
+    min-width: 110px !important;
+    min-height: 110px !important;
+    font-size: 54px !important;
 }
 
 /* লগইন বাটন */
@@ -2118,18 +2118,26 @@ html.is-mobile .profile-trigger {
 }
 
 html.is-mobile #headerUserImageWrapper {
-    width: 88px !important;
-    height: 88px !important;
-    min-width: 88px !important;
-    min-height: 88px !important;
+    width: 110px !important;
+    height: 110px !important;
+    min-width: 110px !important;
+    min-height: 110px !important;
 }
 
 html.is-mobile #headerUserPlaceholder {
-    font-size: 46px !important;
+    font-size: 58px !important;
 }
 
 html.is-mobile #headerUserName {
     font-size: 30px !important;
+}
+
+/* ══════════════════════════════════════════════
+   সার্চ ও একাউন্ট বাটনের মাঝে 35px গ্যাপ
+   মোবাইল ও পিসি উভয়ের জন্য
+   ══════════════════════════════════════════════ */
+.user-controls {
+    gap: 35px !important;
 }
 
 /* ══════════════════════════════════════════════
