@@ -5324,12 +5324,20 @@ function applyAdvancedFilter() {
     const minPrice = minVal !== "" ? parseFloat(minVal) : 0;
     const maxPrice = maxVal !== "" ? parseFloat(maxVal) : Infinity;
 
-    // window.currentlyDisplayedProducts থেকে সরাসরি ফিল্টার করা
-    const source = (window.currentlyDisplayedProducts && window.currentlyDisplayedProducts.length)
-        ? window.currentlyDisplayedProducts
-        : appState.products;
+    // স্ক্রিনে থাকা পণ্যের ID সংগ্রহ
+    const visibleProductCards = document.querySelectorAll('.product-card');
+    const visibleIds = Array.from(visibleProductCards).map(card => {
+        const btn = card.querySelector('button[onclick*="initiateCheckout"]');
+        if (btn) {
+            const match = btn.getAttribute('onclick').match(/'([^']+)'/);
+            return match ? match[1] : null;
+        }
+        return null;
+    }).filter(id => id !== null);
 
-    let filtered = source.filter(p => {
+    let productsToFilter = appState.products.filter(p => visibleIds.includes(p.id));
+
+    let filtered = productsToFilter.filter(p => {
         const pPrice = parseFloat(p.price);
         return pPrice >= minPrice && pPrice <= maxPrice;
     });

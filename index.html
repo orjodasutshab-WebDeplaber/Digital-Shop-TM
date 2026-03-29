@@ -19,49 +19,6 @@
         setScale();
         window.addEventListener('resize', setScale);
     })();
-
-    // মোবাইল ডিটেক্ট করে html তে class যোগ করা (viewport lock bypass)
-    (function(){
-        function detectMobile(){
-            var sw = window.screen.width;
-            // 800px এর নিচে হলে মোবাইল (viewport lock 800 এর সাথে মিল)
-            if(sw < 800){
-                document.documentElement.classList.add('is-mobile');
-                // সরাসরি JS দিয়ে style inject — সব CSS override করবে
-                var styleId = 'mobile-product-fix';
-                if(!document.getElementById(styleId)){
-                    var s = document.createElement('style');
-                    s.id = styleId;
-                    s.innerHTML = [
-                        '#productDisplayArea, .products-grid {',
-                        '  grid-template-columns: repeat(2, 1fr) !important;',
-                        '  gap: 8px !important;',
-                        '}',
-                        '.main-content-area .container {',
-                        '  padding-left: 8px !important;',
-                        '  padding-right: 8px !important;',
-                        '}',
-                        '.product-card .product-slider,',
-                        '.product-card .slide-img,',
-                        '.product-card img,',
-                        '.product-slider,',
-                        '.slide-img {',
-                        '  height: 270px !important;',
-                        '}'
-                    ].join('\n');
-                    document.head.appendChild(s);
-                }
-            } else {
-                document.documentElement.classList.remove('is-mobile');
-                var el = document.getElementById('mobile-product-fix');
-                if(el) el.remove();
-            }
-        }
-        // DOM তৈরির আগে ও পরে দুইবার চালাই
-        detectMobile();
-        window.addEventListener('DOMContentLoaded', detectMobile);
-        window.addEventListener('resize', detectMobile);
-    })();
     </script>
     <title>Digital Shop TM | Premium Business Portal</title>
     <link rel="icon" type="image/x-icon" href="ko.jpeg">
@@ -1547,32 +1504,4 @@ window.addEventListener('load',function(){
     }
 });
 </script>
-
-<!-- ══════════════════════════════════════════════
-     PC: product grid width = 270px (final override)
-     Mobile: 2 column layout
-     ══════════════════════════════════════════════ -->
-<style>
-/* PC ভার্সন — সব CSS এর পরে থাকায় জিতবে */
-html:not(.is-mobile) #productDisplayArea.products-grid,
-html:not(.is-mobile) .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
-}
-
-/* মোবাইল ভার্সন — ২ কলাম */
-html.is-mobile #productDisplayArea.products-grid,
-html.is-mobile .products-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
-}
-html.is-mobile .main-content-area .container {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-}
-html.is-mobile .product-card .product-slider,
-html.is-mobile .product-card .slide-img,
-html.is-mobile .product-card img {
-    height: 170px !important;
-}
-</style>
 </body>
