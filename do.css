@@ -2090,11 +2090,11 @@ html.is-mobile .brand-logo {
 
 /* সার্চ আইকন বাটন */
 html.is-mobile .search-icon-btn {
-    width: 110px !important;
-    height: 110px !important;
-    min-width: 110px !important;
-    min-height: 110px !important;
-    font-size: 54px !important;
+    width: 72px !important;
+    height: 72px !important;
+    min-width: 72px !important;
+    min-height: 72px !important;
+    font-size: 34px !important;
 }
 
 /* লগইন বাটন */
@@ -2118,14 +2118,14 @@ html.is-mobile .profile-trigger {
 }
 
 html.is-mobile #headerUserImageWrapper {
-    width: 110px !important;
-    height: 110px !important;
-    min-width: 110px !important;
-    min-height: 110px !important;
+    width: 72px !important;
+    height: 72px !important;
+    min-width: 72px !important;
+    min-height: 72px !important;
 }
 
 html.is-mobile #headerUserPlaceholder {
-    font-size: 58px !important;
+    font-size: 38px !important;
 }
 
 html.is-mobile #headerUserName {
@@ -2148,15 +2148,26 @@ html.is-mobile #headerUserName {
 /* হেডারের হাইট বাড়ানো — বড় লেখা ও বাটন ঢাকা না পড়ে */
 html.is-mobile .site-header {
     height: auto !important;
-    min-height: 110px !important;
-    padding-top: 14px !important;
-    padding-bottom: 14px !important;
+    min-height: 100px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
 }
 
 html.is-mobile .header-wrapper {
-    flex-wrap: wrap !important;
-    gap: 10px !important;
+    flex-wrap: nowrap !important;
+    gap: 0 !important;
     align-items: center !important;
+    justify-content: space-between !important;
+}
+
+/* brand-section বাম দিকে, user-controls ডান দিকে — একই লাইনে */
+html.is-mobile .brand-section {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+
+html.is-mobile .user-controls {
+    flex-shrink: 0 !important;
 }
 
 /* একাউন্ট বাটনের নীল ব্যাকগ্রাউন্ড রিমুভ */
