@@ -1614,11 +1614,13 @@ body.dark-theme .special-section-wrapper {
     /* grid কে horizontal scroll এ — column wise */
     grid-auto-flow: column;
     grid-template-rows: 1fr 1fr;
-    /* প্রতি লাইনে ৭টা পুরো + ৮ম এর ১/৩ দেখাবে */
-    grid-auto-columns: calc((100% - 7 * 12px) / 7.33);
+    /* PC: viewport width থেকে হিসাব করা
+       ৭টা পুরো + ৮ম এর ১/৩ দেখাবে
+       প্রতি কার্ড = (98vw - gaps) / 7.33 */
+    grid-auto-columns: calc((98vw - 8 * 12px) / 7.33);
     /* scrollbar লুকানো — সব ব্রাউজার */
-    scrollbar-width: none;       /* Firefox */
-    -ms-overflow-style: none;    /* IE/Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 /* Chrome/Safari scrollbar লুকানো */
