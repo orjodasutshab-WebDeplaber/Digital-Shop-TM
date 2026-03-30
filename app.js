@@ -4739,12 +4739,12 @@ function openImgZoom(src) {
     s.textContent = `
 /* GP MODAL — FULL SCREEN */
 .gp-modal{display:none;position:fixed;inset:0;background:#fff;z-index:9999999;overflow:hidden;font-family:'Hind Siliguri',sans-serif;}
-.gpd-pc-box{display:none;width:100%;min-height:100vh;background:#fff;position:relative;}
+.gpd-pc-box{display:none;width:100%;height:100vh;background:#fff;position:relative;flex-direction:column;overflow:hidden;}
 html:not(.is-mobile) .gp-modal[style*="block"]{display:block!important;}
 html:not(.is-mobile) .gpd-pc-box{display:flex;flex-direction:column;}
 html:not(.is-mobile) .gpd-mobile-view{display:none!important;}
 html.is-mobile .gpd-pc-box{display:none!important;}
-html.is-mobile .gpd-mobile-view{display:flex!important;flex-direction:column;min-height:100%;overflow-y:auto;height:100%;padding-top:68px;box-sizing:border-box;-webkit-overflow-scrolling:touch;}
+html.is-mobile .gpd-mobile-view{display:flex!important;flex-direction:column;height:100%;overflow-y:auto;padding-top:68px;box-sizing:border-box;-webkit-overflow-scrolling:touch;}
 html.is-mobile .gp-modal{background:#f5f5f5;}
 
 /* PC LEFT/RIGHT */
@@ -4900,11 +4900,12 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
 
   <!-- ══ PC VIEW ══ -->
   <div class="gpd-pc-box" id="gpdPcBox">
-    <div style="position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;padding:12px 40px;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+    <div style="position:fixed;top:0;left:0;right:0;z-index:10000000;background:#fff;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;padding:12px 40px;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <button onclick="closeGpModal()" style="background:#f5f5f5;border:none;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;" onmouseover="this.style.background='#fee2e2';this.style.color='#ef4444'" onmouseout="this.style.background='#f5f5f5';this.style.color='#333'">✕</button>
       <div id="gpdPcNavTitle" style="font-size:15px;font-weight:700;color:#222;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <button onclick="gpShareProduct()" style="background:#f5f5f5;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;color:#555;display:flex;align-items:center;gap:6px;font-family:'Hind Siliguri',sans-serif;transition:.2s;"><i class="fa fa-share-alt"></i> Share</button>
     </div>
+    <div style="overflow-y:auto;height:100%;padding-top:66px;box-sizing:border-box;-webkit-overflow-scrolling:touch;">
     <div class="gpd-pc-top">
       <div class="gpd-pc-left">
         <div class="gpd-pc-mainimg-wrap"><img id="gpdPcMainImg" src="" alt=""></div>
@@ -4978,6 +4979,7 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
           <div id="gpd-related-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px;"></div>
         </div>
       </div>
+    </div><!-- /.pc-scroll-wrapper -->
     </div>
   </div>
 
@@ -5004,18 +5006,20 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
         <span class="gpd-discount-badge" id="gpModalDiscount" style="display:none;"></span>
       </div>
       <div class="gpd-name" id="gpModalName"></div>
-      <div class="gpd-stars-row">
-        <span class="gpd-star-icons" id="gpModalStarIcons">★★★★★</span>
-        <span class="gpd-stars-val" id="gpModalStarVal">4.5</span>
-        <span class="gpd-review-count" id="gpModalReviewCount">(35)</span>
+      <!-- Like / Share / 3dot — পণ্যের নামের নিচে -->
+      <div class="gpd-mob-likeshare">
+        <button class="gpd-mob-like-btn" id="gpdMobLikeBtn">
+          <span id="gpdMobHeartIcon">🤍</span>
+          <span id="gpdMobLikeCount">0</span>
+        </button>
+        <button class="gpd-mob-share-btn" id="gpdMobShareBtn">
+          <span>🔗</span>
+          <span>শেয়ার</span>
+        </button>
+        <button class="gpd-mob-3dot-btn" id="gpdMob3Dot">⋮</button>
       </div>
     </div>
     <div class="gpd-divider"></div>
-    <div class="gpd-options-sec" id="gpMobOptionsSec">
-      <span class="gpd-options-label">Product Options</span>
-      <span class="gpd-options-val" id="gpModalOptions">অপশন দেখতে লগইন করুন</span>
-      <span class="gpd-options-arrow">&#62;</span>
-    </div>
     <div class="gpd-divider"></div>
     <div style="padding:0 14px;">
       <div class="gpd-mob-accord-block">
@@ -5068,18 +5072,6 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
       </button>
       <button class="gpd-buynow-btn" id="gpdMobBuyBtn">Buy Now</button>
       <button class="gpd-addcart-btn" id="gpdMobCartBtn">Add to Cart</button>
-    </div>
-    <!-- Like / Share / 3dot below action bar -->
-    <div class="gpd-mob-likeshare">
-      <button class="gpd-mob-like-btn" id="gpdMobLikeBtn">
-        <span id="gpdMobHeartIcon">🤍</span>
-        <span id="gpdMobLikeCount">0</span>
-      </button>
-      <button class="gpd-mob-share-btn" id="gpdMobShareBtn">
-        <span>🔗</span>
-        <span>শেয়ার</span>
-      </button>
-      <button class="gpd-mob-3dot-btn" id="gpdMob3Dot">⋮</button>
     </div>
   </div>
 </div>`;
