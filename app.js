@@ -4738,7 +4738,7 @@ function openImgZoom(src) {
     s.id = '_gpdStyleTag';
     s.textContent = `
 /* GP MODAL — FULL SCREEN */
-.gp-modal{display:none;position:fixed;inset:0;background:#fff;z-index:9999999;font-family:'Hind Siliguri',sans-serif;}
+.gp-modal{display:none;position:fixed;inset:0;background:#fff;z-index:98678399999999;font-family:'Hind Siliguri',sans-serif;}
 html.is-mobile .gp-modal{overflow-y:auto;-webkit-overflow-scrolling:touch;}
 html:not(.is-mobile) .gp-modal{overflow:hidden;}
 .gpd-pc-box{display:none;width:100%;height:100vh;background:#fff;position:relative;flex-direction:column;overflow:hidden;}
@@ -4818,7 +4818,7 @@ html.is-mobile #gpdPcNavTabs{display:none!important;}
 .gpd-rel-card-cat{background:#e0f2fe;color:#0284c7;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 
 /* MOBILE VIEW */
-.gpd-topbar{position:fixed;top:0;left:0;right:0;z-index:10000000;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
+.gpd-topbar{position:fixed;top:0;left:0;right:0;z-index:986783999999991;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
 .gpd-back-btn{background:none;border:none;font-size:60px;cursor:pointer;color:#222;padding:4px 8px;line-height:1;width:70px;font-weight:900;}
 .gpd-topbar-title{flex:1;font-size:40px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .gpd-topbar-icons{display:flex;gap:16px;align-items:center;}
@@ -4851,7 +4851,7 @@ html.is-mobile #gpdPcNavTabs{display:none!important;}
 .gpd-desc-title{font-size:36px;font-weight:800;color:#111;margin-bottom:10px;}
 .gpd-desc-text{font-size:32px;color:#555;line-height:1.75;}
 .gpd-spacer{height:110px;}
-.gpd-action-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid #ebebeb;display:flex;align-items:stretch;z-index:10000001;height:90px;box-shadow:0 -4px 16px rgba(0,0,0,0.10);}
+.gpd-action-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid #ebebeb;display:flex;align-items:stretch;z-index:9867839999999911;height:90px;box-shadow:0 -4px 16px rgba(0,0,0,0.10);}
 .gpd-chat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:90px;gap:3px;background:none;border:none;border-right:1px solid #f0f0f0;cursor:pointer;font-family:'Hind Siliguri',sans-serif;padding:0 8px;}
 .gpd-chat-btn span{font-size:22px;color:#555;font-weight:600;}
 .gpd-chat-btn i{font-size:34px;color:#555;}
