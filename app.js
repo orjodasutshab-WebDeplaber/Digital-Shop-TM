@@ -9611,9 +9611,38 @@ function openSironamShop(id, title) {
         
         <div style="position:sticky; top:0; background:#1e293b; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #374151; z-index:100;">
             <h2 style="color:#6366f1; margin:0; font-size:20px; font-weight:bold;">${title}</h2>
-            <div style="display:flex; align-items:center; gap:15px; flex-grow:1; justify-content:flex-end;">
-                <input type="text" id="shopSearchInput" oninput="filterShopProducts()" placeholder="পণ্য খুঁজুন..." 
-                       style="width:100%; max-width:300px; padding:10px 15px; border-radius:30px; border:1px solid #4b5563; background:#111827; color:white; outline:none;">
+            <div style="display:flex; align-items:center; gap:10px; flex-grow:1; justify-content:flex-end;">
+
+                <!-- সার্চ আইকন বাটন (মেইন পপ এর মতো) -->
+                <div style="position:relative; display:flex; align-items:center;">
+                    <button id="shopSearchIconBtn"
+                            onclick="(function(){
+                                var box=document.getElementById('shopSearchExpandBox');
+                                var inp=document.getElementById('shopSearchInput');
+                                var btn=document.getElementById('shopSearchIconBtn');
+                                if(box.style.display==='none'||!box.style.display){
+                                    box.style.display='flex';
+                                    btn.style.display='none';
+                                    setTimeout(function(){inp.focus();},50);
+                                }
+                            })()"
+                            style="background:linear-gradient(135deg,#6366f1 0%,#a855f7 100%); border:none; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; flex-shrink:0; box-shadow:0 4px 15px rgba(99,102,241,0.4); transition:opacity 0.2s,transform 0.2s;">
+                        <i class="fa fa-search"></i>
+                    </button>
+                    <div id="shopSearchExpandBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:68px; align-items:center; justify-content:center; z-index:999999999; background:#1e293b; border-bottom:2px solid #374151; box-shadow:0 4px 24px rgba(0,0,0,0.3); padding:0 16px; box-sizing:border-box; animation:srchDropDown 0.22s ease;">
+                        <div style="flex:1; max-width:700px; display:flex; align-items:center; background:#111827; border:1.5px solid #374151; border-radius:12px 0 0 12px; overflow:hidden; height:68px;">
+                            <i class="fa fa-search" style="color:#94a3b8; font-size:15px; padding:0 10px 0 14px; flex-shrink:0;"></i>
+                            <input type="text" id="shopSearchInput" oninput="filterShopProducts()" placeholder="পণ্য খুঁজুন..."
+                                   onkeydown="if(event.key==='Escape'){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';}"
+                                   style="flex:1; background:transparent; border:none; color:#fff; font-size:15px; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
+                        </div>
+                        <button onclick="(function(){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';document.getElementById('shopSearchInput').value='';filterShopProducts();})()"
+                                style="background:#ef4444; border:none; color:#fff; height:68px; padding:0 22px; border-radius:0 12px 12px 0; font-size:20px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
                 <button onclick="document.getElementById('sironamFullShop').remove()" 
                         style="background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-weight:bold;">
                    🏠 হোম
@@ -9621,7 +9650,7 @@ function openSironamShop(id, title) {
             </div>
         </div>
 
-        <div id="sironamDeliBoard" style="width:95%; max-width:1500px; height:450px; margin:20px auto; background:#111827; border-radius:20px; overflow:hidden; border:1px solid #334155; display:flex; align-items:center; justify-content:center; position:relative;">
+        <div id="sironamDeliBoard" style="width:95%; max-width:1500px; height:450px; margin:20px auto; background:#111827; border-radius:0px; overflow:hidden; border:1px solid #334155; display:flex; align-items:center; justify-content:center; position:relative;">
             ${(() => {
                 const ads = deliAds.filter(a => String(a.sironamId) === String(id));
                 if (ads.length === 0) return '<p style="color:#4b5563;">এখানে ডেলি বিজ্ঞাপন প্রদর্শিত হবে</p>';
