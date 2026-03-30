@@ -4799,6 +4799,13 @@ html.is-mobile .gp-modal{background:#f5f5f5;}
 .gpd-spec-table td:first-child{color:#666;font-weight:600;width:40%;white-space:nowrap;}
 .gpd-spec-table td:last-child{color:#111;}
 
+/* PC nav tabs */
+.gpd-nav-tab{background:none;border:none;border-bottom:3px solid transparent;padding:10px 18px;font-size:13px;font-weight:700;color:#666;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:color .2s,border-color .2s;white-space:nowrap;margin-bottom:-2px;}
+.gpd-nav-tab:hover{color:#f57224;}
+.gpd-nav-tab.active{color:#f57224;border-bottom-color:#f57224;}
+/* মোবাইলে nav tabs লুকানো */
+html.is-mobile #gpdPcNavTabs{display:none!important;}
+
 /* Related cards */
 .gpd-rel-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow .2s;}
 .gpd-rel-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
@@ -4898,12 +4905,20 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
 
   <!-- ══ PC VIEW ══ -->
   <div class="gpd-pc-box" id="gpdPcBox">
-    <div style="position:fixed;top:0;left:0;right:0;z-index:10000000;background:#fff;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;padding:12px 40px;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+    <!-- Top bar row 1: close + title + share -->
+    <div style="position:fixed;top:0;left:0;right:0;z-index:10000000;background:#fff;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;padding:12px 40px;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
       <button onclick="closeGpModal()" style="background:#f5f5f5;border:none;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;" onmouseover="this.style.background='#fee2e2';this.style.color='#ef4444'" onmouseout="this.style.background='#f5f5f5';this.style.color='#333'">✕</button>
       <div id="gpdPcNavTitle" style="font-size:15px;font-weight:700;color:#222;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
       <button onclick="gpShareProduct()" style="background:#f5f5f5;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;color:#555;display:flex;align-items:center;gap:6px;font-family:'Hind Siliguri',sans-serif;transition:.2s;"><i class="fa fa-share-alt"></i> Share</button>
     </div>
-    <div style="overflow-y:auto;height:100%;padding-top:66px;box-sizing:border-box;-webkit-overflow-scrolling:touch;">
+    <!-- Top bar row 2: section nav tabs (PC only) -->
+    <div id="gpdPcNavTabs" style="position:fixed;top:64px;left:0;right:0;z-index:9999999;background:#fff;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;gap:4px;padding:0 40px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+      <button class="gpd-nav-tab active" id="gpd-tab-spec"    onclick="gpdPcScrollTo('spec')"   >&#128203; Specifications</button>
+      <button class="gpd-nav-tab"        id="gpd-tab-details" onclick="gpdPcScrollTo('details')" >&#128196; Product Details</button>
+      <button class="gpd-nav-tab"        id="gpd-tab-seller"  onclick="gpdPcScrollTo('seller')"  >&#127978; Seller</button>
+      <button class="gpd-nav-tab"        id="gpd-tab-related" onclick="gpdPcScrollTo('related')" >&#128269; Product</button>
+    </div>
+    <div id="gpdPcScrollWrap" style="overflow-y:auto;height:100%;padding-top:110px;box-sizing:border-box;-webkit-overflow-scrolling:touch;">
     <div class="gpd-pc-top">
       <div class="gpd-pc-left">
         <div class="gpd-pc-mainimg-wrap"><img id="gpdPcMainImg" src="" alt=""></div>
@@ -4947,32 +4962,36 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
     </div>
     <div class="gpd-pc-tabs-wrap">
       <div class="gpd-accord-block" id="gpd-accord-spec">
-        <div class="gpd-accord-head" onclick="gpdToggleAccord('spec')"><span>📋 Specifications</span><span class="gpd-accord-arrow" id="gpd-arrow-spec">▲</span></div>
+        <div id="gpd-anchor-spec" style="position:relative;top:-20px;visibility:hidden;"></div>
+        <div class="gpd-accord-head" onclick="gpdToggleAccord('spec')"><span>&#128203; Specifications</span><span class="gpd-accord-arrow" id="gpd-arrow-spec">▲</span></div>
         <div class="gpd-accord-body" id="gpd-body-spec"><div id="gpdPcSpecContent"></div></div>
       </div>
       <div class="gpd-accord-block" id="gpd-accord-details">
-        <div class="gpd-accord-head" onclick="gpdToggleAccord('details')"><span>📄 Product Details</span><span class="gpd-accord-arrow" id="gpd-arrow-details">▲</span></div>
+        <div id="gpd-anchor-details" style="position:relative;top:-20px;visibility:hidden;"></div>
+        <div class="gpd-accord-head" onclick="gpdToggleAccord('details')"><span>&#128196; Product Details</span><span class="gpd-accord-arrow" id="gpd-arrow-details">▲</span></div>
         <div class="gpd-accord-body" id="gpd-body-details">
           <div id="gpdPcDescContent" style="font-size:14px;color:#444;line-height:1.9;white-space:pre-wrap;"></div>
           <div id="gpdPcTagsContent" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;"></div>
         </div>
       </div>
       <div class="gpd-accord-block" id="gpd-accord-seller">
-        <div class="gpd-accord-head" onclick="gpdToggleAccord('seller')"><span>🏪 Seller</span><span class="gpd-accord-arrow" id="gpd-arrow-seller">▲</span></div>
+        <div id="gpd-anchor-seller" style="position:relative;top:-20px;visibility:hidden;"></div>
+        <div class="gpd-accord-head" onclick="gpdToggleAccord('seller')"><span>&#127978; Seller</span><span class="gpd-accord-arrow" id="gpd-arrow-seller">▲</span></div>
         <div class="gpd-accord-body" id="gpd-body-seller"><div id="gpdPcSellerContent" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;"></div></div>
       </div>
       <!-- Reports Section PC -->
       <div id="gpd-reports-wrap-pc" style="margin-top:24px;display:none;">
         <div style="border-top:3px solid #f0f0f0;padding-top:20px;">
           <div style="font-size:16px;font-weight:800;color:#ef4444;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
-            ⚠️ ইউজার রিপোর্টসমূহ <span id="gpd-reports-count-pc" style="background:#ef4444;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;"></span>
+            &#9888;&#65039; ইউজার রিপোর্টসমূহ <span id="gpd-reports-count-pc" style="background:#ef4444;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;"></span>
           </div>
           <div id="gpd-reports-list-pc" style="display:flex;flex-direction:column;gap:10px;"></div>
         </div>
       </div>
       <div id="gpd-related-wrap" style="margin-top:32px;display:none;">
+        <div id="gpd-anchor-related" style="position:relative;top:-20px;visibility:hidden;"></div>
         <div style="border-top:3px solid #f0f0f0;padding-top:28px;">
-          <div style="font-size:20px;font-weight:800;color:#111;margin-bottom:6px;">🔍 সম্পর্কিত পণ্য <span id="gpd-related-filter-label" style="font-size:13px;font-weight:600;color:#f57224;background:#fff3e0;padding:3px 12px;border-radius:20px;"></span></div>
+          <div style="font-size:20px;font-weight:800;color:#111;margin-bottom:6px;">&#128269; সম্পর্কিত পণ্য <span id="gpd-related-filter-label" style="font-size:13px;font-weight:600;color:#f57224;background:#fff3e0;padding:3px 12px;border-radius:20px;"></span></div>
           <p style="font-size:13px;color:#aaa;margin-bottom:20px;">একই ক্যাটাগরি / ট্যাগের পণ্যসমূহ</p>
           <div id="gpd-related-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px;"></div>
         </div>
@@ -5100,6 +5119,43 @@ function gpdToggleAccord(key){
     const isHidden=body.classList.contains('hidden');
     body.classList.toggle('hidden',!isHidden);
     if(arrow) arrow.classList.toggle('collapsed',!isHidden);
+}
+
+/* ── PC nav tab scroll ── */
+function gpdPcScrollTo(key){
+    // active tab highlight
+    document.querySelectorAll('.gpd-nav-tab').forEach(b=>b.classList.remove('active'));
+    const activeTab=document.getElementById('gpd-tab-'+key);
+    if(activeTab) activeTab.classList.add('active');
+
+    // related section: display করা দরকার হতে পারে
+    if(key==='related'){
+        const wrap=document.getElementById('gpd-related-wrap');
+        if(wrap) wrap.style.display='block';
+    }
+
+    // accordion body open করা (collapsed থাকলে)
+    const body=document.getElementById('gpd-body-'+key);
+    const arrow=document.getElementById('gpd-arrow-'+key);
+    if(body && body.classList.contains('hidden')){
+        body.classList.remove('hidden');
+        if(arrow) arrow.classList.remove('collapsed');
+    }
+
+    // scroll wrapper খুঁজে target এর কাছে scroll
+    const scrollWrap=document.getElementById('gpdPcScrollWrap');
+    const anchor=document.getElementById('gpd-anchor-'+key)
+               || document.getElementById('gpd-accord-'+key)
+               || document.getElementById('gpd-related-wrap');
+    if(!anchor || !scrollWrap) return;
+
+    // anchor এর scrollWrap এর মধ্যে relative offset বের করা
+    let el=anchor, offsetTop=0;
+    while(el && el!==scrollWrap){
+        offsetTop+=el.offsetTop;
+        el=el.offsetParent;
+    }
+    scrollWrap.scrollTo({top: offsetTop - 20, behavior:'smooth'});
 }
 function gpdMobToggle(key,headEl){
     const body=document.getElementById('gpd-mob-'+key);
@@ -5309,6 +5365,14 @@ function openProductDetails(productId) {
         /* ══ PC VIEW ══ */
         document.getElementById('gpdPcBox').style.display='flex';
         document.querySelector('.gpd-mobile-view').style.display='none';
+
+        // nav tab রিসেট — Specifications active
+        document.querySelectorAll('.gpd-nav-tab').forEach(b=>b.classList.remove('active'));
+        const firstTab=document.getElementById('gpd-tab-spec');
+        if(firstTab) firstTab.classList.add('active');
+        // scroll top এ নিয়ে যাওয়া
+        const sw=document.getElementById('gpdPcScrollWrap');
+        if(sw) sw.scrollTop=0;
 
         // Main image
         const mainImg=document.getElementById('gpdPcMainImg');
