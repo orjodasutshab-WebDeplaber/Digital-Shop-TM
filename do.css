@@ -1763,10 +1763,12 @@ body.dark-theme .special-category-container {
     position: relative;
 }
 
-/* ইমোজি অ্যানিমেশন */
+/* ইমোজি অ্যানিমেশন — ঝাপসা ঠিক করা */
 .special-category-title span {
     display: inline-block;
     animation: emoji-float 3s ease-in-out infinite;
+    -webkit-text-fill-color: initial;  /* ঝাপসা বন্ধ */
+    color: initial;
 }
 
 .special-category-title .emoji-right {
