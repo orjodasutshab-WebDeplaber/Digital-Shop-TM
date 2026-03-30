@@ -146,6 +146,9 @@ window.onload = function() {
             }
             if (typeof startAdBoard === 'function') startAdBoard();
 
+            // ✅ Firebase sync এর পরে শিরোনাম কার্ডগুলো refresh করা
+            if (typeof displaySironamOnPortal === 'function') displaySironamOnPortal();
+
             // বেলি বোর্ড reload
             if (typeof _reloadBeliData === 'function') _reloadBeliData();
             if (typeof refreshBeliDisplay === 'function') refreshBeliDisplay();
@@ -9600,15 +9603,33 @@ function displaySironamOnPortal() {
     const container = document.getElementById('sironam-portal-display');
     if (!container) return;
 
-    // কার্ডে ক্লিক করলে openSironamShop ফাংশন কল হবে
-    container.innerHTML = sironamData.map(item => `
-        <div class="sironam-card" onclick="openSironamShop('${item.id}', '${item.name}')">
-            <img src="${item.img}" alt="${item.name}">
-            <div class="sironam-overlay">
-                <span>${item.name}</span>
-            </div>
-        </div>
-    `).join('');
+    const allProducts = (typeof appState !== 'undefined' && appState.products) ? appState.products : [];
+
+    container.innerHTML = sironamData.map(item => {
+        // এই শিরোনামে কোনো পণ্য আছে কিনা চেক করা
+        const hasProducts = allProducts.some(p => String(p.sironamTag) === String(item.id));
+
+        if (hasProducts) {
+            // পণ্য আছে → স্বাভাবিক ক্লিকযোগ্য কার্ড
+            return `
+            <div class="sironam-card" onclick="openSironamShop('${item.id}', '${item.name}')">
+                <img src="${item.img}" alt="${item.name}">
+                <div class="sironam-overlay">
+                    <span>${item.name}</span>
+                </div>
+            </div>`;
+        } else {
+            // পণ্য নেই → lock করা কার্ড (ক্লিক কাজ করবে না)
+            return `
+            <div class="sironam-card" style="cursor:not-allowed; opacity:0.55; pointer-events:none; position:relative;">
+                <img src="${item.img}" alt="${item.name}" style="filter:grayscale(40%);">
+                <div style="position:absolute; top:6px; right:6px; background:#ef4444; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; font-family:'Hind Siliguri',sans-serif;">শীঘ্রই</div>
+                <div class="sironam-overlay">
+                    <span>${item.name}</span>
+                </div>
+            </div>`;
+        }
+    }).join('');
 }
 // পেজ লোড হলে প্রদর্শন করা
 window.addEventListener('load', displaySironamOnPortal);
