@@ -4720,665 +4720,765 @@ function openImgZoom(src) {
     document.body.appendChild(overlay);
 }
 
-function openProductDetails(productId) {
-    // ১. প্রোডাক্ট খুঁজে বের করা
-    const item = appState.products.find(p => String(p.id) === String(productId));
-    if (!item) { console.error("পণ্যটি পাওয়া যায়নি! আইডি:", productId); return; }
 
-    // ইমেজ প্রসেসিং
-    const images = Array.isArray(item.images) ? item.images : [item.images || item.image || 'ko.jpeg'];
+/* ══════════════════════════════════════════════════════════════
+   NEW openProductDetails — landing.html style gpDetailModal
+   PC: full-screen white Daraz-style with left image + right info
+   Mobile: full-screen with sticky top bar + action bar at bottom
+   Buy Now → initiateCheckout
+   Add to Cart → addToCart
+   Wishlist → addToCart
+   Like / Share / 3dot buttons → below action buttons
+   ══════════════════════════════════════════════════════════════ */
 
-    // landing.html gpDetailModal style এ open করা
-    const isMobile = document.documentElement.classList.contains('is-mobile');
+/* ── inject gpDetailModal CSS once ── */
+(function _injectGpdStyles(){
+    if(document.getElementById('_gpdStyleTag')) return;
+    const s = document.createElement('style');
+    s.id = '_gpdStyleTag';
+    s.textContent = `
+/* GP MODAL — FULL SCREEN */
+.gp-modal{display:none;position:fixed;inset:0;background:#fff;z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;-webkit-overflow-scrolling:touch;}
+.gpd-pc-box{display:none;width:100%;min-height:100vh;background:#fff;position:relative;}
+body:not(.is-mobile) .gp-modal[style*="block"]{display:block!important;}
+body:not(.is-mobile) .gpd-pc-box{display:flex;flex-direction:column;}
+body:not(.is-mobile) .gpd-mobile-view{display:none!important;}
+body.is-mobile .gpd-pc-box{display:none!important;}
+body.is-mobile .gpd-mobile-view{display:block!important;}
+body.is-mobile .gp-modal{background:#f5f5f5;}
 
-    // product data safeP format এ রূপান্তর
-    const oldPrice = item.oldPrice || item.originalPrice || Math.floor(item.price * 1.3);
-    const discount = oldPrice > item.price ? Math.round((1 - item.price / oldPrice) * 100) + '%' : '';
-    const desc = (item.description || item.desc || item.details || '').substring(0, 800);
-    const safeP = encodeURIComponent(JSON.stringify({
-        id: item.id,
-        name: item.title || item.name || 'পণ্য',
-        rating: item.rating || item.stars || item.avgRating || 4.2,
-        img: images[0] || 'ko.jpeg',
-        imgs: images,
-        price: item.price,
-        oldPrice: oldPrice,
-        discount: discount,
-        desc: desc,
-        specifications: item.specifications || {},
-        sellerName: item.sellerName || 'Digital Shop TM',
-        sellerRating: item.sellerRating || '',
-        deliveryCharge: item.deliveryCharge || (typeof SYSTEM_CONFIG !== 'undefined' ? SYSTEM_CONFIG.DELIVERY_CHARGE : '150'),
-        tags: item.tags || [],
-        category: item.category || item.cat || ''
-    }));
-    openGpModalIndex(safeP, item);
+/* PC LEFT/RIGHT */
+.gpd-pc-top{display:flex;gap:0;align-items:flex-start;max-width:1400px;margin:0 auto;width:100%;padding:0 40px;}
+.gpd-pc-left{width:520px;flex-shrink:0;background:#fff;padding:28px 20px;}
+.gpd-pc-mainimg-wrap{border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;background:#f9fafb;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;}
+.gpd-pc-mainimg-wrap img{width:100%;height:100%;object-fit:contain;display:block;}
+.gpd-pc-thumbs{display:flex;gap:8px;margin-top:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
+.gpd-pc-thumbs::-webkit-scrollbar{display:none;}
+.gpd-pc-thumb{width:64px;height:64px;border-radius:8px;overflow:hidden;border:2px solid #e5e7eb;cursor:pointer;flex-shrink:0;transition:.2s;}
+.gpd-pc-thumb:hover,.gpd-pc-thumb.active{border-color:#f57224;}
+.gpd-pc-thumb img{width:100%;height:100%;object-fit:contain;display:block;}
+.gpd-pc-right{flex:1;padding:28px 40px 24px 24px;border-left:1px solid #f0f0f0;min-width:0;max-width:700px;}
+.gpd-pc-title{font-size:20px;font-weight:700;color:#111;line-height:1.5;margin-bottom:10px;}
+.gpd-pc-price-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.gpd-pc-price{color:#f57224;font-size:32px;font-weight:900;}
+.gpd-pc-old{color:#aaa;font-size:16px;text-decoration:line-through;}
+.gpd-pc-discount{background:#f57224;color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:4px;}
+.gpd-pc-sku{font-size:11px;color:#aaa;margin-bottom:14px;}
+.gpd-pc-actions{display:flex;gap:12px;margin-top:18px;}
+.gpd-pc-btn-buy{flex:1;padding:14px;background:#f57224;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
+.gpd-pc-btn-buy:hover{background:#ea6010;}
+.gpd-pc-btn-cart{flex:1;padding:14px;background:#fff;color:#f57224;border:2px solid #f57224;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
+.gpd-pc-btn-cart:hover{background:#fff7ed;}
+.gpd-pc-share-row{display:flex;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f0;align-items:center;}
+.gpd-pc-share-btn{background:#f5f5f5;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;color:#555;display:flex;align-items:center;gap:6px;font-family:'Hind Siliguri',sans-serif;transition:.2s;}
+.gpd-pc-share-btn:hover{background:#e5e7eb;}
+/* PC like/share/3dot row below action buttons */
+.gpd-pc-likeshare-row{display:flex;gap:10px;margin-top:14px;align-items:center;}
+.gpd-pc-like-btn{background:#f5f5f5;border:1px solid #e5e7eb;padding:10px 18px;border-radius:10px;cursor:pointer;font-size:14px;color:#555;display:flex;align-items:center;gap:7px;font-family:'Hind Siliguri',sans-serif;transition:.2s;font-weight:600;}
+.gpd-pc-like-btn:hover{background:#fee2e2;border-color:#f87171;color:#ef4444;}
+.gpd-pc-like-btn.liked{color:#ef4444;border-color:#ef4444;background:#fff1f2;}
+.gpd-pc-share2-btn{background:#f5f5f5;border:1px solid #e5e7eb;padding:10px 18px;border-radius:10px;cursor:pointer;font-size:14px;color:#555;display:flex;align-items:center;gap:7px;font-family:'Hind Siliguri',sans-serif;transition:.2s;font-weight:600;}
+.gpd-pc-share2-btn:hover{background:#e0f2fe;border-color:#38bdf8;color:#0284c7;}
+.gpd-pc-3dot-btn{background:#f5f5f5;border:1px solid #e5e7eb;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:18px;color:#555;display:flex;align-items:center;justify-content:center;transition:.2s;}
+.gpd-pc-3dot-btn:hover{background:#e5e7eb;}
+
+/* PC accordion */
+.gpd-pc-tabs-wrap{border-top:3px solid #f0f0f0;padding:0 40px 60px;max-width:1400px;margin:0 auto;width:100%;}
+.gpd-accord-block{border-bottom:1px solid #f0f0f0;}
+.gpd-accord-head{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;background:#fafafa;cursor:pointer;font-size:15px;font-weight:800;color:#111;user-select:none;transition:background .2s;}
+.gpd-accord-head:hover{background:#f3f4f6;}
+.gpd-accord-arrow{font-size:13px;color:#aaa;transition:transform .3s;}
+.gpd-accord-arrow.collapsed{transform:rotate(180deg);}
+.gpd-accord-body{padding:20px 22px;background:#fff;border-top:1px solid #f0f0f0;}
+.gpd-accord-body.hidden{display:none;}
+.gpd-spec-table{width:100%;border-collapse:collapse;font-size:14px;}
+.gpd-spec-table tr:nth-child(even){background:#fafafa;}
+.gpd-spec-table td{padding:11px 16px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
+.gpd-spec-table td:first-child{color:#666;font-weight:600;width:40%;white-space:nowrap;}
+.gpd-spec-table td:last-child{color:#111;}
+
+/* Related cards */
+.gpd-rel-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;cursor:pointer;transition:box-shadow .2s;}
+.gpd-rel-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.12);transform:translateY(-2px);}
+.gpd-rel-card img{width:100%;aspect-ratio:1/1;object-fit:fill;display:block;background:#f8f9fa;}
+.gpd-rel-card-body{padding:8px 10px 10px;}
+.gpd-rel-card-name{font-size:12px;font-weight:600;color:#222;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;}
+.gpd-rel-card-price{color:#f57224;font-size:14px;font-weight:900;}
+.gpd-rel-card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;}
+.gpd-rel-card-tag{background:#fff3e0;color:#f57224;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
+.gpd-rel-card-cat{background:#e0f2fe;color:#0284c7;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
+
+/* MOBILE VIEW */
+.gpd-topbar{position:sticky;top:0;z-index:20;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
+.gpd-back-btn{background:none;border:none;font-size:60px;cursor:pointer;color:#222;padding:4px 8px;line-height:1;width:70px;font-weight:900;}
+.gpd-topbar-title{flex:1;font-size:40px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gpd-topbar-icons{display:flex;gap:16px;align-items:center;}
+.gpd-topbar-icons i{font-size:40px;color:#444;cursor:pointer;}
+.gpd-img-slider{position:relative;width:100%;background:#fff;}
+.gpd-main-img{width:100%;aspect-ratio:1/1;object-fit:contain;display:block;background:#fff;}
+.gpd-img-counter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.40);color:#fff;font-size:13px;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:1px;}
+.gpd-thumbs{display:flex;gap:8px;padding:10px 14px;background:#fff;border-bottom:1px solid #f0f0f0;overflow-x:auto;scrollbar-width:none;}
+.gpd-thumbs::-webkit-scrollbar{display:none;}
+.gpd-thumb{width:100px;height:100px;border-radius:6px;overflow:hidden;border:2px solid #ddd;cursor:pointer;flex-shrink:0;}
+.gpd-thumb.active{border-color:#f57224;}
+.gpd-thumb img{width:100%;height:100%;object-fit:fill;display:block;}
+.gpd-price-sec{background:#fff;padding:14px 14px 6px;margin-top:8px;}
+.gpd-price-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+.gpd-taka{color:#f57224;font-size:38px;font-weight:700;}
+.gpd-price{color:#f57224;font-size:45px;font-weight:900;line-height:1;}
+.gpd-old-price{color:#aaa;font-size:30px;text-decoration:line-through;font-weight:500;}
+.gpd-discount-badge{background:#f57224;color:#fff;font-size:26px;font-weight:800;padding:4px 14px;border-radius:4px;}
+.gpd-name{font-size:38px;font-weight:600;color:#111;line-height:1.55;margin-bottom:10px;}
+.gpd-stars-row{display:flex;align-items:center;gap:5px;padding-bottom:10px;}
+.gpd-star-icons{color:#f57224;font-size:34px;letter-spacing:2px;}
+.gpd-stars-val{color:#f57224;font-size:32px;font-weight:700;}
+.gpd-review-count{color:#888;font-size:28px;}
+.gpd-divider{height:8px;background:#f5f5f5;}
+.gpd-options-sec{background:#fff;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0;}
+.gpd-options-label{color:#888;font-size:34px;font-weight:600;margin-right:10px;flex-shrink:0;}
+.gpd-options-val{color:#222;font-size:34px;font-weight:600;flex:1;}
+.gpd-options-arrow{color:#bbb;font-size:34px;}
+.gpd-desc-sec{background:#fff;padding:14px 14px;margin-top:8px;}
+.gpd-desc-title{font-size:36px;font-weight:800;color:#111;margin-bottom:10px;}
+.gpd-desc-text{font-size:32px;color:#555;line-height:1.75;}
+.gpd-spacer{height:72px;}
+.gpd-action-bar{position:sticky;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ebebeb;display:flex;align-items:stretch;z-index:20;height:90px;}
+.gpd-store-btn,.gpd-chat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:80px;gap:3px;background:none;border:none;border-right:1px solid #f0f0f0;cursor:pointer;font-family:'Hind Siliguri',sans-serif;padding:0 8px;}
+.gpd-store-btn span,.gpd-chat-btn span{font-size:22px;color:#555;font-weight:600;}
+.gpd-chat-btn i{font-size:34px;color:#555;}
+.gpd-buynow-btn{flex:1;background:#38bdf8;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;border-right:1px solid rgba(255,255,255,0.3);}
+.gpd-addcart-btn{flex:1;background:#f97316;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
+.gpd-store-btn i{font-size:34px;color:#f57224;}
+
+/* Mobile like/share/3dot row — below action bar, inside scrollable area */
+.gpd-mob-likeshare{display:flex;gap:10px;padding:16px 14px 8px;background:#fff;border-bottom:1px solid #f5f5f5;}
+.gpd-mob-like-btn{flex:2;padding:14px 0;border-radius:10px;border:2px solid #e5e7eb;background:#fff;color:#555;font-size:30px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;}
+.gpd-mob-like-btn.liked{color:#ef4444;border-color:#ef4444;background:#fff1f2;}
+.gpd-mob-share-btn{flex:2;padding:14px 0;border-radius:10px;border:2px solid #e5e7eb;background:#fff;color:#555;font-size:30px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;}
+.gpd-mob-3dot-btn{flex:0.7;padding:14px 0;border-radius:10px;border:2px solid #e5e7eb;background:#fff;color:#555;font-size:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+/* Mobile accordion */
+.gpd-mob-accord-block{border-bottom:1px solid #f0f0f0;margin-bottom:0;}
+.gpd-mob-accord-head{display:flex;align-items:center;justify-content:space-between;padding:16px 0;cursor:pointer;user-select:none;}
+.gpd-mob-accord-arrow{font-size:38px;color:#bbb;transition:transform .3s;flex-shrink:0;}
+.gpd-mob-accord-arrow.collapsed{transform:rotate(180deg);}
+.gpd-mob-accord-body{padding-bottom:16px;background:#fff;}
+.gpd-mob-accord-body.hidden{display:none;}
+body.is-mobile .gpd-mob-accord-body{font-size:30px!important;line-height:1.7;}
+
+/* PC adjustments */
+body:not(.is-mobile) .gpd-action-bar{height:56px;}
+body:not(.is-mobile) .gpd-buynow-btn{font-size:15px;}
+body:not(.is-mobile) .gpd-addcart-btn{font-size:15px;}
+body:not(.is-mobile) .gpd-store-btn span,
+body:not(.is-mobile) .gpd-chat-btn span{font-size:11px;}
+body:not(.is-mobile) .gpd-store-btn i,
+body:not(.is-mobile) .gpd-chat-btn i{font-size:18px;}
+body:not(.is-mobile) .gpd-store-btn,
+body:not(.is-mobile) .gpd-chat-btn{width:56px;}
+body:not(.is-mobile) .gpd-spacer{height:40px;}
+body:not(.is-mobile) .gpd-desc-text{font-size:15px;}
+body.is-mobile #gpModalSpecTable table{width:100%;border-collapse:collapse;}
+body.is-mobile #gpModalSpecTable td{font-size:30px!important;padding:14px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
+body.is-mobile .gpd-desc-text{font-size:32px!important;line-height:1.8;color:#444;}
+body.is-mobile #gpModalTagsRow span{font-size:26px!important;padding:5px 14px!important;}
+body.is-mobile #gpModalSellerBox{font-size:29px!important;}
+body.is-mobile .gpd-rel-card-name{font-size:25px;min-height:60px;}
+body.is-mobile .gpd-rel-card-price{font-size:28px;}
+body.is-mobile .gpd-rel-card-tag{font-size:19px;padding:4px 10px;}
+body.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
+`;
+    document.head.appendChild(s);
+})();
+
+/* ── inject gpDetailModal HTML once ── */
+(function _injectGpdHtml(){
+    if(document.getElementById('gpDetailModal')) return;
+    const div = document.createElement('div');
+    div.innerHTML = `
+<div class="gp-modal" id="gpDetailModal">
+
+  <!-- ══ PC VIEW ══ -->
+  <div class="gpd-pc-box" id="gpdPcBox">
+    <div style="position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;padding:12px 40px;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+      <button onclick="closeGpModal()" style="background:#f5f5f5;border:none;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;" onmouseover="this.style.background='#fee2e2';this.style.color='#ef4444'" onmouseout="this.style.background='#f5f5f5';this.style.color='#333'">✕</button>
+      <div id="gpdPcNavTitle" style="font-size:15px;font-weight:700;color:#222;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+      <button onclick="gpShareProduct()" style="background:#f5f5f5;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;color:#555;display:flex;align-items:center;gap:6px;font-family:'Hind Siliguri',sans-serif;transition:.2s;"><i class="fa fa-share-alt"></i> Share</button>
+    </div>
+    <div class="gpd-pc-top">
+      <div class="gpd-pc-left">
+        <div class="gpd-pc-mainimg-wrap"><img id="gpdPcMainImg" src="" alt=""></div>
+        <div class="gpd-pc-thumbs" id="gpdPcThumbs"></div>
+      </div>
+      <div class="gpd-pc-right">
+        <div style="font-size:12px;color:#888;margin-bottom:6px;">Brand: <span id="gpdPcBrand">Digital Shop TM</span></div>
+        <div class="gpd-pc-title" id="gpdPcTitle"></div>
+        <div class="gpd-pc-price-row">
+          <span style="color:#f57224;font-size:15px;font-weight:700;">৳</span>
+          <span class="gpd-pc-price" id="gpdPcPrice"></span>
+          <span class="gpd-pc-old" id="gpdPcOld" style="display:none;"></span>
+          <span class="gpd-pc-discount" id="gpdPcDiscount" style="display:none;"></span>
+        </div>
+        <div class="gpd-pc-sku">SKU: <span id="gpdPcSku">—</span></div>
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+          <i class="fa fa-check-circle" style="color:#22c55e;"></i>
+          <span style="color:#16a34a;font-size:13px;font-weight:600;">In Stock</span>
+        </div>
+        <div class="gpd-pc-actions">
+          <button class="gpd-pc-btn-buy" id="gpdPcBuyBtn">⚡ Buy Now</button>
+          <button class="gpd-pc-btn-cart" id="gpdPcCartBtn">🛒 Add to Cart</button>
+        </div>
+        <div class="gpd-pc-share-row" style="margin-top:16px;">
+          <button class="gpd-pc-share-btn" id="gpdPcShareBtn"><i class="fa fa-share-alt"></i> Share</button>
+          <button class="gpd-pc-share-btn" id="gpdPcWishBtn"><i class="fa fa-heart-o"></i> Wishlist</button>
+        </div>
+        <!-- Like / Share / 3dot below action buttons -->
+        <div class="gpd-pc-likeshare-row">
+          <button class="gpd-pc-like-btn" id="gpdPcLikeBtn">
+            <span id="gpdPcHeartIcon" style="font-size:18px;">🤍</span>
+            <span id="gpdPcLikeCount">0</span>
+          </button>
+          <button class="gpd-pc-share2-btn" id="gpdPcShare2Btn">
+            <span style="font-size:18px;">🔗</span>
+            <span>শেয়ার</span>
+          </button>
+          <button class="gpd-pc-3dot-btn" id="gpdPc3DotBtn">⋮</button>
+        </div>
+      </div>
+    </div>
+    <div class="gpd-pc-tabs-wrap">
+      <div class="gpd-accord-block" id="gpd-accord-spec">
+        <div class="gpd-accord-head" onclick="gpdToggleAccord('spec')"><span>📋 Specifications</span><span class="gpd-accord-arrow" id="gpd-arrow-spec">▲</span></div>
+        <div class="gpd-accord-body" id="gpd-body-spec"><div id="gpdPcSpecContent"></div></div>
+      </div>
+      <div class="gpd-accord-block" id="gpd-accord-details">
+        <div class="gpd-accord-head" onclick="gpdToggleAccord('details')"><span>📄 Product Details</span><span class="gpd-accord-arrow" id="gpd-arrow-details">▲</span></div>
+        <div class="gpd-accord-body" id="gpd-body-details">
+          <div id="gpdPcDescContent" style="font-size:14px;color:#444;line-height:1.9;white-space:pre-wrap;"></div>
+          <div id="gpdPcTagsContent" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;"></div>
+        </div>
+      </div>
+      <div class="gpd-accord-block" id="gpd-accord-seller">
+        <div class="gpd-accord-head" onclick="gpdToggleAccord('seller')"><span>🏪 Seller</span><span class="gpd-accord-arrow" id="gpd-arrow-seller">▲</span></div>
+        <div class="gpd-accord-body" id="gpd-body-seller"><div id="gpdPcSellerContent" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;"></div></div>
+      </div>
+      <div id="gpd-related-wrap" style="margin-top:32px;display:none;">
+        <div style="border-top:3px solid #f0f0f0;padding-top:28px;">
+          <div style="font-size:20px;font-weight:800;color:#111;margin-bottom:6px;">🔍 সম্পর্কিত পণ্য <span id="gpd-related-filter-label" style="font-size:13px;font-weight:600;color:#f57224;background:#fff3e0;padding:3px 12px;border-radius:20px;"></span></div>
+          <p style="font-size:13px;color:#aaa;margin-bottom:20px;">একই ক্যাটাগরি / ট্যাগের পণ্যসমূহ</p>
+          <div id="gpd-related-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:16px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MOBILE VIEW ══ -->
+  <div class="gpd-mobile-view" style="display:none;">
+    <div class="gpd-topbar">
+      <button class="gpd-back-btn" onclick="closeGpModal()">&#8592;</button>
+      <div class="gpd-topbar-title" id="gpModalTitle"></div>
+      <div class="gpd-topbar-icons">
+        <i class="fa fa-shopping-cart" id="gpMobCartIcon" style="cursor:pointer;"></i>
+        <i class="fa fa-ellipsis-v" id="gpMob3DotIcon" style="cursor:pointer;"></i>
+      </div>
+    </div>
+    <div class="gpd-img-slider">
+      <img class="gpd-main-img" id="gpModalImg" src="" alt="">
+      <div class="gpd-img-counter" id="gpdImgCounter">1/1</div>
+    </div>
+    <div class="gpd-thumbs" id="gpdThumbs"></div>
+    <div class="gpd-price-sec">
+      <div class="gpd-price-row">
+        <span class="gpd-taka">৳</span>
+        <span class="gpd-price" id="gpModalPrice"></span>
+        <span class="gpd-old-price" id="gpModalOld" style="display:none;"></span>
+        <span class="gpd-discount-badge" id="gpModalDiscount" style="display:none;"></span>
+      </div>
+      <div class="gpd-name" id="gpModalName"></div>
+      <div class="gpd-stars-row">
+        <span class="gpd-star-icons" id="gpModalStarIcons">★★★★★</span>
+        <span class="gpd-stars-val" id="gpModalStarVal">4.5</span>
+        <span class="gpd-review-count" id="gpModalReviewCount">(35)</span>
+      </div>
+    </div>
+    <div class="gpd-divider"></div>
+    <div class="gpd-options-sec" id="gpMobOptionsSec">
+      <span class="gpd-options-label">Product Options</span>
+      <span class="gpd-options-val" id="gpModalOptions">অপশন দেখতে লগইন করুন</span>
+      <span class="gpd-options-arrow">&#62;</span>
+    </div>
+    <div class="gpd-divider"></div>
+    <div style="padding:0 14px;">
+      <div class="gpd-mob-accord-block">
+        <div class="gpd-mob-accord-head" onclick="gpdMobToggle('mspec',this)">
+          <span style="font-size:44px;font-weight:800;color:#111;">📋 Specifications</span>
+          <span class="gpd-mob-accord-arrow">▲</span>
+        </div>
+        <div class="gpd-mob-accord-body" id="gpd-mob-mspec"><div id="gpModalSpecTable"></div></div>
+      </div>
+      <div class="gpd-mob-accord-block">
+        <div class="gpd-mob-accord-head" onclick="gpdMobToggle('mdetails',this)">
+          <span style="font-size:44px;font-weight:800;color:#111;">📄 Product Details</span>
+          <span class="gpd-mob-accord-arrow">▲</span>
+        </div>
+        <div class="gpd-mob-accord-body" id="gpd-mob-mdetails">
+          <div class="gpd-desc-text" id="gpModalDesc"></div>
+          <div id="gpModalTagsRow" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;"></div>
+        </div>
+      </div>
+      <div class="gpd-mob-accord-block">
+        <div class="gpd-mob-accord-head" onclick="gpdMobToggle('mseller',this)">
+          <span style="font-size:44px;font-weight:800;color:#111;">🏪 Seller</span>
+          <span class="gpd-mob-accord-arrow">▲</span>
+        </div>
+        <div class="gpd-mob-accord-body" id="gpd-mob-mseller"><div id="gpModalSellerBox"></div></div>
+      </div>
+      <div id="gpd-mob-related-wrap" style="margin-top:20px;display:none;">
+        <div style="font-size:32px;font-weight:800;color:#111;margin-bottom:6px;">🔍 সম্পর্কিত পণ্য <span id="gpd-mob-related-label" style="font-size:22px;font-weight:600;color:#f57224;background:#fff3e0;padding:3px 10px;border-radius:20px;"></span></div>
+        <p style="font-size:25px;color:#aaa;margin-bottom:14px;">একই ক্যাটাগরি / ট্যাগের পণ্যসমূহ</p>
+        <div id="gpd-mob-related-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding-bottom:12px;"></div>
+      </div>
+    </div>
+    <div class="gpd-spacer"></div>
+    <!-- Bottom Action Bar -->
+    <div class="gpd-action-bar">
+      <button class="gpd-store-btn" id="gpdMobStoreBtn">
+        <i class="fa fa-store-alt"></i>
+        <span>Store</span>
+      </button>
+      <button class="gpd-chat-btn" id="gpdMobChatBtn">
+        <i class="fa fa-comment-dots"></i>
+        <span>Wishlist</span>
+      </button>
+      <button class="gpd-buynow-btn" id="gpdMobBuyBtn">Buy Now</button>
+      <button class="gpd-addcart-btn" id="gpdMobCartBtn">Add to Cart</button>
+    </div>
+    <!-- Like / Share / 3dot below action bar -->
+    <div class="gpd-mob-likeshare">
+      <button class="gpd-mob-like-btn" id="gpdMobLikeBtn">
+        <span id="gpdMobHeartIcon">🤍</span>
+        <span id="gpdMobLikeCount">0</span>
+      </button>
+      <button class="gpd-mob-share-btn" id="gpdMobShareBtn">
+        <span>🔗</span>
+        <span>শেয়ার</span>
+      </button>
+      <button class="gpd-mob-3dot-btn" id="gpdMob3Dot">⋮</button>
+    </div>
+  </div>
+</div>`;
+    document.body.appendChild(div.firstElementChild);
+})();
+
+/* ── helper functions ── */
+function _gpdUpdateImg(){
+    const imgs = window._gpdImgs || [];
+    const idx  = window._gpdIdx  || 0;
+    const imgEl = document.getElementById('gpModalImg');
+    if(imgEl) imgEl.src = imgs[idx] || '';
+    const ctr = document.getElementById('gpdImgCounter');
+    if(ctr) ctr.textContent = (idx+1)+'/'+imgs.length;
+    document.querySelectorAll('.gpd-thumb').forEach((t,i)=>t.classList.toggle('active',i===idx));
+}
+function gpdGoTo(idx){ window._gpdIdx=idx; _gpdUpdateImg(); }
+function gpdSlide(dir){
+    const len=(window._gpdImgs||[]).length; if(!len)return;
+    window._gpdIdx=((window._gpdIdx||0)+dir+len)%len; _gpdUpdateImg();
+}
+function gpdPcGoTo(idx){
+    window._gpdIdx=idx;
+    const mainImg=document.getElementById('gpdPcMainImg');
+    if(mainImg) mainImg.src=(window._gpdImgs||[])[idx]||'';
+    document.querySelectorAll('.gpd-pc-thumb').forEach((t,i)=>t.classList.toggle('active',i===idx));
+}
+function gpdToggleAccord(key){
+    const body=document.getElementById('gpd-body-'+key);
+    const arrow=document.getElementById('gpd-arrow-'+key);
+    if(!body)return;
+    const isHidden=body.classList.contains('hidden');
+    body.classList.toggle('hidden',!isHidden);
+    if(arrow) arrow.classList.toggle('collapsed',!isHidden);
+}
+function gpdMobToggle(key,headEl){
+    const body=document.getElementById('gpd-mob-'+key);
+    if(!body)return;
+    const arrow=headEl?headEl.querySelector('.gpd-mob-accord-arrow'):null;
+    const isHidden=body.classList.contains('hidden');
+    body.classList.toggle('hidden',!isHidden);
+    if(arrow) arrow.classList.toggle('collapsed',!isHidden);
+}
+function closeGpModal(){
+    const m=document.getElementById('gpDetailModal');
+    if(m) m.style.display='none';
+    document.body.style.overflow='';
+}
+function gpShareProduct(){
+    const id=window._gpdCurrentId; if(!id)return;
+    const url=window.location.href.split('?')[0]+'?id='+encodeURIComponent(id);
+    const name=window._gpdCurrentName||'পণ্য';
+    const txt=`Digital Shop TM থেকে এই অসাধারণ পণ্যটি দেখুন: ${name}\nমূল্য জানতে ও অর্ডার করতে:\n`;
+    if(navigator.share){
+        navigator.share({title:name,text:txt,url:url}).catch(()=>{});
+    } else if(navigator.clipboard){
+        navigator.clipboard.writeText(txt+url).then(()=>showAlert&&showAlert('✅ লিংক কপি হয়েছে!'));
+    } else {
+        alert('🔗 '+url);
+    }
 }
 
-// ══════════════════════════════════════════════════════
-// Landing.html gpDetailModal style — index.html এ ব্যবহার
-// ══════════════════════════════════════════════════════
-function openGpModalIndex(safeP, origItem) {
-    try {
-        const p = JSON.parse(decodeURIComponent(safeP));
-        const imgs = (p.imgs && p.imgs.length) ? p.imgs : [p.img || 'ko.jpeg'];
-        window._gpdImgsIdx = imgs;
-        window._gpdIdxCur  = 0;
-        window._gpdCurrentId   = p.id;
-        window._gpdCurrentName = p.name;
-        window._gpdOrigItem    = origItem; // আসল item (addToCart, initiateCheckout এর জন্য)
+/* Related products render */
+function _gpdRenderRelated(currentP){
+    const allProducts = appState.products||[];
+    if(!allProducts.length)return;
+    const curId=String(currentP.id||'');
+    const curName=String(currentP.title||currentP.name||'').toLowerCase();
+    const curCat=String(currentP.category||currentP.cat||'').toLowerCase();
+    const curTags=Array.isArray(currentP.tags)?currentP.tags.map(t=>String(t).toLowerCase()):[];
+    const scored=allProducts.filter(p=>String(p.id)!==curId).map(p=>{
+        let score=0;
+        const pCat=String(p.category||p.cat||'').toLowerCase();
+        const pTags=Array.isArray(p.tags)?p.tags.map(t=>String(t).toLowerCase()):[];
+        if(curCat&&pCat&&curCat===pCat) score+=4;
+        curTags.forEach(t=>{ if(pTags.includes(t)) score+=3; });
+        const curWords=curName.split(/\s+/).filter(w=>w.length>2);
+        const pName=String(p.title||p.name||'').toLowerCase();
+        curWords.forEach(w=>{ if(pName.includes(w)) score+=1; });
+        return {p,score};
+    }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,12);
 
-        const isMobile = document.documentElement.classList.contains('is-mobile');
+    let filterLabel=curCat||( curTags.length?'#'+curTags[0] : (curName.split(' ')[0]||''));
+    const isMobile=document.body.classList.contains('is-mobile');
 
-        // modal তৈরি বা reuse
-        let modal = document.getElementById('gpDetailModalIndex');
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = 'gpDetailModalIndex';
-            modal.className = 'gp-modal-index';
-            document.body.appendChild(modal);
+    if(!isMobile){
+        const wrap=document.getElementById('gpd-related-wrap');
+        const grid=document.getElementById('gpd-related-grid');
+        const label=document.getElementById('gpd-related-filter-label');
+        if(!wrap||!grid)return;
+        if(!scored.length){wrap.style.display='none';return;}
+        wrap.style.display='block';
+        if(label) label.textContent=filterLabel;
+        grid.innerHTML=scored.map(({p})=>{
+            const img=Array.isArray(p.images)&&p.images.length?p.images[0]:(p.image||p.img||'');
+            const price=p.price||0;
+            const name=p.title||p.name||'পণ্য';
+            const tags=Array.isArray(p.tags)?p.tags:[];
+            const cat=p.category||p.cat||'';
+            return `<div class="gpd-rel-card" onclick="openProductDetails('${p.id}')">
+                <img src="${img}" onerror="this.src=''" alt="${name}">
+                <div class="gpd-rel-card-body">
+                    <div class="gpd-rel-card-name">${name}</div>
+                    <div class="gpd-rel-card-price">৳${price}</div>
+                    <div class="gpd-rel-card-tags">
+                        ${cat?`<span class="gpd-rel-card-cat">${cat}</span>`:''}
+                        ${tags.slice(0,2).map(t=>`<span class="gpd-rel-card-tag">#${t}</span>`).join('')}
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    } else {
+        const wrap=document.getElementById('gpd-mob-related-wrap');
+        const grid=document.getElementById('gpd-mob-related-grid');
+        const label=document.getElementById('gpd-mob-related-label');
+        if(!wrap||!grid)return;
+        if(!scored.length){wrap.style.display='none';return;}
+        wrap.style.display='block';
+        if(label) label.textContent=filterLabel;
+        grid.innerHTML=scored.map(({p})=>{
+            const img=Array.isArray(p.images)&&p.images.length?p.images[0]:(p.image||p.img||'');
+            const price=p.price||0;
+            const name=p.title||p.name||'পণ্য';
+            const tags=Array.isArray(p.tags)?p.tags:[];
+            const cat=p.category||p.cat||'';
+            return `<div class="gpd-rel-card" onclick="openProductDetails('${p.id}')">
+                <img src="${img}" onerror="this.src=''" alt="${name}">
+                <div class="gpd-rel-card-body">
+                    <div class="gpd-rel-card-name">${name}</div>
+                    <div class="gpd-rel-card-price">৳${price}</div>
+                    <div class="gpd-rel-card-tags">
+                        ${cat?`<span class="gpd-rel-card-cat">${cat}</span>`:''}
+                        ${tags.slice(0,2).map(t=>`<span class="gpd-rel-card-tag">#${t}</span>`).join('')}
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    }
+}
+
+/* ── Main openProductDetails ── */
+function openProductDetails(productId) {
+    const item = appState.products.find(p => String(p.id) === String(productId));
+    if (!item) { console.error("পণ্য পাওয়া যায়নি:", productId); return; }
+
+    const images = Array.isArray(item.images) ? item.images : [item.images || item.image || ''];
+    window._gpdImgs = images;
+    window._gpdIdx  = 0;
+    window._gpdCurrentId   = item.id;
+    window._gpdCurrentName = item.title;
+
+    const isMobile = document.body.classList.contains('is-mobile');
+
+    // Auto old price & discount
+    let dispOldPrice = item.oldPrice || item.originalPrice || 0;
+    if (!dispOldPrice && item.price) {
+        let seed=0; const s=String(item.id||item.title||item.price);
+        for(let k=0;k<s.length;k++) seed=(seed*31+s.charCodeAt(k))>>>0;
+        const pct=15+(seed%21);
+        dispOldPrice=Math.round(item.price*(1+pct/100)/5)*5;
+    }
+    const dispDiscount=(dispOldPrice&&dispOldPrice>item.price)?Math.round((dispOldPrice-item.price)/dispOldPrice*100)+'%':'';
+
+    // Stars
+    let spRating=parseFloat(item.rating||item.stars||item.avgRating||0);
+    let spHash=0; const spSeed=String(item.id||item.title||'x');
+    for(let si=0;si<spSeed.length;si++) spHash=(spHash*31+spSeed.charCodeAt(si))>>>0;
+    if(!spRating||isNaN(spRating)) spRating=2.0+(spHash%31)*0.1;
+    spRating=Math.min(5.0,Math.max(2.0,spRating));
+    const spRatingCnt=5+(spHash%200);
+    const fullStars=Math.floor(spRating);
+    const halfStar=(spRating-fullStars)>=0.5;
+    const emptyStars=5-fullStars-(halfStar?1:0);
+
+    // Like state
+    const userId=(appState.currentUser&&appState.currentUser.id)?appState.currentUser.id:'GUEST';
+    const likedByArray=Array.isArray(item.likedBy)?item.likedBy:[];
+    const isLiked=likedByArray.includes(userId);
+
+    // Spec rows
+    const sp=item.specifications||{};
+    const specRows=[['Product Type',sp.productType],['Size',sp.size],['Material',sp.material],['Features',sp.features],['Suitable For',sp.suitableFor],['Closure Type',sp.closureType],['Absorbency',sp.absorbency],['Packaging',sp.packaging]].filter(r=>r[1]);
+    const specHtml=specRows.length
+        ?`<table class="gpd-spec-table">${specRows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`
+        :`<div style="text-align:center;padding:30px;color:#aaa;"><i class="fa fa-info-circle" style="font-size:26px;display:block;margin-bottom:8px;"></i>Specifications পাওয়া যায়নি।</div>`;
+
+    // Seller info
+    const sName=item.sellerName||'Digital Shop TM';
+    const sRating=item.sellerRating||'';
+    const dCharge=item.deliveryCharge||SYSTEM_CONFIG.DELIVERY_CHARGE||150;
+
+    if (!isMobile) {
+        /* ══ PC VIEW ══ */
+        document.getElementById('gpdPcBox').style.display='flex';
+        document.querySelector('.gpd-mobile-view').style.display='none';
+
+        // Main image
+        const mainImg=document.getElementById('gpdPcMainImg');
+        if(mainImg){ mainImg.src=images[0]||''; mainImg.onerror=()=>{}; }
+
+        // Thumbnails
+        const thumbsEl=document.getElementById('gpdPcThumbs');
+        if(thumbsEl){
+            if(images.length>1){
+                thumbsEl.style.display='flex';
+                thumbsEl.innerHTML=images.map((src,i)=>`
+                    <div class="gpd-pc-thumb ${i===0?'active':''}" id="gpdPcThumb-${i}" onclick="gpdPcGoTo(${i})">
+                        <img src="${src}" onerror="this.src=''" alt="">
+                    </div>`).join('');
+            } else { thumbsEl.style.display='none'; }
         }
 
-        // like লজিক
-        const userId = (appState && appState.currentUser && appState.currentUser.id) ? appState.currentUser.id : 'GUEST';
-        const likedBy = Array.isArray(origItem && origItem.likedBy ? origItem.likedBy : []) ? (origItem && origItem.likedBy ? origItem.likedBy : []) : [];
-        const isLiked = likedBy.includes(userId);
-        const heartIcon = isLiked ? '❤️' : '🤍';
+        // Title & nav title
+        const titleEl=document.getElementById('gpdPcTitle');
+        if(titleEl) titleEl.textContent=item.title;
+        const navTitleEl=document.getElementById('gpdPcNavTitle');
+        if(navTitleEl) navTitleEl.textContent=item.title;
+
+        // Price
+        const priceEl=document.getElementById('gpdPcPrice');
+        if(priceEl) priceEl.textContent=item.price;
+        const oldEl=document.getElementById('gpdPcOld');
+        const disEl=document.getElementById('gpdPcDiscount');
+        if(oldEl){ if(dispOldPrice){oldEl.textContent='৳'+dispOldPrice;oldEl.style.display='inline';}else{oldEl.style.display='none';} }
+        if(disEl){ if(dispDiscount){disEl.textContent='-'+dispDiscount;disEl.style.display='inline-block';}else{disEl.style.display='none';} }
+
+        // SKU
+        const skuEl=document.getElementById('gpdPcSku');
+        if(skuEl) skuEl.textContent=item.id||'—';
+
+        // Action buttons
+        const buyBtn=document.getElementById('gpdPcBuyBtn');
+        const cartBtn=document.getElementById('gpdPcCartBtn');
+        const shareBtn=document.getElementById('gpdPcShareBtn');
+        const wishBtn=document.getElementById('gpdPcWishBtn');
+        if(buyBtn) buyBtn.onclick=()=>{ closeGpModal(); initiateCheckout(item.id); };
+        if(cartBtn) cartBtn.onclick=()=>{ closeGpModal(); addToCart(item.id); };
+        if(shareBtn) shareBtn.onclick=()=>gpShareProduct();
+        if(wishBtn) wishBtn.onclick=()=>{ closeGpModal(); addToCart(item.id); };
+
+        // Like / Share / 3dot
+        const likeBtn=document.getElementById('gpdPcLikeBtn');
+        const heartIcon=document.getElementById('gpdPcHeartIcon');
+        const likeCount=document.getElementById('gpdPcLikeCount');
+        const share2Btn=document.getElementById('gpdPcShare2Btn');
+        const dot3Btn=document.getElementById('gpdPc3DotBtn');
+        if(heartIcon) heartIcon.textContent=isLiked?'❤️':'🤍';
+        if(likeCount) likeCount.textContent=item.likes||0;
+        if(likeBtn){
+            likeBtn.classList.toggle('liked',isLiked);
+            likeBtn.onclick=()=>{ toggleProductLike(item.id); };
+        }
+        if(share2Btn) share2Btn.onclick=()=>gpShareProduct();
+        if(dot3Btn) dot3Btn.onclick=()=>{ if(typeof openProductOptions==='function') openProductOptions(item.id); };
+
+        // Spec
+        const specContent=document.getElementById('gpdPcSpecContent');
+        if(specContent) specContent.innerHTML=specHtml;
+
+        // Details
+        const descContent=document.getElementById('gpdPcDescContent');
+        if(descContent) descContent.textContent=item.description||'বিস্তারিত শীঘ্রই যোগ হবে।';
+        const tagsContent=document.getElementById('gpdPcTagsContent');
+        if(tagsContent){ const tags=Array.isArray(item.tags)?item.tags:[]; tagsContent.innerHTML=tags.map(t=>`<span style="background:#fff3e0;color:#f57224;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;">#${t}</span>`).join(''); }
+
+        // Seller
+        const sellerContent=document.getElementById('gpdPcSellerContent');
+        if(sellerContent) sellerContent.innerHTML=`
+            <div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:18px;">
+                <h5 style="margin:0 0 8px;font-size:12px;color:#888;text-transform:uppercase;">Sold By</h5>
+                <div style="color:#1976d2;font-size:15px;font-weight:700;margin-bottom:${sRating?'10':'0'}px;">${sName}</div>
+                ${sRating?`<div style="font-size:11px;color:#888;margin-bottom:4px;">Positive Seller Ratings</div>
+                <div style="font-size:24px;font-weight:800;color:#22c55e;margin-bottom:6px;">${sRating}%</div>
+                <div style="background:#e5e7eb;border-radius:10px;height:7px;overflow:hidden;"><div style="background:linear-gradient(90deg,#22c55e,#16a34a);width:${sRating}%;height:100%;border-radius:10px;"></div></div>`:''}
+            </div>
+            <div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:18px;">
+                <h5 style="margin:0 0 8px;font-size:12px;color:#888;text-transform:uppercase;">Delivery</h5>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                    <div><div style="font-size:14px;font-weight:700;color:#222;">Standard Delivery</div><div style="font-size:12px;color:#888;">3–5 কার্যদিবস</div></div>
+                    <div style="font-size:18px;font-weight:800;color:#f57224;">৳${dCharge}</div>
+                </div>
+            </div>
+            <div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:18px;">
+                <h5 style="margin:0 0 8px;font-size:12px;color:#888;text-transform:uppercase;">Service</h5>
+                <div style="font-size:13px;color:#222;margin-bottom:8px;"><i class="fa fa-undo" style="color:#22c55e;margin-right:6px;"></i>7 Days Returns</div>
+                <div style="font-size:12px;color:#666;"><i class="fa fa-shield-alt" style="color:#888;margin-right:6px;"></i>Authentic Product</div>
+            </div>`;
+
+        // Accordion reset — open
+        ['spec','details','seller'].forEach(k=>{
+            const body=document.getElementById('gpd-body-'+k);
+            const arrow=document.getElementById('gpd-arrow-'+k);
+            if(body) body.classList.remove('hidden');
+            if(arrow) arrow.classList.remove('collapsed');
+        });
+
+        _gpdRenderRelated(item);
+
+    } else {
+        /* ══ MOBILE VIEW ══ */
+        document.getElementById('gpdPcBox').style.display='none';
+        document.querySelector('.gpd-mobile-view').style.display='block';
+
+        // topbar title
+        const titleEl2=document.getElementById('gpModalTitle');
+        if(titleEl2) titleEl2.textContent=item.title;
+
+        // main image
+        _gpdUpdateImg();
+
+        // thumbnails
+        const thumbsEl2=document.getElementById('gpdThumbs');
+        if(thumbsEl2){
+            if(images.length>1){
+                thumbsEl2.style.display='flex';
+                thumbsEl2.innerHTML=images.map((src,i)=>`
+                    <div class="gpd-thumb ${i===0?'active':''}" id="gpd-thumb-${i}" onclick="gpdGoTo(${i})">
+                        <img src="${src}" onerror="this.src=''" alt="">
+                    </div>`).join('');
+            } else { thumbsEl2.style.display='none'; thumbsEl2.innerHTML=''; }
+        }
+
+        // price
+        const priceEl2=document.getElementById('gpModalPrice');
+        if(priceEl2) priceEl2.textContent=item.price;
+        const oldEl2=document.getElementById('gpModalOld');
+        const disEl2=document.getElementById('gpModalDiscount');
+        if(oldEl2){ if(dispOldPrice){oldEl2.textContent='৳'+dispOldPrice;oldEl2.style.display='inline';}else{oldEl2.style.display='none';} }
+        if(disEl2){ if(dispDiscount){disEl2.textContent='-'+dispDiscount;disEl2.style.display='inline-block';}else{disEl2.style.display='none';} }
+
+        // name
+        const nameEl=document.getElementById('gpModalName');
+        if(nameEl) nameEl.textContent=item.title;
 
         // stars
-        const r = parseFloat(p.rating) || 4.2;
-        const full = Math.floor(r); const half = (r - full) >= 0.5;
-        let sh = ''; for(let i=0;i<full;i++) sh+='★'; if(half) sh+='½'; for(let i=full+(half?1:0);i<5;i++) sh+='☆';
-        const cnt = 35 + Math.abs(Math.floor((String(p.id||'').charCodeAt(0)||0)) % 200);
+        const starsIconEl=document.getElementById('gpModalStarIcons');
+        const starsValEl=document.getElementById('gpModalStarVal');
+        const reviewCntEl=document.getElementById('gpModalReviewCount');
+        let sh=''; for(let i=0;i<fullStars;i++) sh+='★'; if(halfStar) sh+='½'; for(let i=fullStars+(halfStar?1:0);i<5;i++) sh+='☆';
+        if(starsIconEl) starsIconEl.textContent=sh;
+        if(starsValEl) starsValEl.textContent=spRating.toFixed(1);
+        if(reviewCntEl) reviewCntEl.textContent='('+spRatingCnt+')';
 
-        // spec table
-        const sp = p.specifications || {};
-        const specRows = [['Product Type',sp.productType],['Size',sp.size],['Material',sp.material],['Features',sp.features],['Suitable For',sp.suitableFor],['Closure Type',sp.closureType],['Absorbency',sp.absorbency],['Packaging',sp.packaging]].filter(r=>r[1]);
-        const specHtml = specRows.length
-            ? `<table class="gpd-spec-table">${specRows.map((r,i)=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`
-            : `<div style="text-align:center;padding:30px;color:#aaa;">Specifications পাওয়া যায়নি।</div>`;
+        // options
+        const optEl=document.getElementById('gpModalOptions');
+        if(optEl) optEl.textContent='অপশন দেখতে লগইন করুন';
+        const optSec=document.getElementById('gpMobOptionsSec');
+        if(optSec) optSec.onclick=()=>{ closeGpModal(); if(typeof openModal==='function') openModal('loginModal'); };
 
-        // seller box
-        const sName = p.sellerName || 'Digital Shop TM';
-        const sRating = p.sellerRating || '';
-        const dCharge = p.deliveryCharge || '150';
-        const lbSz = isMobile ? '32px' : '11px';
-        const nmSz = isMobile ? '36px' : '15px';
-        const prSz = isMobile ? '32px' : '11px';
-        const pvSz = isMobile ? '40px' : '18px';
-        const dlSz = isMobile ? '32px' : '11px';
-        const dsSz = isMobile ? '34px' : '13px';
-        const dsubSz = isMobile ? '30px' : '12px';
-        const dprSz = isMobile ? '38px' : '16px';
-        const svSz = isMobile ? '32px' : '11px';
-        const svcSz = isMobile ? '34px' : '13px';
-        const svc2Sz = isMobile ? '30px' : '12px';
-        const sellerHtml = `<div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:${lbSz};color:#888;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Sold By</div><div style="color:#1976d2;font-size:${nmSz};font-weight:700;">${sName}</div>${sRating?`<div style="margin-top:8px;"><span style="font-size:${prSz};color:#888;">Positive Seller Ratings: </span><span style="font-size:${pvSz};font-weight:800;color:#22c55e;">${sRating}%</span></div><div style="margin-top:4px;background:#e5e7eb;border-radius:10px;height:6px;overflow:hidden;"><div style="background:linear-gradient(90deg,#22c55e,#16a34a);width:${sRating}%;height:100%;border-radius:10px;"></div></div>`:''}</div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:${dlSz};color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Delivery</div><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:${dsSz};font-weight:700;color:#222;">Standard Delivery</div><div style="font-size:${dsubSz};color:#888;">3–5 কার্যদিবস</div></div><div style="font-size:${dprSz};font-weight:800;color:#f57224;">৳${dCharge}</div></div></div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;"><div style="font-size:${svSz};color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Service</div><div style="color:#222;font-size:${svcSz};margin-bottom:6px;"><i class="fa fa-undo" style="color:#22c55e;margin-right:6px;"></i>7 Days Returns</div><div style="color:#666;font-size:${svc2Sz};"><i class="fa fa-shield-alt" style="color:#888;margin-right:6px;"></i>Authentic Product</div></div>`;
+        // desc
+        const descEl2=document.getElementById('gpModalDesc');
+        if(descEl2) descEl2.textContent=item.description||'বিস্তারিত শীঘ্রই।';
 
         // tags
-        const tags = Array.isArray(p.tags) ? p.tags : [];
-        const tagsHtml = tags.length ? tags.map(t=>`<span style="background:#fff3e0;color:#f57224;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;">#${t}</span>`).join('') : '';
+        const tagsRow=document.getElementById('gpModalTagsRow');
+        if(tagsRow){ const tags=Array.isArray(item.tags)?item.tags:[]; tagsRow.innerHTML=tags.map(t=>`<span style="background:#fff3e0;color:#f57224;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;">#${t}</span>`).join(''); }
 
-        // related products (index.html এর appState থেকে)
-        let relatedHtml = '';
-        if (appState && appState.products) {
-            const curCat = String(p.category||'').toLowerCase();
-            const curTags = tags.map(t=>t.toLowerCase());
-            const related = appState.products.filter(rp => {
-                if (String(rp.id) === String(p.id)) return false;
-                if (curCat && rp.category && rp.category.toLowerCase() === curCat) return true;
-                const rpTags = Array.isArray(rp.tags) ? rp.tags.map(t=>t.toLowerCase()) : [];
-                return curTags.some(t => rpTags.includes(t));
-            }).slice(0, 8);
-            if (related.length) {
-                relatedHtml = related.map(rp => {
-                    const rpImg = Array.isArray(rp.images) ? rp.images[0] : (rp.image || 'ko.jpeg');
-                    const rpSafeP = encodeURIComponent(JSON.stringify({
-                        id:rp.id, name:rp.title||rp.name||'পণ্য',
-                        rating:rp.rating||4.2, img:rpImg,
-                        imgs:Array.isArray(rp.images)?rp.images:[rpImg],
-                        price:rp.price, oldPrice:rp.oldPrice||Math.floor(rp.price*1.3),
-                        discount:'', desc:(rp.description||'').substring(0,400),
-                        specifications:rp.specifications||{},
-                        sellerName:rp.sellerName||'Digital Shop TM',
-                        sellerRating:rp.sellerRating||'',
-                        deliveryCharge:rp.deliveryCharge||'150',
-                        tags:rp.tags||[], category:rp.category||''
-                    }));
-                    return `<div class="gpd-rel-card" onclick="openGpModalIndex('${rpSafeP}', appState.products.find(x=>String(x.id)==='${rp.id}'))">
-                        <img src="${rpImg}" onerror="this.src='ko.jpeg'" alt="${rp.title||rp.name||''}">
-                        <div class="gpd-rel-card-body">
-                            <div class="gpd-rel-card-name">${rp.title||rp.name||'পণ্য'}</div>
-                            <div class="gpd-rel-card-price">৳${rp.price}</div>
-                        </div>
-                    </div>`;
-                }).join('');
-            }
+        // spec
+        const specTable=document.getElementById('gpModalSpecTable');
+        if(specTable){ specTable.innerHTML=specRows.length?`<table style="width:100%;border-collapse:collapse;">${specRows.map((r,i)=>`<tr style="background:${i%2===0?'#fafafa':'#fff'};"><td style="padding:10px 12px;color:#666;font-weight:600;width:42%;border-bottom:1px solid #f0f0f0;font-size:12px;">${r[0]}</td><td style="padding:10px 12px;color:#222;border-bottom:1px solid #f0f0f0;font-size:13px;">${r[1]}</td></tr>`).join('')}</table>`:'<div style="text-align:center;padding:28px;color:#bbb;">Specifications পাওয়া যায়নি।</div>'; }
+
+        // seller
+        const sellerBox=document.getElementById('gpModalSellerBox');
+        if(sellerBox){ sellerBox.innerHTML=`<div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:12px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Sold By</div><div style="color:#1976d2;font-size:16px;font-weight:700;">${sName}</div>${sRating?`<div style="margin-top:8px;"><span style="font-size:12px;color:#888;">Positive Seller Ratings: </span><span style="font-size:20px;font-weight:800;color:#22c55e;">${sRating}%</span></div><div style="margin-top:4px;background:#e5e7eb;border-radius:10px;height:6px;overflow:hidden;"><div style="background:linear-gradient(90deg,#22c55e,#16a34a);width:${sRating}%;height:100%;border-radius:10px;"></div></div>`:''}</div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:12px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Delivery</div><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:14px;font-weight:700;color:#222;">Standard Delivery</div><div style="font-size:12px;color:#888;">3–5 কার্যদিবস</div></div><div style="font-size:18px;font-weight:800;color:#f57224;">৳${dCharge}</div></div></div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;"><div style="font-size:12px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Service</div><div style="color:#222;font-size:13px;margin-bottom:6px;"><i class="fa fa-undo" style="color:#22c55e;margin-right:6px;"></i>7 Days Returns</div><div style="color:#666;font-size:12px;"><i class="fa fa-shield-alt" style="color:#888;margin-right:6px;"></i>Authentic Product</div></div>`; }
+
+        // Mobile accordion reset — open
+        ['mspec','mdetails','mseller'].forEach(k=>{
+            const body=document.getElementById('gpd-mob-'+k);
+            if(body) body.classList.remove('hidden');
+            const head=body?body.previousElementSibling:null;
+            if(head){ const arr=head.querySelector('.gpd-mob-accord-arrow'); if(arr) arr.classList.remove('collapsed'); }
+        });
+
+        // Action bar buttons
+        const mobBuyBtn=document.getElementById('gpdMobBuyBtn');
+        const mobCartBtn=document.getElementById('gpdMobCartBtn');
+        const mobChatBtn=document.getElementById('gpdMobChatBtn');
+        const mobStoreBtn=document.getElementById('gpdMobStoreBtn');
+        if(mobBuyBtn) mobBuyBtn.onclick=()=>{ closeGpModal(); initiateCheckout(item.id); };
+        if(mobCartBtn) mobCartBtn.onclick=()=>{ closeGpModal(); addToCart(item.id); };
+        // Wishlist (chat button) → addToCart
+        if(mobChatBtn) mobChatBtn.onclick=()=>{ closeGpModal(); addToCart(item.id); };
+        if(mobStoreBtn) mobStoreBtn.onclick=()=>{ closeGpModal(); if(typeof openModal==='function') openModal('loginModal'); };
+
+        // Mobile Like / Share / 3dot
+        const mobLikeBtn=document.getElementById('gpdMobLikeBtn');
+        const mobHeartIcon=document.getElementById('gpdMobHeartIcon');
+        const mobLikeCount=document.getElementById('gpdMobLikeCount');
+        const mobShareBtn=document.getElementById('gpdMobShareBtn');
+        const mob3Dot=document.getElementById('gpdMob3Dot');
+        if(mobHeartIcon) mobHeartIcon.textContent=isLiked?'❤️':'🤍';
+        if(mobLikeCount) mobLikeCount.textContent=item.likes||0;
+        if(mobLikeBtn){
+            mobLikeBtn.classList.toggle('liked',isLiked);
+            mobLikeBtn.onclick=()=>{ toggleProductLike(item.id); };
         }
+        if(mobShareBtn) mobShareBtn.onclick=()=>gpShareProduct();
+        if(mob3Dot) mob3Dot.onclick=()=>{ if(typeof openProductOptions==='function') openProductOptions(item.id); };
 
-        if (!isMobile) {
-            /* ══ PC VIEW ══ */
-            modal.innerHTML = `
-            <div class="gpd-pc-box" style="display:flex;">
-                <!-- Sticky top bar -->
-                <div style="position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;padding:12px 40px;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-                    <button onclick="closeGpModalIndex()" style="background:#f5f5f5;border:none;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;transition:.2s;" onmouseover="this.style.background='#fee2e2';this.style.color='#ef4444'" onmouseout="this.style.background='#f5f5f5';this.style.color='#333'">✕</button>
-                    <div style="font-size:15px;font-weight:700;color:#222;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
-                    <button onclick="gpShareProductIndex()" style="background:#f5f5f5;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;color:#555;display:flex;align-items:center;gap:6px;font-family:'Hind Siliguri',sans-serif;transition:.2s;"><i class="fa fa-share-alt"></i> Share</button>
-                </div>
+        // Topbar icons
+        const cartIcon=document.getElementById('gpMobCartIcon');
+        const dot3Icon=document.getElementById('gpMob3DotIcon');
+        if(cartIcon) cartIcon.onclick=()=>{ closeGpModal(); if(typeof openUserCart==='function') openUserCart(); };
+        if(dot3Icon) dot3Icon.onclick=()=>{ if(typeof openProductOptions==='function') openProductOptions(item.id); };
 
-                <!-- Top: image left + info right -->
-                <div class="gpd-pc-top">
-                    <div class="gpd-pc-left">
-                        <div class="gpd-pc-mainimg-wrap">
-                            <img id="gpdIdxPcMainImg" src="${imgs[0]||'ko.jpeg'}" alt="" onerror="this.src='ko.jpeg'">
-                        </div>
-                        <div class="gpd-pc-thumbs" id="gpdIdxPcThumbs" style="${imgs.length>1?'display:flex;':'display:none;'}">
-                            ${imgs.map((src,i)=>`<div class="gpd-pc-thumb ${i===0?'active':''}" id="gpdIdxPcThumb-${i}" onclick="gpdIdxPcGoTo(${i})"><img src="${src}" onerror="this.src='ko.jpeg'" alt=""></div>`).join('')}
-                        </div>
-                    </div>
-
-                    <div class="gpd-pc-right">
-                        <div class="gpd-pc-brand">Brand: <span>Digital Shop TM</span></div>
-                        <div class="gpd-pc-title">${p.name}</div>
-                        <div class="gpd-pc-price-row">
-                            <span style="color:#f57224;font-size:15px;font-weight:700;">৳</span>
-                            <span class="gpd-pc-price">${p.price}</span>
-                            ${p.oldPrice ? `<span class="gpd-pc-old">৳${p.oldPrice}</span>` : ''}
-                            ${p.discount ? `<span class="gpd-pc-discount">-${p.discount}</span>` : ''}
-                        </div>
-                        <div class="gpd-pc-sku">SKU: <span>${p.id || '—'}</span></div>
-                        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-                            <i class="fa fa-check-circle" style="color:#22c55e;"></i>
-                            <span style="color:#16a34a;font-size:13px;font-weight:600;">In Stock</span>
-                        </div>
-                        <div class="gpd-pc-actions">
-                            <button class="gpd-pc-btn-buy" onclick="closeGpModalIndex(); initiateCheckout('${p.id}')">⚡ Buy Now</button>
-                            <button class="gpd-pc-btn-cart" onclick="addToCart('${p.id}')">🛒 Add to Cart</button>
-                        </div>
-                        <div class="gpd-pc-share-row" style="margin-top:16px;">
-                            <button class="gpd-pc-share-btn" onclick="gpShareProductIndex()"><i class="fa fa-share-alt"></i> Share</button>
-                            <button class="gpd-pc-share-btn" onclick="addToCart('${p.id}')"><i class="fa fa-heart-o"></i> Wishlist</button>
-                        </div>
-                        <!-- like/share/3dot — Buy Now এর নিচে -->
-                        <div style="display:flex;gap:10px;margin-top:14px;">
-                            <button id="gpIdxLikeBtn-${p.id}" onclick="toggleProductLike('${p.id}')" style="flex:2;padding:10px;background:#f5f5f5;color:${isLiked?'#ef4444':'#555'};border:1px solid ${isLiked?'#ef4444':'#ddd'};border-radius:10px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;">
-                                <span>${heartIcon}</span><span>${origItem ? (origItem.likes||0) : 0}</span>
-                            </button>
-                            <button onclick="gpShareProductIndex()" style="flex:2;padding:10px;background:#f5f5f5;color:#555;border:1px solid #ddd;border-radius:10px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;">
-                                <span>🔗</span><span>শেয়ার</span>
-                            </button>
-                            <button onclick="openProductOptions('${p.id}')" style="flex:0.5;min-width:44px;padding:10px;background:#f5f5f5;color:#555;border:1px solid #ddd;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;">⋮</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Accordion sections -->
-                <div class="gpd-pc-tabs-wrap" style="max-width:1400px;margin:0 auto;width:100%;padding:0 40px 60px;">
-                    <div class="gpd-accord-block">
-                        <div class="gpd-accord-head" onclick="gpdIdxToggleAccord('spec')"><span>📋 Specifications</span><span class="gpd-accord-arrow" id="gpd-idx-arrow-spec">▲</span></div>
-                        <div class="gpd-accord-body" id="gpd-idx-body-spec">${specHtml}</div>
-                    </div>
-                    <div class="gpd-accord-block">
-                        <div class="gpd-accord-head" onclick="gpdIdxToggleAccord('details')"><span>📄 Product Details</span><span class="gpd-accord-arrow" id="gpd-idx-arrow-details">▲</span></div>
-                        <div class="gpd-accord-body" id="gpd-idx-body-details">
-                            <div style="font-size:14px;color:#444;line-height:1.9;white-space:pre-wrap;">${p.desc||'বিস্তারিত শীঘ্রই।'}</div>
-                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;">${tagsHtml}</div>
-                        </div>
-                    </div>
-                    <div class="gpd-accord-block">
-                        <div class="gpd-accord-head" onclick="gpdIdxToggleAccord('seller')"><span>🏪 Seller</span><span class="gpd-accord-arrow" id="gpd-idx-arrow-seller">▲</span></div>
-                        <div class="gpd-accord-body" id="gpd-idx-body-seller">${sellerHtml}</div>
-                    </div>
-                    ${relatedHtml ? `<div style="margin-top:32px;border-top:3px solid #f0f0f0;padding-top:28px;"><div style="font-size:20px;font-weight:800;color:#111;margin-bottom:16px;">🔍 সম্পর্কিত পণ্য</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;">${relatedHtml}</div></div>` : ''}
-                </div>
-            </div>`;
-        } else {
-            /* ══ MOBILE VIEW ══ */
-            modal.innerHTML = `
-            <div class="gpd-mobile-view" style="display:block;">
-                <div class="gpd-topbar">
-                    <button class="gpd-back-btn" onclick="closeGpModalIndex()">&#8592;</button>
-                    <div class="gpd-topbar-title">${p.name}</div>
-                    <div class="gpd-topbar-icons">
-                        <i class="fa fa-shopping-cart" onclick="addToCart('${p.id}')" style="cursor:pointer;"></i>
-                        <i class="fa fa-ellipsis-v" onclick="openProductOptions('${p.id}')" style="cursor:pointer;"></i>
-                    </div>
-                </div>
-                <!-- Image -->
-                <div class="gpd-img-slider">
-                    <img class="gpd-main-img" id="gpIdxModalImg" src="${imgs[0]||'ko.jpeg'}" alt="" onerror="this.src='ko.jpeg'">
-                    <div class="gpd-img-counter" id="gpIdxImgCounter">1/${imgs.length}</div>
-                </div>
-                <!-- Thumbnails -->
-                <div class="gpd-thumbs" id="gpIdxThumbs" style="${imgs.length>1?'display:flex;':'display:none;'}">
-                    ${imgs.map((src,i)=>`<div class="gpd-thumb ${i===0?'active':''}" id="gpIdx-thumb-${i}" onclick="gpIdxGoTo(${i})"><img src="${src}" onerror="this.src='ko.jpeg'" alt=""></div>`).join('')}
-                </div>
-                <!-- Price -->
-                <div class="gpd-price-sec">
-                    <div class="gpd-price-row">
-                        <span class="gpd-taka">৳</span>
-                        <span class="gpd-price">${p.price}</span>
-                        ${p.oldPrice ? `<span class="gpd-old-price">৳${p.oldPrice}</span>` : ''}
-                        ${p.discount ? `<span class="gpd-discount-badge">${p.discount}</span>` : ''}
-                        <div class="gpd-heart-share">
-                            <i class="fa ${isLiked?'fa-heart':'fa-heart-o'}" onclick="toggleProductLike('${p.id}')" style="cursor:pointer;color:${isLiked?'#ef4444':'#888'};"></i>
-                            <i class="fa fa-share-alt" onclick="gpShareProductIndex()" style="cursor:pointer;"></i>
-                        </div>
-                    </div>
-                    <div class="gpd-name">${p.name}</div>
-                    <div class="gpd-stars-row">
-                        <span class="gpd-star-icons">${sh}</span>
-                        <span class="gpd-stars-val">${r.toFixed(1)}</span>
-                        <span class="gpd-review-count">(${cnt})</span>
-                    </div>
-                </div>
-                <div class="gpd-divider"></div>
-
-                <!-- Buy Now / Add to Cart / Share / Wishlist বাটন -->
-                <div style="display:flex;gap:8px;padding:12px 14px;background:#fff;border-bottom:1px solid #f0f0f0;flex-wrap:wrap;">
-                    <button onclick="closeGpModalIndex(); initiateCheckout('${p.id}')" style="flex:1;min-width:140px;padding:16px 10px;background:#38bdf8;color:#fff;border:none;border-radius:10px;font-size:28px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">⚡ Buy Now</button>
-                    <button onclick="addToCart('${p.id}')" style="flex:1;min-width:140px;padding:16px 10px;background:#f97316;color:#fff;border:none;border-radius:10px;font-size:28px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">🛒 Add to Cart</button>
-                    <button onclick="gpShareProductIndex()" style="flex:1;min-width:100px;padding:16px 10px;background:#f5f5f5;color:#333;border:1px solid #ddd;border-radius:10px;font-size:26px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa fa-share-alt"></i> Share</button>
-                    <button onclick="addToCart('${p.id}')" style="flex:1;min-width:100px;padding:16px 10px;background:#f5f5f5;color:#e11d48;border:1px solid #fecdd3;border-radius:10px;font-size:26px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa fa-heart-o"></i> Wishlist</button>
-                </div>
-                <!-- like/share/3dot — বাটনের নিচে -->
-                <div style="display:flex;gap:10px;padding:10px 14px;background:#fff;border-bottom:1px solid #f0f0f0;">
-                    <button id="gpIdxLikeBtn-${p.id}" onclick="toggleProductLike('${p.id}')" style="flex:2;padding:14px;background:#f5f5f5;color:${isLiked?'#ef4444':'#555'};border:1px solid ${isLiked?'#ef4444':'#ddd'};border-radius:10px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;font-size:28px;">
-                        <span>${heartIcon}</span><span>${origItem ? (origItem.likes||0) : 0}</span>
-                    </button>
-                    <button onclick="gpShareProductIndex()" style="flex:2;padding:14px;background:#f5f5f5;color:#555;border:1px solid #ddd;border-radius:10px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;font-size:28px;">
-                        <span>🔗</span><span>শেয়ার</span>
-                    </button>
-                    <button onclick="openProductOptions('${p.id}')" style="flex:0.5;min-width:60px;padding:14px;background:#f5f5f5;color:#555;border:1px solid #ddd;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:30px;">⋮</button>
-                </div>
-
-                <div class="gpd-divider"></div>
-                <div style="padding:0 14px;">
-                    <!-- Specifications -->
-                    <div class="gpd-mob-accord-block">
-                        <div class="gpd-mob-accord-head" onclick="gpdIdxMobToggle('mspec',this)">
-                            <span style="font-size:44px;font-weight:800;color:#111;">📋 Specifications</span>
-                            <span class="gpd-mob-accord-arrow">▲</span>
-                        </div>
-                        <div class="gpd-mob-accord-body" id="gpd-idx-mob-mspec">${specHtml}</div>
-                    </div>
-                    <!-- Product Details -->
-                    <div class="gpd-mob-accord-block">
-                        <div class="gpd-mob-accord-head" onclick="gpdIdxMobToggle('mdetails',this)">
-                            <span style="font-size:44px;font-weight:800;color:#111;">📄 Product Details</span>
-                            <span class="gpd-mob-accord-arrow">▲</span>
-                        </div>
-                        <div class="gpd-mob-accord-body gpd-desc-text" id="gpd-idx-mob-mdetails">
-                            ${p.desc||'বিস্তারিত শীঘ্রই।'}
-                            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;">${tagsHtml}</div>
-                        </div>
-                    </div>
-                    <!-- Seller -->
-                    <div class="gpd-mob-accord-block">
-                        <div class="gpd-mob-accord-head" onclick="gpdIdxMobToggle('mseller',this)">
-                            <span style="font-size:44px;font-weight:800;color:#111;">🏪 Seller</span>
-                            <span class="gpd-mob-accord-arrow">▲</span>
-                        </div>
-                        <div class="gpd-mob-accord-body" id="gpd-idx-mob-mseller">${sellerHtml}</div>
-                    </div>
-                    ${relatedHtml ? `<div style="margin-top:20px;"><div style="font-size:32px;font-weight:800;color:#111;margin-bottom:12px;">🔍 সম্পর্কিত পণ্য</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding-bottom:12px;">${relatedHtml}</div></div>` : ''}
-                </div>
-                <div class="gpd-spacer"></div>
-                <!-- Bottom Action Bar -->
-                <div class="gpd-action-bar">
-                    <button class="gpd-store-btn" onclick="void(0)">
-                        <i class="fa fa-store-alt" style="font-size:20px;color:#f57224;"></i>
-                        <span>Store</span>
-                    </button>
-                    <button class="gpd-chat-btn" onclick="void(0)">
-                        <i class="fa fa-comment-dots"></i>
-                        <span>Chat</span>
-                    </button>
-                    <button class="gpd-buynow-btn" onclick="closeGpModalIndex(); initiateCheckout('${p.id}')">Buy Now</button>
-                    <button class="gpd-addcart-btn" onclick="addToCart('${p.id}')">Add to Cart</button>
-                </div>
-            </div>`;
-        }
-
-        modal.style.display = 'block';
-        modal.scrollTop = 0;
-        document.body.style.overflow = 'hidden';
-
-    } catch(e) { console.error('gpModalIndex error', e); }
-}
-
-function closeGpModalIndex() {
-    const m = document.getElementById('gpDetailModalIndex');
-    if (m) m.style.display = 'none';
-    document.body.style.overflow = '';
-}
-
-function gpShareProductIndex() {
-    const id = window._gpdCurrentId;
-    const name = window._gpdCurrentName;
-    if (!id) return;
-    const url = window.location.href.split('?')[0] + '?product=' + encodeURIComponent(id);
-    if (navigator.share) {
-        navigator.share({ title: name || 'পণ্য', text: name || 'এই পণ্যটি দেখুন', url }).catch(()=>{});
-    } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(url).then(()=>{ showNotification && showNotification('লিংক কপি হয়েছে!','success'); }).catch(()=>{});
-    }
-}
-
-function gpdIdxPcGoTo(idx) {
-    window._gpdIdxCur = idx;
-    const mainImg = document.getElementById('gpdIdxPcMainImg');
-    if (mainImg) mainImg.src = (window._gpdImgsIdx||[])[idx] || 'ko.jpeg';
-    document.querySelectorAll('.gpd-pc-thumb').forEach((t,i) => t.classList.toggle('active', i===idx));
-}
-
-function gpIdxGoTo(idx) {
-    window._gpdIdxCur = idx;
-    const imgEl = document.getElementById('gpIdxModalImg');
-    if (imgEl) imgEl.src = (window._gpdImgsIdx||[])[idx] || 'ko.jpeg';
-    const ctr = document.getElementById('gpIdxImgCounter');
-    if (ctr) ctr.textContent = (idx+1)+'/'+(window._gpdImgsIdx||[]).length;
-    document.querySelectorAll('.gpd-thumb').forEach((t,i) => t.classList.toggle('active', i===idx));
-}
-
-function gpdIdxToggleAccord(key) {
-    const body = document.getElementById('gpd-idx-body-'+key);
-    const arrow = document.getElementById('gpd-idx-arrow-'+key);
-    if (!body) return;
-    const isHidden = body.classList.contains('hidden');
-    body.classList.toggle('hidden', !isHidden);
-    if (arrow) arrow.classList.toggle('collapsed', !isHidden);
-}
-
-function gpdIdxMobToggle(key, headEl) {
-    const body = document.getElementById('gpd-idx-mob-'+key);
-    if (!body) return;
-    const arrow = headEl ? headEl.querySelector('.gpd-mob-accord-arrow') : null;
-    const isHidden = body.classList.contains('hidden');
-    body.classList.toggle('hidden', !isHidden);
-    if (arrow) arrow.classList.toggle('collapsed', !isHidden);
-}
-
-// ════════════════════════════════════════
-// পুরনো openProductDetails এর বাকি অংশ (compat)
-// ════════════════════════════════════════
-function _openProductDetailsOLD(productId) {
-    const item = appState.products.find(p => String(p.id) === String(productId));
-    if (!item) { return; }
-    const images = Array.isArray(item.images) ? item.images : [item.images || item.image || 'https://via.placeholder.com/400'];
-
-    // ৩. মোডাল তৈরি বা চেক করা
-    let modal = document.getElementById('dynamicDetailModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'dynamicDetailModal';
-        modal.style = `position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); backdrop-filter:blur(15px); z-index:98678399999999; display:none; justify-content:center; align-items:center; padding:10px; font-family:'Hind Siliguri', sans-serif;`;
-        document.body.appendChild(modal);
+        _gpdRenderRelated(item);
     }
 
-    // ৪. ডাটা রিকভারি ও অটো-ক্লিনআপ (রিফ্রেশ সমস্যা সমাধান)
-    const savedReports = localStorage.getItem('tm_reports');
-    appState.reports = savedReports ? JSON.parse(savedReports) : [];
-
-    const now = Date.now();
-    const originalLength = appState.reports.length;
-    appState.reports = appState.reports.filter(r => !r.expiryTimestamp || r.expiryTimestamp > now);
-    
-    if (appState.reports.length !== originalLength) {
-        localStorage.setItem('tm_reports', JSON.stringify(appState.reports));
-    }
-
-    // ৫. সম্পর্কিত পণ্য ফিল্টার
-    const _iTags = Array.isArray(item.tags) ? item.tags.map(t=>String(t).toLowerCase()) : (item.tags ? String(item.tags).toLowerCase().split(',').map(t=>t.trim()) : []);
-    const _iWords = item.title.toLowerCase().split(' ').filter(w=>w.length>2);
-    const relatedProducts = appState.products.filter(p => {
-        if (String(p.id) === String(item.id)) return false;
-        if (p.category && item.category && p.category === item.category) return true;
-        const pTags = Array.isArray(p.tags) ? p.tags.map(t=>String(t).toLowerCase()) : (p.tags ? String(p.tags).toLowerCase().split(',').map(t=>t.trim()) : []);
-        if (_iTags.some(t=>pTags.includes(t))) return true;
-        return _iWords.some(w=>p.title.toLowerCase().split(' ').includes(w));
-    }).slice(0, 6);
-
-    // ৬. অ্যাডমিন চেক (আপনার সিস্টেমের লজিক অনুযায়ী)
-    const isAdminUser = (typeof isAdmin === 'function') ? isAdmin() : false;
-
-    let adminExtraButtons = '';
-    // if (isAdminUser) {
-    //     adminExtraButtons = `<button onclick="editProduct('${item.id}')" style="flex:1; padding:18px; background:#3498db; color:#fff; border:none; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer; transition:0.3s; margin-top:10px; display:flex; align-items:center; justify-content:center; gap:8px;">📝 এডিট প্রোডাক্ট (Admin)</button>`;
-    // }
-
-    // ৭. লাইক লজিক
-    const userId = (appState.currentUser && appState.currentUser.id) ? appState.currentUser.id : 'GUEST';
-    const likedByArray = Array.isArray(item.likedBy) ? item.likedBy : [];
-    const isLiked = likedByArray.includes(userId);
-    const likeColor = isLiked ? '#ef4444' : '#fff'; 
-    const heartIcon = isLiked ? '❤️' : '🤍';
-
-    // ৮. বর্তমান প্রোডাক্টের রিপোর্টগুলো ফিল্টার করা
-    const productReports = appState.reports.filter(r => String(r.productId) === String(item.id));
-    
-    let reportsHtml = '';
-    if (productReports.length > 0) {
-        reportsHtml = `
-            <div style="margin-bottom:30px; background:rgba(239, 68, 68, 0.08); border:1px solid rgba(239, 68, 68, 0.3); border-radius:16px; padding:20px;">
-                <h4 style="color:#ef4444; margin:0 0 15px; font-size:16px; display:flex; align-items:center; gap:8px;">⚠️ ইউজার রিপোর্টসমূহ (${productReports.length})</h4>
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                    ${productReports.map(r => `
-                        <div style="background:#1e293b; padding:15px; border-radius:12px; border:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <div style="flex:1; padding-right:10px;">
-                                <p style="color:#e2e8f0; font-size:14px; margin:0; line-height:1.4; word-break: break-word;">${r.reason}</p>
-                                <small style="color:#64748b; font-size:11px; display:block; margin-top:5px;">📅 ${new Date(r.timestamp).toLocaleDateString()} | 👤 ${r.userName || 'User'}</small>
-                            </div>
-                            ${isAdminUser ? `
-                                <button onclick="deleteReportRecord('${r.id}', '${item.id}')" 
-                                    style="background:#ef4444; color:#fff; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:bold; flex-shrink:0; transition:0.2s;"
-                                    onmouseover="this.style.background='#dc2626'" 
-                                    onmouseout="this.style.background='#ef4444'">
-                                    মুছে ফেলুন
-                                </button>
-                            ` : ''}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    }
-
-    modal.innerHTML = `
-        <div style="background:#0f172a; width:98%; max-width:1150px; height:92vh; border-radius:24px; overflow:hidden; position:relative; display:flex; flex-direction:column; border:1px solid rgba(255,255,255,0.1); animation: zoomIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);">
-            
-            <button onclick="document.getElementById('dynamicDetailModal').style.display='none'" style="position:absolute; top:20px; right:25px; background:#ef4444; color:#fff; border:none; border-radius:50%; width:40px; height:40px; cursor:pointer; z-index:10001; font-weight:bold; box-shadow:0 4px 15px rgba(239, 68, 68, 0.3);">✕</button>
-
-            <div style="flex:1; overflow-y:auto; padding:30px;" class="modal-scroll">
-                <div style="display:flex; flex-wrap:wrap; gap:40px; margin-bottom:40px;">
-                    
-                    <div style="flex:1; min-width:320px;">
-                        <div style="background:#000; border-radius:20px; overflow:hidden; height:450px; position:relative; border:1px solid #334155; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);">
-                            <div id="modalGallery" style="display:flex; overflow-x:auto; scroll-snap-type:x mandatory; height:100%; scrollbar-width:none;">
-                                ${images.map(img => `<img src="${img}" style="min-width:100%; height:100%; object-fit:contain; scroll-snap-align:start; cursor:zoom-in; transition:transform 0.2s;" onclick="openImgZoom('${img}')" title="ক্লিক করুন বড় দেখতে">`).join('')}
-                            </div>
-                            <div style="position:absolute; bottom:15px; width:100%; text-align:center; color:#fff; font-size:12px; background:rgba(0,0,0,0.6); padding:8px 0; backdrop-filter:blur(5px);">🔍 ছবিতে ক্লিক করুন বড় দেখতে &nbsp;|&nbsp; ডানে বা বামে স্লাইড করুন ↔️</div>
-                        </div>
-                        
-                        <div style="display:flex; gap:10px; margin-top:20px;">
-                            <button id="likeBtn-${item.id}" onclick="toggleProductLike('${item.id}')" style="flex:2; padding:12px; background:#1e293b; color:${likeColor}; border:1px solid ${isLiked ? '#ef4444' : '#334155'}; border-radius:12px; cursor:pointer; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px;">
-                                <span style="font-size:20px;">${heartIcon}</span>
-                                <span id="likeCount-${item.id}">${item.likes || 0}</span>
-                            </button>
-
-                            <button onclick="shareProduct('${item.id}', '${item.title.replace(/'/g, "\\'")}')" style="flex:2; padding:12px; background:#1e293b; color:#fff; border:1px solid #334155; border-radius:12px; cursor:pointer; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px;">
-                                <span style="font-size:20px;">🔗</span>
-                                <span>শেয়ার</span>
-                            </button>
-
-                            <button onclick="openProductOptions('${item.id}')" style="flex:0.5; min-width:50px; padding:12px; background:#1e293b; color:#fff; border:1px solid #334155; border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
-                                <span style="font-size:20px;">⋮</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div style="flex:1; min-width:320px; display:flex; flex-direction:column;">
-                        <h1 style="color:#fff; font-size:32px; margin:0 0 10px; font-weight:800; line-height:1.2;">${item.title}</h1>
-                        <p style="color:#94a3b8; font-size:14px; background:rgba(255,255,255,0.05); align-self:flex-start; padding:4px 12px; border-radius:20px; border:1px solid rgba(255,255,255,0.1);">Product ID: #${item.id}</p>
-                        
-                        <div style="margin:30px 0; border-bottom:1px solid #334155; padding-bottom:25px;">
-                            <span style="color:#2ecc71; font-size:45px; font-weight:900;">${SYSTEM_CONFIG.CURRENCY} ${item.price}</span>
-                            <span style="color:#64748b; text-decoration:line-through; font-size:22px; margin-left:15px; opacity:0.7;">${SYSTEM_CONFIG.CURRENCY} ${Math.floor(item.price * 1.3)}</span>
-                        </div>
-
-                        <div style="background:rgba(255,255,255,0.02); padding:20px; border-radius:20px; border:1px solid rgba(255,255,255,0.05); margin-bottom:30px;">
-                            <h4 style="color:#3498db; margin:0 0 12px; font-size:18px;">ℹ️ পণ্যের বিবরণ:</h4>
-                            <div style="color:#cbd5e1; font-size:15px; line-height:1.8; white-space:pre-wrap;">${item.description || 'দুঃখিত, কোনো বিবরণ পাওয়া যায়নি।'}</div>
-                        </div>
-
-                        <div style="display:flex; flex-direction:column; gap:12px; margin-top:auto;">
-                            <div style="display:flex; gap:15px;">
-                                <button onclick="addToCart('${item.id}')" style="flex:1; padding:18px; background:#f59e0b; color:#fff; border:none; border-radius:14px; font-size:18px; font-weight:bold; cursor:pointer; transition:0.3s; box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.3);">🛒 কার্টে যোগ করুন</button>
-                                <button onclick="document.getElementById('dynamicDetailModal').style.display='none'; initiateCheckout('${item.id}')" style="flex:1; padding:18px; background:#ef4444; color:#fff; border:none; border-radius:14px; font-size:18px; font-weight:bold; cursor:pointer; transition:0.3s; box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.3);">⚡ এখনই অর্ডার</button>
-                            </div>
-                            ${adminExtraButtons}
-                        </div>
-                    </div>
-                </div>
-
-                <div style="border-top:1px solid #334155; padding-top:40px; margin-top:20px;">
-                    
-                    ${reportsHtml}
-
-                    <!-- ===== TABS ===== -->
-                    <div style="display:flex; gap:8px; margin-bottom:25px; flex-wrap:wrap;">
-                        <button onclick="_pdTab(this,'pdTabSpec')" id="pdBtnSpec" class="pd-tab-btn pd-tab-active" style="padding:10px 20px; border-radius:10px; border:none; cursor:pointer; font-weight:700; font-size:14px; font-family:'Hind Siliguri',sans-serif; transition:0.2s; background:linear-gradient(135deg,#3b82f6,#6366f1); color:#fff;">📋 Specifications</button>
-                        <button onclick="_pdTab(this,'pdTabDetails')" id="pdBtnDetails" class="pd-tab-btn" style="padding:10px 20px; border-radius:10px; border:1px solid #334155; cursor:pointer; font-weight:700; font-size:14px; font-family:'Hind Siliguri',sans-serif; transition:0.2s; background:rgba(255,255,255,0.04); color:#94a3b8;">📄 Product Details</button>
-                        <button onclick="_pdTab(this,'pdTabSeller')" id="pdBtnSeller" class="pd-tab-btn" style="padding:10px 20px; border-radius:10px; border:1px solid #334155; cursor:pointer; font-weight:700; font-size:14px; font-family:'Hind Siliguri',sans-serif; transition:0.2s; background:rgba(255,255,255,0.04); color:#94a3b8;">🏪 Seller</button>
-                        <button onclick="_pdTab(this,'pdTabRelated')" id="pdBtnRelated" class="pd-tab-btn" style="padding:10px 20px; border-radius:10px; border:1px solid #334155; cursor:pointer; font-weight:700; font-size:14px; font-family:'Hind Siliguri',sans-serif; transition:0.2s; background:rgba(255,255,255,0.04); color:#94a3b8;">🔥 আরো পণ্য</button>
-                    </div>
-
-                    <!-- TAB: Specifications -->
-                    <div id="pdTabSpec" class="pd-tab-content">
-                        ${(()=>{
-                            const sp = item.specifications || {};
-                            const rows = [
-                                ['Product Type', sp.productType],
-                                ['Size', sp.size],
-                                ['Material', sp.material],
-                                ['Features', sp.features],
-                                ['Suitable For', sp.suitableFor],
-                                ['Closure Type', sp.closureType],
-                                ['Absorbency', sp.absorbency],
-                                ['Packaging', sp.packaging]
-                            ].filter(r => r[1]);
-                            if(rows.length === 0) return `<div style="text-align:center; padding:40px; color:#475569; background:rgba(255,255,255,0.02); border-radius:16px; border:1px dashed #334155;"><i class="fa fa-info-circle" style="font-size:30px; margin-bottom:10px; display:block; color:#334155;"></i>কোনো Specification যোগ করা হয়নি।</div>`;
-                            return `<div style="background:rgba(255,255,255,0.02); border-radius:16px; border:1px solid #334155; overflow:hidden;">
-                                ${rows.map((r,i) => `
-                                    <div style="display:flex; padding:14px 20px; border-bottom:1px solid ${i<rows.length-1?'#1e293b':'transparent'}; align-items:center; ${i%2===0?'background:rgba(255,255,255,0.01);':''}">
-                                        <span style="min-width:160px; color:#64748b; font-size:14px; font-weight:600;">${r[0]}</span>
-                                        <span style="color:#e2e8f0; font-size:14px; flex:1;">${r[1]}</span>
-                                    </div>
-                                `).join('')}
-                            </div>`;
-                        })()}
-                    </div>
-
-                    <!-- TAB: Product Details -->
-                    <div id="pdTabDetails" class="pd-tab-content" style="display:none;">
-                        <div style="background:rgba(255,255,255,0.02); border-radius:16px; border:1px solid #334155; padding:25px; color:#cbd5e1; font-size:15px; line-height:1.9; white-space:pre-wrap;">
-                            ${item.description || '<span style="color:#475569;">কোনো বিবরণ পাওয়া যায়নি।</span>'}
-                        </div>
-                        <div style="margin-top:20px; display:flex; gap:12px; flex-wrap:wrap;">
-                            ${Array.isArray(item.tags) && item.tags.length > 0 ? item.tags.map(t=>`<span style="background:rgba(99,102,241,0.15); color:#818cf8; padding:6px 14px; border-radius:20px; font-size:13px; border:1px solid rgba(99,102,241,0.3);">#${t}</span>`).join('') : ''}
-                        </div>
-                    </div>
-
-                    <!-- TAB: Seller -->
-                    <div id="pdTabSeller" class="pd-tab-content" style="display:none;">
-                        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;">
-                            <div style="background:#1e293b; border-radius:16px; border:1px solid #334155; padding:20px;">
-                                <div style="font-size:12px; color:#64748b; font-weight:700; text-transform:uppercase; margin-bottom:8px;">Sold By</div>
-                                <div style="color:#3b82f6; font-size:16px; font-weight:700;">${item.sellerName || 'Digital Shop TM'}</div>
-                                ${item.sellerInfo ? `<div style="color:#94a3b8; font-size:13px; margin-top:8px; line-height:1.6;">${item.sellerInfo}</div>` : ''}
-                                ${item.sellerRating ? `
-                                    <div style="margin-top:12px; padding-top:12px; border-top:1px solid #334155;">
-                                        <div style="font-size:11px; color:#64748b; margin-bottom:6px;">Positive Seller Ratings</div>
-                                        <div style="font-size:28px; font-weight:800; color:#22c55e;">${item.sellerRating}%</div>
-                                        <div style="margin-top:6px; background:#334155; border-radius:20px; height:8px; overflow:hidden;">
-                                            <div style="background:linear-gradient(90deg,#22c55e,#16a34a); width:${item.sellerRating}%; height:100%; border-radius:20px;"></div>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                            <div style="background:#1e293b; border-radius:16px; border:1px solid #334155; padding:20px;">
-                                <div style="font-size:12px; color:#64748b; font-weight:700; text-transform:uppercase; margin-bottom:12px;">Delivery</div>
-                                <div style="display:flex; align-items:center; gap:10px; color:#e2e8f0;">
-                                    <i class="fa fa-shipping-fast" style="color:#3b82f6; font-size:18px;"></i>
-                                    <div>
-                                        <div style="font-size:14px; font-weight:600;">Standard Delivery</div>
-                                        <div style="font-size:13px; color:#64748b;">3–5 কার্যদিবস</div>
-                                    </div>
-                                    <div style="margin-left:auto; font-size:16px; font-weight:700; color:#f59e0b;">৳ ${item.deliveryCharge || SYSTEM_CONFIG.DELIVERY_CHARGE}</div>
-                                </div>
-                            </div>
-                            <div style="background:#1e293b; border-radius:16px; border:1px solid #334155; padding:20px;">
-                                <div style="font-size:12px; color:#64748b; font-weight:700; text-transform:uppercase; margin-bottom:12px;">Service</div>
-                                <div style="display:flex; align-items:center; gap:10px; color:#e2e8f0; margin-bottom:10px;">
-                                    <i class="fa fa-undo" style="color:#22c55e; font-size:16px;"></i>
-                                    <div style="font-size:14px;">7 Days Returns</div>
-                                </div>
-                                <div style="display:flex; align-items:center; gap:10px; color:#94a3b8;">
-                                    <i class="fa fa-shield-alt" style="color:#64748b; font-size:16px;"></i>
-                                    <div style="font-size:13px;">Authentic Product</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- TAB: Related Products -->
-                    <div id="pdTabRelated" class="pd-tab-content" style="display:none;">
-                        ${relatedProducts.length > 0 ? `
-                        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:16px;">
-                            ${relatedProducts.map(p => `
-                                <div onclick="openProductDetails('${p.id}')" class="related-card" style="background:#1e293b; padding:12px; border-radius:16px; cursor:pointer; text-align:center; border:1px solid rgba(255,255,255,0.05); transition:0.3s;">
-                                    <img src="${p.image || (p.images && p.images[0])}" style="width:100%; height:120px; object-fit:contain; border-radius:12px; background:#000;">
-                                    <h5 style="color:#fff; margin:10px 0 5px; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title}</h5>
-                                    <p style="color:#2ecc71; margin:0; font-weight:800; font-size:15px;">${SYSTEM_CONFIG.CURRENCY} ${p.price}</p>
-                                </div>
-                            `).join('')}
-                        </div>` : `<div style="text-align:center; padding:40px; color:#475569;"><i class="fa fa-box-open" style="font-size:30px; margin-bottom:10px; display:block;"></i>সম্পর্কিত কোনো পণ্য পাওয়া যায়নি।</div>`}
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <style>
-            @keyframes zoomIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-            .modal-scroll::-webkit-scrollbar { width: 6px; }
-            .modal-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
-            .modal-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-            .related-card:hover { border-color: #3498db !important; transform: translateY(-5px); background: #243147 !important; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-            button:active { transform: scale(0.98); }
-            button:hover { filter: brightness(1.15); }
-            .pd-tab-btn:hover { filter: brightness(1.2); }
-        </style>
-        <script>
-        function _pdTab(btn, tabId) {
-            document.querySelectorAll('.pd-tab-content').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.pd-tab-btn').forEach(b => {
-                b.style.background = 'rgba(255,255,255,0.04)';
-                b.style.color = '#94a3b8';
-                b.style.border = '1px solid #334155';
-            });
-            document.getElementById(tabId).style.display = 'block';
-            btn.style.background = 'linear-gradient(135deg,#3b82f6,#6366f1)';
-            btn.style.color = '#fff';
-            btn.style.border = 'none';
-        }
-        </script>
-    `;
-
-    modal.style.display = 'flex';
+    // show modal
+    const modal=document.getElementById('gpDetailModal');
+    modal.style.display='block';
+    modal.scrollTop=0;
+    document.body.style.overflow='hidden';
 }
-// ════════ পুরনো ফাংশন শেষ ════════
+
 
 window.deleteReportRecord = function(reportId, prodId) {
     if (confirm("আপনি কি নিশ্চিত যে এই রিপোর্টটি ডিলিট করতে চান?")) {
@@ -5410,39 +5510,43 @@ function toggleProductLike(productId) {
     }
 
     const likeIndex = item.likedBy.indexOf(userId);
-    const likeBtn = document.getElementById(`likeBtn-${productId}`);
-    const countDisplay = likeBtn ? likeBtn.querySelector('span:last-child') : null;
-
     if (likeIndex === -1) {
-        // লাইক দেওয়া (Like)
         item.likedBy.push(userId);
         item.likes = (item.likes || 0) + 1;
-        
-        // UI আপডেট (রিয়েল-টাইম)
-        if (likeBtn) {
-            likeBtn.style.color = '#ef4444';
-            likeBtn.style.borderColor = '#ef4444';
-            likeBtn.querySelector('span:first-child').innerText = '❤️';
-        }
     } else {
-        // লাইক তুলে নেওয়া (Unlike)
         item.likedBy.splice(likeIndex, 1);
         item.likes = Math.max(0, (item.likes || 0) - 1);
-        
-        // UI আপডেট (রিয়েল-টাইম)
-        if (likeBtn) {
-            likeBtn.style.color = '#fff';
-            likeBtn.style.borderColor = '#334155';
-            likeBtn.querySelector('span:first-child').innerText = '🤍';
+    }
+    const nowLiked = item.likedBy.includes(userId);
+    const newCount = item.likes;
+    // পুরনো modal like button
+    const likeBtn = document.getElementById('likeBtn-' + productId);
+    if (likeBtn) {
+        if (nowLiked) {
+            likeBtn.style.color='#ef4444';likeBtn.style.borderColor='#ef4444';
+            const sp0=likeBtn.querySelector('span:first-child');if(sp0)sp0.innerText='❤️';
+        } else {
+            likeBtn.style.color='#fff';likeBtn.style.borderColor='#334155';
+            const sp0=likeBtn.querySelector('span:first-child');if(sp0)sp0.innerText='🤍';
         }
+        const cd=likeBtn.querySelector('span:last-child');if(cd)cd.innerText=newCount;
+    }
+    // নতুন gpd modal PC like button
+    const gpdPcLike=document.getElementById('gpdPcLikeBtn');
+    if(gpdPcLike){
+        gpdPcLike.classList.toggle('liked',nowLiked);
+        const hi=document.getElementById('gpdPcHeartIcon');if(hi)hi.textContent=nowLiked?'❤️':'🤍';
+        const lc=document.getElementById('gpdPcLikeCount');if(lc)lc.textContent=newCount;
+    }
+    // নতুন gpd modal Mobile like button
+    const gpdMobLike=document.getElementById('gpdMobLikeBtn');
+    if(gpdMobLike){
+        gpdMobLike.classList.toggle('liked',nowLiked);
+        const mhi=document.getElementById('gpdMobHeartIcon');if(mhi)mhi.textContent=nowLiked?'❤️':'🤍';
+        const mlc=document.getElementById('gpdMobLikeCount');if(mlc)mlc.textContent=newCount;
     }
 
-    // সংখ্যাটি সাথে সাথে আপডেট
-    if (countDisplay) {
-        countDisplay.innerText = item.likes;
-    }
-
-    // ৪. ডাটাবেজে চিরস্থায়ীভাবে সেভ করা (এটিই আপনার মেইন কাজ করবে)
+        // ৪. ডাটাবেজে চিরস্থায়ীভাবে সেভ করা (এটিই আপনার মেইন কাজ করবে)
     localStorage.setItem(DB_KEYS.PRODUCTS, JSON.stringify(appState.products));
     
     console.log(`✅ Digital Shop TM: প্রোডাক্ট #${productId} এর লাইক সেভ হয়েছে!`);
