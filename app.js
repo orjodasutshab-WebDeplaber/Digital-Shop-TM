@@ -10449,9 +10449,18 @@ function pmxRefreshDisplay() {
             <div style="display:flex;align-items:center;justify-content:space-between;padding:0 16px 12px 16px;">
                 <div style="display:flex;align-items:center;gap:10px;">
                     <span style="font-size:22px;">⭐</span>
-                    <span style="font-size:18px;font-weight:900;color:#1a1a1a;font-family:'Hind Siliguri',sans-serif;letter-spacing:1px;">প্রিমিয়াম ক্যাটাগরি</span>
+                    <span style="
+                        font-size:20px;
+                        font-weight:900;
+                        color:#1a1a1a;
+                        font-family:'Segoe UI','Arial Black',sans-serif;
+                        letter-spacing:2px;
+                        text-transform:uppercase;
+                        font-style:italic;
+                        text-shadow: 1px 1px 0 rgba(0,0,0,0.15);
+                    ">Premium Category</span>
                 </div>
-                <div style="background:#1a1a1a;color:#f5a623;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;font-family:'Hind Siliguri',sans-serif;">
+                <div style="background:#1a1a1a;color:#f5c518;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;font-family:'Hind Siliguri',sans-serif;">
                     সব দেখুন →
                 </div>
             </div>
