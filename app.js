@@ -9650,7 +9650,7 @@ function openSironamShop(id, title) {
             </div>
         </div>
 
-        <div id="sironamDeliBoard" style="width:95%; max-width:1500px; height:450px; margin:20px auto; background:#111827; border-radius:0px; overflow:hidden; border:1px solid #334155; display:flex; align-items:center; justify-content:center; position:relative;">
+        <div id="sironamDeliBoard" style="width:100%; height:450px; margin:0; background:#111827; border-radius:0; overflow:hidden; border:none; display:flex; align-items:center; justify-content:center; position:relative;">
             ${(() => {
                 const ads = deliAds.filter(a => String(a.sironamId) === String(id));
                 if (ads.length === 0) return '<p style="color:#4b5563;">এখানে ডেলি বিজ্ঞাপন প্রদর্শিত হবে</p>';
