@@ -1615,7 +1615,7 @@ body.dark-theme .special-section-wrapper {
     grid-auto-flow: column;
     grid-template-rows: 1fr 1fr;
     /* প্রতি লাইনে ৭টা পুরো + ৮ম এর ১/৩ দেখাবে */
-    grid-auto-columns: calc((100%) / 7.4);
+    grid-auto-columns: calc((100% - 7 * 12px) / 7.33);
     /* scrollbar লুকানো — সব ব্রাউজার */
     scrollbar-width: none;       /* Firefox */
     -ms-overflow-style: none;    /* IE/Edge */
