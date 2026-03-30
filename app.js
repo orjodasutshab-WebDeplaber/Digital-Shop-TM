@@ -521,9 +521,9 @@ function renderProductGrid(productList, isLoadMore = false) {
             if (!ratingVal) {
                 // id থেকে একটি consistent seed তৈরি করা হচ্ছে
                 const seed = String(item.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-                // ১৫% পণ্যে ৫ তারা, বাকিগুলোতে ৩.০–৪.৮ এর মধ্যে ভ্যারিয়েশন
+                // ৩০% পণ্যে ৫ তারা, বাকিগুলোতে ৩.৫–৪.৮ এর মধ্যে ভ্যারিয়েশন
                 const rand = ((seed * 9301 + 49297) % 233280) / 233280;
-                ratingVal = rand < 0.15 ? 5 : parseFloat((3.0 + rand * 2.0).toFixed(1));
+                ratingVal = rand < 0.30 ? 5 : parseFloat((3.5 + rand * 1.5).toFixed(1));
             }
             // id থেকে consistent কিন্তু আলাদা আলাদা reviewCount
             const _idStr = String(item.id || item.name || '');
@@ -11259,12 +11259,25 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
 
     document.body.insertAdjacentHTML('beforeend', `
     <div id="pmxHeaderShopModal" style="position:fixed;inset:0;background:#0f172a;z-index:999999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;">
-        <div style="position:sticky;top:0;background:#1e293b;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155;z-index:10;">
-            <h2 style="color:#a78bfa;margin:0;font-size:17px;font-weight:700;">⭐ ${headerName}</h2>
-            <button onclick="document.getElementById('pmxHeaderShopModal').remove()" style="background:#ef4444;color:#fff;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:700;font-family:'Hind Siliguri',sans-serif;">✕ বন্ধ</button>
+        <!-- Sticky Header -->
+        <div style="position:sticky;top:0;background:#1e293b;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155;z-index:10;gap:10px;">
+            <h2 style="color:#a78bfa;margin:0;font-size:17px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">⭐ ${headerName}</h2>
+            <!-- সার্চ আইকন — মেইন হেডারের মতো -->
+            <button id="pmxShopSearchBtn" onclick="pmxToggleShopSearch()" style="background:linear-gradient(135deg,#6366f1 0%,#a855f7 100%);border:none;color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;flex-shrink:0;box-shadow:0 4px 15px rgba(99,102,241,0.4);transition:opacity 0.2s,transform 0.2s;" onmouseover="this.style.opacity='0.85';this.style.transform='scale(1.08)'" onmouseout="this.style.opacity='1';this.style.transform='scale(1)'">
+                <i class="fa fa-search"></i>
+            </button>
+            <button onclick="document.getElementById('pmxHeaderShopModal').remove()" style="background:#ef4444;color:#fff;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:700;font-family:'Hind Siliguri',sans-serif;flex-shrink:0;">✕ বন্ধ</button>
+        </div>
+        <!-- সার্চ বার — toggle করলে নিচে নামে -->
+        <div id="pmxShopSearchExpanded" style="display:none;background:#1e293b;border-bottom:1px solid #334155;padding:10px 16px;">
+            <div style="display:flex;align-items:center;background:#0f172a;border:1.5px solid #334155;border-radius:12px;overflow:hidden;height:44px;">
+                <i class="fa fa-search" style="color:#94a3b8;font-size:14px;padding:0 10px 0 14px;flex-shrink:0;"></i>
+                <input id="pmxShopSearchInput" type="text" placeholder="পণ্য খুঁজুন..." oninput="pmxFilterShopProducts()" style="flex:1;background:transparent;border:none;color:#e2e8f0;font-size:14px;padding:0 10px;outline:none;height:100%;font-family:'Hind Siliguri',sans-serif;">
+                <button onclick="pmxToggleShopSearch()" style="background:#ef4444;border:none;color:#fff;height:44px;padding:0 16px;font-size:16px;font-weight:700;cursor:pointer;border-radius:0 10px 10px 0;">✕</button>
+            </div>
         </div>
         <!-- হোল্ডার বোর্ড -->
-        <div id="pmxHolderBoard" style="width:100%;max-width:1520px;height:350px;margin:20px auto;background:#0a0a0a;border-radius:14px;overflow:hidden;border:1px solid #334151;position:relative;">
+        <div id="pmxHolderBoard" style="width:100%;max-width:1520px;height:350px;margin:20px auto;background:#0a0a0a;border-radius:0;overflow:hidden;border:1px solid #334151;position:relative;">
             ${holderSlides}
             ${holders.length > 1 ? `
             <!-- বাম বাটন -->
@@ -11280,9 +11293,9 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
         <div style="padding:20px;max-width:1520px;margin:0 auto;">
             ${!products.length
                 ? '<p style="color:#4b5563;text-align:center;padding:40px;">এই হেডারে কোনো প্রোডাক্ট নেই</p>'
-                : `<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:14px;">
+                : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:14px;">
                     ${products.map(p => `
-                        <div style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;text-align:center;">
+                        <div class="pmx-prod-card" data-name="${(p.name||'').replace(/"/g,'&quot;')}" style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;text-align:center;">
                             <img src="${p.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:fill;" onerror="this.src='ko.jpeg'">
                             <div style="padding:8px;">
                                 <div style="color:#e2e8f0;font-size:12px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
@@ -11322,6 +11335,33 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
             window.pmxSlideNav(1);
         }, 5000);
     }
+}
+
+// ── PMX Shop সার্চ toggle ──────────────────────────────────────────
+function pmxToggleShopSearch() {
+    const box = document.getElementById('pmxShopSearchExpanded');
+    if (!box) return;
+    const isOpen = box.style.display !== 'none';
+    box.style.display = isOpen ? 'none' : 'block';
+    if (!isOpen) {
+        const inp = document.getElementById('pmxShopSearchInput');
+        if (inp) { inp.value = ''; inp.focus(); pmxFilterShopProducts(); }
+    } else {
+        // বন্ধ হলে সব প্রোডাক্ট আবার দেখাও
+        pmxFilterShopProducts('');
+    }
+}
+// ── PMX Shop সার্চ ফিল্টার ──────────────────────────────────────────
+function pmxFilterShopProducts() {
+    const inp = document.getElementById('pmxShopSearchInput');
+    const term = inp ? inp.value.toLowerCase().trim() : '';
+    const grid = document.getElementById('pmxShopProductGrid');
+    if (!grid) return;
+    const cards = grid.querySelectorAll('.pmx-prod-card');
+    cards.forEach(function(card) {
+        const name = (card.getAttribute('data-name') || '').toLowerCase();
+        card.style.display = (!term || name.includes(term)) ? '' : 'none';
+    });
 }
 
 // ══════════════════════════════════════════════════════════════════
