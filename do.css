@@ -1777,23 +1777,35 @@ body.dark-theme .special-category-container {
 
 /* ══════════════════════════════════════════════════
    ⭐ প্রিমিয়াম প্রোডাক্ট হেডার — থিম অ্যাওয়ার ব্যাকগ্রাউন্ড
+   লাইট মোড: হলুদ | ডার্ক মোড: নীল | কোনা সমান
    ══════════════════════════════════════════════════ */
+#pmx-header-display {
+    border-radius: 0 !important;
+    transition: background 0.4s ease;
+}
+
 #pmx-header-display > div {
-    border-radius: 16px;
-    margin: 0 10px;
+    border-radius: 0 !important;
+    margin: 0 !important;
     transition: background 0.4s ease, border 0.4s ease;
 }
 
-/* লাইট মোড: হালকা কালো ব্যাকগ্রাউন্ড */
+/* লাইট মোড: হলুদ ব্যাকগ্রাউন্ড */
+body:not(.dark-theme) #pmx-header-display {
+    background: rgba(234, 179, 8, 0.28) !important;
+}
 body:not(.dark-theme) #pmx-header-display > div {
-    background: rgba(0, 0, 0, 0.10) !important;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: transparent !important;
+    border: none !important;
 }
 
-/* ডার্ক মোড: হালকা সাদা ব্যাকগ্রাউন্ড */
+/* ডার্ক মোড: নীল ব্যাকগ্রাউন্ড */
+body.dark-theme #pmx-header-display {
+    background: rgba(37, 99, 235, 0.22) !important;
+}
 body.dark-theme #pmx-header-display > div {
-    background: rgba(255, 255, 255, 0.07) !important;
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: transparent !important;
+    border: none !important;
 }
 
 /* ══════════════════════════════════════════════════

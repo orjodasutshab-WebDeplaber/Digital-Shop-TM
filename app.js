@@ -10439,11 +10439,10 @@ function pmxRefreshDisplay() {
 
     container.innerHTML = `
         <div style="
-            background: linear-gradient(135deg, #f5a623 0%, #f7c948 50%, #f5a623 100%);
-            border-radius: 16px;
-            margin: 10px 10px 20px 10px;
+            background: transparent;
+            border-radius: 0;
+            margin: 0;
             padding: 14px 0 18px 0;
-            box-shadow: 0 8px 24px rgba(245,166,35,0.35);
             overflow: hidden;
         ">
             <!-- হেডার বার -->
