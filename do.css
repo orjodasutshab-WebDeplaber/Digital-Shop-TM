@@ -1611,14 +1611,10 @@ body.dark-theme .special-section-wrapper {
     padding: 0 10px;
     overflow-x: auto;
     overflow-y: hidden;
-    /* grid কে horizontal scroll এ — column wise */
     grid-auto-flow: column;
     grid-template-rows: 1fr 1fr;
-    /* PC: viewport width থেকে হিসাব করা
-       ৭টা পুরো + ৮ম এর ১/৩ দেখাবে
-       প্রতি কার্ড = (98vw - gaps) / 7.33 */
+    /* PC: ৭টা পুরো + ৮ম এর ১/৩ */
     grid-auto-columns: calc((98vw - 8 * 12px) / 7.33);
-    /* scrollbar লুকানো — সব ব্রাউজার */
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -1626,6 +1622,11 @@ body.dark-theme .special-section-wrapper {
 /* Chrome/Safari scrollbar লুকানো */
 .sironam-grid-container::-webkit-scrollbar {
     display: none;
+}
+
+/* মোবাইল: ৪টা পুরো + ৫ম এর ১/৩ */
+html.is-mobile .sironam-grid-container {
+    grid-auto-columns: calc((98vw - 5 * 12px) / 4.33);
 }
 
 /* আপনার অরিজিনাল কার্ড ডিজাইন (আপডেটেড) */
