@@ -1660,7 +1660,7 @@ html.is-mobile .sironam-grid-container {
 .sironam-overlay {
     position: static;
     width: 100%;
-    background: rgba(0, 0, 0, 0.08); /* Light mode: হালকা কালো */
+    background: rgba(0, 0, 0, 0.08);
     padding: 8px 6px 10px 6px;
     text-align: center;
     color: #2d3436;
@@ -1671,6 +1671,12 @@ html.is-mobile .sironam-grid-container {
     border-top: 1px solid rgba(0,0,0,0.08);
     font-family: 'Hind Siliguri', sans-serif;
     transition: background 0.3s, color 0.3s;
+}
+
+/* মোবাইলে sironam নাম বোল্ড */
+html.is-mobile .sironam-overlay {
+    font-weight: 800 !important;
+    font-size: 20px !important;
 }
 
 /* Light mode কার্ড */

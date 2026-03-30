@@ -10498,13 +10498,14 @@ function pmxRefreshDisplay() {
                             background: rgba(0,0,0,0.06);
                             padding: 6px 4px 8px 4px;
                             font-size: 12px;
-                            font-weight: 700;
+                            font-weight: ${isMob ? '800' : '700'};
                             color: #1a1a1a;
                             white-space: nowrap;
                             overflow: hidden;
                             text-overflow: ellipsis;
                             font-family: 'Hind Siliguri', sans-serif;
                             border-top: 1px solid rgba(0,0,0,0.08);
+                            ${isMob ? 'font-size:20px;' : ''}
                         ">${h.name}</div>
                     </div>`).join('')}
             </div>
