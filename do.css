@@ -1663,13 +1663,27 @@ body.dark-theme .sironam-overlay {
     text-align: center;
     margin: 30px auto 40px auto;
     padding: 5px 5px;
-    background: linear-gradient(135deg, #111827 0%, #1e293b 100%); /* ডার্ক ডাইনামিক ব্যাকগ্রাউন্ড */
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(0,0,0,0.4);
     max-width: 1500px;
     border: 1px solid #334155;
     position: relative;
     overflow: hidden;
+    transition: background 0.4s ease, border-color 0.4s ease;
+}
+
+/* লাইট মোড: হালকা কালো ব্যাকগ্রাউন্ড */
+body:not(.dark-theme) .special-category-container {
+    background: rgba(0, 0, 0, 0.13);
+    border-color: rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+}
+
+/* ডার্ক মোড: হালকা সাদা ব্যাকগ্রাউন্ড */
+body.dark-theme .special-category-container {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 24px rgba(255,255,255,0.05);
 }
 
 /* ব্যাকগ্রাউন্ডে হালকা গ্লো ইফেক্ট */
@@ -1727,7 +1741,58 @@ body.dark-theme .sironam-overlay {
     50% { transform: translateY(-8px) rotate(5deg); }
 }
 
+/* ══════════════════════════════════════════════════
+   ⭐ প্রিমিয়াম প্রোডাক্ট হেডার — থিম অ্যাওয়ার ব্যাকগ্রাউন্ড
+   ══════════════════════════════════════════════════ */
+#pmx-header-display > div {
+    border-radius: 16px;
+    margin: 0 10px;
+    transition: background 0.4s ease, border 0.4s ease;
+}
 
+/* লাইট মোড: হালকা কালো ব্যাকগ্রাউন্ড */
+body:not(.dark-theme) #pmx-header-display > div {
+    background: rgba(0, 0, 0, 0.10) !important;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* ডার্ক মোড: হালকা সাদা ব্যাকগ্রাউন্ড */
+body.dark-theme #pmx-header-display > div {
+    background: rgba(255, 255, 255, 0.07) !important;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* ══════════════════════════════════════════════════
+   sironam গ্রিড কন্টেইনার — থিম অ্যাওয়ার ব্যাকগ্রাউন্ড
+   ══════════════════════════════════════════════════ */
+#sironam-portal-display {
+    border-radius: 16px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px 0;
+    transition: background 0.4s ease;
+}
+
+/* লাইট মোড */
+body:not(.dark-theme) #sironam-portal-display {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+/* ডার্ক মোড */
+body.dark-theme #sironam-portal-display {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* ══════════════════════════════════════════════════
+   সাদা main-content-area special-category এর আগে শেষ
+   ══════════════════════════════════════════════════ */
+body:not(.dark-theme) #special-category-container,
+body:not(.dark-theme) #sironam-portal-display,
+body:not(.dark-theme) #pmx-header-display {
+    /* এগুলো main-content-area এর মধ্যে থাকলেও আলাদা ব্যাকগ্রাউন্ড পাবে */
+    position: relative;
+    z-index: 1;
+}
 
 /* ============================================================
    MOBILE DESKTOP-LIKE EXPERIENCE — Final Fixes
@@ -1975,10 +2040,14 @@ body.dark-theme .card-star-empty        { color: #7f1d1d !important; }
 }
 
 /* ── লাইট মোড ── */
-body:not(.dark-theme) .main-content-area,
+/* শুধু product container সাদা — special-category আগে শেষ */
 body:not(.dark-theme) .main-content-area > .container,
 body:not(.dark-theme) .main-content-area > .container > div:first-child {
     background: #ffffff !important;
+}
+/* main-content-area নিজে body background নেবে */
+body:not(.dark-theme) .main-content-area {
+    background: #f1f2f6 !important;
 }
 body:not(.dark-theme) .main-content-area .section-title h2 {
     color: #111827 !important;
@@ -1997,6 +2066,13 @@ body:not(.dark-theme) .product-card-box {
     background: #e2e8f0 !important;
     border: 1px solid #cbd5e1 !important;
     color: #1e293b !important;
+}
+
+/* special-category, sironam ও pmx — নিজেদের থিম-অ্যাওয়ার ব্যাকগ্রাউন্ড */
+body:not(.dark-theme) .special-category-container,
+body:not(.dark-theme) #sironam-portal-display,
+body:not(.dark-theme) #pmx-header-display {
+    background: transparent !important;
 }
 
 /* ── ডার্ক মোড ── */
