@@ -979,18 +979,19 @@ body.is-mobile .pb-filter-arrow     { display: none; }
 
 </main>
 
-<!-- ══ special-category + sironam + pmx — main এর বাইরে, সাদা ব্যাকগ্রাউন্ড এখানে শেষ ══ -->
-<div id="special-category-container" class="special-category-container">
-    <h2 class="special-category-title">
-        <span class="emoji-left">🌋</span>
-        আপনার স্পেশাল ক্যাটাগরির পণ্য
-        <span class="emoji-right">🌋</span>
-    </h2>
-    
+<!-- ══ special-category + sironam wrapper — এই অংশে থিম-aware ব্যাকগ্রাউন্ড ══ -->
+<div class="special-section-wrapper">
+    <div id="special-category-container" class="special-category-container">
+        <h2 class="special-category-title">
+            <span class="emoji-left">🌋</span>
+            আপনার স্পেশাল ক্যাটাগরির পণ্য
+            <span class="emoji-right">🌋</span>
+        </h2>
+    </div>
+    <div id="sironam-portal-display" class="sironam-grid-container"></div>
 </div>
-<div id="sironam-portal-display" class="sironam-grid-container"></div>
 
-<!-- প্রিমিয়াম প্রোডাক্ট হেডার -->
+<!-- প্রিমিয়াম প্রোডাক্ট হেডার — wrapper এর বাইরে -->
 <div id="pmx-header-display" style="padding:0 0 10px;"></div>
 <div id="aboutUsModal" style="display:none; position:fixed; z-index:90999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.98); overflow-y:auto; font-family:'Segoe UI', Roboto, sans-serif;">
     <div style="background:#0f172a; color:#e2e8f0; margin:1% auto; padding:60px 40px; border-radius:10px; width:95%; max-width:1100px; position:relative; border:1px solid #1e293b; box-shadow: 0 0 50px rgba(16, 185, 129, 0.2);">

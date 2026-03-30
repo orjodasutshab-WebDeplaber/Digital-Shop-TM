@@ -1585,6 +1585,23 @@ body, html {
 
 /* sironam-grid flex version removed */
 
+/* ══════════════════════════════════════════════════
+   special-section-wrapper — শিরোনাম থেকে sironam শেষ পর্যন্ত ব্যাকগ্রাউন্ড
+   লাইট মোড: হালকা কালো | ডার্ক মোড: হালকা সাদা
+   ══════════════════════════════════════════════════ */
+.special-section-wrapper {
+    transition: background 0.4s ease;
+    padding: 10px 0 20px 0;
+}
+
+body:not(.dark-theme) .special-section-wrapper {
+    background: rgba(0, 0, 0, 0.07);
+}
+
+body.dark-theme .special-section-wrapper {
+    background: rgba(255, 255, 255, 0.06);
+}
+
 /* শিরোনাম গ্রিড কন্টেইনার */
 .sironam-grid-container {
     display: grid;
@@ -1674,16 +1691,16 @@ body.dark-theme .sironam-overlay {
 
 /* লাইট মোড: হালকা কালো ব্যাকগ্রাউন্ড */
 body:not(.dark-theme) .special-category-container {
-    background: rgba(0, 0, 0, 0.13);
-    border-color: rgba(0, 0, 0, 0.15);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+    background: transparent;
+    border-color: rgba(0, 0, 0, 0.10);
+    box-shadow: none;
 }
 
 /* ডার্ক মোড: হালকা সাদা ব্যাকগ্রাউন্ড */
 body.dark-theme .special-category-container {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: 0 8px 24px rgba(255,255,255,0.05);
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.10);
+    box-shadow: none;
 }
 
 /* ব্যাকগ্রাউন্ডে হালকা গ্লো ইফেক্ট */
