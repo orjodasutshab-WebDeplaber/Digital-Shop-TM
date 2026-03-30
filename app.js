@@ -5004,18 +5004,20 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
         <span class="gpd-discount-badge" id="gpModalDiscount" style="display:none;"></span>
       </div>
       <div class="gpd-name" id="gpModalName"></div>
-      <div class="gpd-stars-row">
-        <span class="gpd-star-icons" id="gpModalStarIcons">★★★★★</span>
-        <span class="gpd-stars-val" id="gpModalStarVal">4.5</span>
-        <span class="gpd-review-count" id="gpModalReviewCount">(35)</span>
+      <!-- Like / Share / 3dot — below product name -->
+      <div class="gpd-mob-likeshare">
+        <button class="gpd-mob-like-btn" id="gpdMobLikeBtn">
+          <span id="gpdMobHeartIcon">🤍</span>
+          <span id="gpdMobLikeCount">0</span>
+        </button>
+        <button class="gpd-mob-share-btn" id="gpdMobShareBtn">
+          <span>🔗</span>
+          <span>শেয়ার</span>
+        </button>
+        <button class="gpd-mob-3dot-btn" id="gpdMob3Dot">⋮</button>
       </div>
     </div>
     <div class="gpd-divider"></div>
-    <div class="gpd-options-sec" id="gpMobOptionsSec">
-      <span class="gpd-options-label">Product Options</span>
-      <span class="gpd-options-val" id="gpModalOptions">অপশন দেখতে লগইন করুন</span>
-      <span class="gpd-options-arrow">&#62;</span>
-    </div>
     <div class="gpd-divider"></div>
     <div style="padding:0 14px;">
       <div class="gpd-mob-accord-block">
@@ -5068,18 +5070,6 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
       </button>
       <button class="gpd-buynow-btn" id="gpdMobBuyBtn">Buy Now</button>
       <button class="gpd-addcart-btn" id="gpdMobCartBtn">Add to Cart</button>
-    </div>
-    <!-- Like / Share / 3dot below action bar -->
-    <div class="gpd-mob-likeshare">
-      <button class="gpd-mob-like-btn" id="gpdMobLikeBtn">
-        <span id="gpdMobHeartIcon">🤍</span>
-        <span id="gpdMobLikeCount">0</span>
-      </button>
-      <button class="gpd-mob-share-btn" id="gpdMobShareBtn">
-        <span>🔗</span>
-        <span>শেয়ার</span>
-      </button>
-      <button class="gpd-mob-3dot-btn" id="gpdMob3Dot">⋮</button>
     </div>
   </div>
 </div>`;
