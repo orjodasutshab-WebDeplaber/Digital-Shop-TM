@@ -5004,7 +5004,7 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
         <span class="gpd-discount-badge" id="gpModalDiscount" style="display:none;"></span>
       </div>
       <div class="gpd-name" id="gpModalName"></div>
-      <!-- Like / Share / 3dot — below product name -->
+      <!-- Like / Share / 3dot — পণ্যের নামের নিচে -->
       <div class="gpd-mob-likeshare">
         <button class="gpd-mob-like-btn" id="gpdMobLikeBtn">
           <span id="gpdMobHeartIcon">🤍</span>
