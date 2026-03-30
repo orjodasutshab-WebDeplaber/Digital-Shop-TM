@@ -4821,7 +4821,7 @@ html.is-mobile #gpdPcNavTabs{display:none!important;}
 .gpd-topbar{position:fixed;top:0;left:0;right:0;z-index:986783999999991;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
 .gpd-back-btn{background:none;border:none;font-size:60px;cursor:pointer;color:#222;padding:4px 8px;line-height:1;width:70px;font-weight:900;}
 .gpd-topbar-title{flex:1;font-size:40px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.gpd-topbar-icons{display:flex;gap:16px;align-items:center;}
+.gpd-topbar-icons{display:flex;gap:39px;align-items:center;}
 .gpd-topbar-icons i{font-size:40px;color:#444;cursor:pointer;}
 .gpd-img-slider{position:relative;width:100%;background:#fff;margin-top:68px;}
 .gpd-main-img{width:100%;aspect-ratio:1/1;object-fit:contain;display:block;background:#fff;}
