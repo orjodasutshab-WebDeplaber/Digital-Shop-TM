@@ -4843,14 +4843,13 @@ html.is-mobile .gp-modal{background:#f5f5f5;}
 .gpd-desc-sec{background:#fff;padding:14px 14px;margin-top:8px;}
 .gpd-desc-title{font-size:36px;font-weight:800;color:#111;margin-bottom:10px;}
 .gpd-desc-text{font-size:32px;color:#555;line-height:1.75;}
-.gpd-spacer{height:16px;}
-.gpd-action-bar{position:sticky;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ebebeb;display:flex;align-items:stretch;z-index:20;height:90px;}
-.gpd-store-btn,.gpd-chat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:80px;gap:3px;background:none;border:none;border-right:1px solid #f0f0f0;cursor:pointer;font-family:'Hind Siliguri',sans-serif;padding:0 8px;}
-.gpd-store-btn span,.gpd-chat-btn span{font-size:22px;color:#555;font-weight:600;}
+.gpd-spacer{height:110px;}
+.gpd-action-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid #ebebeb;display:flex;align-items:stretch;z-index:10000001;height:90px;box-shadow:0 -4px 16px rgba(0,0,0,0.10);}
+.gpd-chat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:90px;gap:3px;background:none;border:none;border-right:1px solid #f0f0f0;cursor:pointer;font-family:'Hind Siliguri',sans-serif;padding:0 8px;}
+.gpd-chat-btn span{font-size:22px;color:#555;font-weight:600;}
 .gpd-chat-btn i{font-size:34px;color:#555;}
 .gpd-buynow-btn{flex:1;background:#38bdf8;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;border-right:1px solid rgba(255,255,255,0.3);}
 .gpd-addcart-btn{flex:1;background:#f97316;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
-.gpd-store-btn i{font-size:34px;color:#f57224;}
 
 /* Mobile like/share/3dot row — below action bar, inside scrollable area */
 .gpd-mob-likeshare{display:flex;gap:10px;padding:16px 14px 8px;background:#fff;border-bottom:1px solid #f5f5f5;}
@@ -4872,11 +4871,8 @@ html.is-mobile .gpd-mob-accord-body{font-size:30px!important;line-height:1.7;}
 html:not(.is-mobile) html:not(.is-mobile) .gpd-action-bar{height:56px;}
 html:not(.is-mobile) .gpd-buynow-btn{font-size:15px;}
 html:not(.is-mobile) .gpd-addcart-btn{font-size:15px;}
-html:not(.is-mobile) .gpd-store-btn span,
 html:not(.is-mobile) .gpd-chat-btn span{font-size:11px;}
-html:not(.is-mobile) .gpd-store-btn i,
 html:not(.is-mobile) .gpd-chat-btn i{font-size:18px;}
-html:not(.is-mobile) .gpd-store-btn,
 html:not(.is-mobile) .gpd-chat-btn{width:56px;}
 html:not(.is-mobile) .gpd-spacer{height:16px;}
 html:not(.is-mobile) .gpd-desc-text{font-size:15px;}
@@ -5064,10 +5060,6 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
     <div class="gpd-spacer"></div>
     <!-- Bottom Action Bar -->
     <div class="gpd-action-bar">
-      <button class="gpd-store-btn" id="gpdMobStoreBtn">
-        <i class="fa fa-store-alt"></i>
-        <span>Store</span>
-      </button>
       <button class="gpd-chat-btn" id="gpdMobChatBtn">
         <i class="fa fa-comment-dots"></i>
         <span>Wishlist</span>
@@ -5501,12 +5493,10 @@ function openProductDetails(productId) {
         const mobBuyBtn=document.getElementById('gpdMobBuyBtn');
         const mobCartBtn=document.getElementById('gpdMobCartBtn');
         const mobChatBtn=document.getElementById('gpdMobChatBtn');
-        const mobStoreBtn=document.getElementById('gpdMobStoreBtn');
         if(mobBuyBtn) mobBuyBtn.onclick=()=>{ closeGpModal(); initiateCheckout(item.id); };
         if(mobCartBtn) mobCartBtn.onclick=()=>{ closeGpModal(); addToCart(item.id); };
         // Wishlist (chat button) → addToCart
         if(mobChatBtn) mobChatBtn.onclick=()=>{ closeGpModal(); addToCart(item.id); };
-        if(mobStoreBtn) mobStoreBtn.onclick=()=>{ closeGpModal(); if(typeof openModal==='function') openModal('loginModal'); };
 
         // Mobile Like / Share / 3dot
         const mobLikeBtn=document.getElementById('gpdMobLikeBtn');
