@@ -1606,10 +1606,24 @@ body.dark-theme .special-section-wrapper {
 .sironam-grid-container {
     display: grid;
     grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: auto auto;
     gap: 12px;
     margin: 20px auto 40px auto;
     max-width: 98%;
     padding: 0 10px;
+    /* ২ লাইন দেখাবে, বাকি scroll */
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    /* প্রতি লাইনে ৭টা পুরো + ৮ম এর ১/৩ দেখাবে:
+       ৭ + ১/৩ = ৭.৩৩ কলাম
+       width = 7.333 / 8 × 100% */
+    max-height: none;
+    /* grid কে horizontal scroll এ আনার জন্য */
+    grid-auto-flow: column;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: none;
+    grid-auto-columns: calc((100%) / 7.333);
 }
 
 /* আপনার অরিজিনাল কার্ড ডিজাইন (আপডেটেড) */
