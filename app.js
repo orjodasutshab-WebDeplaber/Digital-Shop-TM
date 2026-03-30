@@ -521,9 +521,9 @@ function renderProductGrid(productList, isLoadMore = false) {
             if (!ratingVal) {
                 // id থেকে একটি consistent seed তৈরি করা হচ্ছে
                 const seed = String(item.id || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-                // ৩০% পণ্যে ৫ তারা, বাকিগুলোতে ৩.৫–৪.৮ এর মধ্যে ভ্যারিয়েশন
+                // ১৫% পণ্যে ৫ তারা, বাকিগুলোতে ৩.০–৪.৮ এর মধ্যে ভ্যারিয়েশন
                 const rand = ((seed * 9301 + 49297) % 233280) / 233280;
-                ratingVal = rand < 0.30 ? 5 : parseFloat((3.5 + rand * 1.5).toFixed(1));
+                ratingVal = rand < 0.15 ? 5 : parseFloat((3.0 + rand * 2.0).toFixed(1));
             }
             // id থেকে consistent কিন্তু আলাদা আলাদা reviewCount
             const _idStr = String(item.id || item.name || '');
