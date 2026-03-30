@@ -1788,24 +1788,23 @@ body.dark-theme .special-category-container {
     border-radius: 0 !important;
     margin: 0 !important;
     transition: background 0.4s ease, border 0.4s ease;
+    background: transparent !important;
+    border: none !important;
 }
 
-/* লাইট মোড: ঘন হলুদ ব্যাকগ্রাউন্ড */
-body:not(.dark-theme) #pmx-header-display {
+/* লাইট মোড: ঘন হলুদ */
+body#mainBody:not(.dark-theme) #pmx-header-display,
+html:not(.dark-theme) body #pmx-header-display,
+body.light-theme #pmx-header-display {
+    background-color: #f5c518 !important;
     background: #f5c518 !important;
 }
-body:not(.dark-theme) #pmx-header-display > div {
-    background: transparent !important;
-    border: none !important;
-}
 
-/* ডার্ক মোড: আকাশি নীল ব্যাকগ্রাউন্ড */
-body.dark-theme #pmx-header-display {
+/* ডার্ক মোড: আকাশি নীল */
+body#mainBody.dark-theme #pmx-header-display,
+html body.dark-theme #pmx-header-display {
+    background-color: #38bdf8 !important;
     background: #38bdf8 !important;
-}
-body.dark-theme #pmx-header-display > div {
-    background: transparent !important;
-    border: none !important;
 }
 
 /* ══════════════════════════════════════════════════

@@ -992,7 +992,25 @@ body.is-mobile .pb-filter-arrow     { display: none; }
 </div>
 
 <!-- প্রিমিয়াম প্রোডাক্ট হেডার — wrapper এর বাইরে -->
-<div id="pmx-header-display" style="padding:0 0 10px;"></div>
+<div id="pmx-header-display"></div>
+<script>
+// pmx-header-display এর background থিম অনুযায়ী সেট করা
+function pmxSetHeaderBg() {
+    const el = document.getElementById('pmx-header-display');
+    if (!el) return;
+    const isDark = document.body.classList.contains('dark-theme');
+    el.style.backgroundColor = isDark ? '#38bdf8' : '#f5c518';
+    el.style.padding = '0 0 10px 0';
+}
+// পেজ লোডে
+window.addEventListener('load', pmxSetHeaderBg);
+// থিম টগল হলে আবার চালাবে
+const _origToggle = window.toggleThemeMode;
+window.toggleThemeMode = function() {
+    if (_origToggle) _origToggle.apply(this, arguments);
+    setTimeout(pmxSetHeaderBg, 50);
+};
+</script>
 <div id="aboutUsModal" style="display:none; position:fixed; z-index:90999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.98); overflow-y:auto; font-family:'Segoe UI', Roboto, sans-serif;">
     <div style="background:#0f172a; color:#e2e8f0; margin:1% auto; padding:60px 40px; border-radius:10px; width:95%; max-width:1100px; position:relative; border:1px solid #1e293b; box-shadow: 0 0 50px rgba(16, 185, 129, 0.2);">
         

@@ -10518,6 +10518,8 @@ function pmxRefreshDisplay() {
     style.id = 'pmxScrollStyle';
     style.innerHTML = '#pmxScrollRow::-webkit-scrollbar{display:none;}';
     document.head.appendChild(style);
+    // background থিম অনুযায়ী ঠিক করা
+    if (typeof pmxSetHeaderBg === 'function') pmxSetHeaderBg();
 }
 
 // ══════════════════════════════════════════════════════════════════
