@@ -4723,12 +4723,389 @@ function openImgZoom(src) {
 function openProductDetails(productId) {
     // ১. প্রোডাক্ট খুঁজে বের করা
     const item = appState.products.find(p => String(p.id) === String(productId));
-    if (!item) {
-        console.error("পণ্যটি পাওয়া যায়নি! আইডি:", productId);
-        return;
-    }
+    if (!item) { console.error("পণ্যটি পাওয়া যায়নি! আইডি:", productId); return; }
 
-    // ২. ইমেজ প্রসেসিং
+    // ইমেজ প্রসেসিং
+    const images = Array.isArray(item.images) ? item.images : [item.images || item.image || 'ko.jpeg'];
+
+    // landing.html gpDetailModal style এ open করা
+    const isMobile = document.documentElement.classList.contains('is-mobile');
+
+    // product data safeP format এ রূপান্তর
+    const oldPrice = item.oldPrice || item.originalPrice || Math.floor(item.price * 1.3);
+    const discount = oldPrice > item.price ? Math.round((1 - item.price / oldPrice) * 100) + '%' : '';
+    const desc = (item.description || item.desc || item.details || '').substring(0, 800);
+    const safeP = encodeURIComponent(JSON.stringify({
+        id: item.id,
+        name: item.title || item.name || 'পণ্য',
+        rating: item.rating || item.stars || item.avgRating || 4.2,
+        img: images[0] || 'ko.jpeg',
+        imgs: images,
+        price: item.price,
+        oldPrice: oldPrice,
+        discount: discount,
+        desc: desc,
+        specifications: item.specifications || {},
+        sellerName: item.sellerName || 'Digital Shop TM',
+        sellerRating: item.sellerRating || '',
+        deliveryCharge: item.deliveryCharge || (typeof SYSTEM_CONFIG !== 'undefined' ? SYSTEM_CONFIG.DELIVERY_CHARGE : '150'),
+        tags: item.tags || [],
+        category: item.category || item.cat || ''
+    }));
+    openGpModalIndex(safeP, item);
+}
+
+// ══════════════════════════════════════════════════════
+// Landing.html gpDetailModal style — index.html এ ব্যবহার
+// ══════════════════════════════════════════════════════
+function openGpModalIndex(safeP, origItem) {
+    try {
+        const p = JSON.parse(decodeURIComponent(safeP));
+        const imgs = (p.imgs && p.imgs.length) ? p.imgs : [p.img || 'ko.jpeg'];
+        window._gpdImgsIdx = imgs;
+        window._gpdIdxCur  = 0;
+        window._gpdCurrentId   = p.id;
+        window._gpdCurrentName = p.name;
+        window._gpdOrigItem    = origItem; // আসল item (addToCart, initiateCheckout এর জন্য)
+
+        const isMobile = document.documentElement.classList.contains('is-mobile');
+
+        // modal তৈরি বা reuse
+        let modal = document.getElementById('gpDetailModalIndex');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'gpDetailModalIndex';
+            modal.className = 'gp-modal-index';
+            document.body.appendChild(modal);
+        }
+
+        // like লজিক
+        const userId = (appState && appState.currentUser && appState.currentUser.id) ? appState.currentUser.id : 'GUEST';
+        const likedBy = Array.isArray(origItem && origItem.likedBy ? origItem.likedBy : []) ? (origItem && origItem.likedBy ? origItem.likedBy : []) : [];
+        const isLiked = likedBy.includes(userId);
+        const heartIcon = isLiked ? '❤️' : '🤍';
+
+        // stars
+        const r = parseFloat(p.rating) || 4.2;
+        const full = Math.floor(r); const half = (r - full) >= 0.5;
+        let sh = ''; for(let i=0;i<full;i++) sh+='★'; if(half) sh+='½'; for(let i=full+(half?1:0);i<5;i++) sh+='☆';
+        const cnt = 35 + Math.abs(Math.floor((String(p.id||'').charCodeAt(0)||0)) % 200);
+
+        // spec table
+        const sp = p.specifications || {};
+        const specRows = [['Product Type',sp.productType],['Size',sp.size],['Material',sp.material],['Features',sp.features],['Suitable For',sp.suitableFor],['Closure Type',sp.closureType],['Absorbency',sp.absorbency],['Packaging',sp.packaging]].filter(r=>r[1]);
+        const specHtml = specRows.length
+            ? `<table class="gpd-spec-table">${specRows.map((r,i)=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</table>`
+            : `<div style="text-align:center;padding:30px;color:#aaa;">Specifications পাওয়া যায়নি।</div>`;
+
+        // seller box
+        const sName = p.sellerName || 'Digital Shop TM';
+        const sRating = p.sellerRating || '';
+        const dCharge = p.deliveryCharge || '150';
+        const lbSz = isMobile ? '32px' : '11px';
+        const nmSz = isMobile ? '36px' : '15px';
+        const prSz = isMobile ? '32px' : '11px';
+        const pvSz = isMobile ? '40px' : '18px';
+        const dlSz = isMobile ? '32px' : '11px';
+        const dsSz = isMobile ? '34px' : '13px';
+        const dsubSz = isMobile ? '30px' : '12px';
+        const dprSz = isMobile ? '38px' : '16px';
+        const svSz = isMobile ? '32px' : '11px';
+        const svcSz = isMobile ? '34px' : '13px';
+        const svc2Sz = isMobile ? '30px' : '12px';
+        const sellerHtml = `<div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:${lbSz};color:#888;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Sold By</div><div style="color:#1976d2;font-size:${nmSz};font-weight:700;">${sName}</div>${sRating?`<div style="margin-top:8px;"><span style="font-size:${prSz};color:#888;">Positive Seller Ratings: </span><span style="font-size:${pvSz};font-weight:800;color:#22c55e;">${sRating}%</span></div><div style="margin-top:4px;background:#e5e7eb;border-radius:10px;height:6px;overflow:hidden;"><div style="background:linear-gradient(90deg,#22c55e,#16a34a);width:${sRating}%;height:100%;border-radius:10px;"></div></div>`:''}</div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:${dlSz};color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Delivery</div><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:${dsSz};font-weight:700;color:#222;">Standard Delivery</div><div style="font-size:${dsubSz};color:#888;">3–5 কার্যদিবস</div></div><div style="font-size:${dprSz};font-weight:800;color:#f57224;">৳${dCharge}</div></div></div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;"><div style="font-size:${svSz};color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Service</div><div style="color:#222;font-size:${svcSz};margin-bottom:6px;"><i class="fa fa-undo" style="color:#22c55e;margin-right:6px;"></i>7 Days Returns</div><div style="color:#666;font-size:${svc2Sz};"><i class="fa fa-shield-alt" style="color:#888;margin-right:6px;"></i>Authentic Product</div></div>`;
+
+        // tags
+        const tags = Array.isArray(p.tags) ? p.tags : [];
+        const tagsHtml = tags.length ? tags.map(t=>`<span style="background:#fff3e0;color:#f57224;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;">#${t}</span>`).join('') : '';
+
+        // related products (index.html এর appState থেকে)
+        let relatedHtml = '';
+        if (appState && appState.products) {
+            const curCat = String(p.category||'').toLowerCase();
+            const curTags = tags.map(t=>t.toLowerCase());
+            const related = appState.products.filter(rp => {
+                if (String(rp.id) === String(p.id)) return false;
+                if (curCat && rp.category && rp.category.toLowerCase() === curCat) return true;
+                const rpTags = Array.isArray(rp.tags) ? rp.tags.map(t=>t.toLowerCase()) : [];
+                return curTags.some(t => rpTags.includes(t));
+            }).slice(0, 8);
+            if (related.length) {
+                relatedHtml = related.map(rp => {
+                    const rpImg = Array.isArray(rp.images) ? rp.images[0] : (rp.image || 'ko.jpeg');
+                    const rpSafeP = encodeURIComponent(JSON.stringify({
+                        id:rp.id, name:rp.title||rp.name||'পণ্য',
+                        rating:rp.rating||4.2, img:rpImg,
+                        imgs:Array.isArray(rp.images)?rp.images:[rpImg],
+                        price:rp.price, oldPrice:rp.oldPrice||Math.floor(rp.price*1.3),
+                        discount:'', desc:(rp.description||'').substring(0,400),
+                        specifications:rp.specifications||{},
+                        sellerName:rp.sellerName||'Digital Shop TM',
+                        sellerRating:rp.sellerRating||'',
+                        deliveryCharge:rp.deliveryCharge||'150',
+                        tags:rp.tags||[], category:rp.category||''
+                    }));
+                    return `<div class="gpd-rel-card" onclick="openGpModalIndex('${rpSafeP}', appState.products.find(x=>String(x.id)==='${rp.id}'))">
+                        <img src="${rpImg}" onerror="this.src='ko.jpeg'" alt="${rp.title||rp.name||''}">
+                        <div class="gpd-rel-card-body">
+                            <div class="gpd-rel-card-name">${rp.title||rp.name||'পণ্য'}</div>
+                            <div class="gpd-rel-card-price">৳${rp.price}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+        }
+
+        if (!isMobile) {
+            /* ══ PC VIEW ══ */
+            modal.innerHTML = `
+            <div class="gpd-pc-box" style="display:flex;">
+                <!-- Sticky top bar -->
+                <div style="position:sticky;top:0;z-index:100;background:#fff;border-bottom:2px solid #f0f0f0;display:flex;align-items:center;padding:12px 40px;gap:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+                    <button onclick="closeGpModalIndex()" style="background:#f5f5f5;border:none;width:40px;height:40px;border-radius:50%;font-size:20px;cursor:pointer;color:#333;display:flex;align-items:center;justify-content:center;transition:.2s;" onmouseover="this.style.background='#fee2e2';this.style.color='#ef4444'" onmouseout="this.style.background='#f5f5f5';this.style.color='#333'">✕</button>
+                    <div style="font-size:15px;font-weight:700;color:#222;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+                    <button onclick="gpShareProductIndex()" style="background:#f5f5f5;border:none;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px;color:#555;display:flex;align-items:center;gap:6px;font-family:'Hind Siliguri',sans-serif;transition:.2s;"><i class="fa fa-share-alt"></i> Share</button>
+                </div>
+
+                <!-- Top: image left + info right -->
+                <div class="gpd-pc-top">
+                    <div class="gpd-pc-left">
+                        <div class="gpd-pc-mainimg-wrap">
+                            <img id="gpdIdxPcMainImg" src="${imgs[0]||'ko.jpeg'}" alt="" onerror="this.src='ko.jpeg'">
+                        </div>
+                        <div class="gpd-pc-thumbs" id="gpdIdxPcThumbs" style="${imgs.length>1?'display:flex;':'display:none;'}">
+                            ${imgs.map((src,i)=>`<div class="gpd-pc-thumb ${i===0?'active':''}" id="gpdIdxPcThumb-${i}" onclick="gpdIdxPcGoTo(${i})"><img src="${src}" onerror="this.src='ko.jpeg'" alt=""></div>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="gpd-pc-right">
+                        <div class="gpd-pc-brand">Brand: <span>Digital Shop TM</span></div>
+                        <div class="gpd-pc-title">${p.name}</div>
+                        <div class="gpd-pc-price-row">
+                            <span style="color:#f57224;font-size:15px;font-weight:700;">৳</span>
+                            <span class="gpd-pc-price">${p.price}</span>
+                            ${p.oldPrice ? `<span class="gpd-pc-old">৳${p.oldPrice}</span>` : ''}
+                            ${p.discount ? `<span class="gpd-pc-discount">-${p.discount}</span>` : ''}
+                        </div>
+                        <div class="gpd-pc-sku">SKU: <span>${p.id || '—'}</span></div>
+                        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                            <i class="fa fa-check-circle" style="color:#22c55e;"></i>
+                            <span style="color:#16a34a;font-size:13px;font-weight:600;">In Stock</span>
+                        </div>
+                        <div class="gpd-pc-actions">
+                            <button class="gpd-pc-btn-buy" onclick="closeGpModalIndex(); initiateCheckout('${p.id}')">⚡ Buy Now</button>
+                            <button class="gpd-pc-btn-cart" onclick="addToCart('${p.id}')">🛒 Add to Cart</button>
+                        </div>
+                        <div class="gpd-pc-share-row" style="margin-top:16px;">
+                            <button class="gpd-pc-share-btn" onclick="gpShareProductIndex()"><i class="fa fa-share-alt"></i> Share</button>
+                            <button class="gpd-pc-share-btn" onclick="addToCart('${p.id}')"><i class="fa fa-heart-o"></i> Wishlist</button>
+                        </div>
+                        <!-- like/share/3dot — Buy Now এর নিচে -->
+                        <div style="display:flex;gap:10px;margin-top:14px;">
+                            <button id="gpIdxLikeBtn-${p.id}" onclick="toggleProductLike('${p.id}')" style="flex:2;padding:10px;background:#f5f5f5;color:${isLiked?'#ef4444':'#555'};border:1px solid ${isLiked?'#ef4444':'#ddd'};border-radius:10px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;">
+                                <span>${heartIcon}</span><span>${origItem ? (origItem.likes||0) : 0}</span>
+                            </button>
+                            <button onclick="gpShareProductIndex()" style="flex:2;padding:10px;background:#f5f5f5;color:#555;border:1px solid #ddd;border-radius:10px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;">
+                                <span>🔗</span><span>শেয়ার</span>
+                            </button>
+                            <button onclick="openProductOptions('${p.id}')" style="flex:0.5;min-width:44px;padding:10px;background:#f5f5f5;color:#555;border:1px solid #ddd;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;">⋮</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Accordion sections -->
+                <div class="gpd-pc-tabs-wrap" style="max-width:1400px;margin:0 auto;width:100%;padding:0 40px 60px;">
+                    <div class="gpd-accord-block">
+                        <div class="gpd-accord-head" onclick="gpdIdxToggleAccord('spec')"><span>📋 Specifications</span><span class="gpd-accord-arrow" id="gpd-idx-arrow-spec">▲</span></div>
+                        <div class="gpd-accord-body" id="gpd-idx-body-spec">${specHtml}</div>
+                    </div>
+                    <div class="gpd-accord-block">
+                        <div class="gpd-accord-head" onclick="gpdIdxToggleAccord('details')"><span>📄 Product Details</span><span class="gpd-accord-arrow" id="gpd-idx-arrow-details">▲</span></div>
+                        <div class="gpd-accord-body" id="gpd-idx-body-details">
+                            <div style="font-size:14px;color:#444;line-height:1.9;white-space:pre-wrap;">${p.desc||'বিস্তারিত শীঘ্রই।'}</div>
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;">${tagsHtml}</div>
+                        </div>
+                    </div>
+                    <div class="gpd-accord-block">
+                        <div class="gpd-accord-head" onclick="gpdIdxToggleAccord('seller')"><span>🏪 Seller</span><span class="gpd-accord-arrow" id="gpd-idx-arrow-seller">▲</span></div>
+                        <div class="gpd-accord-body" id="gpd-idx-body-seller">${sellerHtml}</div>
+                    </div>
+                    ${relatedHtml ? `<div style="margin-top:32px;border-top:3px solid #f0f0f0;padding-top:28px;"><div style="font-size:20px;font-weight:800;color:#111;margin-bottom:16px;">🔍 সম্পর্কিত পণ্য</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;">${relatedHtml}</div></div>` : ''}
+                </div>
+            </div>`;
+        } else {
+            /* ══ MOBILE VIEW ══ */
+            modal.innerHTML = `
+            <div class="gpd-mobile-view" style="display:block;">
+                <div class="gpd-topbar">
+                    <button class="gpd-back-btn" onclick="closeGpModalIndex()">&#8592;</button>
+                    <div class="gpd-topbar-title">${p.name}</div>
+                    <div class="gpd-topbar-icons">
+                        <i class="fa fa-shopping-cart" onclick="addToCart('${p.id}')" style="cursor:pointer;"></i>
+                        <i class="fa fa-ellipsis-v" onclick="openProductOptions('${p.id}')" style="cursor:pointer;"></i>
+                    </div>
+                </div>
+                <!-- Image -->
+                <div class="gpd-img-slider">
+                    <img class="gpd-main-img" id="gpIdxModalImg" src="${imgs[0]||'ko.jpeg'}" alt="" onerror="this.src='ko.jpeg'">
+                    <div class="gpd-img-counter" id="gpIdxImgCounter">1/${imgs.length}</div>
+                </div>
+                <!-- Thumbnails -->
+                <div class="gpd-thumbs" id="gpIdxThumbs" style="${imgs.length>1?'display:flex;':'display:none;'}">
+                    ${imgs.map((src,i)=>`<div class="gpd-thumb ${i===0?'active':''}" id="gpIdx-thumb-${i}" onclick="gpIdxGoTo(${i})"><img src="${src}" onerror="this.src='ko.jpeg'" alt=""></div>`).join('')}
+                </div>
+                <!-- Price -->
+                <div class="gpd-price-sec">
+                    <div class="gpd-price-row">
+                        <span class="gpd-taka">৳</span>
+                        <span class="gpd-price">${p.price}</span>
+                        ${p.oldPrice ? `<span class="gpd-old-price">৳${p.oldPrice}</span>` : ''}
+                        ${p.discount ? `<span class="gpd-discount-badge">${p.discount}</span>` : ''}
+                        <div class="gpd-heart-share">
+                            <i class="fa ${isLiked?'fa-heart':'fa-heart-o'}" onclick="toggleProductLike('${p.id}')" style="cursor:pointer;color:${isLiked?'#ef4444':'#888'};"></i>
+                            <i class="fa fa-share-alt" onclick="gpShareProductIndex()" style="cursor:pointer;"></i>
+                        </div>
+                    </div>
+                    <div class="gpd-name">${p.name}</div>
+                    <div class="gpd-stars-row">
+                        <span class="gpd-star-icons">${sh}</span>
+                        <span class="gpd-stars-val">${r.toFixed(1)}</span>
+                        <span class="gpd-review-count">(${cnt})</span>
+                    </div>
+                </div>
+                <div class="gpd-divider"></div>
+
+                <!-- Buy Now / Add to Cart / Share / Wishlist বাটন -->
+                <div style="display:flex;gap:8px;padding:12px 14px;background:#fff;border-bottom:1px solid #f0f0f0;flex-wrap:wrap;">
+                    <button onclick="closeGpModalIndex(); initiateCheckout('${p.id}')" style="flex:1;min-width:140px;padding:16px 10px;background:#38bdf8;color:#fff;border:none;border-radius:10px;font-size:28px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">⚡ Buy Now</button>
+                    <button onclick="addToCart('${p.id}')" style="flex:1;min-width:140px;padding:16px 10px;background:#f97316;color:#fff;border:none;border-radius:10px;font-size:28px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">🛒 Add to Cart</button>
+                    <button onclick="gpShareProductIndex()" style="flex:1;min-width:100px;padding:16px 10px;background:#f5f5f5;color:#333;border:1px solid #ddd;border-radius:10px;font-size:26px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa fa-share-alt"></i> Share</button>
+                    <button onclick="addToCart('${p.id}')" style="flex:1;min-width:100px;padding:16px 10px;background:#f5f5f5;color:#e11d48;border:1px solid #fecdd3;border-radius:10px;font-size:26px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;"><i class="fa fa-heart-o"></i> Wishlist</button>
+                </div>
+                <!-- like/share/3dot — বাটনের নিচে -->
+                <div style="display:flex;gap:10px;padding:10px 14px;background:#fff;border-bottom:1px solid #f0f0f0;">
+                    <button id="gpIdxLikeBtn-${p.id}" onclick="toggleProductLike('${p.id}')" style="flex:2;padding:14px;background:#f5f5f5;color:${isLiked?'#ef4444':'#555'};border:1px solid ${isLiked?'#ef4444':'#ddd'};border-radius:10px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;font-size:28px;">
+                        <span>${heartIcon}</span><span>${origItem ? (origItem.likes||0) : 0}</span>
+                    </button>
+                    <button onclick="gpShareProductIndex()" style="flex:2;padding:14px;background:#f5f5f5;color:#555;border:1px solid #ddd;border-radius:10px;cursor:pointer;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;font-size:28px;">
+                        <span>🔗</span><span>শেয়ার</span>
+                    </button>
+                    <button onclick="openProductOptions('${p.id}')" style="flex:0.5;min-width:60px;padding:14px;background:#f5f5f5;color:#555;border:1px solid #ddd;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:30px;">⋮</button>
+                </div>
+
+                <div class="gpd-divider"></div>
+                <div style="padding:0 14px;">
+                    <!-- Specifications -->
+                    <div class="gpd-mob-accord-block">
+                        <div class="gpd-mob-accord-head" onclick="gpdIdxMobToggle('mspec',this)">
+                            <span style="font-size:44px;font-weight:800;color:#111;">📋 Specifications</span>
+                            <span class="gpd-mob-accord-arrow">▲</span>
+                        </div>
+                        <div class="gpd-mob-accord-body" id="gpd-idx-mob-mspec">${specHtml}</div>
+                    </div>
+                    <!-- Product Details -->
+                    <div class="gpd-mob-accord-block">
+                        <div class="gpd-mob-accord-head" onclick="gpdIdxMobToggle('mdetails',this)">
+                            <span style="font-size:44px;font-weight:800;color:#111;">📄 Product Details</span>
+                            <span class="gpd-mob-accord-arrow">▲</span>
+                        </div>
+                        <div class="gpd-mob-accord-body gpd-desc-text" id="gpd-idx-mob-mdetails">
+                            ${p.desc||'বিস্তারিত শীঘ্রই।'}
+                            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;">${tagsHtml}</div>
+                        </div>
+                    </div>
+                    <!-- Seller -->
+                    <div class="gpd-mob-accord-block">
+                        <div class="gpd-mob-accord-head" onclick="gpdIdxMobToggle('mseller',this)">
+                            <span style="font-size:44px;font-weight:800;color:#111;">🏪 Seller</span>
+                            <span class="gpd-mob-accord-arrow">▲</span>
+                        </div>
+                        <div class="gpd-mob-accord-body" id="gpd-idx-mob-mseller">${sellerHtml}</div>
+                    </div>
+                    ${relatedHtml ? `<div style="margin-top:20px;"><div style="font-size:32px;font-weight:800;color:#111;margin-bottom:12px;">🔍 সম্পর্কিত পণ্য</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding-bottom:12px;">${relatedHtml}</div></div>` : ''}
+                </div>
+                <div class="gpd-spacer"></div>
+                <!-- Bottom Action Bar -->
+                <div class="gpd-action-bar">
+                    <button class="gpd-store-btn" onclick="void(0)">
+                        <i class="fa fa-store-alt" style="font-size:20px;color:#f57224;"></i>
+                        <span>Store</span>
+                    </button>
+                    <button class="gpd-chat-btn" onclick="void(0)">
+                        <i class="fa fa-comment-dots"></i>
+                        <span>Chat</span>
+                    </button>
+                    <button class="gpd-buynow-btn" onclick="closeGpModalIndex(); initiateCheckout('${p.id}')">Buy Now</button>
+                    <button class="gpd-addcart-btn" onclick="addToCart('${p.id}')">Add to Cart</button>
+                </div>
+            </div>`;
+        }
+
+        modal.style.display = 'block';
+        modal.scrollTop = 0;
+        document.body.style.overflow = 'hidden';
+
+    } catch(e) { console.error('gpModalIndex error', e); }
+}
+
+function closeGpModalIndex() {
+    const m = document.getElementById('gpDetailModalIndex');
+    if (m) m.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function gpShareProductIndex() {
+    const id = window._gpdCurrentId;
+    const name = window._gpdCurrentName;
+    if (!id) return;
+    const url = window.location.href.split('?')[0] + '?product=' + encodeURIComponent(id);
+    if (navigator.share) {
+        navigator.share({ title: name || 'পণ্য', text: name || 'এই পণ্যটি দেখুন', url }).catch(()=>{});
+    } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(()=>{ showNotification && showNotification('লিংক কপি হয়েছে!','success'); }).catch(()=>{});
+    }
+}
+
+function gpdIdxPcGoTo(idx) {
+    window._gpdIdxCur = idx;
+    const mainImg = document.getElementById('gpdIdxPcMainImg');
+    if (mainImg) mainImg.src = (window._gpdImgsIdx||[])[idx] || 'ko.jpeg';
+    document.querySelectorAll('.gpd-pc-thumb').forEach((t,i) => t.classList.toggle('active', i===idx));
+}
+
+function gpIdxGoTo(idx) {
+    window._gpdIdxCur = idx;
+    const imgEl = document.getElementById('gpIdxModalImg');
+    if (imgEl) imgEl.src = (window._gpdImgsIdx||[])[idx] || 'ko.jpeg';
+    const ctr = document.getElementById('gpIdxImgCounter');
+    if (ctr) ctr.textContent = (idx+1)+'/'+(window._gpdImgsIdx||[]).length;
+    document.querySelectorAll('.gpd-thumb').forEach((t,i) => t.classList.toggle('active', i===idx));
+}
+
+function gpdIdxToggleAccord(key) {
+    const body = document.getElementById('gpd-idx-body-'+key);
+    const arrow = document.getElementById('gpd-idx-arrow-'+key);
+    if (!body) return;
+    const isHidden = body.classList.contains('hidden');
+    body.classList.toggle('hidden', !isHidden);
+    if (arrow) arrow.classList.toggle('collapsed', !isHidden);
+}
+
+function gpdIdxMobToggle(key, headEl) {
+    const body = document.getElementById('gpd-idx-mob-'+key);
+    if (!body) return;
+    const arrow = headEl ? headEl.querySelector('.gpd-mob-accord-arrow') : null;
+    const isHidden = body.classList.contains('hidden');
+    body.classList.toggle('hidden', !isHidden);
+    if (arrow) arrow.classList.toggle('collapsed', !isHidden);
+}
+
+// ════════════════════════════════════════
+// পুরনো openProductDetails এর বাকি অংশ (compat)
+// ════════════════════════════════════════
+function _openProductDetailsOLD(productId) {
+    const item = appState.products.find(p => String(p.id) === String(productId));
+    if (!item) { return; }
     const images = Array.isArray(item.images) ? item.images : [item.images || item.image || 'https://via.placeholder.com/400'];
 
     // ৩. মোডাল তৈরি বা চেক করা
@@ -5001,6 +5378,7 @@ function openProductDetails(productId) {
 
     modal.style.display = 'flex';
 }
+// ════════ পুরনো ফাংশন শেষ ════════
 
 window.deleteReportRecord = function(reportId, prodId) {
     if (confirm("আপনি কি নিশ্চিত যে এই রিপোর্টটি ডিলিট করতে চান?")) {
