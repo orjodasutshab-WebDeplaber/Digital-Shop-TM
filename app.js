@@ -4997,6 +4997,66 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
         </div>
       </div>
     </div>
+    <!-- ══ PC FOOTER ══ -->
+    <footer style="background:#111827;color:#d1d5db;padding:50px 20px 20px;border-top:1px solid #374151;font-family:sans-serif;margin-top:32px;">
+      <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:15px;">
+            <img src="ko.jpeg" alt="Logo" style="width:48px;height:48px;border-radius:10px;object-fit:fill;border:2px solid #10b981;" onerror="this.style.display='none'">
+            <h2 style="color:#10b981;margin:0;">Digital Shop TM</h2>
+          </div>
+          <p style="font-size:14px;line-height:1.6;">আপনার বিশ্বস্ত অনলাইন শপ।</p>
+        </div>
+        <div>
+          <h3 style="color:white;font-size:18px;margin-bottom:20px;">COMPANY</h3>
+          <ul style="list-style:none;padding:0;font-size:14px;line-height:2.5;">
+            <li><a href="javascript:void(0)" onclick="openAboutModal()" style="color:#9ca3af;text-decoration:none;">About Us</a></li>
+            <li><a href="javascript:void(0)" onclick="openTermsModal()" style="color:#9ca3af;text-decoration:none;">Terms &amp; Conditions</a></li>
+            <li><a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:#9ca3af;text-decoration:none;">Privacy Policy</a></li>
+            <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af;text-decoration:none;">Cancellation &amp; Return Policy</a></li>
+            <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af;text-decoration:none;">FAQs</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="color:white;font-size:18px;margin-bottom:20px;">QUICK HELP</h3>
+          <ul style="list-style:none;padding:0;font-size:14px;line-height:2.5;">
+            <li><a href="javascript:void(0)" onclick="openCustomerCareModal()" style="color:#9ca3af;text-decoration:none;">গ্রাহক সেবা</a></li>
+            <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af;text-decoration:none;">কিভাবে কিনবেন</a></li>
+            <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af;text-decoration:none;">রিটার্ন ও রিফান্ড</a></li>
+            <li><a href="tel:+8801707498418" style="color:#9ca3af;text-decoration:none;">যোগাযোগ: +8801707498418</a></li>
+          </ul>
+          <p style="margin-top:15px;font-size:14px;">Hotline: +8801707498418</p>
+        </div>
+        <div>
+          <h3 style="color:white;font-size:18px;margin-bottom:20px;">VERIFIED BY</h3>
+          <div style="margin-bottom:15px;">
+            <p style="font-size:12px;margin-bottom:5px;">DBID ID: 437361334</p>
+            <p style="font-size:12px;">Registration ID: 304903094</p>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" style="height:35px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" style="height:35px;">
+          </div>
+          <div style="margin-top:18px;">
+            <p style="font-size:12px;color:#6b7280;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">পেমেন্ট মেথড</p>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+              <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o1.jpg" alt="bKash" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#E2136E';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>bKash</span>'"></div>
+              <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o2.png" alt="Nagad" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#F15922';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>Nagad</span>'"></div>
+              <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o3.png" alt="Rocket" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#8B008B';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>Rocket</span>'"></div>
+              <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o4.png" alt="Upay" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#EE3424';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>Upay</span>'"></div>
+              <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o5.jpg" alt="DBBL" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#006838';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>DBBL</span>'"></div>
+              <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o6.png" alt="City Bank" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#003087';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>City Bank</span>'"></div>
+              <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o7.jpg" alt="Islami Bank" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#1d4ed8';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:12px;padding:0 6px>Islami Bank</span>'"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:30px;font-size:13px;color:#6b7280;">
+        <hr style="border:0;border-top:1px solid #374151;margin-bottom:20px;">
+        <p>© 2026 <strong>Digital Shop TM</strong>. সর্বস্বত্ব সংরক্ষিত।</p>
+        <p style="margin-top:5px;">Developed by: <span style="color:#10b981;">Digital Shop TM Team</span></p>
+      </div>
+    </footer>
     </div><!-- /.pc-scroll-wrapper -->
   </div>
 
@@ -5075,6 +5135,66 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
         <p style="font-size:25px;color:#aaa;margin-bottom:14px;">একই ক্যাটাগরি / ট্যাগের পণ্যসমূহ</p>
         <div id="gpd-mob-related-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding-bottom:12px;"></div>
       </div>
+      <!-- ══ MOBILE FOOTER ══ -->
+      <footer style="background:#111827;color:#d1d5db;padding:50px 20px 120px;border-top:1px solid #374151;font-family:sans-serif;margin-top:24px;">
+        <div style="display:flex;flex-direction:column;gap:36px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:15px;">
+              <img src="ko.jpeg" alt="Logo" style="width:56px;height:56px;border-radius:10px;object-fit:fill;border:2px solid #10b981;" onerror="this.style.display='none'">
+              <h2 style="color:#10b981;margin:0;font-size:34px;">Digital Shop TM</h2>
+            </div>
+            <p style="font-size:26px;line-height:1.7;">আপনার বিশ্বস্ত অনলাইন শপ।</p>
+          </div>
+          <div>
+            <h3 style="color:white;font-size:30px;margin-bottom:20px;">COMPANY</h3>
+            <ul style="list-style:none;padding:0;font-size:26px;line-height:3;">
+              <li><a href="javascript:void(0)" onclick="openAboutModal()" style="color:#9ca3af;text-decoration:none;">About Us</a></li>
+              <li><a href="javascript:void(0)" onclick="openTermsModal()" style="color:#9ca3af;text-decoration:none;">Terms &amp; Conditions</a></li>
+              <li><a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:#9ca3af;text-decoration:none;">Privacy Policy</a></li>
+              <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af;text-decoration:none;">Cancellation &amp; Return Policy</a></li>
+              <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af;text-decoration:none;">FAQs</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="color:white;font-size:30px;margin-bottom:20px;">QUICK HELP</h3>
+            <ul style="list-style:none;padding:0;font-size:26px;line-height:3;">
+              <li><a href="javascript:void(0)" onclick="openCustomerCareModal()" style="color:#9ca3af;text-decoration:none;">গ্রাহক সেবা</a></li>
+              <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af;text-decoration:none;">কিভাবে কিনবেন</a></li>
+              <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af;text-decoration:none;">রিটার্ন ও রিফান্ড</a></li>
+              <li><a href="tel:+8801707498418" style="color:#9ca3af;text-decoration:none;">যোগাযোগ: +8801707498418</a></li>
+            </ul>
+            <p style="margin-top:15px;font-size:26px;">Hotline: +8801707498418</p>
+          </div>
+          <div>
+            <h3 style="color:white;font-size:30px;margin-bottom:20px;">VERIFIED BY</h3>
+            <div style="margin-bottom:15px;">
+              <p style="font-size:24px;margin-bottom:8px;">DBID ID: 437361334</p>
+              <p style="font-size:24px;">Registration ID: 304903094</p>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" style="height:50px;">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" style="height:50px;">
+            </div>
+            <div style="margin-top:18px;">
+              <p style="font-size:24px;color:#6b7280;margin-bottom:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">পেমেন্ট মেথড</p>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o1.jpg" alt="bKash" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#E2136E';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>bKash</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o2.png" alt="Nagad" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#F15922';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>Nagad</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o3.png" alt="Rocket" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#8B008B';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>Rocket</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o4.png" alt="Upay" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#EE3424';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>Upay</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o5.jpg" alt="DBBL" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#006838';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>DBBL</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o6.png" alt="City Bank" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#003087';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>City Bank</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o7.jpg" alt="Islami Bank" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#1d4ed8';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:18px;padding:0 8px>Islami Bank</span>'"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:36px;font-size:24px;color:#6b7280;">
+          <hr style="border:0;border-top:1px solid #374151;margin-bottom:24px;">
+          <p>© 2026 <strong>Digital Shop TM</strong>. সর্বস্বত্ব সংরক্ষিত।</p>
+          <p style="margin-top:8px;">Developed by: <span style="color:#10b981;">Digital Shop TM Team</span></p>
+        </div>
+      </footer>
     </div>
     <div class="gpd-spacer"></div>
     <!-- Bottom Action Bar -->
@@ -5323,13 +5443,14 @@ function openProductDetails(productId) {
 
     const isMobile = document.documentElement.classList.contains('is-mobile');
 
-    // Auto old price & discount
-    let dispOldPrice = item.oldPrice || item.originalPrice || 0;
-    if (!dispOldPrice && item.price) {
-        let seed=0; const s=String(item.id||item.title||item.price);
-        for(let k=0;k<s.length;k++) seed=(seed*31+s.charCodeAt(k))>>>0;
-        const pct=15+(seed%21);
-        dispOldPrice=Math.round(item.price*(1+pct/100)/5)*5;
+    // Auto old price & discount — কার্ডের মতো একই লজিক
+    const _dpIdStr = String(item.id || item.name || '');
+    const _dpSeed = _dpIdStr.split('').reduce((acc, c, i) => acc + c.charCodeAt(0) * (i + 7), 0);
+    let dispOldPrice = parseFloat(item.oldPrice || item.originalPrice || item.mrp || 0);
+    if (!dispOldPrice || dispOldPrice <= item.price) {
+        const _opSeed = _dpSeed % 1000;
+        const multiplier = 1.15 + (_opSeed / 1000) * 0.20;
+        dispOldPrice = Math.ceil(item.price * multiplier / 10) * 10;
     }
     const dispDiscount=(dispOldPrice&&dispOldPrice>item.price)?Math.round((dispOldPrice-item.price)/dispOldPrice*100)+'%':'';
 
