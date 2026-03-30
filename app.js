@@ -2548,6 +2548,17 @@ function toggleThemeMode() {
     document.body.classList.toggle('dark-theme');
     const isDark = document.body.classList.contains('dark-theme');
     localStorage.setItem(DB_KEYS.THEME, isDark ? 'dark' : 'light');
+
+    // সিরোনাম শপ খোলা থাকলে background আপডেট করো
+    const sShop = document.getElementById('sironamFullShop');
+    if (sShop) {
+        sShop.style.background = isDark ? '#0f172a' : '#f8fafc';
+        const sNav = sShop.querySelector('div[style*="position:sticky"]');
+        if (sNav) {
+            sNav.style.background = isDark ? '#1e293b' : '#ffffff';
+            sNav.style.borderBottomColor = isDark ? '#374151' : '#e2e8f0';
+        }
+    }
 }
 
 function loadTheme() {
@@ -9606,14 +9617,74 @@ function openSironamShop(id, title) {
     // ডেলি বিজ্ঞাপন খুঁজে বের করা
     const currentDeliAd = deliAds.find(a => String(a.sironamId) === String(id));
 
+    // থিম চেক
+    const _isDark = document.body.classList.contains('dark-theme');
+    const _shopBg     = _isDark ? '#0f172a' : '#f8fafc';
+    const _shopNavBg  = _isDark ? '#1e293b' : '#ffffff';
+    const _shopBorder = _isDark ? '#374151' : '#e2e8f0';
+    const _shopSearchBg = _isDark ? '#111827' : '#f1f5f9';
+    const _shopSearchInputBg = _isDark ? 'transparent' : '#ffffff';
+    const _shopSearchColor = _isDark ? '#fff' : '#1e293b';
+    const _shopSearchIconColor = _isDark ? '#94a3b8' : '#64748b';
+
+    // Footer HTML (মেইন পপ থেকে কপি)
+    const _footerHTML = `
+    <footer style="background:#111827; color:#d1d5db; padding:50px 20px 20px; border-top:1px solid #374151; font-family:sans-serif; margin-top:20px;">
+        <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:30px;">
+            <div>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                    <img src="ko.jpeg" alt="Logo" style="width:42px;height:42px;border-radius:10px;object-fit:fill;border:2px solid #10b981;" onerror="this.style.display='none'">
+                    <h2 style="color:#10b981; margin:0; font-size:16px;">Digital Shop TM</h2>
+                </div>
+                <p style="font-size:13px; line-height:1.6;">আপনার বিশ্বস্ত অনলাইন শপ।</p>
+            </div>
+            <div>
+                <h3 style="color:white; font-size:16px; margin-bottom:15px;">COMPANY</h3>
+                <ul style="list-style:none; padding:0; font-size:13px; line-height:2.5;">
+                    <li><a href="javascript:void(0)" onclick="openAboutModal()" style="color:#9ca3af; text-decoration:none;">About Us</a></li>
+                    <li><a href="javascript:void(0)" onclick="openTermsModal()" style="color:#9ca3af; text-decoration:none;">Terms &amp; Conditions</a></li>
+                    <li><a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:#9ca3af; text-decoration:none;">Privacy Policy</a></li>
+                    <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af; text-decoration:none;">Return Policy</a></li>
+                    <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af; text-decoration:none;">FAQs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color:white; font-size:16px; margin-bottom:15px;">QUICK HELP</h3>
+                <ul style="list-style:none; padding:0; font-size:13px; line-height:2.5;">
+                    <li><a href="javascript:void(0)" onclick="openCustomerCareModal()" style="color:#9ca3af; text-decoration:none;">গ্রাহক সেবা</a></li>
+                    <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af; text-decoration:none;">কিভাবে কিনবেন</a></li>
+                    <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af; text-decoration:none;">রিটার্ন ও রিফান্ড</a></li>
+                    <li><a href="tel:+8801707498418" style="color:#9ca3af; text-decoration:none;">যোগাযোগ: +8801707498418</a></li>
+                </ul>
+                <p style="font-size:13px;">Hotline: +8801707498418</p>
+            </div>
+            <div>
+                <h3 style="color:white; font-size:16px; margin-bottom:15px;">VERIFIED BY</h3>
+                <p style="font-size:12px; margin-bottom:4px;">DBID ID: 437361334</p>
+                <p style="font-size:12px; margin-bottom:12px;">Registration ID: 304903094</p>
+                <p style="font-size:12px;color:#6b7280;margin-bottom:8px;font-weight:600;text-transform:uppercase;">পেমেন্ট মেথড</p>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
+                    <div style="background:#fff;border-radius:6px;padding:3px 5px;height:30px;display:flex;align-items:center;justify-content:center;"><img src="o1.jpg" alt="bKash" style="height:22px;width:auto;object-fit:contain;" onerror="this.parentElement.innerHTML='<span style=color:#E2136E;font-weight:900;font-size:11px;padding:0 4px>bKash</span>'"></div>
+                    <div style="background:#fff;border-radius:6px;padding:3px 5px;height:30px;display:flex;align-items:center;justify-content:center;"><img src="o2.png" alt="Nagad" style="height:22px;width:auto;object-fit:contain;" onerror="this.parentElement.innerHTML='<span style=color:#F15922;font-weight:900;font-size:11px;padding:0 4px>Nagad</span>'"></div>
+                    <div style="background:#fff;border-radius:6px;padding:3px 5px;height:30px;display:flex;align-items:center;justify-content:center;"><img src="o3.png" alt="Rocket" style="height:22px;width:auto;object-fit:contain;" onerror="this.parentElement.innerHTML='<span style=color:#8B008B;font-weight:900;font-size:11px;padding:0 4px>Rocket</span>'"></div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:25px; font-size:13px; color:#6b7280;">
+            <hr style="border:0; border-top:1px solid #374151; margin-bottom:15px;">
+            <p>© 2026 <strong>Digital Shop TM</strong>. সর্বস্বত্ব সংরক্ষিত।</p>
+            <p style="margin-top:4px;">Developed by: <span style="color:#10b981;">Digital Shop TM Team</span></p>
+        </div>
+    </footer>`;
+
     const shopHTML = `
-    <div id="sironamFullShop" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0f172a; z-index:999999999; overflow-y:auto; font-family: 'Hind Siliguri', sans-serif;">
+    <div id="sironamFullShop" style="position:fixed; top:0; left:0; width:100%; height:100%; background:${_shopBg}; z-index:999999999; overflow-y:auto; font-family: 'Hind Siliguri', sans-serif;">
         
-        <div style="position:sticky; top:0; background:#1e293b; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #374151; z-index:100;">
+        <div style="position:sticky; top:0; background:${_shopNavBg}; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid ${_shopBorder}; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
             <h2 style="color:#6366f1; margin:0; font-size:20px; font-weight:bold;">${title}</h2>
             <div style="display:flex; align-items:center; gap:10px; flex-grow:1; justify-content:flex-end;">
 
-                <!-- সার্চ আইকন বাটন (মেইন পপ এর মতো) -->
+                <!-- সার্চ আইকন বাটন -->
                 <div style="position:relative; display:flex; align-items:center;">
                     <button id="shopSearchIconBtn"
                             onclick="(function(){
@@ -9626,18 +9697,18 @@ function openSironamShop(id, title) {
                                     setTimeout(function(){inp.focus();},50);
                                 }
                             })()"
-                            style="background:linear-gradient(135deg,#6366f1 0%,#a855f7 100%); border:none; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; flex-shrink:0; box-shadow:0 4px 15px rgba(99,102,241,0.4); transition:opacity 0.2s,transform 0.2s;">
+                            style="background:${_isDark ? 'linear-gradient(135deg,#1e293b 0%,#334155 100%)' : 'linear-gradient(135deg,#f1f5f9 0%,#e2e8f0 100%)'}; border:2px solid ${_isDark ? '#475569' : '#cbd5e1'}; color:${_isDark ? '#e2e8f0' : '#1e293b'}; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; flex-shrink:0; transition:opacity 0.2s,transform 0.2s;">
                         <i class="fa fa-search"></i>
                     </button>
-                    <div id="shopSearchExpandBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:68px; align-items:center; justify-content:center; z-index:999999999; background:#1e293b; border-bottom:2px solid #374151; box-shadow:0 4px 24px rgba(0,0,0,0.3); padding:0 16px; box-sizing:border-box; animation:srchDropDown 0.22s ease;">
-                        <div style="flex:1; max-width:700px; display:flex; align-items:center; background:#111827; border:1.5px solid #374151; border-radius:12px 0 0 12px; overflow:hidden; height:68px;">
-                            <i class="fa fa-search" style="color:#94a3b8; font-size:15px; padding:0 10px 0 14px; flex-shrink:0;"></i>
+                    <div id="shopSearchExpandBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:68px; align-items:center; justify-content:center; z-index:999999999; background:${_shopNavBg}; border-bottom:2px solid ${_shopBorder}; box-shadow:0 4px 24px rgba(0,0,0,0.3); padding:0 16px; box-sizing:border-box; animation:srchDropDown 0.22s ease;">
+                        <div style="flex:1; max-width:700px; display:flex; align-items:center; background:${_shopSearchBg}; border:1.5px solid ${_shopBorder}; border-radius:12px 0 0 12px; overflow:hidden; height:44px;">
+                            <i class="fa fa-search" style="color:${_shopSearchIconColor}; font-size:15px; padding:0 10px 0 14px; flex-shrink:0;"></i>
                             <input type="text" id="shopSearchInput" oninput="filterShopProducts()" placeholder="পণ্য খুঁজুন..."
                                    onkeydown="if(event.key==='Escape'){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';}"
-                                   style="flex:1; background:transparent; border:none; color:#fff; font-size:15px; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
+                                   style="flex:1; background:${_shopSearchInputBg}; border:none; color:${_shopSearchColor}; font-size:15px; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
                         </div>
                         <button onclick="(function(){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';document.getElementById('shopSearchInput').value='';filterShopProducts();})()"
-                                style="background:#ef4444; border:none; color:#fff; height:68px; padding:0 22px; border-radius:0 12px 12px 0; font-size:20px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                style="background:#ef4444; border:none; color:#fff; height:44px; padding:0 18px; border-radius:0 12px 12px 0; font-size:18px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
                             <i class="fa fa-times"></i>
                         </button>
                     </div>
@@ -9665,6 +9736,8 @@ function openSironamShop(id, title) {
         <div id="shopProductGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:20px; padding:30px;">
             ${renderTaggedProducts(id)}
         </div>
+
+        ${_footerHTML}
     </div>`;
 
     document.body.insertAdjacentHTML('beforeend', shopHTML);
@@ -9705,8 +9778,16 @@ function renderTaggedProducts(sironamId) {
         const displayImg = Array.isArray(p.images) ? p.images[0] : (p.img || p.image);
         const pId = p.id || p._id; // আইডির ভেরিয়েবল নিশ্চিত করা
         
+        // থিম অনুযায়ী পণ্য background: সাদা→সবুজ, কালো→লাল
+        const _isShopDark = document.body.classList.contains('dark-theme');
+        const _cardBg = _isShopDark
+            ? 'linear-gradient(135deg,#7f1d1d 0%,#991b1b 100%)'
+            : 'linear-gradient(135deg,#14532d 0%,#166534 100%)';
+        const _cardBorder = _isShopDark ? '#ef4444' : '#22c55e';
+        const _tags = (p.tags || p.category || p.title || p.name || '').toLowerCase();
+
         return `
-        <div class="shop-product-item" data-name="${p.title || p.name}" style="background:#1e293b; border-radius:12px; padding:10px; border:1px solid #374151; text-align:center; display:flex; flex-direction:column; justify-content:space-between; height: 100%; position: relative;">
+        <div class="shop-product-item" data-name="${p.title || p.name}" data-tags="${_tags}" style="background:${_cardBg}; border-radius:12px; padding:10px; border:1px solid ${_cardBorder}; text-align:center; display:flex; flex-direction:column; justify-content:space-between; height: 100%; position: relative;">
             
             ${checkAdmin ? `
                 <div class="admin-actions-overlay" style="position: absolute; top: 15px; left: 15px; z-index: 10; display: flex; gap: 5px;">
@@ -9757,16 +9838,19 @@ function loadShopProducts() {
 
 // ৩. পণ্য ফিল্টার করার ফাংশন (অপরিবর্তিত)
 function filterShopProducts() {
-    const searchValue = document.getElementById('shopSearchInput').value.toLowerCase();
+    let searchValue = document.getElementById('shopSearchInput').value.toLowerCase().trim();
     const allProducts = document.querySelectorAll('.shop-product-item');
 
+    // # ট্যাগ দিয়ে সার্চ করলে # সরিয়ে বাকি অংশ দিয়ে ফিল্টার
+    if (searchValue.startsWith('#')) {
+        searchValue = searchValue.slice(1).trim();
+    }
+
     allProducts.forEach(product => {
-        const productName = product.getAttribute('data-name').toLowerCase();
-        if (productName.includes(searchValue)) {
-            product.style.display = 'block';
-        } else {
-            product.style.display = 'none';
-        }
+        const productName = (product.getAttribute('data-name') || '').toLowerCase();
+        const productTags = (product.getAttribute('data-tags') || '').toLowerCase();
+        const match = productName.includes(searchValue) || productTags.includes(searchValue);
+        product.style.display = (searchValue === '' || match) ? '' : 'none';
     });
 }
 
