@@ -4740,12 +4740,12 @@ function openImgZoom(src) {
 /* GP MODAL — FULL SCREEN */
 .gp-modal{display:none;position:fixed;inset:0;background:#fff;z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;-webkit-overflow-scrolling:touch;}
 .gpd-pc-box{display:none;width:100%;min-height:100vh;background:#fff;position:relative;}
-body:not(.is-mobile) .gp-modal[style*="block"]{display:block!important;}
-body:not(.is-mobile) .gpd-pc-box{display:flex;flex-direction:column;}
-body:not(.is-mobile) .gpd-mobile-view{display:none!important;}
-body.is-mobile .gpd-pc-box{display:none!important;}
-body.is-mobile .gpd-mobile-view{display:block!important;}
-body.is-mobile .gp-modal{background:#f5f5f5;}
+html:not(.is-mobile) .gp-modal[style*="block"]{display:block!important;}
+html:not(.is-mobile) .gpd-pc-box{display:flex;flex-direction:column;}
+html:not(.is-mobile) .gpd-mobile-view{display:none!important;}
+html.is-mobile .gpd-pc-box{display:none!important;}
+html.is-mobile .gpd-mobile-view{display:flex!important;flex-direction:column;min-height:100%;}
+html.is-mobile .gp-modal{background:#f5f5f5;}
 
 /* PC LEFT/RIGHT */
 .gpd-pc-top{display:flex;gap:0;align-items:flex-start;max-width:1400px;margin:0 auto;width:100%;padding:0 40px;}
@@ -4841,7 +4841,7 @@ body.is-mobile .gp-modal{background:#f5f5f5;}
 .gpd-desc-sec{background:#fff;padding:14px 14px;margin-top:8px;}
 .gpd-desc-title{font-size:36px;font-weight:800;color:#111;margin-bottom:10px;}
 .gpd-desc-text{font-size:32px;color:#555;line-height:1.75;}
-.gpd-spacer{height:72px;}
+.gpd-spacer{height:16px;}
 .gpd-action-bar{position:sticky;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ebebeb;display:flex;align-items:stretch;z-index:20;height:90px;}
 .gpd-store-btn,.gpd-chat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:80px;gap:3px;background:none;border:none;border-right:1px solid #f0f0f0;cursor:pointer;font-family:'Hind Siliguri',sans-serif;padding:0 8px;}
 .gpd-store-btn span,.gpd-chat-btn span{font-size:22px;color:#555;font-weight:600;}
@@ -4864,29 +4864,29 @@ body.is-mobile .gp-modal{background:#f5f5f5;}
 .gpd-mob-accord-arrow.collapsed{transform:rotate(180deg);}
 .gpd-mob-accord-body{padding-bottom:16px;background:#fff;}
 .gpd-mob-accord-body.hidden{display:none;}
-body.is-mobile .gpd-mob-accord-body{font-size:30px!important;line-height:1.7;}
+html.is-mobile .gpd-mob-accord-body{font-size:30px!important;line-height:1.7;}
 
 /* PC adjustments */
-body:not(.is-mobile) .gpd-action-bar{height:56px;}
-body:not(.is-mobile) .gpd-buynow-btn{font-size:15px;}
-body:not(.is-mobile) .gpd-addcart-btn{font-size:15px;}
-body:not(.is-mobile) .gpd-store-btn span,
-body:not(.is-mobile) .gpd-chat-btn span{font-size:11px;}
-body:not(.is-mobile) .gpd-store-btn i,
-body:not(.is-mobile) .gpd-chat-btn i{font-size:18px;}
-body:not(.is-mobile) .gpd-store-btn,
-body:not(.is-mobile) .gpd-chat-btn{width:56px;}
-body:not(.is-mobile) .gpd-spacer{height:40px;}
-body:not(.is-mobile) .gpd-desc-text{font-size:15px;}
-body.is-mobile #gpModalSpecTable table{width:100%;border-collapse:collapse;}
-body.is-mobile #gpModalSpecTable td{font-size:30px!important;padding:14px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
-body.is-mobile .gpd-desc-text{font-size:32px!important;line-height:1.8;color:#444;}
-body.is-mobile #gpModalTagsRow span{font-size:26px!important;padding:5px 14px!important;}
-body.is-mobile #gpModalSellerBox{font-size:29px!important;}
-body.is-mobile .gpd-rel-card-name{font-size:25px;min-height:60px;}
-body.is-mobile .gpd-rel-card-price{font-size:28px;}
-body.is-mobile .gpd-rel-card-tag{font-size:19px;padding:4px 10px;}
-body.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
+html:not(.is-mobile) html:not(.is-mobile) .gpd-action-bar{height:56px;}
+html:not(.is-mobile) .gpd-buynow-btn{font-size:15px;}
+html:not(.is-mobile) .gpd-addcart-btn{font-size:15px;}
+html:not(.is-mobile) .gpd-store-btn span,
+html:not(.is-mobile) .gpd-chat-btn span{font-size:11px;}
+html:not(.is-mobile) .gpd-store-btn i,
+html:not(.is-mobile) .gpd-chat-btn i{font-size:18px;}
+html:not(.is-mobile) .gpd-store-btn,
+html:not(.is-mobile) .gpd-chat-btn{width:56px;}
+html:not(.is-mobile) .gpd-spacer{height:16px;}
+html:not(.is-mobile) .gpd-desc-text{font-size:15px;}
+html.is-mobile #gpModalSpecTable table{width:100%;border-collapse:collapse;}
+html.is-mobile #gpModalSpecTable td{font-size:30px!important;padding:14px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
+html.is-mobile .gpd-desc-text{font-size:32px!important;line-height:1.8;color:#444;}
+html.is-mobile #gpModalTagsRow span{font-size:26px!important;padding:5px 14px!important;}
+html.is-mobile #gpModalSellerBox{font-size:29px!important;}
+html.is-mobile .gpd-rel-card-name{font-size:25px;min-height:60px;}
+html.is-mobile .gpd-rel-card-price{font-size:28px;}
+html.is-mobile .gpd-rel-card-tag{font-size:19px;padding:4px 10px;}
+html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
 `;
     document.head.appendChild(s);
 })();
@@ -4962,6 +4962,15 @@ body.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
         <div class="gpd-accord-head" onclick="gpdToggleAccord('seller')"><span>🏪 Seller</span><span class="gpd-accord-arrow" id="gpd-arrow-seller">▲</span></div>
         <div class="gpd-accord-body" id="gpd-body-seller"><div id="gpdPcSellerContent" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;"></div></div>
       </div>
+      <!-- Reports Section PC -->
+      <div id="gpd-reports-wrap-pc" style="margin-top:24px;display:none;">
+        <div style="border-top:3px solid #f0f0f0;padding-top:20px;">
+          <div style="font-size:16px;font-weight:800;color:#ef4444;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+            ⚠️ ইউজার রিপোর্টসমূহ <span id="gpd-reports-count-pc" style="background:#ef4444;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:20px;"></span>
+          </div>
+          <div id="gpd-reports-list-pc" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+      </div>
       <div id="gpd-related-wrap" style="margin-top:32px;display:none;">
         <div style="border-top:3px solid #f0f0f0;padding-top:28px;">
           <div style="font-size:20px;font-weight:800;color:#111;margin-bottom:6px;">🔍 সম্পর্কিত পণ্য <span id="gpd-related-filter-label" style="font-size:13px;font-weight:600;color:#f57224;background:#fff3e0;padding:3px 12px;border-radius:20px;"></span></div>
@@ -5032,6 +5041,13 @@ body.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
           <span class="gpd-mob-accord-arrow">▲</span>
         </div>
         <div class="gpd-mob-accord-body" id="gpd-mob-mseller"><div id="gpModalSellerBox"></div></div>
+      </div>
+      <!-- Reports Section Mobile -->
+      <div id="gpd-reports-wrap-mob" style="margin-top:16px;display:none;background:#fff;border-radius:12px;border:2px solid rgba(239,68,68,0.2);padding:16px;">
+        <div style="font-size:34px;font-weight:800;color:#ef4444;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+          ⚠️ রিপোর্টসমূহ <span id="gpd-reports-count-mob" style="background:#ef4444;color:#fff;font-size:22px;font-weight:800;padding:3px 10px;border-radius:20px;"></span>
+        </div>
+        <div id="gpd-reports-list-mob" style="display:flex;flex-direction:column;gap:12px;"></div>
       </div>
       <div id="gpd-mob-related-wrap" style="margin-top:20px;display:none;">
         <div style="font-size:32px;font-weight:800;color:#111;margin-bottom:6px;">🔍 সম্পর্কিত পণ্য <span id="gpd-mob-related-label" style="font-size:22px;font-weight:600;color:#f57224;background:#fff3e0;padding:3px 10px;border-radius:20px;"></span></div>
@@ -5147,7 +5163,7 @@ function _gpdRenderRelated(currentP){
     }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,12);
 
     let filterLabel=curCat||( curTags.length?'#'+curTags[0] : (curName.split(' ')[0]||''));
-    const isMobile=document.body.classList.contains('is-mobile');
+    const isMobile=document.documentElement.classList.contains('is-mobile');
 
     if(!isMobile){
         const wrap=document.getElementById('gpd-related-wrap');
@@ -5204,6 +5220,54 @@ function _gpdRenderRelated(currentP){
     }
 }
 
+
+/* ── Reports render function ── */
+function _gpdRenderReports(productId, isMob){
+    // Reports load + auto-cleanup
+    const savedRep = localStorage.getItem('tm_reports');
+    appState.reports = savedRep ? JSON.parse(savedRep) : [];
+    const now = Date.now();
+    appState.reports = appState.reports.filter(r => !r.expiryTimestamp || r.expiryTimestamp > now);
+    localStorage.setItem('tm_reports', JSON.stringify(appState.reports));
+
+    const productReports = appState.reports.filter(r => String(r.productId) === String(productId));
+    const isAdminUser = (typeof isAdmin === 'function') ? isAdmin() : false;
+
+    if(!productReports.length){
+        const w = document.getElementById(isMob ? 'gpd-reports-wrap-mob' : 'gpd-reports-wrap-pc');
+        if(w) w.style.display='none';
+        return;
+    }
+
+    const wrap = document.getElementById(isMob ? 'gpd-reports-wrap-mob' : 'gpd-reports-wrap-pc');
+    const list = document.getElementById(isMob ? 'gpd-reports-list-mob' : 'gpd-reports-list-pc');
+    const cnt  = document.getElementById(isMob ? 'gpd-reports-count-mob' : 'gpd-reports-count-pc');
+    if(!wrap||!list) return;
+    wrap.style.display='block';
+    if(cnt) cnt.textContent = productReports.length;
+
+    const txtSz  = isMob ? '28px' : '13px';
+    const smSz   = isMob ? '22px' : '11px';
+    const btnSz  = isMob ? '24px' : '12px';
+    const padBtn = isMob ? '10px 18px' : '7px 12px';
+
+    list.innerHTML = productReports.map(r => `
+        <div style="background:#fff5f5;border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:${isMob?'16px':'12px'};display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+            <div style="flex:1;">
+                <p style="color:#1e293b;font-size:${txtSz};margin:0;line-height:1.5;word-break:break-word;">${r.reason}</p>
+                <small style="color:#94a3b8;font-size:${smSz};display:block;margin-top:5px;">
+                    📅 ${new Date(r.timestamp).toLocaleDateString('bn-BD')} &nbsp;|&nbsp; 👤 ${r.userName||'User'}
+                </small>
+            </div>
+            ${isAdminUser ? `
+            <button onclick="window.deleteReportRecord('${r.id}','${productId}')"
+                style="background:#ef4444;color:#fff;border:none;padding:${padBtn};border-radius:8px;cursor:pointer;font-size:${btnSz};font-weight:800;font-family:'Hind Siliguri',sans-serif;flex-shrink:0;transition:.2s;"
+                onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
+                মুছুন
+            </button>` : ''}
+        </div>`).join('');
+}
+
 /* ── Main openProductDetails ── */
 function openProductDetails(productId) {
     const item = appState.products.find(p => String(p.id) === String(productId));
@@ -5215,7 +5279,7 @@ function openProductDetails(productId) {
     window._gpdCurrentId   = item.id;
     window._gpdCurrentName = item.title;
 
-    const isMobile = document.body.classList.contains('is-mobile');
+    const isMobile = document.documentElement.classList.contains('is-mobile');
 
     // Auto old price & discount
     let dispOldPrice = item.oldPrice || item.originalPrice || 0;
@@ -5360,6 +5424,8 @@ function openProductDetails(productId) {
             if(arrow) arrow.classList.remove('collapsed');
         });
 
+        // Reports render — PC
+        _gpdRenderReports(item.id, false);
         _gpdRenderRelated(item);
 
     } else {
@@ -5469,6 +5535,8 @@ function openProductDetails(productId) {
         if(cartIcon) cartIcon.onclick=()=>{ closeGpModal(); if(typeof openUserCart==='function') openUserCart(); };
         if(dot3Icon) dot3Icon.onclick=()=>{ if(typeof openProductOptions==='function') openProductOptions(item.id); };
 
+        // Reports render — Mobile
+        _gpdRenderReports(item.id, true);
         _gpdRenderRelated(item);
     }
 
