@@ -2548,8 +2548,6 @@ function toggleThemeMode() {
     document.body.classList.toggle('dark-theme');
     const isDark = document.body.classList.contains('dark-theme');
     localStorage.setItem(DB_KEYS.THEME, isDark ? 'dark' : 'light');
-    // থিম বদলালে সিরোনাম কার্ড রি-রেন্ডার
-    if (typeof displaySironamOnPortal === 'function') displaySironamOnPortal();
 }
 
 function loadTheme() {
@@ -8868,26 +8866,15 @@ function deleteSironam(id) {
 }
 
 function displaySironamOnPortal() {
-    _reloadSironamData();
+    _reloadSironamData(); // ✅ hydration শেষে fresh data নেওয়া
     const container = document.getElementById('sironam-portal-display');
     if (!container) return;
 
-    const isDark = document.body.classList.contains('dark-theme');
-
-    // Card style — Light: হালকা কালো, Dark: হালকা সাদা
-    const cardStyle = isDark
-        ? 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #4a5568;box-shadow:0 2px 8px rgba(0,0,0,0.4);background:rgba(255,255,255,0.12);'
-        : 'position:relative;border-radius:10px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;align-items:center;border:1px solid #c8cdd5;box-shadow:0 2px 8px rgba(0,0,0,0.10);background:rgba(0,0,0,0.08);';
-
-    // Name label background — clearly visible
-    const overlayStyle = isDark
-        ? 'position:static;width:100%;background:#253347;padding:9px 6px 11px;text-align:center;color:#e2e8f0;font-weight:600;font-size:13px;line-height:1.35;display:block;border-top:1px solid #334155;font-family:Hind Siliguri,sans-serif;'
-        : 'position:static;width:100%;background:#e8eaed;padding:9px 6px 11px;text-align:center;color:#1e293b;font-weight:600;font-size:13px;line-height:1.35;display:block;border-top:1px solid #d1d5db;font-family:Hind Siliguri,sans-serif;';
-
+    // কার্ডে ক্লিক করলে openSironamShop ফাংশন কল হবে
     container.innerHTML = sironamData.map(item => `
-        <div class="sironam-card" style="${cardStyle}" onclick="openSironamShop('${item.id}', '${item.name}')">
-            <img src="${item.img}" alt="${item.name}" style="width:100%;height:120px;object-fit:cover;display:block;border-radius:10px 10px 0 0;">
-            <div class="sironam-overlay" style="${overlayStyle}">
+        <div class="sironam-card" onclick="openSironamShop('${item.id}', '${item.name}')">
+            <img src="${item.img}" alt="${item.name}">
+            <div class="sironam-overlay">
                 <span>${item.name}</span>
             </div>
         </div>
@@ -10441,17 +10428,88 @@ function pmxRefreshDisplay() {
     if (!container) return;
     const headers = pmxGetAll(PMX_KEYS.HEADERS);
     if (!headers.length) { container.innerHTML = ''; return; }
+
+    // মোবাইল ডিটেক্ট
+    const isMob = document.documentElement.classList.contains('is-mobile');
+    // PC: ৬টা পুরো + ৭ম এর ১/৩  → divisor 6.33
+    // Mobile: ৫টা পুরো + ৬ষ্ঠ এর ১/৩ → divisor 5.33
+    const divisor = isMob ? 5.33 : 6.33;
+    const gaps    = isMob ? 5 : 6;
+    const cardW   = `calc((98vw - ${gaps} * 10px) / ${divisor})`;
+
     container.innerHTML = `
-        <div style="padding:16px 0 8px;">
-            <h3 style="color:#a78bfa;font-size:16px;font-weight:700;margin:0 0 14px;padding:0 16px;">⭐ প্রিমিয়াম প্রোডাক্ট</h3>
-            <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:0 16px;overflow-x:auto;">
+        <div style="
+            background: linear-gradient(135deg, #f5a623 0%, #f7c948 50%, #f5a623 100%);
+            border-radius: 16px;
+            margin: 10px 10px 20px 10px;
+            padding: 14px 0 18px 0;
+            box-shadow: 0 8px 24px rgba(245,166,35,0.35);
+            overflow: hidden;
+        ">
+            <!-- হেডার বার -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0 16px 12px 16px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:22px;">⭐</span>
+                    <span style="font-size:18px;font-weight:900;color:#1a1a1a;font-family:'Hind Siliguri',sans-serif;letter-spacing:1px;">প্রিমিয়াম ক্যাটাগরি</span>
+                </div>
+                <div style="background:#1a1a1a;color:#f5a623;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;font-family:'Hind Siliguri',sans-serif;">
+                    সব দেখুন →
+                </div>
+            </div>
+
+            <!-- horizontal scroll কার্ড রো -->
+            <div id="pmxScrollRow" style="
+                display: flex;
+                gap: 10px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 0 16px 4px 16px;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            ">
                 ${headers.map(h => `
-                    <div onclick="pmxOpenHeaderShop(${h.id},'${h.name.replace(/'/g,"\\'")}','${h.img}')" style="cursor:pointer;text-align:center;background:#1e293b;border-radius:12px;padding:10px 6px;border:1px solid #334155;transition:all 0.2s;" onmouseover="this.style.borderColor='#7c3aed'" onmouseout="this.style.borderColor='#334155'">
-                        <img src="${h.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:fill;border-radius:8px;margin-bottom:6px;" onerror="this.src='ko.jpeg'">
-                        <div style="color:#e2e8f0;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${h.name}</div>
+                    <div onclick="pmxOpenHeaderShop(${h.id},'${h.name.replace(/'/g,"\\'")}','${h.img}')"
+                        style="
+                            flex: 0 0 ${cardW};
+                            cursor: pointer;
+                            text-align: center;
+                            background: #ffffff;
+                            border-radius: 12px;
+                            overflow: hidden;
+                            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                            transition: transform 0.2s, box-shadow 0.2s;
+                            border: 2px solid rgba(255,255,255,0.8);
+                        "
+                        onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 20px rgba(0,0,0,0.25)'"
+                        onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+                    >
+                        <img src="${h.img||'ko.jpeg'}"
+                            style="width:100%;aspect-ratio:1;object-fit:fill;display:block;"
+                            onerror="this.src='ko.jpeg'">
+                        <div style="
+                            background: rgba(0,0,0,0.06);
+                            padding: 6px 4px 8px 4px;
+                            font-size: 12px;
+                            font-weight: 700;
+                            color: #1a1a1a;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            font-family: 'Hind Siliguri', sans-serif;
+                            border-top: 1px solid rgba(0,0,0,0.08);
+                        ">${h.name}</div>
                     </div>`).join('')}
             </div>
         </div>`;
+
+    // Chrome/Safari scrollbar লুকানো
+    const row = document.getElementById('pmxScrollRow');
+    if (row) row.style.cssText += ';scrollbar-width:none;';
+    // webkit
+    const style = document.getElementById('pmxScrollStyle') || document.createElement('style');
+    style.id = 'pmxScrollStyle';
+    style.innerHTML = '#pmxScrollRow::-webkit-scrollbar{display:none;}';
+    document.head.appendChild(style);
 }
 
 // ══════════════════════════════════════════════════════════════════
