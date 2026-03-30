@@ -4738,13 +4738,13 @@ function openImgZoom(src) {
     s.id = '_gpdStyleTag';
     s.textContent = `
 /* GP MODAL — FULL SCREEN */
-.gp-modal{display:none;position:fixed;inset:0;background:#fff;z-index:9999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;-webkit-overflow-scrolling:touch;}
+.gp-modal{display:none;position:fixed;inset:0;background:#fff;z-index:9999999;overflow:hidden;font-family:'Hind Siliguri',sans-serif;}
 .gpd-pc-box{display:none;width:100%;min-height:100vh;background:#fff;position:relative;}
 html:not(.is-mobile) .gp-modal[style*="block"]{display:block!important;}
 html:not(.is-mobile) .gpd-pc-box{display:flex;flex-direction:column;}
 html:not(.is-mobile) .gpd-mobile-view{display:none!important;}
 html.is-mobile .gpd-pc-box{display:none!important;}
-html.is-mobile .gpd-mobile-view{display:flex!important;flex-direction:column;min-height:100%;}
+html.is-mobile .gpd-mobile-view{display:flex!important;flex-direction:column;min-height:100%;overflow-y:auto;height:100%;padding-top:68px;box-sizing:border-box;-webkit-overflow-scrolling:touch;}
 html.is-mobile .gp-modal{background:#f5f5f5;}
 
 /* PC LEFT/RIGHT */
@@ -4809,7 +4809,7 @@ html.is-mobile .gp-modal{background:#f5f5f5;}
 .gpd-rel-card-cat{background:#e0f2fe;color:#0284c7;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 
 /* MOBILE VIEW */
-.gpd-topbar{position:sticky;top:0;z-index:20;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
+.gpd-topbar{position:fixed;top:0;left:0;right:0;z-index:10000000;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
 .gpd-back-btn{background:none;border:none;font-size:60px;cursor:pointer;color:#222;padding:4px 8px;line-height:1;width:70px;font-weight:900;}
 .gpd-topbar-title{flex:1;font-size:40px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .gpd-topbar-icons{display:flex;gap:16px;align-items:center;}
@@ -5004,20 +5004,18 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
         <span class="gpd-discount-badge" id="gpModalDiscount" style="display:none;"></span>
       </div>
       <div class="gpd-name" id="gpModalName"></div>
-      <!-- Like / Share / 3dot — পণ্যের নামের নিচে -->
-      <div class="gpd-mob-likeshare">
-        <button class="gpd-mob-like-btn" id="gpdMobLikeBtn">
-          <span id="gpdMobHeartIcon">🤍</span>
-          <span id="gpdMobLikeCount">0</span>
-        </button>
-        <button class="gpd-mob-share-btn" id="gpdMobShareBtn">
-          <span>🔗</span>
-          <span>শেয়ার</span>
-        </button>
-        <button class="gpd-mob-3dot-btn" id="gpdMob3Dot">⋮</button>
+      <div class="gpd-stars-row">
+        <span class="gpd-star-icons" id="gpModalStarIcons">★★★★★</span>
+        <span class="gpd-stars-val" id="gpModalStarVal">4.5</span>
+        <span class="gpd-review-count" id="gpModalReviewCount">(35)</span>
       </div>
     </div>
     <div class="gpd-divider"></div>
+    <div class="gpd-options-sec" id="gpMobOptionsSec">
+      <span class="gpd-options-label">Product Options</span>
+      <span class="gpd-options-val" id="gpModalOptions">অপশন দেখতে লগইন করুন</span>
+      <span class="gpd-options-arrow">&#62;</span>
+    </div>
     <div class="gpd-divider"></div>
     <div style="padding:0 14px;">
       <div class="gpd-mob-accord-block">
@@ -5070,6 +5068,18 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
       </button>
       <button class="gpd-buynow-btn" id="gpdMobBuyBtn">Buy Now</button>
       <button class="gpd-addcart-btn" id="gpdMobCartBtn">Add to Cart</button>
+    </div>
+    <!-- Like / Share / 3dot below action bar -->
+    <div class="gpd-mob-likeshare">
+      <button class="gpd-mob-like-btn" id="gpdMobLikeBtn">
+        <span id="gpdMobHeartIcon">🤍</span>
+        <span id="gpdMobLikeCount">0</span>
+      </button>
+      <button class="gpd-mob-share-btn" id="gpdMobShareBtn">
+        <span>🔗</span>
+        <span>শেয়ার</span>
+      </button>
+      <button class="gpd-mob-3dot-btn" id="gpdMob3Dot">⋮</button>
     </div>
   </div>
 </div>`;
