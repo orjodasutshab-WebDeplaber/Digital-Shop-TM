@@ -2586,17 +2586,25 @@ function toggleThemeMode() {
             iconBtn.style.border = isDark ? '1.5px solid #475569' : '1.5px solid #cbd5e1';
         }
 
+        // সকল পণ্য wrapper bg আপডেট
+        const wrapper = document.getElementById('shopAllProductsWrapper');
+        if (wrapper) {
+            wrapper.style.background = isDark ? '#166534' : '#fbbf24';
+            const heading = wrapper.querySelector('span');
+            if (heading) {
+                heading.style.color = isDark ? '#ffffff' : '#1a1a1a';
+                heading.style.borderBottom = isDark ? '3px solid rgba(255,255,255,0.3)' : '3px solid rgba(0,0,0,0.15)';
+            }
+        }
+
         const cards = shop.querySelectorAll('.shop-product-item');
         cards.forEach(function(card) {
             card.style.background = isDark ? '#1e293b' : '#ffffff';
             card.style.border     = isDark ? '1px solid #374151' : '1px solid #e2e8f0';
-            const footerDiv = card.querySelector('div[style*="border-top"]');
-            if (footerDiv) {
-                footerDiv.style.background = isDark ? '#991b1b' : '#16a34a';
-                footerDiv.style.borderTop  = isDark ? '2px solid #7f1d1d' : '2px solid #15803d';
-            }
             const imgBox = card.querySelector('div[style*="aspect-ratio"]');
             if (imgBox) imgBox.style.background = isDark ? '#0f172a' : '#f8fafc';
+            const titleEl = card.querySelector('h4');
+            if (titleEl) titleEl.style.color = isDark ? '#ffffff' : '#1e293b';
         });
     }
 }
@@ -9808,8 +9816,15 @@ function openSironamShop(id, title) {
             })()}
         </div>
 
-        <div id="shopProductGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:20px; padding:${_gridPad};">
-            ${renderTaggedProducts(id)}
+        <div id="shopAllProductsWrapper" style="background:${_isD ? '#166534' : '#fbbf24'}; padding:30px; margin:0;">
+            <div style="text-align:center; margin-bottom:28px;">
+                <span style="font-family:'Georgia',serif; font-size:clamp(28px,5vw,48px); font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:${_isD ? '#ffffff' : '#1a1a1a'}; display:inline-block; border-bottom:3px solid ${_isD ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}; padding-bottom:8px;">
+                    All Products
+                </span>
+            </div>
+            <div id="shopProductGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:20px;">
+                ${renderTaggedProducts(id)}
+            </div>
         </div>
 
         ${_sironamFooterHTML}
@@ -9854,9 +9869,6 @@ function renderTaggedProducts(sironamId) {
     const _cardBdr = _isD ? '#374151' : '#e2e8f0';
     const _imgBg   = _isD ? '#0f172a' : '#f8fafc';
     const _titleC  = _isD ? '#ffffff' : '#1e293b';
-    // পণ্যের নিচের ব্যাকগ্রাউন্ড: সাদা(light) → সবুজ, কালো(dark) → লাল
-    const _productFooterBg = _isD ? '#991b1b' : '#16a34a';
-    const _productFooterBdr = _isD ? '#7f1d1d' : '#15803d';
 
     return filtered.map(p => {
         // ইমেজের প্রথমটি নেওয়া
@@ -9880,12 +9892,12 @@ function renderTaggedProducts(sironamId) {
                      title="বিস্তারিত দেখতে ক্লিক করুন">
             </div>
 
-            <div style="margin-top:8px; background:${_productFooterBg}; border-radius:0 0 8px 8px; margin-left:-10px; margin-right:-10px; margin-bottom:-10px; padding:10px 10px 12px; border-top:2px solid ${_productFooterBdr};">
-                <h4 style="color:#ffffff; margin:0 0 4px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title || p.name}</h4>
-                <p style="color:#f0fdf4; font-weight:bold; font-size:16px; margin:0 0 8px;">৳ ${p.price}</p>
+            <div style="margin-top:8px;">
+                <h4 style="color:${_titleC}; margin:0 0 5px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title || p.name}</h4>
+                <p style="color:#10b981; font-weight:bold; font-size:16px; margin:0 0 8px;">৳ ${p.price}</p>
                 <button class="btn-buy-now" 
                         onclick="initiateCheckout('${pId}')" 
-                        style="width:100%; background:rgba(0,0,0,0.25); color:white; border:1.5px solid rgba(255,255,255,0.3); padding:8px; border-radius:8px; cursor:pointer; font-weight:600; font-size:14px; transition:background 0.2s;">
+                        style="width:100%; background:#27ae60; color:white; border:none; padding:8px; border-radius:8px; cursor:pointer; font-weight:600; font-size:14px;">
                     <i class="fa fa-shopping-cart"></i> অর্ডার করুন
                 </button>
             </div>
@@ -9912,29 +9924,21 @@ function loadShopProducts() {
     }
 }
 
-// ৩. পণ্য ফিল্টার করার ফাংশন (# ট্যাগ সার্চ সহ ফিক্সড)
+// ৩. পণ্য ফিল্টার করার ফাংশন (নাম + ট্যাগ একসাথে সার্চ — # ছাড়াই)
 function filterShopProducts() {
     const rawValue = document.getElementById('shopSearchInput').value.trim();
-    const searchValue = rawValue.toLowerCase();
+    const searchValue = rawValue.toLowerCase().replace(/^#+/, ''); // # থাকলেও ছাড়িয়ে নাও
     const allProducts = document.querySelectorAll('.shop-product-item');
 
-    // # দিয়ে শুরু হলে ট্যাগ সার্চ, না হলে নাম সার্চ
-    const isTagSearch = searchValue.startsWith('#');
-    const tagQuery = isTagSearch ? searchValue.slice(1).trim() : '';
-
     allProducts.forEach(product => {
+        if (searchValue === '') {
+            product.style.display = 'flex';
+            return;
+        }
         const productName = (product.getAttribute('data-name') || '').toLowerCase();
         const productTags = (product.getAttribute('data-tags') || '').toLowerCase();
-
-        let show = false;
-        if (searchValue === '') {
-            show = true;
-        } else if (isTagSearch) {
-            show = productTags.includes(tagQuery) || productName.includes(tagQuery);
-        } else {
-            show = productName.includes(searchValue);
-        }
-
+        // নাম অথবা ট্যাগ যেকোনোটায় মিললেই দেখাবে
+        const show = productName.includes(searchValue) || productTags.includes(searchValue);
         product.style.display = show ? 'flex' : 'none';
     });
 }
