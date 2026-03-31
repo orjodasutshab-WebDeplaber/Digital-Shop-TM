@@ -9816,9 +9816,9 @@ function openSironamShop(id, title) {
             })()}
         </div>
 
-        <div id="shopAllProductsWrapper" style="background:${_isD ? '#166534' : '#fbbf24'}; padding:30px; margin:0;">
+        <div id="shopAllProductsWrapper" style="background:${_isDark ? '#166534' : '#fbbf24'}; padding:30px; margin:0;">
             <div style="text-align:center; margin-bottom:28px;">
-                <span style="font-family:'Georgia',serif; font-size:clamp(28px,5vw,48px); font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:${_isD ? '#ffffff' : '#1a1a1a'}; display:inline-block; border-bottom:3px solid ${_isD ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}; padding-bottom:8px;">
+                <span style="font-family:'Georgia',serif; font-size:clamp(28px,5vw,48px); font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:${_isDark ? '#ffffff' : '#1a1a1a'}; display:inline-block; border-bottom:3px solid ${_isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)'}; padding-bottom:8px;">
                     All Products
                 </span>
             </div>
