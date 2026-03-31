@@ -9819,13 +9819,13 @@ function openSironamShop(id, title) {
         <div id="shopAllProductsWrapper" style="background:${_isDark ? '#dcfce7' : '#fef9c3'}; margin:0; padding:0;">
 
             <!-- ALL PRODUCTS হেডিং — বাম দিকে, নিচে সাদা bg ডেলি বোর্ড-টাচ -->
-            <div style="padding:22px 30px 0 30px;">
-                <span id="shopAllProductsHeading" style="font-family:'Georgia',serif; font-size:clamp(22px,4vw,38px); font-weight:900; letter-spacing:0.06em; text-transform:uppercase; color:${_isDark ? '#14532d' : '#78350f'}; display:inline-block; border-bottom:3px solid ${_isDark ? '#86efac' : '#fbbf24'}; padding-bottom:6px; background:#ffffff; padding:6px 16px 6px 16px; border-radius:8px;">
+            <div style="padding:8px 30px 0 30px;">
+                <span id="shopAllProductsHeading" style="font-family:'Georgia',serif; font-size:clamp(16px,3vw,26px); font-weight:900; letter-spacing:0.06em; text-transform:uppercase; color:${_isDark ? '#14532d' : '#78350f'}; display:inline-block; border-bottom:3px solid ${_isDark ? '#86efac' : '#fbbf24'}; background:#ffffff; padding:4px 14px; border-radius:6px;">
                     All Products
                 </span>
             </div>
 
-            <div style="width:100%; height:6px; background:#000000; margin-top:14px;"></div>
+            <div style="width:100%; height:4px; background:#000000; margin-top:6px;"></div>
 
             <div id="shopProductGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:20px; padding:24px 30px 30px;">
                 ${renderTaggedProducts(id)}
