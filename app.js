@@ -2551,6 +2551,54 @@ function toggleThemeMode() {
     document.body.classList.toggle('dark-theme');
     const isDark = document.body.classList.contains('dark-theme');
     localStorage.setItem(DB_KEYS.THEME, isDark ? 'dark' : 'light');
+
+    // ── sironamFullShop খোলা থাকলে থিম অনুযায়ী আপডেট করো ──
+    const shop = document.getElementById('sironamFullShop');
+    if (shop) {
+        shop.style.background = isDark ? '#0f172a' : '#f1f2f6';
+
+        const header = shop.querySelector('div[style*="position:sticky"]');
+        if (header) {
+            header.style.background   = isDark ? '#1e293b' : '#ffffff';
+            header.style.borderBottom = isDark ? '1px solid #374151' : '1px solid #e2e8f0';
+        }
+
+        const expandBox = document.getElementById('shopSearchExpandBox');
+        if (expandBox) {
+            expandBox.style.background   = isDark ? '#1e293b' : '#ffffff';
+            expandBox.style.borderBottom = isDark ? '2px solid #374151' : '2px solid #e2e8f0';
+            const inner = expandBox.querySelector('div');
+            if (inner) {
+                inner.style.background = isDark ? '#111827' : '#ffffff';
+                inner.style.border     = isDark ? '1.5px solid #374151' : '1.5px solid #cbd5e1';
+            }
+        }
+
+        const searchInp = document.getElementById('shopSearchInput');
+        if (searchInp) searchInp.style.color = isDark ? '#ffffff' : '#1e293b';
+
+        const iconBtn = document.getElementById('shopSearchIconBtn');
+        if (iconBtn) {
+            iconBtn.style.background = isDark
+                ? 'linear-gradient(135deg,#1e293b 0%,#334155 100%)'
+                : 'linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%)';
+            iconBtn.style.color  = isDark ? '#94a3b8' : '#475569';
+            iconBtn.style.border = isDark ? '1.5px solid #475569' : '1.5px solid #cbd5e1';
+        }
+
+        const cards = shop.querySelectorAll('.shop-product-item');
+        cards.forEach(function(card) {
+            card.style.background = isDark ? '#1e293b' : '#ffffff';
+            card.style.border     = isDark ? '1px solid #374151' : '1px solid #e2e8f0';
+            const footerDiv = card.querySelector('div[style*="border-top"]');
+            if (footerDiv) {
+                footerDiv.style.background = isDark ? '#991b1b' : '#16a34a';
+                footerDiv.style.borderTop  = isDark ? '2px solid #7f1d1d' : '2px solid #15803d';
+            }
+            const imgBox = card.querySelector('div[style*="aspect-ratio"]');
+            if (imgBox) imgBox.style.background = isDark ? '#0f172a' : '#f8fafc';
+        });
+    }
 }
 
 function loadTheme() {
@@ -9627,14 +9675,91 @@ function openSironamShop(id, title) {
     // ডেলি বিজ্ঞাপন খুঁজে বের করা
     const currentDeliAd = deliAds.find(a => String(a.sironamId) === String(id));
 
+    // থিম ডিটেক্ট করা
+    const _isDark = document.body.classList.contains('dark-theme');
+    const _shopBg     = _isDark ? '#0f172a' : '#f1f2f6';
+    const _headerBg   = _isDark ? '#1e293b' : '#ffffff';
+    const _headerBdr  = _isDark ? '#374151' : '#e2e8f0';
+    const _srchBoxBg  = _isDark ? '#111827' : '#ffffff';
+    const _srchBdr    = _isDark ? '#374151' : '#cbd5e1';
+    const _srchInput  = _isDark ? '#ffffff' : '#1e293b';
+    const _srchIcon   = _isDark ? '#94a3b8' : '#64748b';
+    const _srchExpandBg = _isDark ? '#1e293b' : '#ffffff';
+    const _srchExpandBdr = _isDark ? '#374151' : '#e2e8f0';
+    const _titleClr   = _isDark ? '#6366f1' : '#4f46e5';
+    const _deliBoard  = _isDark ? '#111827' : '#e2e8f0';
+    const _gridPad    = '30px';
+
+    // footer HTML (মেইন footer এর কপি — থিম-aware)
+    const _sironamFooterHTML = `
+    <footer style="background:#111827; color:#d1d5db; padding:50px 20px 20px; border-top:1px solid #374151; font-family:sans-serif; margin-top:30px;">
+        <div style="max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:40px;">
+            <div>
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
+                    <img src="ko.jpeg" alt="Logo" style="width:48px;height:48px;border-radius:10px;object-fit:fill;border:2px solid #10b981;" onerror="this.style.display='none'">
+                    <h2 style="color:#10b981; margin:0;">Digital Shop TM</h2>
+                </div>
+                <p style="font-size:14px; line-height:1.6;">আপনার বিশ্বস্ত অনলাইন শপ।</p>
+            </div>
+            <div>
+                <h3 style="color:white; font-size:18px; margin-bottom:20px;">COMPANY</h3>
+                <ul style="list-style:none; padding:0; font-size:14px; line-height:2.5;">
+                    <li><a href="javascript:void(0)" onclick="openAboutModal()" style="color:#9ca3af; text-decoration:none;">About Us</a></li>
+                    <li><a href="javascript:void(0)" onclick="openTermsModal()" style="color:#9ca3af; text-decoration:none;">Terms &amp; Conditions</a></li>
+                    <li><a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:#9ca3af; text-decoration:none;">Privacy Policy</a></li>
+                    <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af; text-decoration:none;">Cancellation &amp; Return Policy</a></li>
+                    <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af; text-decoration:none;">FAQs</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color:white; font-size:18px; margin-bottom:20px;">QUICK HELP</h3>
+                <ul style="list-style:none; padding:0; font-size:14px; line-height:2.5;">
+                    <li><a href="javascript:void(0)" onclick="openCustomerCareModal()" style="color:#9ca3af; text-decoration:none;">গ্রাহক সেবা</a></li>
+                    <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af; text-decoration:none;">কিভাবে কিনবেন</a></li>
+                    <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af; text-decoration:none;">রিটার্ন ও রিফান্ড</a></li>
+                    <li><a href="tel:+8801707498418" style="color:#9ca3af; text-decoration:none;">যোগাযোগ: +8801707498418</a></li>
+                </ul>
+                <p style="margin-top:15px; font-size:14px;">Hotline: +8801707498418</p>
+            </div>
+            <div>
+                <h3 style="color:white; font-size:18px; margin-bottom:20px;">VERIFIED BY</h3>
+                <div style="margin-bottom:15px;">
+                    <p style="font-size:12px; margin-bottom:5px;">DBID ID: 437361334</p>
+                    <p style="font-size:12px;">Registration ID: 304903094</p>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" style="height:35px;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" style="height:35px;">
+                </div>
+                <div style="margin-top:18px;">
+                    <p style="font-size:12px;color:#6b7280;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">পেমেন্ট মেথড</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+                        <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o1.jpg" alt="bKash" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#E2136E';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>bKash</span>'"></div>
+                        <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o2.png" alt="Nagad" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#F15922';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>Nagad</span>'"></div>
+                        <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o3.png" alt="Rocket" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#8B008B';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>Rocket</span>'"></div>
+                        <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o4.png" alt="Upay" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#EE3424';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>Upay</span>'"></div>
+                        <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o5.jpg" alt="DBBL" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#006838';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>DBBL</span>'"></div>
+                        <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o6.png" alt="City Bank" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#003087';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>City Bank</span>'"></div>
+                        <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o7.jpg" alt="Islami Bank" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#1d4ed8';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:12px;padding:0 6px>Islami Bank</span>'"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:30px; font-size:13px; color:#6b7280;">
+            <hr style="border:0; border-top:1px solid #374151; margin-bottom:20px;">
+            <p>© 2026 <strong>Digital Shop TM</strong>. সর্বস্বত্ব সংরক্ষিত।</p>
+            <p style="margin-top:5px;">Developed by: <span style="color:#10b981;">Digital Shop TM Team</span></p>
+        </div>
+    </footer>`;
+
     const shopHTML = `
-    <div id="sironamFullShop" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0f172a; z-index:999999999; overflow-y:auto; font-family: 'Hind Siliguri', sans-serif;">
+    <div id="sironamFullShop" style="position:fixed; top:0; left:0; width:100%; height:100%; background:${_shopBg}; z-index:999999999; overflow-y:auto; font-family: 'Hind Siliguri', sans-serif;">
         
-        <div style="position:sticky; top:0; background:#1e293b; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #374151; z-index:100;">
-            <h2 style="color:#6366f1; margin:0; font-size:20px; font-weight:bold;">${title}</h2>
+        <div style="position:sticky; top:0; background:${_headerBg}; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid ${_headerBdr}; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.12);">
+            <h2 style="color:${_titleClr}; margin:0; font-size:20px; font-weight:bold;">${title}</h2>
             <div style="display:flex; align-items:center; gap:10px; flex-grow:1; justify-content:flex-end;">
 
-                <!-- সার্চ আইকন বাটন (মেইন পপ এর মতো) -->
+                <!-- সার্চ আইকন বাটন — থিম-aware -->
                 <div style="position:relative; display:flex; align-items:center;">
                     <button id="shopSearchIconBtn"
                             onclick="(function(){
@@ -9647,15 +9772,15 @@ function openSironamShop(id, title) {
                                     setTimeout(function(){inp.focus();},50);
                                 }
                             })()"
-                            style="background:linear-gradient(135deg,#6366f1 0%,#a855f7 100%); border:none; color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; flex-shrink:0; box-shadow:0 4px 15px rgba(99,102,241,0.4); transition:opacity 0.2s,transform 0.2s;">
+                            style="background:${_isDark ? 'linear-gradient(135deg,#1e293b 0%,#334155 100%)' : 'linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%)'}; border:1.5px solid ${_isDark ? '#475569' : '#cbd5e1'}; color:${_isDark ? '#94a3b8' : '#475569'}; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.15); transition:all 0.2s;">
                         <i class="fa fa-search"></i>
                     </button>
-                    <div id="shopSearchExpandBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:68px; align-items:center; justify-content:center; z-index:999999999; background:#1e293b; border-bottom:2px solid #374151; box-shadow:0 4px 24px rgba(0,0,0,0.3); padding:0 16px; box-sizing:border-box; animation:srchDropDown 0.22s ease;">
-                        <div style="flex:1; max-width:700px; display:flex; align-items:center; background:#111827; border:1.5px solid #374151; border-radius:12px 0 0 12px; overflow:hidden; height:68px;">
-                            <i class="fa fa-search" style="color:#94a3b8; font-size:15px; padding:0 10px 0 14px; flex-shrink:0;"></i>
-                            <input type="text" id="shopSearchInput" oninput="filterShopProducts()" placeholder="পণ্য খুঁজুন..."
+                    <div id="shopSearchExpandBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:68px; align-items:center; justify-content:center; z-index:999999999; background:${_srchExpandBg}; border-bottom:2px solid ${_srchExpandBdr}; box-shadow:0 4px 24px rgba(0,0,0,0.18); padding:0 16px; box-sizing:border-box; animation:srchDropDown 0.22s ease;">
+                        <div style="flex:1; max-width:700px; display:flex; align-items:center; background:${_srchBoxBg}; border:1.5px solid ${_srchBdr}; border-radius:12px 0 0 12px; overflow:hidden; height:68px;">
+                            <i class="fa fa-search" style="color:${_srchIcon}; font-size:15px; padding:0 10px 0 14px; flex-shrink:0;"></i>
+                            <input type="text" id="shopSearchInput" oninput="filterShopProducts()" placeholder="পণ্য খুঁজুন... (#ট্যাগ দিয়েও খুঁজুন)"
                                    onkeydown="if(event.key==='Escape'){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';}"
-                                   style="flex:1; background:transparent; border:none; color:#fff; font-size:15px; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
+                                   style="flex:1; background:transparent; border:none; color:${_srchInput}; font-size:15px; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
                         </div>
                         <button onclick="(function(){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';document.getElementById('shopSearchInput').value='';filterShopProducts();})()"
                                 style="background:#ef4444; border:none; color:#fff; height:68px; padding:0 22px; border-radius:0 12px 12px 0; font-size:20px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
@@ -9671,7 +9796,7 @@ function openSironamShop(id, title) {
             </div>
         </div>
 
-        <div id="sironamDeliBoard" style="width:100%; height:450px; margin:0; background:#111827; border-radius:0; overflow:hidden; border:none; display:flex; align-items:center; justify-content:center; position:relative;">
+        <div id="sironamDeliBoard" style="width:100%; height:450px; margin:0; background:${_deliBoard}; border-radius:0; overflow:hidden; border:none; display:flex; align-items:center; justify-content:center; position:relative;">
             ${(() => {
                 const ads = deliAds.filter(a => String(a.sironamId) === String(id));
                 if (ads.length === 0) return '<p style="color:#4b5563;">এখানে ডেলি বিজ্ঞাপন প্রদর্শিত হবে</p>';
@@ -9683,9 +9808,11 @@ function openSironamShop(id, title) {
             })()}
         </div>
 
-        <div id="shopProductGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:20px; padding:30px;">
+        <div id="shopProductGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:20px; padding:${_gridPad};">
             ${renderTaggedProducts(id)}
         </div>
+
+        ${_sironamFooterHTML}
     </div>`;
 
     document.body.insertAdjacentHTML('beforeend', shopHTML);
@@ -9721,13 +9848,23 @@ function renderTaggedProducts(sironamId) {
     // অ্যাডমিন চেক করা হচ্ছে
     const checkAdmin = (typeof isAdmin === 'function') ? isAdmin() : false;
 
+    // থিম-aware রং
+    const _isD = document.body.classList.contains('dark-theme');
+    const _cardBg  = _isD ? '#1e293b' : '#ffffff';
+    const _cardBdr = _isD ? '#374151' : '#e2e8f0';
+    const _imgBg   = _isD ? '#0f172a' : '#f8fafc';
+    const _titleC  = _isD ? '#ffffff' : '#1e293b';
+    // পণ্যের নিচের ব্যাকগ্রাউন্ড: সাদা(light) → সবুজ, কালো(dark) → লাল
+    const _productFooterBg = _isD ? '#991b1b' : '#16a34a';
+    const _productFooterBdr = _isD ? '#7f1d1d' : '#15803d';
+
     return filtered.map(p => {
         // ইমেজের প্রথমটি নেওয়া
         const displayImg = Array.isArray(p.images) ? p.images[0] : (p.img || p.image);
         const pId = p.id || p._id; // আইডির ভেরিয়েবল নিশ্চিত করা
         
         return `
-        <div class="shop-product-item" data-name="${p.title || p.name}" style="background:#1e293b; border-radius:12px; padding:10px; border:1px solid #374151; text-align:center; display:flex; flex-direction:column; justify-content:space-between; height: 100%; position: relative;">
+        <div class="shop-product-item" data-name="${p.title || p.name}" data-tags="${p.tags || p.sironamTag || ''}" style="background:${_cardBg}; border-radius:12px; padding:10px; border:1px solid ${_cardBdr}; text-align:center; display:flex; flex-direction:column; justify-content:space-between; height: 100%; position: relative;">
             
             ${checkAdmin ? `
                 <div class="admin-actions-overlay" style="position: absolute; top: 15px; left: 15px; z-index: 10; display: flex; gap: 5px;">
@@ -9736,23 +9873,22 @@ function renderTaggedProducts(sironamId) {
                 </div>
             ` : ''}
 
-            <div style="width:100%; aspect-ratio: 1 / 1; overflow:hidden; border-radius:10px; background:#0f172a; display:flex; align-items:center; justify-content:center; padding: 5px;">
+            <div style="width:100%; aspect-ratio: 1 / 1; overflow:hidden; border-radius:10px; background:${_imgBg}; display:flex; align-items:center; justify-content:center; padding: 5px;">
                 <img src="${displayImg}" 
                      onclick="openProductDetails('${pId}')" 
                      style="max-width:100%; max-height:100%; object-fit:contain; cursor:pointer;" 
                      title="বিস্তারিত দেখতে ক্লিক করুন">
             </div>
 
-            <div style="margin-top: 8px;">
-                <h4 style="color:white; margin:0 0 5px; font-size:14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.title || p.name}</h4>
-                <p style="color:#10b981; font-weight:bold; font-size:16px; margin:0;">৳ ${p.price}</p>
+            <div style="margin-top:8px; background:${_productFooterBg}; border-radius:0 0 8px 8px; margin-left:-10px; margin-right:-10px; margin-bottom:-10px; padding:10px 10px 12px; border-top:2px solid ${_productFooterBdr};">
+                <h4 style="color:#ffffff; margin:0 0 4px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title || p.name}</h4>
+                <p style="color:#f0fdf4; font-weight:bold; font-size:16px; margin:0 0 8px;">৳ ${p.price}</p>
+                <button class="btn-buy-now" 
+                        onclick="initiateCheckout('${pId}')" 
+                        style="width:100%; background:rgba(0,0,0,0.25); color:white; border:1.5px solid rgba(255,255,255,0.3); padding:8px; border-radius:8px; cursor:pointer; font-weight:600; font-size:14px; transition:background 0.2s;">
+                    <i class="fa fa-shopping-cart"></i> অর্ডার করুন
+                </button>
             </div>
-            
-            <button class="btn-buy-now" 
-                    onclick="initiateCheckout('${pId}')" 
-                    style="width:100%; background:#27ae60; color:white; border:none; padding:8px; border-radius:8px; margin-top:8px; cursor:pointer; font-weight:600; font-size:14px;">
-                <i class="fa fa-shopping-cart"></i> অর্ডার করুন
-            </button>
             
         </div>
         `;
@@ -9776,18 +9912,30 @@ function loadShopProducts() {
     }
 }
 
-// ৩. পণ্য ফিল্টার করার ফাংশন (অপরিবর্তিত)
+// ৩. পণ্য ফিল্টার করার ফাংশন (# ট্যাগ সার্চ সহ ফিক্সড)
 function filterShopProducts() {
-    const searchValue = document.getElementById('shopSearchInput').value.toLowerCase();
+    const rawValue = document.getElementById('shopSearchInput').value.trim();
+    const searchValue = rawValue.toLowerCase();
     const allProducts = document.querySelectorAll('.shop-product-item');
 
+    // # দিয়ে শুরু হলে ট্যাগ সার্চ, না হলে নাম সার্চ
+    const isTagSearch = searchValue.startsWith('#');
+    const tagQuery = isTagSearch ? searchValue.slice(1).trim() : '';
+
     allProducts.forEach(product => {
-        const productName = product.getAttribute('data-name').toLowerCase();
-        if (productName.includes(searchValue)) {
-            product.style.display = 'block';
+        const productName = (product.getAttribute('data-name') || '').toLowerCase();
+        const productTags = (product.getAttribute('data-tags') || '').toLowerCase();
+
+        let show = false;
+        if (searchValue === '') {
+            show = true;
+        } else if (isTagSearch) {
+            show = productTags.includes(tagQuery) || productName.includes(tagQuery);
         } else {
-            product.style.display = 'none';
+            show = productName.includes(searchValue);
         }
+
+        product.style.display = show ? 'flex' : 'none';
     });
 }
 
