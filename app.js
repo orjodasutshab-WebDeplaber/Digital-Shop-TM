@@ -9939,8 +9939,8 @@ function renderTaggedProducts(sironamId) {
                 </div>
             ` : ''}
 
-            <div style="width:100%;aspect-ratio:1/1;overflow:hidden;border-radius:10px;background:${_imgBg};display:flex;align-items:center;justify-content:center;padding:5px;">
-                <img src="${displayImg}" style="max-width:100%;max-height:100%;object-fit:contain;">
+            <div style="width:100%;aspect-ratio:1/1;overflow:hidden;border-radius:10px;background:${_imgBg};">
+                <img src="${displayImg}" style="width:100%;height:100%;object-fit:cover;display:block;">
             </div>
 
             <div style="margin-top:8px;">
