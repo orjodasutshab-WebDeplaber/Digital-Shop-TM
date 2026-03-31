@@ -579,20 +579,20 @@ function renderProductGrid(productList, isLoadMore = false) {
             // ─────────────────────────────────────────────────────────
 
             return `
-            <div class="product-card" style="position: relative;">
+            <div class="product-card" style="position: relative; cursor:pointer;" onclick="openProductDetails('${item.id}')">
                 ${checkAdmin ? `
-                    <div class="admin-actions-overlay">
-                        <button class="admin-btn btn-edit" onclick="openEditModal('${item.id}')">EDIT</button>
-                        <button class="admin-btn btn-delete" onclick="adminDeleteProduct('${item.id}')">DELETE</button>
+                    <div class="admin-actions-overlay" onclick="event.stopPropagation()">
+                        <button class="admin-btn btn-edit" onclick="event.stopPropagation(); openEditModal('${item.id}')">EDIT</button>
+                        <button class="admin-btn btn-delete" onclick="event.stopPropagation(); adminDeleteProduct('${item.id}')">DELETE</button>
                     </div>
                 ` : ''}
                 <div class="product-slider" id="slider-${item.id}">
                     <div class="slides-container scroll-custom">
-                        ${images.map(img => `<img src="${img}" class="slide-img" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">`).join('')}
+                        ${images.map(img => `<img src="${img}" class="slide-img" style="cursor:pointer;">`).join('')}
                     </div>
 
                 </div>
-                <h4 class="product-title" style="cursor:pointer;" onclick="openProductDetails('${item.id}')">${item.title}</h4>
+                <h4 class="product-title" style="cursor:pointer;">${item.title}</h4>
                 ${priceHTML}
                 ${badgeHTML}
                 ${ratingHTML}
@@ -9877,37 +9877,83 @@ function renderTaggedProducts(sironamId) {
     const _titleC  = _isD ? '#ffffff' : '#1e293b';
 
     return filtered.map(p => {
-        // ইমেজের প্রথমটি নেওয়া
         const displayImg = Array.isArray(p.images) ? p.images[0] : (p.img || p.image);
-        const pId = p.id || p._id; // আইডির ভেরিয়েবল নিশ্চিত করা
-        
+        const pId = p.id || p._id;
+
+        // ── Rating ──────────────────────────────────────────────
+        let ratingVal = parseFloat(p.rating) || 0;
+        if (!ratingVal) {
+            const seed = String(pId || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+            const rand = ((seed * 9301 + 49297) % 233280) / 233280;
+            ratingVal = rand < 0.30 ? 5 : parseFloat((3.5 + rand * 1.5).toFixed(1));
+        }
+        const _idStr = String(pId || p.name || '');
+        const _seed = _idStr.split('').reduce((acc, c, i) => acc + c.charCodeAt(0) * (i + 7), 0);
+        const reviewCount = p.reviewCount || p.reviews || (Math.floor(((_seed * 1373 + 6151) % 196) + 5));
+        const fullStars  = Math.floor(ratingVal);
+        const halfStar   = (ratingVal - fullStars) >= 0.5;
+        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+        const _isDarkNow = document.body.classList.contains('dark-theme');
+        const starColor  = _isDarkNow ? '#ef4444' : '#f59e0b';
+        const isMob = window.screen.width < 800;
+        const starsHTML = `<span style="color:${starColor};font-size:${isMob?'28px':'13px'};">`
+            + '★'.repeat(fullStars)
+            + (halfStar ? '½' : '')
+            + `<span style="color:#d1d5db;">`+'★'.repeat(emptyStars)+'</span>'
+            + '</span>';
+        const ratingHTML = `<div style="display:flex;align-items:center;gap:4px;justify-content:center;margin:5px 0 4px;">
+            ${starsHTML}
+            <span style="font-size:${isMob?'24px':'11px'};color:#6b7280;">${ratingVal.toFixed(1)} (${reviewCount})</span>
+        </div>`;
+        // ──────────────────────────────────────────────────────────
+
+        // ── Old Price & Discount ──────────────────────────────────
+        const newPrice = parseFloat(p.price) || 0;
+        let oldPrice = parseFloat(p.oldPrice || p.originalPrice || p.mrp || 0);
+        if (!oldPrice || oldPrice <= newPrice) {
+            const _opSeed = _seed % 1000;
+            oldPrice = Math.ceil(newPrice * (1.15 + (_opSeed / 1000) * 0.20) / 10) * 10;
+        }
+        const discountPct = Math.round(((oldPrice - newPrice) / oldPrice) * 100);
+        // ──────────────────────────────────────────────────────────
+
+        // ── Badges ───────────────────────────────────────────────
+        const hasFast     = p.badges && p.badges.fast;
+        const hasVerified = p.badges && p.badges.verified;
+        const badgeHTML   = (hasFast || hasVerified) ? `
+            <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin:5px 0 3px;">
+                ${hasFast     ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#dcfce7;color:#15803d;border:1px solid #86efac;padding:3px 9px;border-radius:20px;font-size:${isMob?'24px':'11px'};font-weight:700;">⚡ FAST</span>` : ''}
+                ${hasVerified ? `<span style="display:inline-flex;align-items:center;gap:4px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;padding:3px 9px;border-radius:20px;font-size:${isMob?'24px':'11px'};font-weight:700;">✔ Verified</span>` : ''}
+            </div>` : '';
+        // ──────────────────────────────────────────────────────────
+
         return `
-        <div class="shop-product-item" data-name="${p.title || p.name}" data-tags="${p.tags || p.sironamTag || ''}" style="background:${_cardBg}; border-radius:12px; padding:10px; border:1px solid ${_cardBdr}; text-align:center; display:flex; flex-direction:column; justify-content:space-between; height: 100%; position: relative;">
-            
+        <div class="shop-product-item" data-name="${p.title || p.name}" data-tags="${p.tags || p.sironamTag || ''}"
+             style="background:${_cardBg}; border-radius:12px; padding:10px; border:1px solid ${_cardBdr}; text-align:center; display:flex; flex-direction:column; justify-content:space-between; height:100%; position:relative; cursor:pointer;"
+             onclick="openProductDetails('${pId}')">
+
             ${checkAdmin ? `
-                <div class="admin-actions-overlay" style="position: absolute; top: 15px; left: 15px; z-index: 10; display: flex; gap: 5px;">
-                    <button class="admin-btn btn-edit" onclick="openEditModal('${pId}')" style="background: #fbbf24; color: black; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">EDIT</button>
-                    <button class="admin-btn btn-delete" onclick="adminDeleteProduct('${pId}')" style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold;">DELETE</button>
+                <div class="admin-actions-overlay" style="position:absolute;top:15px;left:15px;z-index:10;display:flex;gap:5px;" onclick="event.stopPropagation()">
+                    <button class="admin-btn btn-edit" onclick="event.stopPropagation();openEditModal('${pId}')" style="background:#fbbf24;color:black;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px;font-weight:bold;">EDIT</button>
+                    <button class="admin-btn btn-delete" onclick="event.stopPropagation();adminDeleteProduct('${pId}')" style="background:#ef4444;color:white;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px;font-weight:bold;">DELETE</button>
                 </div>
             ` : ''}
 
-            <div style="width:100%; aspect-ratio: 1 / 1; overflow:hidden; border-radius:10px; background:${_imgBg}; display:flex; align-items:center; justify-content:center; padding: 5px;">
-                <img src="${displayImg}" 
-                     onclick="openProductDetails('${pId}')" 
-                     style="max-width:100%; max-height:100%; object-fit:contain; cursor:pointer;" 
-                     title="বিস্তারিত দেখতে ক্লিক করুন">
+            <div style="width:100%;aspect-ratio:1/1;overflow:hidden;border-radius:10px;background:${_imgBg};display:flex;align-items:center;justify-content:center;padding:5px;">
+                <img src="${displayImg}" style="max-width:100%;max-height:100%;object-fit:contain;">
             </div>
 
             <div style="margin-top:8px;">
-                <h4 style="color:${_titleC}; margin:0 0 5px; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.title || p.name}</h4>
-                <p style="color:#10b981; font-weight:bold; font-size:16px; margin:0 0 8px;">৳ ${p.price}</p>
-                <button class="btn-buy-now" 
-                        onclick="initiateCheckout('${pId}')" 
-                        style="width:100%; background:#27ae60; color:white; border:none; padding:8px; border-radius:8px; cursor:pointer; font-weight:600; font-size:14px;">
-                    <i class="fa fa-shopping-cart"></i> অর্ডার করুন
-                </button>
+                <h4 style="color:${_titleC};margin:0 0 4px;font-size:${isMob?'28px':'14px'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.title || p.name}</h4>
+                <div style="display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap;margin:4px 0 2px;">
+                    <span style="font-size:${isMob?'36px':'16px'};font-weight:900;color:#16a34a;">৳ ${newPrice.toLocaleString('bn-BD')}</span>
+                    <span style="font-size:${isMob?'26px':'12px'};color:#94a3b8;text-decoration:line-through;">৳ ${oldPrice.toLocaleString('bn-BD')}</span>
+                    <span style="font-size:${isMob?'22px':'11px'};font-weight:700;background:#ef4444;color:#fff;padding:1px 6px;border-radius:20px;">${discountPct}% ছাড়</span>
+                </div>
+                ${badgeHTML}
+                ${ratingHTML}
             </div>
-            
+
         </div>
         `;
     }).join('');
