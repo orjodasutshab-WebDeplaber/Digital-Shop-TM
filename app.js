@@ -9764,7 +9764,7 @@ function openSironamShop(id, title) {
     <div id="sironamFullShop" style="position:fixed; top:0; left:0; width:100%; height:100%; background:${_shopBg}; z-index:999999999; overflow-y:auto; font-family: 'Hind Siliguri', sans-serif;">
         
         <div style="position:sticky; top:0; background:${_headerBg}; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid ${_headerBdr}; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.12);">
-            <h2 style="color:${_titleClr}; margin:0; font-size:20px; font-weight:bold;">${title}</h2>
+            <h2 style="color:${_titleClr}; margin:0; font-size:clamp(26px,4vw,42px); font-weight:900; font-family:'Dancing Script','Pacifico','Hind Siliguri',cursive; letter-spacing:0.03em; text-shadow:0 2px 8px rgba(0,0,0,0.10);">${title}</h2>
             <div style="display:flex; align-items:center; gap:10px; flex-grow:1; justify-content:flex-end;">
 
                 <!-- সার্চ আইকন বাটন — থিম-aware -->
@@ -9798,8 +9798,8 @@ function openSironamShop(id, title) {
                 </div>
 
                 <button onclick="document.getElementById('sironamFullShop').remove()" 
-                        style="background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:30px; cursor:pointer; font-weight:bold;">
-                   🏠 হোম
+                        style="background:linear-gradient(135deg,#ef4444,#dc2626); color:white; border:none; padding:13px 28px; border-radius:50px; cursor:pointer; font-weight:800; font-size:17px; display:flex; align-items:center; gap:8px; box-shadow:0 4px 15px rgba(239,68,68,0.4); transition:all 0.3s; letter-spacing:0.03em;">
+                   <span style="font-size:20px;">🏠</span> হোম
                 </button>
             </div>
         </div>
