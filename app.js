@@ -9827,7 +9827,7 @@ function openSironamShop(id, title) {
 
             <div style="width:100%; height:4px; background:#000000; margin-top:6px;"></div>
 
-            <div id="shopProductGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:20px; padding:24px 30px 30px;">
+            <div id="shopProductGrid" style="display:grid; grid-template-columns:${window.screen.width < 800 ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(220px, 1fr))'}; gap:${window.screen.width < 800 ? '10px' : '20px'}; padding:${window.screen.width < 800 ? '12px' : '24px 30px 30px'};">
                 ${renderTaggedProducts(id)}
             </div>
 
