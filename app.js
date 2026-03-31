@@ -9763,7 +9763,24 @@ function openSironamShop(id, title) {
     const shopHTML = `
     <div id="sironamFullShop" style="position:fixed; top:0; left:0; width:100%; height:100%; background:${_shopBg}; z-index:999999999; overflow-y:auto; font-family: 'Hind Siliguri', sans-serif;">
         
-        <div style="position:sticky; top:0; background:${_headerBg}; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid ${_headerBdr}; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.12);">
+        <div id="sironamStickyHeader" style="position:sticky; top:0; background:${_headerBg}; border-bottom:1px solid ${_headerBdr}; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.12);">
+
+            <!-- সার্চ expand box — sticky header এর ভেতরে -->
+            <div id="shopSearchExpandBox" style="display:none; width:100%; height:68px; align-items:center; justify-content:center; background:${_srchExpandBg}; border-bottom:2px solid ${_srchExpandBdr}; box-shadow:0 4px 24px rgba(0,0,0,0.18); padding:0 16px; box-sizing:border-box; animation:srchDropDown 0.22s ease;">
+                <div style="flex:1; max-width:700px; display:flex; align-items:center; background:${_srchBoxBg}; border:1.5px solid ${_srchBdr}; border-radius:12px 0 0 12px; overflow:hidden; height:68px;">
+                    <i class="fa fa-search" style="color:${_srchIcon}; font-size:15px; padding:0 10px 0 14px; flex-shrink:0;"></i>
+                    <input type="text" id="shopSearchInput" oninput="filterShopProducts()" placeholder="পণ্য খুঁজুন... (#ট্যাগ দিয়েও খুঁজুন)"
+                           onkeydown="if(event.key==='Escape'){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';}"
+                           style="flex:1; background:transparent; border:none; color:${_srchInput}; font-size:15px; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
+                </div>
+                <button onclick="(function(){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';document.getElementById('shopSearchInput').value='';filterShopProducts();})()"
+                        style="background:#ef4444; border:none; color:#fff; height:68px; padding:0 22px; border-radius:0 12px 12px 0; font-size:20px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <!-- মেইন হেডার রো -->
+            <div style="padding:15px 20px; display:flex; justify-content:space-between; align-items:center;">
             <h2 style="color:${_titleClr}; margin:0; font-size:clamp(26px,4vw,42px); font-weight:900; font-family:'Dancing Script','Pacifico','Hind Siliguri',cursive; letter-spacing:0.03em; text-shadow:0 2px 8px rgba(0,0,0,0.10);">${title}</h2>
             <div style="display:flex; align-items:center; gap:10px; flex-grow:1; justify-content:flex-end;">
 
@@ -9783,24 +9800,13 @@ function openSironamShop(id, title) {
                             style="background:${_isDark ? 'linear-gradient(135deg,#1e293b 0%,#334155 100%)' : 'linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%)'}; border:1.5px solid ${_isDark ? '#475569' : '#cbd5e1'}; color:${_isDark ? '#94a3b8' : '#475569'}; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.15); transition:all 0.2s;">
                         <i class="fa fa-search"></i>
                     </button>
-                    <div id="shopSearchExpandBox" style="display:none; position:fixed; top:0; left:0; width:100%; height:68px; align-items:center; justify-content:center; z-index:999999999; background:${_srchExpandBg}; border-bottom:2px solid ${_srchExpandBdr}; box-shadow:0 4px 24px rgba(0,0,0,0.18); padding:0 16px; box-sizing:border-box; animation:srchDropDown 0.22s ease;">
-                        <div style="flex:1; max-width:700px; display:flex; align-items:center; background:${_srchBoxBg}; border:1.5px solid ${_srchBdr}; border-radius:12px 0 0 12px; overflow:hidden; height:68px;">
-                            <i class="fa fa-search" style="color:${_srchIcon}; font-size:15px; padding:0 10px 0 14px; flex-shrink:0;"></i>
-                            <input type="text" id="shopSearchInput" oninput="filterShopProducts()" placeholder="পণ্য খুঁজুন... (#ট্যাগ দিয়েও খুঁজুন)"
-                                   onkeydown="if(event.key==='Escape'){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';}"
-                                   style="flex:1; background:transparent; border:none; color:${_srchInput}; font-size:15px; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
-                        </div>
-                        <button onclick="(function(){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';document.getElementById('shopSearchInput').value='';filterShopProducts();})()"
-                                style="background:#ef4444; border:none; color:#fff; height:68px; padding:0 22px; border-radius:0 12px 12px 0; font-size:20px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
                 </div>
 
                 <button onclick="document.getElementById('sironamFullShop').remove()" 
                         style="background:linear-gradient(135deg,#ef4444,#dc2626); color:white; border:none; padding:13px 28px; border-radius:50px; cursor:pointer; font-weight:800; font-size:17px; display:flex; align-items:center; gap:8px; box-shadow:0 4px 15px rgba(239,68,68,0.4); transition:all 0.3s; letter-spacing:0.03em;">
                    <span style="font-size:20px;">🏠</span> হোম
                 </button>
+            </div>
             </div>
         </div>
 
