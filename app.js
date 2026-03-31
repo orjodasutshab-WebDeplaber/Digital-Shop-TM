@@ -9770,6 +9770,7 @@ function openSironamShop(id, title) {
                 <div style="flex:1; max-width:700px; display:flex; align-items:center; background:${_srchBoxBg}; border:1.5px solid ${_srchBdr}; border-radius:12px 0 0 12px; overflow:hidden; height:68px;">
                     <i class="fa fa-search" style="color:${_srchIcon}; font-size:15px; padding:0 10px 0 14px; flex-shrink:0;"></i>
                     <input type="text" id="shopSearchInput" oninput="filterShopProducts()" placeholder="পণ্য খুঁজুন... (#ট্যাগ দিয়েও খুঁজুন)"
+                           onfocus="(function(){var s=document.getElementById('sironamFullShop');if(s){var p=s.scrollTop;setTimeout(function(){s.scrollTop=p;},100);}})()"
                            onkeydown="if(event.key==='Escape'){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';}"
                            style="flex:1; background:transparent; border:none; color:${_srchInput}; font-size:15px; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
                 </div>
@@ -9984,8 +9985,11 @@ function loadShopProducts() {
 
 // ৩. পণ্য ফিল্টার করার ফাংশন (নাম + ট্যাগ একসাথে সার্চ — # ছাড়াই)
 function filterShopProducts() {
+    const shop = document.getElementById('sironamFullShop');
+    const scrollPos = shop ? shop.scrollTop : 0;
+
     const rawValue = document.getElementById('shopSearchInput').value.trim();
-    const searchValue = rawValue.toLowerCase().replace(/^#+/, ''); // # থাকলেও ছাড়িয়ে নাও
+    const searchValue = rawValue.toLowerCase().replace(/^#+/, '');
     const allProducts = document.querySelectorAll('.shop-product-item');
 
     allProducts.forEach(product => {
@@ -9995,10 +9999,11 @@ function filterShopProducts() {
         }
         const productName = (product.getAttribute('data-name') || '').toLowerCase();
         const productTags = (product.getAttribute('data-tags') || '').toLowerCase();
-        // নাম অথবা ট্যাগ যেকোনোটায় মিললেই দেখাবে
         const show = productName.includes(searchValue) || productTags.includes(searchValue);
         product.style.display = show ? 'flex' : 'none';
     });
+
+    if (shop) shop.scrollTop = scrollPos;
 }
 
 // ৪. ডেলি বিজ্ঞাপন ডাটা স্টোর (অপরিবর্তিত)
