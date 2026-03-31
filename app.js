@@ -9772,7 +9772,7 @@ function openSironamShop(id, title) {
                     <input type="text" id="shopSearchInput" oninput="filterShopProducts()" placeholder="পণ্য খুঁজুন... (#ট্যাগ দিয়েও খুঁজুন)"
                            onfocus="(function(){var s=document.getElementById('sironamFullShop');if(s){var p=s.scrollTop;setTimeout(function(){s.scrollTop=p;},100);}})()"
                            onkeydown="if(event.key==='Escape'){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';}"
-                           style="flex:1; background:transparent; border:none; color:${_srchInput}; font-size:${window.screen.width < 800 ? '17px' : '15px'}; font-weight:${window.screen.width < 800 ? '700' : '400'}; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
+                           style="flex:1; background:transparent; border:none; color:${_srchInput}; font-size:${window.screen.width < 800 ? '20px' : '15px'}; font-weight:${window.screen.width < 800 ? '700' : '400'}; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
                 </div>
                 <button onclick="(function(){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';document.getElementById('shopSearchInput').value='';filterShopProducts();})()"
                         style="background:#ef4444; border:none; color:#fff; height:68px; padding:0 22px; border-radius:0 12px 12px 0; font-size:20px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
@@ -9783,7 +9783,7 @@ function openSironamShop(id, title) {
             <!-- মেইন হেডার রো -->
             <div style="padding:15px 20px; display:flex; justify-content:space-between; align-items:center;">
             <h2 style="color:${_titleClr}; margin:0; font-size:clamp(26px,4vw,42px); font-weight:900; font-family:'Dancing Script','Pacifico','Hind Siliguri',cursive; letter-spacing:0.03em; text-shadow:0 2px 8px rgba(0,0,0,0.10);">${title}</h2>
-            <div style="display:flex; align-items:center; gap:${window.screen.width < 800 ? '70px' : '10px'}; flex-grow:1; justify-content:flex-end;">
+            <div style="display:flex; align-items:center; gap:${window.screen.width < 800 ? '50px' : '10px'}; flex-grow:1; justify-content:flex-end;">
 
                 <!-- সার্চ আইকন বাটন — থিম-aware -->
                 <div style="position:relative; display:flex; align-items:center;">
