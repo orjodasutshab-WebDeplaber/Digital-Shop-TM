@@ -9766,16 +9766,16 @@ function openSironamShop(id, title) {
         <div id="sironamStickyHeader" style="position:sticky; top:0; background:${_headerBg}; border-bottom:1px solid ${_headerBdr}; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.12);">
 
             <!-- সার্চ expand box — sticky header এর ভেতরে -->
-            <div id="shopSearchExpandBox" style="display:none; width:100%; height:${window.screen.width < 800 ? '88px' : '76px'}; align-items:center; justify-content:center; background:${_srchExpandBg}; border-bottom:2px solid ${_srchExpandBdr}; box-shadow:0 4px 24px rgba(0,0,0,0.18); padding:0 16px; box-sizing:border-box; animation:srchDropDown 0.22s ease;">
-                <div style="flex:1; max-width:700px; display:flex; align-items:center; background:${_srchBoxBg}; border:1.5px solid ${_srchBdr}; border-radius:12px 0 0 12px; overflow:hidden; height:${window.screen.width < 800 ? '88px' : '76px'};">
-                    <i class="fa fa-search" style="color:${_srchIcon}; font-size:${window.screen.width < 800 ? '28px' : '20px'}; padding:0 12px 0 16px; flex-shrink:0;"></i>
+            <div id="shopSearchExpandBox" style="display:none; width:100%; height:68px; align-items:center; justify-content:center; background:${_srchExpandBg}; border-bottom:2px solid ${_srchExpandBdr}; box-shadow:0 4px 24px rgba(0,0,0,0.18); padding:0 16px; box-sizing:border-box; animation:srchDropDown 0.22s ease;">
+                <div style="flex:1; max-width:700px; display:flex; align-items:center; background:${_srchBoxBg}; border:1.5px solid ${_srchBdr}; border-radius:12px 0 0 12px; overflow:hidden; height:68px;">
+                    <i class="fa fa-search" style="color:${_srchIcon}; font-size:15px; padding:0 10px 0 14px; flex-shrink:0;"></i>
                     <input type="text" id="shopSearchInput" oninput="filterShopProducts()" placeholder="পণ্য খুঁজুন... (#ট্যাগ দিয়েও খুঁজুন)"
                            onfocus="(function(){var s=document.getElementById('sironamFullShop');if(s){var p=s.scrollTop;setTimeout(function(){s.scrollTop=p;},100);}})()"
                            onkeydown="if(event.key==='Escape'){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';}"
-                           style="flex:1; background:transparent; border:none; color:${_srchInput}; font-size:${window.screen.width < 800 ? '35px' : '20px'}; font-weight:${window.screen.width < 800 ? '700' : '500'}; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
+                           style="flex:1; background:transparent; border:none; color:${_srchInput}; font-size:${window.screen.width < 800 ? '20px' : '15px'}; font-weight:${window.screen.width < 800 ? '700' : '400'}; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
                 </div>
                 <button onclick="(function(){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';document.getElementById('shopSearchInput').value='';filterShopProducts();})()"
-                        style="background:#ef4444; border:none; color:#fff; height:${window.screen.width < 800 ? '88px' : '76px'}; padding:0 22px; border-radius:0 12px 12px 0; font-size:${window.screen.width < 800 ? '28px' : '22px'}; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        style="background:#ef4444; border:none; color:#fff; height:68px; padding:0 22px; border-radius:0 12px 12px 0; font-size:20px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
                     <i class="fa fa-times"></i>
                 </button>
             </div>
@@ -9798,7 +9798,7 @@ function openSironamShop(id, title) {
                                     setTimeout(function(){inp.focus();},50);
                                 }
                             })()"
-                            style="background:${_isDark ? 'linear-gradient(135deg,#1e293b 0%,#334155 100%)' : 'linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%)'}; border:2px solid ${_isDark ? '#475569' : '#cbd5e1'}; color:${_isDark ? '#94a3b8' : '#475569'}; width:${window.screen.width < 800 ? '72px' : '58px'}; height:${window.screen.width < 800 ? '72px' : '58px'}; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:${window.screen.width < 800 ? '32px' : '26px'}; flex-shrink:0; box-shadow:0 2px 12px rgba(0,0,0,0.18); transition:all 0.2s;">
+                            style="background:${_isDark ? 'linear-gradient(135deg,#1e293b 0%,#334155 100%)' : 'linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%)'}; border:1.5px solid ${_isDark ? '#475569' : '#cbd5e1'}; color:${_isDark ? '#94a3b8' : '#475569'}; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.15); transition:all 0.2s;">
                         <i class="fa fa-search"></i>
                     </button>
                 </div>
@@ -9992,21 +9992,6 @@ function filterShopProducts() {
     const searchValue = rawValue.toLowerCase().replace(/^#+/, '');
     const allProducts = document.querySelectorAll('.shop-product-item');
 
-    // ── ডেলি বোর্ড hide/show ──
-    const deliBoard = document.getElementById('sironamDeliBoard');
-    const allProductsWrapper = document.getElementById('shopAllProductsWrapper');
-    if (deliBoard) {
-        if (searchValue !== '') {
-            // সার্চ চলছে — ডেলি বোর্ড লুকিয়ে পণ্য উপরে আনো
-            deliBoard.style.display = 'none';
-            if (allProductsWrapper) allProductsWrapper.style.marginTop = '0';
-        } else {
-            // সার্চ খালি — ডেলি বোর্ড ফিরিয়ে দাও
-            deliBoard.style.display = 'flex';
-            if (allProductsWrapper) allProductsWrapper.style.marginTop = '';
-        }
-    }
-
     allProducts.forEach(product => {
         if (searchValue === '') {
             product.style.display = 'flex';
@@ -10018,8 +10003,7 @@ function filterShopProducts() {
         product.style.display = show ? 'flex' : 'none';
     });
 
-    // সার্চ করলে স্ক্রল উপরে নিয়ে যাও, খালি হলে আগের অবস্থায়
-    if (shop) shop.scrollTop = searchValue !== '' ? 0 : scrollPos;
+    if (shop) shop.scrollTop = scrollPos;
 }
 
 // ৪. ডেলি বিজ্ঞাপন ডাটা স্টোর (অপরিবর্তিত)
@@ -11529,6 +11513,7 @@ function pmxRefreshDisplay() {
 function pmxOpenHeaderShop(headerId, headerName, headerImg) {
     const el = document.getElementById('pmxHeaderShopModal');
     if (el) el.remove();
+    const isMob = document.documentElement.classList.contains('is-mobile') || window.screen.width < 800;
     const allProducts = pmxGetAll(PMX_KEYS.PRODUCTS);
     const products = allProducts.filter(p => p.headerId === headerId || String(p.headerId) === String(headerId));
     const allHolders = pmxGetAll(PMX_KEYS.HOLDERS);
@@ -11574,14 +11559,17 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
         <div style="padding:20px;max-width:1520px;margin:0 auto;">
             ${!products.length
                 ? '<p style="color:#4b5563;text-align:center;padding:40px;">এই হেডারে কোনো প্রোডাক্ট নেই</p>'
-                : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:repeat(8,1fr);gap:14px;">
+                : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:${isMob ? 'repeat(2,1fr)' : 'repeat(4,1fr)'};gap:${isMob ? '12px' : '18px'};">
                     ${products.map(p => `
-                        <div class="pmx-prod-card" data-name="${(p.name||'').replace(/"/g,'&quot;')}" style="background:#1e293b;border-radius:12px;overflow:hidden;border:1px solid #334155;text-align:center;">
+                        <div class="pmx-prod-card" data-name="${(p.name||'').replace(/"/g,'&quot;')}"
+                             onclick="pmxOpenBuyModal('${p.id}')"
+                             style="background:#1e293b;border-radius:16px;overflow:hidden;border:1px solid #334155;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;"
+                             onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 12px 30px rgba(167,139,250,0.25)';this.style.borderColor='#a78bfa'"
+                             onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none';this.style.borderColor='#334155'">
                             <img src="${p.img||'ko.jpeg'}" style="width:100%;aspect-ratio:1;object-fit:fill;" onerror="this.src='ko.jpeg'">
-                            <div style="padding:8px;">
-                                <div style="color:#e2e8f0;font-size:12px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
-                                <div style="color:#10b981;font-size:13px;font-weight:700;margin-bottom:8px;">৳${p.price}</div>
-                                <button onclick="pmxOpenBuyModal('${p.id}')" style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:6px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Hind Siliguri',sans-serif;">🛒 Buy</button>
+                            <div style="padding:${isMob ? '12px 10px' : '10px 12px'};">
+                                <div style="color:#e2e8f0;font-size:${isMob ? '28px' : '14px'};font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+                                <div style="color:#10b981;font-size:${isMob ? '30px' : '15px'};font-weight:800;">৳${p.price}</div>
                             </div>
                         </div>`).join('')}
                 </div>`}
