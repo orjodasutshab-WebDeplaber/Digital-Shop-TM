@@ -9766,16 +9766,16 @@ function openSironamShop(id, title) {
         <div id="sironamStickyHeader" style="position:sticky; top:0; background:${_headerBg}; border-bottom:1px solid ${_headerBdr}; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.12);">
 
             <!-- সার্চ expand box — sticky header এর ভেতরে -->
-            <div id="shopSearchExpandBox" style="display:none; width:100%; height:68px; align-items:center; justify-content:center; background:${_srchExpandBg}; border-bottom:2px solid ${_srchExpandBdr}; box-shadow:0 4px 24px rgba(0,0,0,0.18); padding:0 16px; box-sizing:border-box; animation:srchDropDown 0.22s ease;">
-                <div style="flex:1; max-width:700px; display:flex; align-items:center; background:${_srchBoxBg}; border:1.5px solid ${_srchBdr}; border-radius:12px 0 0 12px; overflow:hidden; height:68px;">
-                    <i class="fa fa-search" style="color:${_srchIcon}; font-size:15px; padding:0 10px 0 14px; flex-shrink:0;"></i>
+            <div id="shopSearchExpandBox" style="display:none; width:100%; height:${window.screen.width < 800 ? '90px' : '80px'}; align-items:center; justify-content:center; background:${_srchExpandBg}; border-bottom:2px solid ${_srchExpandBdr}; box-shadow:0 4px 24px rgba(0,0,0,0.18); padding:0 16px; box-sizing:border-box; animation:srchDropDown 0.22s ease;">
+                <div style="flex:1; max-width:700px; display:flex; align-items:center; background:${_srchBoxBg}; border:1.5px solid ${_srchBdr}; border-radius:12px 0 0 12px; overflow:hidden; height:${window.screen.width < 800 ? '90px' : '80px'};">
+                    <i class="fa fa-search" style="color:${_srchIcon}; font-size:${window.screen.width < 800 ? '26px' : '20px'}; padding:0 12px 0 16px; flex-shrink:0;"></i>
                     <input type="text" id="shopSearchInput" oninput="filterShopProducts()" placeholder="পণ্য খুঁজুন... (#ট্যাগ দিয়েও খুঁজুন)"
                            onfocus="(function(){var s=document.getElementById('sironamFullShop');if(s){var p=s.scrollTop;setTimeout(function(){s.scrollTop=p;},100);}})()"
                            onkeydown="if(event.key==='Escape'){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';}"
-                           style="flex:1; background:transparent; border:none; color:${_srchInput}; font-size:${window.screen.width < 800 ? '20px' : '15px'}; font-weight:${window.screen.width < 800 ? '700' : '400'}; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
+                           style="flex:1; background:transparent; border:none; color:${_srchInput}; font-size:${window.screen.width < 800 ? '35px' : '20px'}; font-weight:${window.screen.width < 800 ? '700' : '500'}; padding:0 10px; outline:none; height:100%; font-family:'Hind Siliguri',sans-serif;">
                 </div>
                 <button onclick="(function(){document.getElementById('shopSearchExpandBox').style.display='none';document.getElementById('shopSearchIconBtn').style.display='flex';document.getElementById('shopSearchInput').value='';filterShopProducts();})()"
-                        style="background:#ef4444; border:none; color:#fff; height:68px; padding:0 22px; border-radius:0 12px 12px 0; font-size:20px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        style="background:#ef4444; border:none; color:#fff; height:${window.screen.width < 800 ? '90px' : '80px'}; padding:0 22px; border-radius:0 12px 12px 0; font-size:${window.screen.width < 800 ? '26px' : '22px'}; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
                     <i class="fa fa-times"></i>
                 </button>
             </div>

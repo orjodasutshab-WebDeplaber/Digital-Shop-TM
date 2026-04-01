@@ -1193,7 +1193,19 @@ body.dark-theme .btn-reset-pass {
 
 /* মোবাইলের জন্য রেসপন্সিভ */
 /* Search wrapper — desktop size maintain */
-.search-wrapper { max-width: 300px; }
+.search-wrapper { max-width: 450px; }
+
+/* PC সার্চ ইনপুট বড় */
+.search-wrapper input {
+    padding: 12px 14px 12px 46px !important;
+    font-size: 17px !important;
+    border-radius: 25px !important;
+}
+
+.search-wrapper i {
+    font-size: 18px !important;
+    left: 14px !important;
+}
 
 
 /* ১. লগইন ফর্মের ভেতরের সব সাধারণ টেক্সট এবং শিরোনাম কালো করা */
@@ -2340,3 +2352,27 @@ html.is-mobile .nav-text {
     font-size: 22px !important;
     font-weight: 700 !important;
 }
+
+/* ══════════════════════════════════════════════
+   মোবাইল — হেডার সার্চ বার বড় (মোবাইল ভিউ)
+   ══════════════════════════════════════════════ */
+html.is-mobile .header-search-box {
+    padding: 0 8px !important;
+}
+
+html.is-mobile .search-wrapper {
+    max-width: 100% !important;
+}
+
+html.is-mobile .search-wrapper input {
+    padding: 16px 14px 16px 56px !important;
+    font-size: 35px !important;
+    border-radius: 30px !important;
+    height: 80px !important;
+}
+
+html.is-mobile .search-wrapper i {
+    font-size: 30px !important;
+    left: 16px !important;
+}
+
