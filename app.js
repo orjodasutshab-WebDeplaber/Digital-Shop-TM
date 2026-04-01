@@ -11513,7 +11513,6 @@ function pmxRefreshDisplay() {
 function pmxOpenHeaderShop(headerId, headerName, headerImg) {
     const el = document.getElementById('pmxHeaderShopModal');
     if (el) el.remove();
-    const isMob = document.documentElement.classList.contains('is-mobile') || window.screen.width < 800;
     const allProducts = pmxGetAll(PMX_KEYS.PRODUCTS);
     const products = allProducts.filter(p => p.headerId === headerId || String(p.headerId) === String(headerId));
     const allHolders = pmxGetAll(PMX_KEYS.HOLDERS);
@@ -11559,17 +11558,17 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
         <div style="padding:20px;max-width:1520px;margin:0 auto;">
             ${!products.length
                 ? '<p style="color:#4b5563;text-align:center;padding:40px;">এই হেডারে কোনো প্রোডাক্ট নেই</p>'
-                : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:repeat(auto-fill,170px);gap:${isMob ? '12px' : '16px'};justify-content:start;">
+                : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:repeat(auto-fill,193px);gap:14px;justify-content:start;">
                     ${products.map(p => `
                         <div class="pmx-prod-card" data-name="${(p.name||'').replace(/"/g,'&quot;')}"
                              onclick="pmxOpenBuyModal('${p.id}')"
-                             style="width:170px;background:#1e293b;border-radius:16px;overflow:hidden;border:1px solid #334155;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;"
+                             style="width:193px;background:#1e293b;border-radius:16px;overflow:hidden;border:1px solid #334155;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;"
                              onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 12px 30px rgba(167,139,250,0.25)';this.style.borderColor='#a78bfa'"
                              onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none';this.style.borderColor='#334155'">
-                            <img src="${p.img||'ko.jpeg'}" style="width:170px;height:170px;object-fit:fill;display:block;" onerror="this.src='ko.jpeg'">
-                            <div style="padding:${isMob ? '12px 10px' : '10px 12px'};">
-                                <div style="color:#e2e8f0;font-size:${isMob ? '28px' : '13px'};font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
-                                <div style="color:#10b981;font-size:${isMob ? '30px' : '14px'};font-weight:800;">৳${p.price}</div>
+                            <img src="${p.img||'ko.jpeg'}" style="width:193px;height:193px;object-fit:fill;display:block;" onerror="this.src='ko.jpeg'">
+                            <div style="padding:10px 12px;">
+                                <div style="color:#e2e8f0;font-size:13px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+                                <div style="color:#10b981;font-size:14px;font-weight:800;">৳${p.price}</div>
                             </div>
                         </div>`).join('')}
                 </div>`}
