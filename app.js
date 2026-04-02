@@ -11542,53 +11542,63 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
     document.body.insertAdjacentHTML('beforeend', `
     <div id="pmxHeaderShopModal" style="position:fixed;inset:0;background:${modalBg};z-index:999999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;">
 
-        <!-- Sticky Header -->
-        <div style="position:sticky;top:0;background:${headerBg};padding:${isMob?'10px 14px':'12px 16px'};display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid ${headerBdr};z-index:10;gap:10px;backdrop-filter:blur(10px);">
-            <h2 style="color:${titleClr};margin:0;font-size:${isMob?'15px':'17px'};font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">⭐ ${headerName}</h2>
-            <div style="display:flex;align-items:center;gap:${isMob?'60px':'50px'};flex-shrink:0;">
-                <!-- সার্চ বাটন — মডার্ন -->
-                <button id="pmxShopSearchBtn" onclick="pmxToggleShopSearch()"
-                    style="background:${isDark?'linear-gradient(135deg,#1e293b,#334155)':'linear-gradient(135deg,#f8fafc,#e2e8f0)'};
-                           border:1.5px solid ${isDark?'#475569':'#cbd5e1'};
-                           color:${isDark?'#e2e8f0':'#374151'};
-                           width:${isMob?'40px':'44px'};height:${isMob?'40px':'44px'};
-                           border-radius:12px;
-                           display:flex;align-items:center;justify-content:center;
-                           cursor:pointer;font-size:${isMob?'16px':'18px'};
-                           flex-shrink:0;
-                           box-shadow:${isDark?'0 2px 8px rgba(0,0,0,0.4)':'0 2px 8px rgba(0,0,0,0.08)'};
-                           transition:all 0.2s;"
-                    onmouseover="this.style.transform='scale(1.08)';this.style.boxShadow='0 4px 16px rgba(99,102,241,0.35)';this.style.borderColor='#6366f1'"
-                    onmouseout="this.style.transform='scale(1)';this.style.boxShadow='${isDark?'0 2px 8px rgba(0,0,0,0.4)':'0 2px 8px rgba(0,0,0,0.08)'}';this.style.borderColor='${isDark?'#475569':'#cbd5e1'}'">
-                    <i class="fa fa-search"></i>
-                </button>
-                <!-- বন্ধ বাটন — মডার্ন -->
-                <button onclick="document.getElementById('pmxHeaderShopModal').remove()"
-                    style="background:linear-gradient(135deg,#ef4444,#dc2626);
-                           color:#fff;border:none;
-                           width:${isMob?'40px':'auto'};height:${isMob?'40px':'auto'};
-                           padding:${isMob?'0':'8px 18px'};
-                           border-radius:${isMob?'12px':'20px'};
-                           cursor:pointer;font-weight:700;
-                           font-size:${isMob?'18px':'14px'};
-                           font-family:'Hind Siliguri',sans-serif;
-                           flex-shrink:0;
-                           display:flex;align-items:center;justify-content:center;gap:5px;
-                           box-shadow:0 2px 10px rgba(239,68,68,0.4);
-                           transition:all 0.2s;"
-                    onmouseover="this.style.transform='scale(1.05)';this.style.boxShadow='0 6px 20px rgba(239,68,68,0.5)'"
-                    onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 2px 10px rgba(239,68,68,0.4)'">
-                    ${isMob ? '✕' : '<span>✕</span><span>বন্ধ</span>'}
-                </button>
-            </div>
-        </div>
+        <!-- Sticky Header — সার্চ বার সহ sticky তাই স্ক্রল করলে যাবে না -->
+        <div style="position:sticky;top:0;background:${headerBg};border-bottom:1px solid ${headerBdr};z-index:10;backdrop-filter:blur(10px);">
 
-        <!-- সার্চ বার — toggle -->
-        <div id="pmxShopSearchExpanded" style="display:none;background:${srchExpBg};border-bottom:1px solid ${srchExpBdr};padding:10px 16px;">
-            <div style="display:flex;align-items:center;background:${srchBoxBg};border:1.5px solid ${srchExpBdr};border-radius:12px;overflow:hidden;height:44px;">
-                <i class="fa fa-search" style="color:${srchIconClr};font-size:14px;padding:0 10px 0 14px;flex-shrink:0;"></i>
-                <input id="pmxShopSearchInput" type="text" placeholder="পণ্য বা #ট্যাগ দিয়ে খুঁজুন..." oninput="pmxFilterShopProducts()" style="flex:1;background:transparent;border:none;color:${srchInpClr};font-size:14px;padding:0 10px;outline:none;height:100%;font-family:'Hind Siliguri',sans-serif;">
-                <button onclick="pmxToggleShopSearch()" style="background:#ef4444;border:none;color:#fff;height:44px;padding:0 16px;font-size:16px;font-weight:700;cursor:pointer;border-radius:0 10px 10px 0;">✕</button>
+            <!-- টাইটেল + বাটন রো -->
+            <div style="padding:${isMob?'10px 14px':'12px 16px'};display:flex;justify-content:space-between;align-items:center;gap:10px;">
+                <h2 style="color:${titleClr};margin:0;font-size:${isMob?'15px':'17px'};font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">⭐ ${headerName}</h2>
+                <div style="display:flex;align-items:center;gap:${isMob?'60px':'50px'};flex-shrink:0;">
+                    <!-- সার্চ বাটন -->
+                    <button id="pmxShopSearchBtn" onclick="pmxToggleShopSearch()"
+                        style="background:${isDark?'linear-gradient(135deg,#1e293b,#334155)':'linear-gradient(135deg,#f8fafc,#e2e8f0)'};
+                               border:1.5px solid ${isDark?'#475569':'#cbd5e1'};
+                               color:${isDark?'#e2e8f0':'#374151'};
+                               width:${isMob?'40px':'44px'};height:${isMob?'40px':'44px'};
+                               border-radius:12px;display:flex;align-items:center;justify-content:center;
+                               cursor:pointer;font-size:${isMob?'16px':'18px'};flex-shrink:0;
+                               box-shadow:${isDark?'0 2px 8px rgba(0,0,0,0.4)':'0 2px 8px rgba(0,0,0,0.08)'};
+                               transition:all 0.2s;"
+                        onmouseover="this.style.transform='scale(1.08)';this.style.borderColor='#6366f1'"
+                        onmouseout="this.style.transform='scale(1)';this.style.borderColor='${isDark?'#475569':'#cbd5e1'}'">
+                        <i class="fa fa-search"></i>
+                    </button>
+                    <!-- বন্ধ বাটন -->
+                    <button onclick="document.getElementById('pmxHeaderShopModal').remove()"
+                        style="background:linear-gradient(135deg,#ef4444,#dc2626);
+                               color:#fff;border:none;
+                               width:${isMob?'40px':'auto'};height:${isMob?'40px':'auto'};
+                               padding:${isMob?'0':'8px 18px'};
+                               border-radius:${isMob?'12px':'20px'};
+                               cursor:pointer;font-weight:700;
+                               font-size:${isMob?'18px':'14px'};
+                               font-family:'Hind Siliguri',sans-serif;flex-shrink:0;
+                               display:flex;align-items:center;justify-content:center;gap:5px;
+                               box-shadow:0 2px 10px rgba(239,68,68,0.4);transition:all 0.2s;"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'">
+                        ${isMob ? '✕' : '<span>✕</span><span>বন্ধ</span>'}
+                    </button>
+                </div>
+            </div>
+
+            <!-- সার্চ বার — sticky header এর ভেতরে, স্ক্রল করলে যাবে না -->
+            <div id="pmxShopSearchExpanded" style="display:none;background:${srchExpBg};border-top:1px solid ${srchExpBdr};padding:${isMob?'10px 12px':'10px 16px'};">
+                <div style="display:flex;align-items:center;background:${srchBoxBg};border:1.5px solid ${srchExpBdr};border-radius:12px;overflow:hidden;height:${isMob?'62px':'46px'};">
+                    <i class="fa fa-search" style="color:${srchIconClr};font-size:${isMob?'22px':'15px'};padding:0 12px 0 16px;flex-shrink:0;"></i>
+                    <input id="pmxShopSearchInput" type="text" placeholder="পণ্য বা #ট্যাগ দিয়ে খুঁজুন..."
+                           oninput="pmxFilterShopProducts()"
+                           style="flex:1;background:transparent;border:none;color:${srchInpClr};
+                                  font-size:${isMob?'38px':'15px'};
+                                  font-weight:${isMob?'700':'400'};
+                                  padding:0 10px;outline:none;height:100%;
+                                  font-family:'Hind Siliguri',sans-serif;">
+                    <button onclick="pmxToggleShopSearch()"
+                            style="background:#ef4444;border:none;color:#fff;
+                                   height:${isMob?'62px':'46px'};padding:0 ${isMob?'18px':'14px'};
+                                   font-size:${isMob?'22px':'16px'};
+                                   font-weight:700;cursor:pointer;border-radius:0 10px 10px 0;">✕</button>
+                </div>
             </div>
         </div>
 
@@ -11618,7 +11628,7 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
             <div style="padding:16px 20px 20px 20px;max-width:1520px;margin:0 auto;">
                 ${!products.length
                     ? `<p style="color:${isDark?'#4b5563':'#94a3b8'};text-align:center;padding:40px;">এই হেডারে কোনো প্রোডাক্ট নেই</p>`
-                    : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:${isMob?'repeat(3,1fr)':'repeat(auto-fill,minmax(170px,200px))'};gap:${isMob?'8px':'14px'};justify-content:start;">
+                    : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,200px));gap:${isMob?'10px':'14px'};justify-content:start;">
                         ${products.map(p => {
                             const seed = String(p.id).split('').reduce((a,c)=>a+c.charCodeAt(0),0);
                             const rating = Math.min(5, parseFloat((2 + (seed % 31) / 10).toFixed(1)));
@@ -11641,7 +11651,7 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
                                  data-name="${(p.name||'').replace(/"/g,'&quot;')}"
                                  data-tags="${(p.tags||'').replace(/"/g,'&quot;')}"
                                  onclick="pmxOpenBuyModal('${p.id}')"
-                                 style="background:${cardBg};border-radius:14px;overflow:hidden;border:1.5px solid ${cardBdr};cursor:pointer;transition:transform 0.22s,box-shadow 0.22s,border-color 0.22s;box-shadow:0 2px 8px rgba(0,0,0,0.10);${isMob?'width:100%;':'width:auto;'}"
+                                 style="background:${cardBg};border-radius:14px;overflow:hidden;border:1.5px solid ${cardBdr};cursor:pointer;transition:transform 0.22s,box-shadow 0.22s,border-color 0.22s;box-shadow:0 2px 8px rgba(0,0,0,0.10);"
                                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 28px rgba(0,0,0,0.18)';this.style.borderColor='${hoverBdr}'"
                                  onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.10)';this.style.borderColor='${cardBdr}'">
                                 <div style="position:relative;">
