@@ -4884,7 +4884,7 @@ html.is-mobile #gpdPcNavTabs{display:none!important;}
 .gpd-topbar-icons i{font-size:40px;color:#444;cursor:pointer;}
 .gpd-img-slider{position:relative;width:100%;background:#fff;margin-top:68px;}
 .gpd-main-img{width:100%;aspect-ratio:1/1;object-fit:contain;display:block;background:#fff;}
-.gpd-img-counter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.40);color:#fff;font-size:13px;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:1px;}
+.gpd-img-counter{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.40);color:#fff;font-size:39px;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:1px;}
 .gpd-thumbs{display:flex;gap:8px;padding:10px 14px;background:#fff;border-bottom:1px solid #f0f0f0;overflow-x:auto;scrollbar-width:none;}
 .gpd-thumbs::-webkit-scrollbar{display:none;}
 .gpd-thumb{width:100px;height:100px;border-radius:6px;overflow:hidden;border:2px solid #ddd;cursor:pointer;flex-shrink:0;}
@@ -4892,46 +4892,46 @@ html.is-mobile #gpdPcNavTabs{display:none!important;}
 .gpd-thumb img{width:100%;height:100%;object-fit:fill;display:block;}
 .gpd-price-sec{background:#fff;padding:14px 14px 6px;margin-top:8px;}
 .gpd-price-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
-.gpd-taka{color:#f57224;font-size:38px;font-weight:700;}
-.gpd-price{color:#f57224;font-size:45px;font-weight:900;line-height:1;}
-.gpd-old-price{color:#aaa;font-size:30px;text-decoration:line-through;font-weight:500;}
-.gpd-discount-badge{background:#f57224;color:#fff;font-size:26px;font-weight:800;padding:4px 14px;border-radius:4px;}
-.gpd-name{font-size:38px;font-weight:600;color:#111;line-height:1.55;margin-bottom:10px;}
+.gpd-taka{color:#f57224;font-size:45px;font-weight:700;}
+.gpd-price{color:#f57224;font-size:60px;font-weight:900;line-height:1;}
+.gpd-old-price{color:#aaa;font-size:42px;text-decoration:line-through;font-weight:500;}
+.gpd-discount-badge{background:#f57224;color:#fff;font-size:39px;font-weight:800;padding:4px 14px;border-radius:4px;}
+.gpd-name{font-size:50px;font-weight:600;color:#111;line-height:1.55;margin-bottom:10px;}
 .gpd-stars-row{display:flex;align-items:center;gap:5px;padding-bottom:10px;}
-.gpd-star-icons{color:#f57224;font-size:34px;letter-spacing:2px;}
-.gpd-stars-val{color:#f57224;font-size:32px;font-weight:700;}
-.gpd-review-count{color:#888;font-size:28px;}
+.gpd-star-icons{color:#f57224;font-size:44px;letter-spacing:2px;}
+.gpd-stars-val{color:#f57224;font-size:42px;font-weight:700;}
+.gpd-review-count{color:#888;font-size:39px;}
 .gpd-divider{height:8px;background:#f5f5f5;}
 .gpd-options-sec{background:#fff;padding:13px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0;}
-.gpd-options-label{color:#888;font-size:34px;font-weight:600;margin-right:10px;flex-shrink:0;}
-.gpd-options-val{color:#222;font-size:34px;font-weight:600;flex:1;}
-.gpd-options-arrow{color:#bbb;font-size:34px;}
+.gpd-options-label{color:#888;font-size:42px;font-weight:600;margin-right:10px;flex-shrink:0;}
+.gpd-options-val{color:#222;font-size:42px;font-weight:600;flex:1;}
+.gpd-options-arrow{color:#bbb;font-size:42px;}
 .gpd-desc-sec{background:#fff;padding:14px 14px;margin-top:8px;}
-.gpd-desc-title{font-size:36px;font-weight:800;color:#111;margin-bottom:10px;}
-.gpd-desc-text{font-size:32px;color:#555;line-height:1.75;}
+.gpd-desc-title{font-size:50px;font-weight:800;color:#111;margin-bottom:10px;}
+.gpd-desc-text{font-size:42px;color:#555;line-height:1.75;}
 .gpd-spacer{height:110px;}
-.gpd-action-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid #ebebeb;display:flex;align-items:stretch;z-index:9867839999999911;height:90px;box-shadow:0 -4px 16px rgba(0,0,0,0.10);}
-.gpd-chat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:90px;gap:3px;background:none;border:none;border-right:1px solid #f0f0f0;cursor:pointer;font-family:'Hind Siliguri',sans-serif;padding:0 8px;}
-.gpd-chat-btn span{font-size:22px;color:#555;font-weight:600;}
-.gpd-chat-btn i{font-size:34px;color:#555;}
-.gpd-buynow-btn{flex:1;background:#38bdf8;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;border-right:1px solid rgba(255,255,255,0.3);}
-.gpd-addcart-btn{flex:1;background:#f97316;color:#fff;border:none;font-size:30px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
+.gpd-action-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid #ebebeb;display:flex;align-items:stretch;z-index:9867839999999911;height:100px;box-shadow:0 -4px 16px rgba(0,0,0,0.10);}
+.gpd-chat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100px;gap:3px;background:none;border:none;border-right:1px solid #f0f0f0;cursor:pointer;font-family:'Hind Siliguri',sans-serif;padding:0 8px;}
+.gpd-chat-btn span{font-size:39px;color:#555;font-weight:600;}
+.gpd-chat-btn i{font-size:42px;color:#555;}
+.gpd-buynow-btn{flex:1;background:#38bdf8;color:#fff;border:none;font-size:42px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;border-right:1px solid rgba(255,255,255,0.3);}
+.gpd-addcart-btn{flex:1;background:#f97316;color:#fff;border:none;font-size:42px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;}
 
 /* Mobile like/share/3dot row — below action bar, inside scrollable area */
 .gpd-mob-likeshare{display:flex;gap:10px;padding:16px 14px 8px;background:#fff;border-bottom:1px solid #f5f5f5;}
-.gpd-mob-like-btn{flex:2;padding:14px 0;border-radius:10px;border:2px solid #e5e7eb;background:#fff;color:#555;font-size:30px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;}
+.gpd-mob-like-btn{flex:2;padding:14px 0;border-radius:10px;border:2px solid #e5e7eb;background:#fff;color:#555;font-size:42px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;}
 .gpd-mob-like-btn.liked{color:#ef4444;border-color:#ef4444;background:#fff1f2;}
-.gpd-mob-share-btn{flex:2;padding:14px 0;border-radius:10px;border:2px solid #e5e7eb;background:#fff;color:#555;font-size:30px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;}
-.gpd-mob-3dot-btn{flex:0.7;padding:14px 0;border-radius:10px;border:2px solid #e5e7eb;background:#fff;color:#555;font-size:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.gpd-mob-share-btn{flex:2;padding:14px 0;border-radius:10px;border:2px solid #e5e7eb;background:#fff;color:#555;font-size:42px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;}
+.gpd-mob-3dot-btn{flex:0.7;padding:14px 0;border-radius:10px;border:2px solid #e5e7eb;background:#fff;color:#555;font-size:46px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 
 /* Mobile accordion */
 .gpd-mob-accord-block{border-bottom:1px solid #f0f0f0;margin-bottom:0;}
 .gpd-mob-accord-head{display:flex;align-items:center;justify-content:space-between;padding:16px 0;cursor:pointer;user-select:none;}
-.gpd-mob-accord-arrow{font-size:38px;color:#bbb;transition:transform .3s;flex-shrink:0;}
+.gpd-mob-accord-arrow{font-size:46px;color:#bbb;transition:transform .3s;flex-shrink:0;}
 .gpd-mob-accord-arrow.collapsed{transform:rotate(180deg);}
 .gpd-mob-accord-body{padding-bottom:16px;background:#fff;}
 .gpd-mob-accord-body.hidden{display:none;}
-html.is-mobile .gpd-mob-accord-body{font-size:30px!important;line-height:1.7;}
+html.is-mobile .gpd-mob-accord-body{font-size:42px!important;line-height:1.7;}
 
 /* PC adjustments */
 html:not(.is-mobile) html:not(.is-mobile) .gpd-action-bar{height:56px;}
@@ -4943,14 +4943,14 @@ html:not(.is-mobile) .gpd-chat-btn{width:56px;}
 html:not(.is-mobile) .gpd-spacer{height:16px;}
 html:not(.is-mobile) .gpd-desc-text{font-size:15px;}
 html.is-mobile #gpModalSpecTable table{width:100%;border-collapse:collapse;}
-html.is-mobile #gpModalSpecTable td{font-size:30px!important;padding:14px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
-html.is-mobile .gpd-desc-text{font-size:32px!important;line-height:1.8;color:#444;}
-html.is-mobile #gpModalTagsRow span{font-size:26px!important;padding:5px 14px!important;}
-html.is-mobile #gpModalSellerBox{font-size:29px!important;}
-html.is-mobile .gpd-rel-card-name{font-size:25px;min-height:60px;}
-html.is-mobile .gpd-rel-card-price{font-size:28px;}
-html.is-mobile .gpd-rel-card-tag{font-size:19px;padding:4px 10px;}
-html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
+html.is-mobile #gpModalSpecTable td{font-size:42px!important;padding:14px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
+html.is-mobile .gpd-desc-text{font-size:42px!important;line-height:1.8;color:#444;}
+html.is-mobile #gpModalTagsRow span{font-size:39px!important;padding:5px 14px!important;}
+html.is-mobile #gpModalSellerBox{font-size:42px!important;}
+html.is-mobile .gpd-rel-card-name{font-size:39px;min-height:60px;}
+html.is-mobile .gpd-rel-card-price{font-size:42px;}
+html.is-mobile .gpd-rel-card-tag{font-size:39px;padding:4px 10px;}
+html.is-mobile .gpd-rel-card-cat{font-size:39px;padding:4px 10px;}
 `;
     document.head.appendChild(s);
 })();
@@ -5184,14 +5184,14 @@ html.is-mobile .gpd-rel-card-cat{font-size:19px;padding:4px 10px;}
       </div>
       <!-- Reports Section Mobile -->
       <div id="gpd-reports-wrap-mob" style="margin-top:16px;display:none;background:#fff;border-radius:12px;border:2px solid rgba(239,68,68,0.2);padding:16px;">
-        <div style="font-size:34px;font-weight:800;color:#ef4444;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
-          ⚠️ রিপোর্টসমূহ <span id="gpd-reports-count-mob" style="background:#ef4444;color:#fff;font-size:22px;font-weight:800;padding:3px 10px;border-radius:20px;"></span>
+        <div style="font-size:46px;font-weight:800;color:#ef4444;margin-bottom:14px;display:flex;align-items:center;gap:10px;">
+          ⚠️ রিপোর্টসমূহ <span id="gpd-reports-count-mob" style="background:#ef4444;color:#fff;font-size:39px;font-weight:800;padding:3px 10px;border-radius:20px;"></span>
         </div>
         <div id="gpd-reports-list-mob" style="display:flex;flex-direction:column;gap:12px;"></div>
       </div>
       <div id="gpd-mob-related-wrap" style="margin-top:20px;display:none;">
-        <div style="font-size:32px;font-weight:800;color:#111;margin-bottom:6px;">🔍 সম্পর্কিত পণ্য <span id="gpd-mob-related-label" style="font-size:22px;font-weight:600;color:#f57224;background:#fff3e0;padding:3px 10px;border-radius:20px;"></span></div>
-        <p style="font-size:25px;color:#aaa;margin-bottom:14px;">একই ক্যাটাগরি / ট্যাগের পণ্যসমূহ</p>
+        <div style="font-size:46px;font-weight:800;color:#111;margin-bottom:6px;">🔍 সম্পর্কিত পণ্য <span id="gpd-mob-related-label" style="font-size:39px;font-weight:600;color:#f57224;background:#fff3e0;padding:3px 10px;border-radius:20px;"></span></div>
+        <p style="font-size:39px;color:#aaa;margin-bottom:14px;">একই ক্যাটাগরি / ট্যাগের পণ্যসমূহ</p>
         <div id="gpd-mob-related-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding-bottom:12px;"></div>
       </div>
       <!-- ══ MOBILE FOOTER ══ -->
