@@ -11566,18 +11566,18 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
                     <!-- বন্ধ বাটন -->
                     <button onclick="document.getElementById('pmxHeaderShopModal').remove()"
                         style="background:linear-gradient(135deg,#ef4444,#dc2626);
-                               color:#fff;border:none;
-                               width:${isMob?'65px':'auto'};height:${isMob?'65px':'auto'};
-                               padding:${isMob?'0':'10px 24px'};
-                               border-radius:${isMob?'14px':'22px'};
+                               color:#fff;border:1.5px solid #dc2626;
+                               width:${isMob?'65px':'68px'};height:${isMob?'65px':'68px'};
+                               padding:0;
+                               border-radius:14px;
                                cursor:pointer;font-weight:700;
-                               font-size:${isMob?'28px':'18px'};
+                               font-size:${isMob?'28px':'30px'};
                                font-family:'Hind Siliguri',sans-serif;flex-shrink:0;
-                               display:flex;align-items:center;justify-content:center;gap:5px;
-                               box-shadow:0 2px 10px rgba(239,68,68,0.4);transition:all 0.2s;"
-                        onmouseover="this.style.transform='scale(1.05)'"
-                        onmouseout="this.style.transform='scale(1)'">
-                        ${isMob ? '✕' : '<span>✕</span><span>বন্ধ</span>'}
+                               display:flex;align-items:center;justify-content:center;
+                               box-shadow:0 2px 8px rgba(239,68,68,0.4);transition:all 0.2s;"
+                        onmouseover="this.style.transform='scale(1.08)';this.style.borderColor='#b91c1c'"
+                        onmouseout="this.style.transform='scale(1)';this.style.borderColor='#dc2626'">
+                        ✕
                     </button>
                 </div>
             </div>
