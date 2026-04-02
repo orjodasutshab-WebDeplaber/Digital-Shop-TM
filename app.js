@@ -9798,7 +9798,7 @@ function openSironamShop(id, title) {
                                     setTimeout(function(){inp.focus();},50);
                                 }
                             })()"
-                            style="background:${_isDark ? 'linear-gradient(135deg,#1e293b 0%,#334155 100%)' : 'linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%)'}; border:1.5px solid ${_isDark ? '#475569' : '#cbd5e1'}; color:${_isDark ? '#94a3b8' : '#475569'}; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:17px; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.15); transition:all 0.2s;">
+                            style="background:${_isDark ? 'linear-gradient(135deg,#1e293b 0%,#334155 100%)' : 'linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%)'}; border:1.5px solid ${_isDark ? '#475569' : '#cbd5e1'}; color:${_isDark ? '#94a3b8' : '#475569'}; width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:24px; flex-shrink:0; box-shadow:0 2px 8px rgba(0,0,0,0.15); transition:all 0.2s;">
                         <i class="fa fa-search"></i>
                     </button>
                 </div>
@@ -11133,6 +11133,9 @@ function pmxOpenProductAdmin() {
                 <input id="pmxPrdPrice" type="text" placeholder="দাম *" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
                 <textarea id="pmxPrdDesc" placeholder="বিস্তারিত বিবরণ" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;min-height:80px;resize:vertical;"></textarea>
                 <input id="pmxPrdTB" type="text" placeholder="TB কোড (ঐচ্ছিক)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
+                <label style="color:#94a3b8;font-size:13px;display:block;margin-bottom:6px;"><i class="fa fa-hashtag" style="color:#a78bfa;margin-right:4px;"></i> ট্যাগ যোগ করুন (ঐচ্ছিক)</label>
+                <input id="pmxPrdTags" type="text" placeholder="#ট্যাগ লিখুন, কমা দিয়ে আলাদা করুন (যেমন: #ফ্যাশন, #নতুন)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #7c3aed;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;" oninput="(function(el){var v=el.value;var parts=v.split(',');var fixed=parts.map(function(p){p=p.trimStart();if(p.length>0&&p[0]!=='#')p='#'+p;return p;});el.value=fixed.join(',');})(this)">
+                <p style="color:#6366f1;font-size:11px;margin:-6px 0 10px 2px;">* # দিয়ে শুরু করুন। একাধিক ট্যাগ কমা দিয়ে আলাদা করুন।</p>
                 <label style="color:#94a3b8;font-size:13px;display:block;margin-bottom:6px;">হেডার সিলেক্ট করুন *</label>
                 <select id="pmxPrdHeader" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;">${headerOpts}</select>
                 <button onclick="pmxPublishProduct()" style="width:100%;background:linear-gradient(135deg,#0ea5e9,#0369a1);color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">✅ পাবলিশ করুন</button>
@@ -11146,10 +11149,12 @@ function pmxPublishProduct() {
     const price = document.getElementById('pmxPrdPrice')?.value.trim();
     const desc = document.getElementById('pmxPrdDesc')?.value.trim();
     const tb = document.getElementById('pmxPrdTB')?.value.trim();
+    const tagsRaw = document.getElementById('pmxPrdTags')?.value.trim();
+    const tags = tagsRaw ? tagsRaw.split(',').map(t=>t.trim()).filter(t=>t.length>0) : [];
     const headerId = Number(document.getElementById('pmxPrdHeader')?.value);
     if (!name || !price || !headerId) { showToast('❌ নাম, দাম ও হেডার আবশ্যক!'); return; }
     const products = pmxGetAll(PMX_KEYS.PRODUCTS);
-    const p = { id: Date.now(), img: img||'', name, price, desc: desc||'', tb: tb||'', headerId, createdAt: new Date().toISOString() };
+    const p = { id: Date.now(), img: img||'', name, price, desc: desc||'', tb: tb||'', tags: tags, headerId, createdAt: new Date().toISOString() };
     products.push(p);
     localStorage.setItem(PMX_KEYS.PRODUCTS, JSON.stringify(products));
     const db = pmxDb();
