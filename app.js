@@ -11628,7 +11628,7 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
             <div style="padding:16px 20px 20px 20px;max-width:1520px;margin:0 auto;">
                 ${!products.length
                     ? `<p style="color:${isDark?'#4b5563':'#94a3b8'};text-align:center;padding:40px;">এই হেডারে কোনো প্রোডাক্ট নেই</p>`
-                    : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,200px));gap:${isMob?'10px':'14px'};justify-content:start;">
+                    : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:${isMob?'repeat(2,1fr)':'repeat(auto-fill,minmax(170px,200px))'};gap:${isMob?'12px':'14px'};justify-content:start;">
                         ${products.map(p => {
                             const seed = String(p.id).split('').reduce((a,c)=>a+c.charCodeAt(0),0);
                             const rating = Math.min(5, parseFloat((2 + (seed % 31) / 10).toFixed(1)));
@@ -11636,7 +11636,7 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
                             const fullStars = Math.floor(rating);
                             const halfStar = (rating - fullStars) >= 0.5;
                             const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-                            const starsHtml = '<span style="color:#f59e0b;">' + '★'.repeat(fullStars) + (halfStar?'<span style="color:#f59e0b;">½</span>':'') + '<span style="color:#d1d5db;">' + '★'.repeat(emptyStars) + '</span></span>';
+                            const starsHtml = '<span style="color:#f59e0b;font-size:' + (isMob?'24px':'14px') + ';">' + '★'.repeat(fullStars) + (halfStar?'<span style="color:#f59e0b;">½</span>':'') + '<span style="color:#d1d5db;">' + '★'.repeat(emptyStars) + '</span></span>';
                             const discPct = 10 + (seed % 21);
                             const origPrice = Math.round(parseFloat(p.price) / (1 - discPct/100));
                             const badgeType = seed % 4;
@@ -11655,19 +11655,19 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
                                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 28px rgba(0,0,0,0.18)';this.style.borderColor='${hoverBdr}'"
                                  onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.10)';this.style.borderColor='${cardBdr}'">
                                 <div style="position:relative;">
-                                    <img src="${p.img||'ko.jpeg'}" style="width:100%;height:155px;object-fit:cover;display:block;" onerror="this.src='ko.jpeg'">
-                                    <span style="position:absolute;top:7px;right:7px;background:#ef4444;color:#fff;font-size:10px;font-weight:900;padding:2px 8px;border-radius:20px;letter-spacing:0.3px;">${discPct}% ছাড়</span>
+                                    <img src="${p.img||'ko.jpeg'}" style="width:100%;height:${isMob?'200px':'155px'};object-fit:cover;display:block;" onerror="this.src='ko.jpeg'">
+                                    <span style="position:absolute;top:7px;right:7px;background:#ef4444;color:#fff;font-size:${isMob?'20px':'10px'};font-weight:900;padding:${isMob?'4px 12px':'2px 8px'};border-radius:20px;letter-spacing:0.3px;">${discPct}% ছাড়</span>
                                 </div>
-                                <div style="padding:8px 10px 10px;text-align:left;">
-                                    <div style="color:${nameClr};font-size:13px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;">${p.name}</div>
-                                    <div style="display:flex;align-items:center;gap:5px;margin-bottom:${(fastBadge||verBadge)?'5px':'6px'};">
-                                        <span style="color:${priceClr};font-size:14px;font-weight:900;font-family:'Hind Siliguri',sans-serif;">৳ ${p.price}</span>
-                                        <span style="color:#9ca3af;font-size:11px;text-decoration:line-through;">৳ ${origPrice}</span>
+                                <div style="padding:${isMob?'12px 12px 14px':'8px 10px 10px'};text-align:left;">
+                                    <div style="color:${nameClr};font-size:${isMob?'28px':'13px'};font-weight:700;margin-bottom:${isMob?'8px':'4px'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;">${p.name}</div>
+                                    <div style="display:flex;align-items:center;gap:5px;margin-bottom:${(fastBadge||verBadge)?(isMob?'8px':'5px'):(isMob?'8px':'6px')};">
+                                        <span style="color:${priceClr};font-size:${isMob?'36px':'14px'};font-weight:900;font-family:'Hind Siliguri',sans-serif;">৳ ${p.price}</span>
+                                        <span style="color:#9ca3af;font-size:${isMob?'22px':'11px'};text-decoration:line-through;">৳ ${origPrice}</span>
                                     </div>
-                                    ${(fastBadge||verBadge)?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${fastBadge}${verBadge}</div>`:''}
+                                    ${(fastBadge||verBadge)?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:${isMob?'8px':'6px'};">${fastBadge}${verBadge}</div>`:''}
                                     <div style="display:flex;align-items:center;gap:3px;">
                                         ${starsHtml}
-                                        <span style="color:#9ca3af;font-size:11px;margin-left:2px;">${rating} (${reviewCount})</span>
+                                        <span style="color:#9ca3af;font-size:${isMob?'20px':'11px'};margin-left:2px;">${rating} (${reviewCount})</span>
                                     </div>
                                 </div>
                             </div>`;
