@@ -2016,14 +2016,10 @@ body.is-mobile .gp-grid {
 
 /* ====================== MOBILE OPTIMIZATION ====================== */
 body.is-mobile .gp-name {
-    font-size: 13.8px;
-    line-height: 1.4;
-    
     display: -webkit-box !important;
     -webkit-box-orient: vertical !important;
     -webkit-line-clamp: 2 !important;
     line-clamp: 2 !important;
-    
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
@@ -2079,9 +2075,14 @@ body.is-mobile .gp-name {
 }
 
 /* Mobile Extra Boost */
-body.is-mobile .gp-name { font-size: 13.8px; }
-body.is-mobile .gp-price { font-size: 17px; }
-body.is-mobile .gp-stars { font-size: 15px; }
+body.is-mobile .gp-name { font-size: 32px !important; line-height: 1.4 !important; }
+body.is-mobile .gp-price { font-size: 42px !important; font-weight: 900 !important; }
+body.is-mobile .gp-old-price { font-size: 28px !important; }
+body.is-mobile .gp-stars { font-size: 30px !important; min-height: 40px !important; margin-bottom: 14px !important; }
+body.is-mobile .gp-detail-btn,
+body.is-mobile .gp-buy-btn { font-size: 28px !important; padding: 16px 10px !important; border-radius: 14px !important; }
+body.is-mobile .gp-body { padding: 18px 14px 20px !important; }
+body.is-mobile .gp-btn-row { gap: 12px !important; }
 
 /* ══════════════════════════════════════════════════════════════
    ⭐ STAR COLORS — Light Mode: হলুদ | Dark Mode: লাল

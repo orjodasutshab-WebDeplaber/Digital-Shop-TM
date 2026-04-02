@@ -11589,7 +11589,7 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
                     <input id="pmxShopSearchInput" type="text" placeholder="পণ্য বা #ট্যাগ দিয়ে খুঁজুন..."
                            oninput="pmxFilterShopProducts()"
                            style="flex:1;background:transparent;border:none;color:${srchInpClr};
-                                  font-size:${isMob?'38px':'24px'};
+                                  font-size:${isMob?'48px':'24px'};
                                   font-weight:${isMob?'700':'600'};
                                   padding:0 12px;outline:none;height:100%;
                                   font-family:'Hind Siliguri',sans-serif;">
