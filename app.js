@@ -11588,70 +11588,46 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
             <div style="padding:16px 20px 20px 20px;max-width:1520px;margin:0 auto;">
                 ${!products.length
                     ? `<p style="color:${isDark?'#4b5563':'#94a3b8'};text-align:center;padding:40px;">এই হেডারে কোনো প্রোডাক্ট নেই</p>`
-                    : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:repeat(auto-fill,193px);gap:${isMob?'12px':'16px'};justify-content:start;">
+                    : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,200px));gap:${isMob?'10px':'14px'};justify-content:start;">
                         ${products.map(p => {
-                            // অটো রেটিং — ২.০ থেকে ৫.০ এর মধ্যে (product id দিয়ে consistent)
                             const seed = String(p.id).split('').reduce((a,c)=>a+c.charCodeAt(0),0);
-                            const rawRating = 2 + (seed % 31) / 10;  // 2.0–5.0
-                            const rating = Math.min(5, parseFloat(rawRating.toFixed(1)));
-                            const reviewCount = 10 + (seed % 290);   // 10–299
+                            const rating = Math.min(5, parseFloat((2 + (seed % 31) / 10).toFixed(1)));
+                            const reviewCount = 10 + (seed % 290);
                             const fullStars = Math.floor(rating);
                             const halfStar = (rating - fullStars) >= 0.5;
                             const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-                            const starsHtml = '★'.repeat(fullStars) + (halfStar?'½':'') + '☆'.repeat(emptyStars);
-
-                            // ছাড় — ১০% থেকে ৩০% (auto)
+                            const starsHtml = '<span style="color:#f59e0b;">' + '★'.repeat(fullStars) + (halfStar?'<span style="color:#f59e0b;">½</span>':'') + '<span style="color:#d1d5db;">' + '★'.repeat(emptyStars) + '</span></span>';
                             const discPct = 10 + (seed % 21);
                             const origPrice = Math.round(parseFloat(p.price) / (1 - discPct/100));
-
-                            // Badge — seed অনুযায়ী FAST / Verified / দুটোই / কোনোটাই না
-                            const badgeType = seed % 4; // 0=none,1=fast,2=verified,3=both
-                            const fastBadge = (badgeType===1||badgeType===3) ? `<span style="display:inline-flex;align-items:center;gap:3px;background:#d1fae5;color:#065f46;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;border:1px solid #6ee7b7;">⚡ FAST</span>` : '';
-                            const verBadge  = (badgeType===2||badgeType===3) ? `<span style="display:inline-flex;align-items:center;gap:3px;background:#ede9fe;color:#5b21b6;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;border:1px solid #c4b5fd;">✓ Verified</span>` : '';
-
-                            // কার্ড bg ও info bg থিম অনুযায়ী
-                            const cardBg    = isDark ? '#1e293b' : '#ffffff';
-                            const cardBdr   = isDark ? '#334155' : '#e2e8f0';
-                            const infoBg    = isDark ? '#1a3a2a' : '#c7d9f0';
-                            const nameClr   = isDark ? '#fde68a' : '#1e293b';
-                            const priceClr  = isDark ? '#fb923c' : '#22c55e';
-                            const oldPriceClr = '#9ca3af';
-                            const discBg    = '#ef4444';
-
-                            return `
-                            <div class="pmx-prod-card"
+                            const badgeType = seed % 4;
+                            const fastBadge = (badgeType===1||badgeType===3) ? '<span style="display:inline-flex;align-items:center;gap:2px;background:#d1fae5;color:#065f46;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;border:1px solid #6ee7b7;">⚡ FAST</span>' : '';
+                            const verBadge  = (badgeType===2||badgeType===3) ? '<span style="display:inline-flex;align-items:center;gap:2px;background:#ede9fe;color:#5b21b6;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;border:1px solid #c4b5fd;">✓ Verified</span>' : '';
+                            const cardBg  = isDark ? '#1a2a1a' : '#ffffff';
+                            const cardBdr = isDark ? '#2d4a2d' : '#e5e7eb';
+                            const nameClr = isDark ? '#f0fdf4' : '#111827';
+                            const priceClr= isDark ? '#4ade80' : '#16a34a';
+                            const hoverBdr= isDark ? '#4ade80' : '#a78bfa';
+                            return `<div class="pmx-prod-card"
                                  data-name="${(p.name||'').replace(/"/g,'&quot;')}"
                                  data-tags="${(p.tags||'').replace(/"/g,'&quot;')}"
                                  onclick="pmxOpenBuyModal('${p.id}')"
-                                 style="width:193px;background:${cardBg};border-radius:16px;overflow:hidden;border:1px solid ${cardBdr};text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.08);"
-                                 onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.15)';this.style.borderColor='#a78bfa'"
-                                 onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)';this.style.borderColor='${cardBdr}'">
-
-                                <!-- ছবি -->
+                                 style="background:${cardBg};border-radius:14px;overflow:hidden;border:1.5px solid ${cardBdr};cursor:pointer;transition:transform 0.22s,box-shadow 0.22s,border-color 0.22s;box-shadow:0 2px 8px rgba(0,0,0,0.10);"
+                                 onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 28px rgba(0,0,0,0.18)';this.style.borderColor='${hoverBdr}'"
+                                 onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.10)';this.style.borderColor='${cardBdr}'">
                                 <div style="position:relative;">
-                                    <img src="${p.img||'ko.jpeg'}" style="width:193px;height:160px;object-fit:cover;display:block;" onerror="this.src='ko.jpeg'">
-                                    <!-- ছাড়ের badge — ছবির উপরে ডান কোণে -->
-                                    <span style="position:absolute;top:8px;right:8px;background:${discBg};color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:20px;">${discPct}% ছাড়</span>
+                                    <img src="${p.img||'ko.jpeg'}" style="width:100%;height:155px;object-fit:cover;display:block;" onerror="this.src='ko.jpeg'">
+                                    <span style="position:absolute;top:7px;right:7px;background:#ef4444;color:#fff;font-size:10px;font-weight:900;padding:2px 8px;border-radius:20px;letter-spacing:0.3px;">${discPct}% ছাড়</span>
                                 </div>
-
-                                <!-- info section -->
-                                <div style="padding:9px 10px 10px;background:${infoBg};text-align:left;">
-                                    <!-- নাম -->
-                                    <div style="color:${nameClr};font-size:13px;font-weight:700;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;">${p.name}</div>
-
-                                    <!-- দাম রো -->
-                                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px;">
+                                <div style="padding:8px 10px 10px;text-align:left;">
+                                    <div style="color:${nameClr};font-size:13px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;">${p.name}</div>
+                                    <div style="display:flex;align-items:center;gap:5px;margin-bottom:${(fastBadge||verBadge)?'5px':'6px'};">
                                         <span style="color:${priceClr};font-size:14px;font-weight:900;font-family:'Hind Siliguri',sans-serif;">৳ ${p.price}</span>
-                                        <span style="color:${oldPriceClr};font-size:11px;font-weight:500;text-decoration:line-through;">৳ ${origPrice}</span>
+                                        <span style="color:#9ca3af;font-size:11px;text-decoration:line-through;">৳ ${origPrice}</span>
                                     </div>
-
-                                    <!-- Badge রো -->
-                                    ${(fastBadge||verBadge) ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${fastBadge}${verBadge}</div>` : ''}
-
-                                    <!-- স্টার রেটিং -->
-                                    <div style="display:flex;align-items:center;gap:4px;">
-                                        <span style="color:#f59e0b;font-size:12px;letter-spacing:-1px;">${starsHtml}</span>
-                                        <span style="color:${nameClr};font-size:11px;font-weight:600;opacity:0.8;">${rating} (${reviewCount})</span>
+                                    ${(fastBadge||verBadge)?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${fastBadge}${verBadge}</div>`:''}
+                                    <div style="display:flex;align-items:center;gap:3px;">
+                                        ${starsHtml}
+                                        <span style="color:#9ca3af;font-size:11px;margin-left:2px;">${rating} (${reviewCount})</span>
                                     </div>
                                 </div>
                             </div>`;
