@@ -11515,6 +11515,10 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
     if (el) el.remove();
     const isMob = document.documentElement.classList.contains('is-mobile') || window.screen.width < 800;
     const isDark = document.body.classList.contains('dark-theme');
+    // রিফ্রেশের জন্য সেভ
+    window._pmxCurrentHeaderId   = headerId;
+    window._pmxCurrentHeaderName = headerName;
+    window._pmxCurrentHeaderImg  = headerImg;
     const modalBg    = isDark ? '#0f172a' : '#f1f5f9';
     const headerBg   = isDark ? '#1e293b' : '#ffffff';
     const headerBdr  = isDark ? '#334155' : '#e2e8f0';
@@ -11640,23 +11644,43 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
                             const discPct = 10 + (seed % 21);
                             const origPrice = Math.round(parseFloat(p.price) / (1 - discPct/100));
                             const badgeType = seed % 4;
-                            const fastBadge = (badgeType===1||badgeType===3) ? '<span style="display:inline-flex;align-items:center;gap:2px;background:#d1fae5;color:#065f46;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;border:1px solid #6ee7b7;">⚡ FAST</span>' : '';
-                            const verBadge  = (badgeType===2||badgeType===3) ? '<span style="display:inline-flex;align-items:center;gap:2px;background:#ede9fe;color:#5b21b6;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;border:1px solid #c4b5fd;">✓ Verified</span>' : '';
+                            const bFS  = isMob ? '22px' : '11px';
+                            const fastBadge = (p.fast || badgeType===1||badgeType===3) ? `<span style="display:inline-flex;align-items:center;gap:2px;background:#d1fae5;color:#065f46;font-size:${bFS};font-weight:800;padding:${isMob?'4px 10px':'2px 7px'};border-radius:20px;border:1px solid #6ee7b7;">⚡ FAST</span>` : '';
+                            const verBadge  = (p.verified || badgeType===2||badgeType===3) ? `<span style="display:inline-flex;align-items:center;gap:2px;background:#ede9fe;color:#5b21b6;font-size:${bFS};font-weight:800;padding:${isMob?'4px 10px':'2px 7px'};border-radius:20px;border:1px solid #c4b5fd;">✓ Verified</span>` : '';
                             const cardBg  = isDark ? '#1a2a1a' : '#ffffff';
                             const cardBdr = isDark ? '#2d4a2d' : '#e5e7eb';
                             const nameClr = isDark ? '#f0fdf4' : '#111827';
                             const priceClr= isDark ? '#4ade80' : '#16a34a';
                             const hoverBdr= isDark ? '#4ade80' : '#a78bfa';
+                            const isAdminNow = appState.currentUser && (appState.currentUser.role === 'admin' || appState.currentUser.role === 'sub_admin');
+                            const adminBtns = isAdminNow ? `
+                                <div onclick="event.stopPropagation()" style="position:absolute;top:7px;left:7px;display:flex;gap:5px;z-index:10;">
+                                    <button onclick="event.stopPropagation();pmxEditProduct('${p.id}')"
+                                        style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border:none;
+                                               padding:${isMob?'6px 12px':'4px 9px'};border-radius:8px;
+                                               font-size:${isMob?'18px':'11px'};font-weight:800;cursor:pointer;
+                                               box-shadow:0 2px 6px rgba(59,130,246,0.5);font-family:'Hind Siliguri',sans-serif;">
+                                        ✏️ এডিট
+                                    </button>
+                                    <button onclick="event.stopPropagation();pmxDeleteProduct('${p.id}')"
+                                        style="background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;
+                                               padding:${isMob?'6px 12px':'4px 9px'};border-radius:8px;
+                                               font-size:${isMob?'18px':'11px'};font-weight:800;cursor:pointer;
+                                               box-shadow:0 2px 6px rgba(239,68,68,0.5);font-family:'Hind Siliguri',sans-serif;">
+                                        🗑 ডিলিট
+                                    </button>
+                                </div>` : '';
                             return `<div class="pmx-prod-card"
                                  data-name="${(p.name||'').replace(/"/g,'&quot;')}"
                                  data-tags="${(p.tags||'').replace(/"/g,'&quot;')}"
                                  onclick="pmxOpenBuyModal('${p.id}')"
-                                 style="background:${cardBg};border-radius:14px;overflow:hidden;border:1.5px solid ${cardBdr};cursor:pointer;transition:transform 0.22s,box-shadow 0.22s,border-color 0.22s;box-shadow:0 2px 8px rgba(0,0,0,0.10);"
+                                 style="background:${cardBg};border-radius:14px;overflow:hidden;border:1.5px solid ${cardBdr};cursor:pointer;transition:transform 0.22s,box-shadow 0.22s,border-color 0.22s;box-shadow:0 2px 8px rgba(0,0,0,0.10);position:relative;"
                                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 28px rgba(0,0,0,0.18)';this.style.borderColor='${hoverBdr}'"
                                  onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.10)';this.style.borderColor='${cardBdr}'">
                                 <div style="position:relative;">
                                     <img src="${p.img||'ko.jpeg'}" style="width:100%;height:${isMob?'200px':'155px'};object-fit:cover;display:block;" onerror="this.src='ko.jpeg'">
                                     <span style="position:absolute;top:7px;right:7px;background:#ef4444;color:#fff;font-size:${isMob?'20px':'10px'};font-weight:900;padding:${isMob?'4px 12px':'2px 8px'};border-radius:20px;letter-spacing:0.3px;">${discPct}% ছাড়</span>
+                                    ${adminBtns}
                                 </div>
                                 <div style="padding:${isMob?'12px 12px 14px':'8px 10px 10px'};text-align:left;">
                                     <div style="color:${nameClr};font-size:${isMob?'28px':'13px'};font-weight:700;margin-bottom:${isMob?'8px':'4px'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;">${p.name}</div>
@@ -11767,6 +11791,140 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
         }, 5000);
     }
 }
+
+// ── PMX প্রোডাক্ট ডিলিট (Admin) ─────────────────────────────────────
+window.pmxDeleteProduct = function(productId) {
+    if (!confirm('এই প্রিমিয়াম প্রোডাক্টটি স্থায়ীভাবে মুছে ফেলবেন?')) return;
+    let products = pmxGetAll(PMX_KEYS.PRODUCTS);
+    products = products.filter(p => String(p.id) !== String(productId));
+    localStorage.setItem(PMX_KEYS.PRODUCTS, JSON.stringify(products));
+    const db = (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) ? firebase.firestore() : null;
+    if (db) db.collection('pmx_products').doc(String(productId)).delete().catch(e => console.warn('[PMX del]', e));
+    pmxPushCloud('pmx_products');
+    // গ্রিড রিফ্রেশ
+    const modal = document.getElementById('pmxHeaderShopModal');
+    if (modal) {
+        modal.remove();
+        if (window._pmxCurrentHeaderId !== undefined)
+            pmxOpenHeaderShop(window._pmxCurrentHeaderId, window._pmxCurrentHeaderName, window._pmxCurrentHeaderImg);
+    }
+};
+
+// ── PMX প্রোডাক্ট এডিট (Admin) ────────────────────────────────────
+window.pmxEditProduct = function(productId) {
+    const products = pmxGetAll(PMX_KEYS.PRODUCTS);
+    const p = products.find(x => String(x.id) === String(productId));
+    if (!p) return;
+    const old = document.getElementById('pmxEditModal');
+    if (old) old.remove();
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxEditModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;padding:12px;box-sizing:border-box;">
+        <div style="background:#fff;width:100%;max-width:480px;border-radius:20px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.5);display:flex;flex-direction:column;max-height:92vh;">
+            <!-- Header -->
+            <div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;">
+                <div>
+                    <h3 style="margin:0;font-size:16px;font-weight:700;">⭐ প্রিমিয়াম প্রোডাক্ট এডিট</h3>
+                    <p style="margin:0;font-size:11px;opacity:0.75;">ID: ${p.id}</p>
+                </div>
+                <button onclick="document.getElementById('pmxEditModal').remove()"
+                    style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+            </div>
+            <!-- Body -->
+            <div style="padding:20px;overflow-y:auto;flex:1;">
+                <!-- নাম -->
+                <div style="margin-bottom:14px;">
+                    <label style="display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:5px;">পণ্যের নাম</label>
+                    <input id="pmxEditName" type="text" value="${(p.name||'').replace(/"/g,'&quot;')}"
+                        style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+                </div>
+                <!-- দাম -->
+                <div style="margin-bottom:14px;">
+                    <label style="display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:5px;">দাম (৳)</label>
+                    <input id="pmxEditPrice" type="number" value="${p.price||''}"
+                        style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;box-sizing:border-box;">
+                </div>
+                <!-- বিস্তারিত -->
+                <div style="margin-bottom:14px;">
+                    <label style="display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:5px;">বিস্তারিত বিবরণ</label>
+                    <textarea id="pmxEditDesc" rows="3"
+                        style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;resize:vertical;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">${p.desc||p.description||''}</textarea>
+                </div>
+                <!-- #ট্যাগ -->
+                <div style="margin-bottom:14px;">
+                    <label style="display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:5px;">#ট্যাগ (space দিয়ে আলাদা করুন)</label>
+                    <input id="pmxEditTags" type="text" value="${p.tags||''}" placeholder="#shirt #new #sale"
+                        style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+                </div>
+                <!-- ছবি URL -->
+                <div style="margin-bottom:14px;">
+                    <label style="display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:5px;">ছবির URL</label>
+                    <input id="pmxEditImg" type="text" value="${p.img||''}" placeholder="https://..."
+                        style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;box-sizing:border-box;">
+                    <img id="pmxEditImgPreview" src="${p.img||''}" onerror="this.style.display='none'" onload="this.style.display='block'"
+                        style="width:100%;height:120px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid #e2e8f0;${p.img?'':'display:none'}">
+                </div>
+                <!-- ব্যাজ -->
+                <div style="margin-bottom:18px;background:#f8fafc;padding:14px;border-radius:12px;border:1px solid #e2e8f0;">
+                    <label style="display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:10px;">🏷️ ব্যাজ সিলেক্ট করুন</label>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                        <label style="display:flex;align-items:center;gap:8px;background:${p.fast?'#d1fae5':'#f1f5f9'};border:1.5px solid ${p.fast?'#6ee7b7':'#e2e8f0'};padding:8px 16px;border-radius:30px;cursor:pointer;transition:0.2s;" id="pmxFastLabel">
+                            <input type="checkbox" id="pmxEditFast" ${p.fast?'checked':''} onchange="document.getElementById('pmxFastLabel').style.background=this.checked?'#d1fae5':'#f1f5f9';document.getElementById('pmxFastLabel').style.borderColor=this.checked?'#6ee7b7':'#e2e8f0';"
+                                style="width:16px;height:16px;accent-color:#10b981;cursor:pointer;">
+                            <span style="color:#065f46;font-size:13px;font-weight:800;">⚡ FAST DELIVERY</span>
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;background:${p.verified?'#ede9fe':'#f1f5f9'};border:1.5px solid ${p.verified?'#c4b5fd':'#e2e8f0'};padding:8px 16px;border-radius:30px;cursor:pointer;transition:0.2s;" id="pmxVerLabel">
+                            <input type="checkbox" id="pmxEditVerified" ${p.verified?'checked':''} onchange="document.getElementById('pmxVerLabel').style.background=this.checked?'#ede9fe':'#f1f5f9';document.getElementById('pmxVerLabel').style.borderColor=this.checked?'#c4b5fd':'#e2e8f0';"
+                                style="width:16px;height:16px;accent-color:#7c3aed;cursor:pointer;">
+                            <span style="color:#5b21b6;font-size:13px;font-weight:800;">✓ VERIFIED</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div style="padding:14px 20px;background:#f8fafc;border-top:1px solid #e2e8f0;display:flex;gap:10px;flex-shrink:0;">
+                <button onclick="document.getElementById('pmxEditModal').remove()"
+                    style="flex:1;padding:11px;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;color:#64748b;font-weight:600;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">বাতিল</button>
+                <button onclick="pmxSaveEditProduct('${p.id}')"
+                    style="flex:2;padding:11px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-size:14px;">✅ সেভ করুন</button>
+            </div>
+        </div>
+    </div>`);
+    // ছবি preview live update
+    document.getElementById('pmxEditImg').addEventListener('input', function() {
+        const prev = document.getElementById('pmxEditImgPreview');
+        prev.src = this.value;
+        prev.style.display = this.value ? 'block' : 'none';
+    });
+};
+
+// ── PMX এডিট সেভ ──────────────────────────────────────────────────
+window.pmxSaveEditProduct = function(productId) {
+    let products = pmxGetAll(PMX_KEYS.PRODUCTS);
+    const idx = products.findIndex(x => String(x.id) === String(productId));
+    if (idx === -1) return;
+    products[idx].name        = document.getElementById('pmxEditName').value.trim();
+    products[idx].price       = document.getElementById('pmxEditPrice').value.trim();
+    products[idx].desc        = document.getElementById('pmxEditDesc').value.trim();
+    products[idx].description = products[idx].desc;
+    products[idx].tags        = document.getElementById('pmxEditTags').value.trim();
+    products[idx].img         = document.getElementById('pmxEditImg').value.trim();
+    products[idx].fast        = document.getElementById('pmxEditFast').checked;
+    products[idx].verified    = document.getElementById('pmxEditVerified').checked;
+    localStorage.setItem(PMX_KEYS.PRODUCTS, JSON.stringify(products));
+    const db = (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) ? firebase.firestore() : null;
+    if (db) db.collection('pmx_products').doc(String(productId)).set(products[idx]).catch(e => console.warn('[PMX edit]', e));
+    pmxPushCloud('pmx_products');
+    document.getElementById('pmxEditModal').remove();
+    // modal রিফ্রেশ
+    const modal = document.getElementById('pmxHeaderShopModal');
+    if (modal) {
+        const hId   = window._pmxCurrentHeaderId;
+        const hName = window._pmxCurrentHeaderName;
+        const hImg  = window._pmxCurrentHeaderImg;
+        modal.remove();
+        if (hId !== undefined) pmxOpenHeaderShop(hId, hName, hImg);
+    }
+};
 
 // ── PMX Shop সার্চ toggle ──────────────────────────────────────────
 function pmxToggleShopSearch() {
