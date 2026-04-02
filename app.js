@@ -11513,73 +11513,159 @@ function pmxRefreshDisplay() {
 function pmxOpenHeaderShop(headerId, headerName, headerImg) {
     const el = document.getElementById('pmxHeaderShopModal');
     if (el) el.remove();
+    const isMob = document.documentElement.classList.contains('is-mobile') || window.screen.width < 800;
     const isDark = document.body.classList.contains('dark-theme');
-    // লাইট মোড (নীল bg): কার্ড info → হালকা কালো bg, কালো রঙের টেক্সট
-    // ডার্ক মোড (সবুজ bg): কার্ড info → হালকা হলুদ bg, হলুদ রঙের টেক্সট
-    const cardInfoBg  = isDark ? '#3a3200' : '#2a2a2a';   // হালকা হলুদ-কালো | হালকা কালো
-    const nameClr     = isDark ? '#fde68a' : '#d1d5db';   // হালকা হলুদ | হালকা ধূসর-সাদা
-    const priceClr    = isDark ? '#fbbf24' : '#a3e635';   // হলুদ | সবুজাভ উজ্জ্বল
+    const modalBg    = isDark ? '#0f172a' : '#f1f5f9';
+    const headerBg   = isDark ? '#1e293b' : '#ffffff';
+    const headerBdr  = isDark ? '#334155' : '#e2e8f0';
+    const titleClr   = isDark ? '#a78bfa' : '#4f46e5';
+    const srchBtnBg  = isDark ? '#1e293b' : '#ffffff';
+    const srchBtnBdr = isDark ? '#475569' : '#d1d5db';
+    const srchBtnClr = isDark ? '#ffffff' : '#1a1a1a';
+    const srchExpBg  = isDark ? '#1e293b' : '#f8fafc';
+    const srchExpBdr = isDark ? '#334155' : '#e2e8f0';
+    const srchBoxBg  = isDark ? '#0f172a' : '#f1f5f9';
+    const srchInpClr = isDark ? '#e2e8f0' : '#1e293b';
+    const srchIconClr= isDark ? '#94a3b8' : '#64748b';
+    const cardInfoBg = isDark ? '#1a3a2a' : '#c7d9f0';
+    const nameFontClr= isDark ? '#e2e8f0' : '#1e293b';
+    const priceFontClr= isDark ? '#10b981' : '#0369a1';
+
     const allProducts = pmxGetAll(PMX_KEYS.PRODUCTS);
     const products = allProducts.filter(p => p.headerId === headerId || String(p.headerId) === String(headerId));
     const allHolders = pmxGetAll(PMX_KEYS.HOLDERS);
-    // এই হেডারের holders অথবা global (headerId খালি) holders
     const holders = allHolders.filter(h => !h.headerId || String(h.headerId) === String(headerId));
     const holderSlides = holders.length
         ? holders.map((h,i) => `<div class="pmx-slide" style="position:absolute;inset:0;display:${i===0?'block':'none'};"><img src="${h.img}" style="width:100%;height:100%;object-fit:fill;" onerror="this.style.opacity='0'"></div>`).join('')
         : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#4b5563;font-size:14px;">হোল্ডার বোর্ড এখনো নেই</div>';
 
     document.body.insertAdjacentHTML('beforeend', `
-    <div id="pmxHeaderShopModal" style="position:fixed;inset:0;background:#0f172a;z-index:999999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;">
+    <div id="pmxHeaderShopModal" style="position:fixed;inset:0;background:${modalBg};z-index:999999999;overflow-y:auto;font-family:'Hind Siliguri',sans-serif;">
+
         <!-- Sticky Header -->
-        <div style="position:sticky;top:0;background:#1e293b;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155;z-index:10;gap:10px;">
-            <h2 style="color:#a78bfa;margin:0;font-size:17px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">⭐ ${headerName}</h2>
-            <!-- সার্চ আইকন — মেইন হেডারের মতো -->
-            <button id="pmxShopSearchBtn" onclick="pmxToggleShopSearch()" style="background:linear-gradient(135deg,#6366f1 0%,#a855f7 100%);border:none;color:#fff;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;flex-shrink:0;box-shadow:0 4px 15px rgba(99,102,241,0.4);transition:opacity 0.2s,transform 0.2s;" onmouseover="this.style.opacity='0.85';this.style.transform='scale(1.08)'" onmouseout="this.style.opacity='1';this.style.transform='scale(1)'">
-                <i class="fa fa-search"></i>
-            </button>
-            <button onclick="document.getElementById('pmxHeaderShopModal').remove()" style="background:#ef4444;color:#fff;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:700;font-family:'Hind Siliguri',sans-serif;flex-shrink:0;">✕ বন্ধ</button>
+        <div style="position:sticky;top:0;background:${headerBg};padding:12px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid ${headerBdr};z-index:10;gap:10px;">
+            <h2 style="color:${titleClr};margin:0;font-size:17px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">⭐ ${headerName}</h2>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                <button id="pmxShopSearchBtn" onclick="pmxToggleShopSearch()" style="background:${srchBtnBg};border:2px solid ${srchBtnBdr};color:${srchBtnClr};width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:all 0.2s;">
+                    <i class="fa fa-search"></i>
+                </button>
+                <button onclick="document.getElementById('pmxHeaderShopModal').remove()" style="background:#ef4444;color:#fff;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-weight:700;font-family:'Hind Siliguri',sans-serif;flex-shrink:0;">✕ বন্ধ</button>
+            </div>
         </div>
-        <!-- সার্চ বার — toggle করলে নিচে নামে -->
-        <div id="pmxShopSearchExpanded" style="display:none;background:#1e293b;border-bottom:1px solid #334155;padding:10px 16px;">
-            <div style="display:flex;align-items:center;background:#0f172a;border:1.5px solid #334155;border-radius:12px;overflow:hidden;height:44px;">
-                <i class="fa fa-search" style="color:#94a3b8;font-size:14px;padding:0 10px 0 14px;flex-shrink:0;"></i>
-                <input id="pmxShopSearchInput" type="text" placeholder="পণ্য খুঁজুন..." oninput="pmxFilterShopProducts()" style="flex:1;background:transparent;border:none;color:#e2e8f0;font-size:14px;padding:0 10px;outline:none;height:100%;font-family:'Hind Siliguri',sans-serif;">
+
+        <!-- সার্চ বার — toggle -->
+        <div id="pmxShopSearchExpanded" style="display:none;background:${srchExpBg};border-bottom:1px solid ${srchExpBdr};padding:10px 16px;">
+            <div style="display:flex;align-items:center;background:${srchBoxBg};border:1.5px solid ${srchExpBdr};border-radius:12px;overflow:hidden;height:44px;">
+                <i class="fa fa-search" style="color:${srchIconClr};font-size:14px;padding:0 10px 0 14px;flex-shrink:0;"></i>
+                <input id="pmxShopSearchInput" type="text" placeholder="পণ্য বা #ট্যাগ দিয়ে খুঁজুন..." oninput="pmxFilterShopProducts()" style="flex:1;background:transparent;border:none;color:${srchInpClr};font-size:14px;padding:0 10px;outline:none;height:100%;font-family:'Hind Siliguri',sans-serif;">
                 <button onclick="pmxToggleShopSearch()" style="background:#ef4444;border:none;color:#fff;height:44px;padding:0 16px;font-size:16px;font-weight:700;cursor:pointer;border-radius:0 10px 10px 0;">✕</button>
             </div>
         </div>
+
         <!-- হোল্ডার বোর্ড -->
-        <div id="pmxHolderBoard" style="width:100%;max-width:1520px;height:350px;margin:20px auto;background:#0a0a0a;border-radius:0;overflow:hidden;border:1px solid #334151;position:relative;">
+        <div id="pmxHolderBoard" style="width:100%;max-width:1520px;height:350px;margin:20px auto;background:#0a0a0a;border-radius:0;overflow:hidden;border:1px solid #334151;position:relative;transition:all 0.3s ease;">
             ${holderSlides}
             ${holders.length > 1 ? `
-            <!-- বাম বাটন -->
             <button onclick="pmxSlideNav(-1)" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:2px solid rgba(255,255,255,0.3);width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;z-index:10;transition:all 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.6)'">&#8249;</button>
-            <!-- ডান বাটন -->
             <button onclick="pmxSlideNav(1)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.6);color:#fff;border:2px solid rgba(255,255,255,0.3);width:44px;height:44px;border-radius:50%;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;z-index:10;transition:all 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.6)'">&#8250;</button>
-            <!-- dots -->
             <div style="position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10;">
                 ${holders.map((_,i)=>`<div id="pmxDot${i}" style="width:${i===0?'20':'8'}px;height:8px;border-radius:4px;background:${i===0?'#a78bfa':'rgba(255,255,255,0.4)'};transition:all 0.3s;"></div>`).join('')}
             </div>` : ''}
         </div>
-        <!-- প্রোডাক্ট গ্রিড -->
-        <div style="padding:20px;max-width:1520px;margin:0 auto;">
-            ${!products.length
-                ? '<p style="color:#4b5563;text-align:center;padding:40px;">এই হেডারে কোনো প্রোডাক্ট নেই</p>'
-                : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:repeat(auto-fill,193px);gap:14px;justify-content:start;">
-                    ${products.map(p => `
-                        <div class="pmx-prod-card"
-                             data-name="${(p.name||'').replace(/"/g,'&quot;')}"
-                             data-tags="${(p.tags||'').replace(/"/g,'&quot;')}"
-                             onclick="pmxOpenBuyModal('${p.id}')"
-                             style="width:193px;background:${isDark?'#1e293b':'#ffffff'};border-radius:12px;overflow:hidden;border:1px solid ${isDark?'#334155':'#e2e8f0'};text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;"
-                             onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 12px 30px rgba(167,139,250,0.25)';this.style.borderColor='#a78bfa'"
-                             onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none';this.style.borderColor='${isDark?'#334155':'#e2e8f0'}'">
-                            <img src="${p.img||'ko.jpeg'}" style="width:193px;height:193px;object-fit:fill;display:block;" onerror="this.src='ko.jpeg'">
-                            <div style="padding:10px 12px;background:${cardInfoBg};">
-                                <div style="color:${nameClr};font-size:13px;font-weight:800;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;letter-spacing:0.01em;">${p.name}</div>
-                                <div style="color:${priceClr};font-size:15px;font-weight:900;font-family:'Hind Siliguri',sans-serif;letter-spacing:0.02em;">৳ ${p.price}</div>
+
+        <!-- সকল পণ্য wrapper — হালকা bg, এখান থেকে footer পর্যন্ত -->
+        <div style="background:${cardInfoBg};">
+            <!-- সকল পণ্য হেডিং -->
+            <div style="padding:10px 20px 0 20px;">
+                <span style="font-family:'Georgia',serif;font-size:clamp(14px,2.5vw,22px);font-weight:900;letter-spacing:0.06em;text-transform:uppercase;color:${isDark?'#14532d':'#1e3a5f'};display:inline-block;border-bottom:3px solid ${isDark?'#86efac':'#60a5fa'};background:${isDark?'#dcfce7':'#dbeafe'};padding:4px 14px;border-radius:6px;">
+                    সকল পণ্য
+                </span>
+            </div>
+            <!-- সরু কালো বার -->
+            <div style="width:100%;height:4px;background:#000000;margin-top:6px;"></div>
+
+            <!-- প্রোডাক্ট গ্রিড -->
+            <div style="padding:16px 20px 20px 20px;max-width:1520px;margin:0 auto;">
+                ${!products.length
+                    ? `<p style="color:${isDark?'#4b5563':'#94a3b8'};text-align:center;padding:40px;">এই হেডারে কোনো প্রোডাক্ট নেই</p>`
+                    : `<div id="pmxShopProductGrid" style="display:grid;grid-template-columns:repeat(auto-fill,193px);gap:${isMob?'12px':'16px'};justify-content:start;">
+                        ${products.map(p => `
+                            <div class="pmx-prod-card"
+                                 data-name="${(p.name||'').replace(/"/g,'&quot;')}"
+                                 data-tags="${(p.tags||'').replace(/"/g,'&quot;')}"
+                                 onclick="pmxOpenBuyModal('${p.id}')"
+                                 style="width:193px;background:${isDark?'#1e293b':'#ffffff'};border-radius:16px;overflow:hidden;border:1px solid ${isDark?'#334155':'#e2e8f0'};text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;"
+                                 onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 12px 30px rgba(167,139,250,0.25)';this.style.borderColor='#a78bfa'"
+                                 onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none';this.style.borderColor='${isDark?'#334155':'#e2e8f0'}'">
+                                <img src="${p.img||'ko.jpeg'}" style="width:193px;height:193px;object-fit:fill;display:block;" onerror="this.src='ko.jpeg'">
+                                <div style="padding:10px 12px;background:${cardInfoBg};">
+                                    <div style="color:${nameFontClr};font-size:13px;font-weight:800;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;letter-spacing:0.01em;">${p.name}</div>
+                                    <div style="color:${priceFontClr};font-size:15px;font-weight:900;font-family:'Hind Siliguri',sans-serif;letter-spacing:0.02em;">৳ ${p.price}</div>
+                                </div>
+                            </div>`).join('')}
+                    </div>`}
+            </div>
+
+            <!-- Footer -->
+            <footer style="background:#111827;color:#d1d5db;padding:50px 20px 20px;border-top:1px solid #374151;font-family:sans-serif;margin-top:10px;">
+                <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;">
+                    <div>
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:15px;">
+                            <img src="ko.jpeg" alt="Logo" style="width:48px;height:48px;border-radius:10px;object-fit:fill;border:2px solid #10b981;" onerror="this.style.display='none'">
+                            <h2 style="color:#10b981;margin:0;">Digital Shop TM</h2>
+                        </div>
+                        <p style="font-size:14px;line-height:1.6;">আপনার বিশ্বস্ত অনলাইন শপ।</p>
+                    </div>
+                    <div>
+                        <h3 style="color:white;font-size:18px;margin-bottom:20px;">COMPANY</h3>
+                        <ul style="list-style:none;padding:0;font-size:14px;line-height:2.5;">
+                            <li><a href="javascript:void(0)" onclick="openAboutModal()" style="color:#9ca3af;text-decoration:none;">About Us</a></li>
+                            <li><a href="javascript:void(0)" onclick="openTermsModal()" style="color:#9ca3af;text-decoration:none;">Terms &amp; Conditions</a></li>
+                            <li><a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:#9ca3af;text-decoration:none;">Privacy Policy</a></li>
+                            <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af;text-decoration:none;">Cancellation &amp; Return Policy</a></li>
+                            <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af;text-decoration:none;">FAQs</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 style="color:white;font-size:18px;margin-bottom:20px;">QUICK HELP</h3>
+                        <ul style="list-style:none;padding:0;font-size:14px;line-height:2.5;">
+                            <li><a href="javascript:void(0)" onclick="openCustomerCareModal()" style="color:#9ca3af;text-decoration:none;">গ্রাহক সেবা</a></li>
+                            <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af;text-decoration:none;">কিভাবে কিনবেন</a></li>
+                            <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af;text-decoration:none;">রিটার্ন ও রিফান্ড</a></li>
+                            <li><a href="tel:+8801707498418" style="color:#9ca3af;text-decoration:none;">যোগাযোগ: +8801707498418</a></li>
+                        </ul>
+                        <p style="margin-top:15px;font-size:14px;">Hotline: +8801707498418</p>
+                    </div>
+                    <div>
+                        <h3 style="color:white;font-size:18px;margin-bottom:20px;">VERIFIED BY</h3>
+                        <div style="margin-bottom:15px;">
+                            <p style="font-size:12px;margin-bottom:5px;">DBID ID: 437361334</p>
+                            <p style="font-size:12px;">Registration ID: 304903094</p>
+                        </div>
+                        <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" style="height:35px;">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" style="height:35px;">
+                        </div>
+                        <div style="margin-top:18px;">
+                            <p style="font-size:12px;color:#6b7280;margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">পেমেন্ট মেথড</p>
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+                                <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o1.jpg" alt="bKash" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#E2136E';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>bKash</span>'"></div>
+                                <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o2.png" alt="Nagad" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#F15922';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>Nagad</span>'"></div>
+                                <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o3.png" alt="Rocket" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#8B008B';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>Rocket</span>'"></div>
+                                <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o4.png" alt="Upay" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#EE3424';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>Upay</span>'"></div>
+                                <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o5.jpg" alt="DBBL" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#006838';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>DBBL</span>'"></div>
+                                <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o6.png" alt="City Bank" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#003087';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:13px;padding:0 6px>City Bank</span>'"></div>
+                                <div style="background:#fff;border-radius:8px;padding:4px 6px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.15);"><img src="o7.jpg" alt="Islami Bank" style="height:28px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#1d4ed8';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:12px;padding:0 6px>Islami Bank</span>'"></div>
                             </div>
-                        </div>`).join('')}
-                </div>`}
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:30px;font-size:13px;color:#6b7280;">
+                    <hr style="border:0;border-top:1px solid #374151;margin-bottom:20px;">
+                    <p>© 2026 <strong>Digital Shop TM</strong>. সর্বস্বত্ব সংরক্ষিত।</p>
+                    <p style="margin-top:5px;">Developed by: <span style="color:#10b981;">Digital Shop TM Team</span></p>
+                </div>
+            </footer>
         </div>
     </div>`);
 
@@ -11623,20 +11709,36 @@ function pmxToggleShopSearch() {
         const inp = document.getElementById('pmxShopSearchInput');
         if (inp) { inp.value = ''; inp.focus(); pmxFilterShopProducts(); }
     } else {
-        // বন্ধ হলে সব প্রোডাক্ট আবার দেখাও
-        pmxFilterShopProducts('');
+        // সার্চ বার বন্ধ — ইনপুট খালি করে সব রিসেট
+        const inp = document.getElementById('pmxShopSearchInput');
+        if (inp) inp.value = '';
+        pmxFilterShopProducts();
     }
 }
 // ── PMX Shop সার্চ ফিল্টার ──────────────────────────────────────────
+// ── PMX Shop সার্চ ফিল্টার ──────────────────────────────────────────
 function pmxFilterShopProducts() {
     const inp = document.getElementById('pmxShopSearchInput');
-    const term = inp ? inp.value.toLowerCase().trim() : '';
+    const raw = inp ? inp.value.trim() : '';
+    const term = raw.toLowerCase().replace(/^#+/, '');
+
+    // হোল্ডার বোর্ড hide/show
+    const holderBoard = document.getElementById('pmxHolderBoard');
+    if (holderBoard) {
+        if (term !== '') {
+            holderBoard.style.display = 'none';
+        } else {
+            holderBoard.style.display = 'block';
+        }
+    }
+
     const grid = document.getElementById('pmxShopProductGrid');
     if (!grid) return;
     const cards = grid.querySelectorAll('.pmx-prod-card');
     cards.forEach(function(card) {
         const name = (card.getAttribute('data-name') || '').toLowerCase();
-        card.style.display = (!term || name.includes(term)) ? '' : 'none';
+        const tags = (card.getAttribute('data-tags') || '').toLowerCase();
+        card.style.display = (!term || name.includes(term) || tags.includes(term)) ? '' : 'none';
     });
 }
 
