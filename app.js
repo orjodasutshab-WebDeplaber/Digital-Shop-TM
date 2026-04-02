@@ -11977,49 +11977,284 @@ function pmxFilterShopProducts() {
 // ══════════════════════════════════════════════════════════════════
 // 8. BUY MODAL
 // ══════════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════════
+   PMX PREMIUM PRODUCT DETAILS — Full-Screen v3.0
+   PC: ছবি বামে, তথ্য ডানে | Mobile: ছবি উপরে, তথ্য নিচে
+   নাইট মোড সাপোর্ট | জেনারেটিভ সেল কাউন্টার (১০০০–২০,০০,০০,০০০)
+   পুরনো buy modal এর সব ফাংশন অক্ষুণ্ণ
+   ═══════════════════════════════════════════════════════════════════ */
 function pmxOpenBuyModal(productId) {
     const products = pmxGetAll(PMX_KEYS.PRODUCTS);
     const p = products.find(p => String(p.id) === String(productId));
     if (!p) return;
+
     const el = document.getElementById('pmxBuyModal');
     if (el) el.remove();
-    document.body.insertAdjacentHTML('beforeend', `
-    <div id="pmxBuyModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
-        <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:480px;max-height:90vh;overflow-y:auto;border:1px solid #10b981;position:relative;">
-            <button onclick="document.getElementById('pmxBuyModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
-            ${p.img ? `<img src="${p.img}" style="width:100%;max-height:180px;object-fit:fill;border-radius:12px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
-            <div style="color:#fff;font-size:17px;font-weight:700;margin-bottom:4px;">${p.name}</div>
-            <div style="color:#10b981;font-size:16px;font-weight:700;margin-bottom:8px;">৳${p.price}</div>
-            ${p.desc ? `<div style="color:#94a3b8;font-size:13px;margin-bottom:14px;line-height:1.5;">${p.desc}</div>` : ''}
-            <div style="background:#0f172a;border-radius:12px;padding:14px;margin-bottom:14px;">
-                <input id="pmxBuyUserId" placeholder="ইউজার আইডি / মোবাইল / লিংক" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
-                <input id="pmxBuyMobile" placeholder="আপনার মোবাইল নম্বর" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
-                <!-- পেমেন্ট method -->
-                <label style="color:#94a3b8;font-size:13px;display:block;margin-bottom:8px;">পেমেন্ট পদ্ধতি *</label>
-                <div style="display:flex;gap:10px;margin-bottom:12px;">
-                    <label onclick="pmxSelectPayment('bkash')" id="pmxPayBkash" style="flex:1;display:flex;align-items:center;gap:8px;padding:10px;background:#1e293b;border:2px solid #e91e8c;border-radius:10px;cursor:pointer;">
-                        <input type="radio" name="pmxPayMethod" value="bkash" checked style="accent-color:#e91e8c;">
-                        <span style="color:#fff;font-size:13px;font-weight:700;">💳 বিকাশ</span>
-                    </label>
-                    <label onclick="pmxSelectPayment('nagad')" id="pmxPayNagad" style="flex:1;display:flex;align-items:center;gap:8px;padding:10px;background:#1e293b;border:2px solid #374151;border-radius:10px;cursor:pointer;">
-                        <input type="radio" name="pmxPayMethod" value="nagad" style="accent-color:#f97316;">
-                        <span style="color:#fff;font-size:13px;font-weight:700;">💳 নগদ</span>
-                    </label>
-                </div>
-                <!-- payment info box -->
-                <div id="pmxPayInfoBox" style="background:rgba(233,30,140,0.1);border:1px solid #e91e8c;border-radius:10px;padding:12px;margin-bottom:12px;">
-                    <div style="color:#f9a8d4;font-size:12px;margin-bottom:4px;">বিকাশ নম্বরে পাঠান:</div>
-                    <div style="color:#fff;font-size:16px;font-weight:700;letter-spacing:1px;">018*********</div>
-                    <div style="color:#94a3b8;font-size:11px;margin-top:4px;">(Send Money করুন)</div>
-                </div>
-                <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *" style="width:100%;padding:10px;border-radius:8px;border:2px solid #6366f1;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-weight:600;">
-                <div style="background:rgba(245,158,11,0.1);border:1px solid #f59e0b;border-radius:8px;padding:10px;font-size:12px;color:#fcd34d;line-height:1.6;margin-bottom:14px;">
-                    📌 অর্ডার হওয়ার পর আপনাকে মেসেজ দিয়ে বিস্তারিত জানতে চাওয়া হবে। কোনো কিছু ভুল বা না বুঝলে ওখানে জানিয়ে দেওয়া হবে। তাই অর্ডার করুন, পরে সংশোধন করতে পারবেন।
-                </div>
-                <button onclick="pmxPlaceOrder('${p.id}')" style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:14px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">🛒 Buy করুন</button>
-            </div>
+
+    // ── থিম ডিটেক্ট ──
+    const isDark = document.body.classList.contains('dark-theme');
+    const isMob  = document.documentElement.classList.contains('is-mobile');
+
+    // ── থিম রঙ ──
+    const pageBg   = isDark ? '#0f172a' : '#f8fafc';
+    const cardBg   = isDark ? '#1e293b' : '#ffffff';
+    const headerBg = isDark ? 'rgba(15,23,42,0.97)' : 'rgba(255,255,255,0.97)';
+    const borderC  = isDark ? '#334155' : '#e2e8f0';
+    const titleC   = isDark ? '#f1f5f9' : '#0f172a';
+    const mutedC   = isDark ? '#94a3b8' : '#64748b';
+    const priceC   = isDark ? '#34d399' : '#059669';
+    const inputBg  = isDark ? '#0f172a' : '#f1f5f9';
+    const inputClr = isDark ? '#e2e8f0' : '#1e293b';
+    const inputBdr = isDark ? '#334155' : '#cbd5e1';
+    const sectionBg= isDark ? '#1a2744' : '#f0f9ff';
+    const sectionBdr= isDark ? '#2d4a6a' : '#bfdbfe';
+    const labelC   = isDark ? '#7dd3fc' : '#1d4ed8';
+    const accentGold= '#f5c518';
+
+    // ── জেনারেটিভ সেল কাউন্টার ──
+    // প্রতিটি পণ্যের জন্য unique seed → সংখ্যা বাড়বে, max হলে reset
+    const _pid = String(p.id || p.name || '');
+    const _seed = _pid.split('').reduce((a,c,i)=>a+c.charCodeAt(0)*(i+3),0);
+    const _storageKey = 'pmx_salecnt_' + _pid;
+    const _min = 1000;
+    const _max = 200000000; // ২০ কোটি
+    let _curSale = parseInt(localStorage.getItem(_storageKey) || '0');
+    if (!_curSale || _curSale < _min) {
+        // প্রথমবার: seed থেকে _min-_max এর মধ্যে random শুরু
+        _curSale = _min + (_seed % (_max - _min));
+    }
+    // প্রতি ওপেনে random ৩–৪৭ যোগ হয়
+    const _increment = 3 + (_seed % 45);
+    _curSale += _increment;
+    if (_curSale >= _max) _curSale = _min + (_seed % 50000); // reset
+    localStorage.setItem(_storageKey, String(_curSale));
+    const _saleDisplay = _curSale.toLocaleString('bn-BD');
+
+    // ── পুরনো price/discount লজিক ──
+    const _dpSeed2 = _pid.split('').reduce((acc,c,i)=>acc+c.charCodeAt(0)*(i+7),0);
+    let dispOldPrice = parseFloat(p.origPrice || p.oldPrice || 0);
+    if (!dispOldPrice || dispOldPrice <= parseFloat(p.price)) {
+        const _opSeed = _dpSeed2 % 1000;
+        const multiplier = 1.12 + (_opSeed / 1000) * 0.22;
+        dispOldPrice = Math.ceil(parseFloat(p.price) * multiplier / 10) * 10;
+    }
+    const discPct = dispOldPrice > parseFloat(p.price)
+        ? Math.round((dispOldPrice - parseFloat(p.price)) / dispOldPrice * 100)
+        : 0;
+
+    // ── Stars ──
+    const spHash2 = _pid.split('').reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,0);
+    const spRating = Math.min(5.0, Math.max(3.5, 3.5 + (spHash2 % 16) * 0.1));
+    const spRevCnt = 50 + (spHash2 % 950);
+    const fullStars2 = Math.floor(spRating);
+    const halfStar2 = (spRating - fullStars2) >= 0.5;
+    let starsHtml2 = '';
+    for(let i=0;i<fullStars2;i++) starsHtml2+='<span style="color:#f59e0b;">★</span>';
+    if(halfStar2) starsHtml2+='<span style="color:#f59e0b;font-size:0.9em;">½</span>';
+    for(let i=fullStars2+(halfStar2?1:0);i<5;i++) starsHtml2+='<span style="color:#d1d5db;">★</span>';
+
+    // ── PC লেআউট ──
+    const pcLayout = `
+    <div style="display:flex;height:100%;overflow:hidden;">
+      <!-- বাম: ছবি -->
+      <div style="width:48%;flex-shrink:0;background:${isDark?'#111827':'#f9fafb'};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 30px;border-right:1px solid ${borderC};">
+        <div style="width:100%;max-width:440px;border-radius:16px;overflow:hidden;border:2px solid ${borderC};box-shadow:0 8px 32px rgba(0,0,0,0.18);background:${cardBg};aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;">
+          <img src="${p.img||''}" id="pmxDetImg" style="width:100%;height:100%;object-fit:contain;display:block;" onerror="this.src='ko.jpeg'">
         </div>
+        <!-- সেল কাউন্টার ব্যাজ -->
+        <div style="margin-top:20px;background:linear-gradient(135deg,${isDark?'#1e3a2a':'#ecfdf5'},${isDark?'#0d2a1a':'#d1fae5'});border:1.5px solid ${isDark?'#34d399':'#10b981'};border-radius:16px;padding:14px 24px;text-align:center;width:100%;max-width:440px;box-sizing:border-box;">
+          <div style="color:${mutedC};font-size:12px;font-weight:600;margin-bottom:4px;letter-spacing:0.5px;">🔥 সর্বমোট অর্ডার করেছেন</div>
+          <div id="pmxSaleCntPC" style="color:${priceC};font-size:28px;font-weight:900;font-family:'Hind Siliguri',sans-serif;letter-spacing:1px;">${_saleDisplay} জন</div>
+          <div style="color:${mutedC};font-size:11px;margin-top:3px;">এই পণ্য সংখ্যা বাড়ছে ↑</div>
+        </div>
+      </div>
+      <!-- ডান: তথ্য -->
+      <div style="flex:1;overflow-y:auto;padding:0;background:${pageBg};">
+        <!-- sticky top bar -->
+        <div style="position:sticky;top:0;background:${headerBg};backdrop-filter:blur(12px);border-bottom:1px solid ${borderC};padding:14px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:1px;">⭐ PREMIUM</span>
+            <span style="color:${mutedC};font-size:13px;">${p.name||''}</span>
+          </div>
+          <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';"
+            style="background:${isDark?'#334155':'#f1f5f9'};border:1px solid ${borderC};color:${titleC};width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.2s;"
+            onmouseover="this.style.background='#ef4444';this.style.color='#fff'"
+            onmouseout="this.style.background='${isDark?'#334155':'#f1f5f9'}';this.style.color='${titleC}'">✕</button>
+        </div>
+        <div style="padding:28px 32px 40px;">
+          <!-- নাম -->
+          <h1 style="color:${titleC};font-size:22px;font-weight:800;margin:0 0 12px;line-height:1.5;font-family:'Hind Siliguri',sans-serif;">${p.name||''}</h1>
+          <!-- স্টার -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+            <div style="font-size:18px;">${starsHtml2}</div>
+            <span style="color:${accentGold};font-size:14px;font-weight:700;">${spRating.toFixed(1)}</span>
+            <span style="color:${mutedC};font-size:13px;">(${spRevCnt} রিভিউ)</span>
+          </div>
+          <!-- দাম -->
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+            <span style="color:${priceC};font-size:36px;font-weight:900;font-family:'Hind Siliguri',sans-serif;">৳${p.price}</span>
+            ${dispOldPrice?`<span style="color:${mutedC};font-size:18px;text-decoration:line-through;">৳${dispOldPrice}</span>`:''}
+            ${discPct?`<span style="background:#ef4444;color:#fff;font-size:13px;font-weight:800;padding:4px 12px;border-radius:6px;">${discPct}% ছাড়</span>`:''}
+          </div>
+          <!-- সেল কাউন্টার মিনি -->
+          <div style="display:inline-flex;align-items:center;gap:8px;background:${isDark?'rgba(52,211,153,0.1)':'rgba(16,185,129,0.07)'};border:1px solid ${isDark?'#065f46':'#6ee7b7'};border-radius:10px;padding:8px 16px;margin-bottom:20px;">
+            <span style="font-size:18px;">🛒</span>
+            <span style="color:${priceC};font-weight:800;font-size:15px;" id="pmxSaleCntMiniPC">${_saleDisplay}</span>
+            <span style="color:${mutedC};font-size:12px;">জন অর্ডার করেছেন</span>
+          </div>
+          <!-- বিস্তারিত -->
+          ${p.desc?`
+          <div style="background:${isDark?'#1e293b':'#f8fafc'};border:1px solid ${borderC};border-radius:12px;padding:16px;margin-bottom:20px;">
+            <div style="color:${isDark?'#7dd3fc':'#1d4ed8'};font-size:13px;font-weight:700;margin-bottom:8px;">📋 বিস্তারিত বিবরণ</div>
+            <div style="color:${isDark?'#cbd5e1':'#475569'};font-size:14px;line-height:1.8;">${p.desc}</div>
+          </div>`:''}
+          <!-- অর্ডার ফর্ম -->
+          <div style="background:${sectionBg};border:1.5px solid ${sectionBdr};border-radius:16px;padding:20px;">
+            <div style="color:${labelC};font-size:14px;font-weight:800;margin-bottom:16px;">🛒 এখনই অর্ডার করুন</div>
+            <input id="pmxBuyUserId" placeholder="ইউজার আইডি / মোবাইল / লিংক"
+              style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:10px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;outline:none;"
+              onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">
+            <input id="pmxBuyMobile" placeholder="আপনার মোবাইল নম্বর"
+              style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:14px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;outline:none;"
+              onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">
+            <label style="color:${mutedC};font-size:13px;display:block;margin-bottom:8px;font-weight:600;">পেমেন্ট পদ্ধতি *</label>
+            <div style="display:flex;gap:10px;margin-bottom:12px;">
+              <label onclick="pmxSelectPayment('bkash')" id="pmxPayBkash" style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;background:${inputBg};border:2px solid #e91e8c;border-radius:10px;cursor:pointer;">
+                <input type="radio" name="pmxPayMethod" value="bkash" checked style="accent-color:#e91e8c;">
+                <span style="color:${inputClr};font-size:14px;font-weight:700;">💳 বিকাশ</span>
+              </label>
+              <label onclick="pmxSelectPayment('nagad')" id="pmxPayNagad" style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;background:${inputBg};border:2px solid ${inputBdr};border-radius:10px;cursor:pointer;">
+                <input type="radio" name="pmxPayMethod" value="nagad" style="accent-color:#f97316;">
+                <span style="color:${inputClr};font-size:14px;font-weight:700;">💳 নগদ</span>
+              </label>
+            </div>
+            <div id="pmxPayInfoBox" style="background:rgba(233,30,140,0.12);border:1px solid #e91e8c;border-radius:10px;padding:12px;margin-bottom:12px;">
+              <div style="color:#f9a8d4;font-size:12px;margin-bottom:4px;">বিকাশ নম্বরে পাঠান:</div>
+              <div style="color:#fff;font-size:16px;font-weight:700;letter-spacing:1px;">018*********</div>
+              <div style="color:#94a3b8;font-size:11px;margin-top:4px;">(Send Money করুন)</div>
+            </div>
+            <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *"
+              style="width:100%;padding:12px 14px;border-radius:10px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;font-weight:600;outline:none;"
+              onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#6366f1'">
+            <div style="background:${isDark?'rgba(245,158,11,0.08)':'rgba(245,158,11,0.1)'};border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;font-size:13px;color:${isDark?'#fcd34d':'#92400e'};line-height:1.7;margin-bottom:16px;">
+              📌 অর্ডার হওয়ার পর আপনাকে মেসেজ দিয়ে বিস্তারিত জানতে চাওয়া হবে। তাই অর্ডার করুন, পরে সংশোধন করতে পারবেন।
+            </div>
+            <button onclick="pmxPlaceOrder('${p.id}')"
+              style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:16px;border-radius:12px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;letter-spacing:0.3px;transition:.2s;box-shadow:0 4px 16px rgba(16,185,129,0.35);"
+              onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(16,185,129,0.45)'"
+              onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(16,185,129,0.35)'">
+              🛒 Buy করুন — ৳${p.price}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+    // ── Mobile লেআউট ──
+    const mobLayout = `
+    <!-- sticky top bar -->
+    <div style="position:sticky;top:0;background:${headerBg};backdrop-filter:blur(10px);border-bottom:1px solid ${borderC};padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:10;">
+      <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';"
+        style="background:${isDark?'#334155':'#f1f5f9'};border:1px solid ${borderC};color:${titleC};width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
+      <div style="flex:1;overflow:hidden;">
+        <div style="color:${titleC};font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;">${p.name||''}</div>
+        <div style="color:${priceC};font-size:13px;font-weight:800;">৳${p.price}</div>
+      </div>
+      <span style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;flex-shrink:0;">⭐ PREMIUM</span>
+    </div>
+    <!-- ছবি উপরে -->
+    <div style="width:100%;background:${isDark?'#111827':'#f9fafb'};aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;max-height:75vw;overflow:hidden;border-bottom:1px solid ${borderC};">
+      <img src="${p.img||''}" style="width:100%;height:100%;object-fit:contain;display:block;" onerror="this.src='ko.jpeg'">
+    </div>
+    <!-- তথ্য নিচে -->
+    <div style="padding:16px;background:${pageBg};">
+      <!-- নাম ও দাম -->
+      <h2 style="color:${titleC};font-size:19px;font-weight:800;margin:0 0 8px;line-height:1.5;font-family:'Hind Siliguri',sans-serif;">${p.name||''}</h2>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+        <span style="color:${priceC};font-size:30px;font-weight:900;font-family:'Hind Siliguri',sans-serif;">৳${p.price}</span>
+        ${dispOldPrice?`<span style="color:${mutedC};font-size:16px;text-decoration:line-through;">৳${dispOldPrice}</span>`:''}
+        ${discPct?`<span style="background:#ef4444;color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:6px;">${discPct}% ছাড়</span>`:''}
+      </div>
+      <!-- স্টার -->
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;">
+        <div style="font-size:16px;">${starsHtml2}</div>
+        <span style="color:${accentGold};font-size:13px;font-weight:700;">${spRating.toFixed(1)}</span>
+        <span style="color:${mutedC};font-size:12px;">(${spRevCnt})</span>
+      </div>
+      <!-- সেল কাউন্টার -->
+      <div style="display:flex;align-items:center;gap:10px;background:${isDark?'rgba(52,211,153,0.1)':'rgba(16,185,129,0.07)'};border:1.5px solid ${isDark?'#065f46':'#6ee7b7'};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
+        <span style="font-size:26px;">🔥</span>
+        <div>
+          <div style="color:${priceC};font-size:22px;font-weight:900;font-family:'Hind Siliguri',sans-serif;">${_saleDisplay} জন</div>
+          <div style="color:${mutedC};font-size:12px;margin-top:1px;">এই পণ্য অর্ডার করেছেন</div>
+        </div>
+      </div>
+      <!-- বিস্তারিত -->
+      ${p.desc?`
+      <div style="background:${isDark?'#1e293b':'#f8fafc'};border:1px solid ${borderC};border-radius:12px;padding:14px;margin-bottom:16px;">
+        <div style="color:${isDark?'#7dd3fc':'#1d4ed8'};font-size:13px;font-weight:700;margin-bottom:8px;">📋 বিস্তারিত বিবরণ</div>
+        <div style="color:${isDark?'#cbd5e1':'#475569'};font-size:13px;line-height:1.8;">${p.desc}</div>
+      </div>`:''}
+      <!-- অর্ডার ফর্ম -->
+      <div style="background:${sectionBg};border:1.5px solid ${sectionBdr};border-radius:16px;padding:16px;">
+        <div style="color:${labelC};font-size:14px;font-weight:800;margin-bottom:14px;">🛒 এখনই অর্ডার করুন</div>
+        <input id="pmxBuyUserId" placeholder="ইউজার আইডি / মোবাইল / লিংক"
+          style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:10px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;outline:none;"
+          onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">
+        <input id="pmxBuyMobile" placeholder="আপনার মোবাইল নম্বর"
+          style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:14px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;outline:none;"
+          onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">
+        <label style="color:${mutedC};font-size:13px;display:block;margin-bottom:8px;font-weight:600;">পেমেন্ট পদ্ধতি *</label>
+        <div style="display:flex;gap:10px;margin-bottom:12px;">
+          <label onclick="pmxSelectPayment('bkash')" id="pmxPayBkash" style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;background:${inputBg};border:2px solid #e91e8c;border-radius:10px;cursor:pointer;">
+            <input type="radio" name="pmxPayMethod" value="bkash" checked style="accent-color:#e91e8c;">
+            <span style="color:${inputClr};font-size:13px;font-weight:700;">💳 বিকাশ</span>
+          </label>
+          <label onclick="pmxSelectPayment('nagad')" id="pmxPayNagad" style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;background:${inputBg};border:2px solid ${inputBdr};border-radius:10px;cursor:pointer;">
+            <input type="radio" name="pmxPayMethod" value="nagad" style="accent-color:#f97316;">
+            <span style="color:${inputClr};font-size:13px;font-weight:700;">💳 নগদ</span>
+          </label>
+        </div>
+        <div id="pmxPayInfoBox" style="background:rgba(233,30,140,0.12);border:1px solid #e91e8c;border-radius:10px;padding:12px;margin-bottom:12px;">
+          <div style="color:#f9a8d4;font-size:12px;margin-bottom:4px;">বিকাশ নম্বরে পাঠান:</div>
+          <div style="color:#fff;font-size:16px;font-weight:700;letter-spacing:1px;">018*********</div>
+          <div style="color:#94a3b8;font-size:11px;margin-top:4px;">(Send Money করুন)</div>
+        </div>
+        <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *"
+          style="width:100%;padding:12px 14px;border-radius:10px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;font-weight:600;outline:none;"
+          onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#6366f1'">
+        <div style="background:${isDark?'rgba(245,158,11,0.08)':'rgba(245,158,11,0.1)'};border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;font-size:13px;color:${isDark?'#fcd34d':'#92400e'};line-height:1.7;margin-bottom:16px;">
+          📌 অর্ডার হওয়ার পর আপনাকে মেসেজ দিয়ে বিস্তারিত জানতে চাওয়া হবে। তাই অর্ডার করুন, পরে সংশোধন করতে পারবেন।
+        </div>
+        <button onclick="pmxPlaceOrder('${p.id}')"
+          style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:16px;border-radius:12px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 16px rgba(16,185,129,0.35);">
+          🛒 Buy করুন — ৳${p.price}
+        </button>
+      </div>
+      <div style="height:20px;"></div>
+    </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxBuyModal" style="position:fixed;inset:0;background:${pageBg};z-index:9999999999;font-family:'Hind Siliguri',sans-serif;overflow-y:${isMob?'auto':'hidden'};-webkit-overflow-scrolling:touch;">
+      ${isMob ? mobLayout : pcLayout}
     </div>`);
+
+    document.body.style.overflow = 'hidden';
+
+    // ── সেল কাউন্টার লাইভ অ্যানিমেশন: ৫ সেকেন্ডে একবার +১ ──
+    window._pmxSaleCntTimer = setInterval(() => {
+        const modal = document.getElementById('pmxBuyModal');
+        if (!modal) { clearInterval(window._pmxSaleCntTimer); return; }
+        let cur = parseInt(localStorage.getItem(_storageKey) || String(_curSale));
+        cur += 1 + Math.floor(Math.random() * 3);
+        if (cur >= _max) cur = _min + (_seed % 50000);
+        localStorage.setItem(_storageKey, String(cur));
+        const fmt = cur.toLocaleString('bn-BD') + ' জন';
+        const e1 = document.getElementById('pmxSaleCntPC');
+        const e2 = document.getElementById('pmxSaleCntMiniPC');
+        if (e1) { e1.textContent = fmt; e1.style.transform='scale(1.1)'; setTimeout(()=>{if(e1)e1.style.transform='';},300); }
+        if (e2) { e2.textContent = cur.toLocaleString('bn-BD'); }
+    }, 5000);
 }
 function pmxSelectPayment(method) {
     const bkash = document.getElementById('pmxPayBkash');
@@ -12085,7 +12320,9 @@ function pmxPlaceOrder(productId) {
             userRef.set({ pmxOrders: existing }, { merge: true });
         }).catch(e => console.warn('[PMX] user order save:', e.message));
     }
+    if (window._pmxSaleCntTimer) clearInterval(window._pmxSaleCntTimer);
     document.getElementById('pmxBuyModal')?.remove();
+    document.body.style.overflow = '';
     // Success popup
     const popup = document.createElement('div');
     popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999999999;display:flex;align-items:center;justify-content:center;font-family:"Hind Siliguri",sans-serif;';
