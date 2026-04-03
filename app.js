@@ -12203,7 +12203,7 @@ function pmxOpenBuyModal(productId) {
     // ── মোবাইল ফর্মের কাস্টম ঘর HTML ──
     const _mobFieldsHtml = _fields.map((f, i) => `
         <input id="pmxExtraField_${i}" placeholder="${f}"
-          style="width:100%;padding:14px 16px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:10px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:30px;font-weight:700;outline:none;"
+          style="width:100%;padding:18px 16px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:40px;font-weight:700;outline:none;min-height:80px;"
           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">`).join('');
 
     // ── Stars ──
@@ -12293,11 +12293,8 @@ function pmxOpenBuyModal(productId) {
               <div style="color:#94a3b8;font-size:11px;margin-top:4px;">(Send Money করুন)</div>
             </div>
             <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *"
-              style="width:100%;padding:12px 14px;border-radius:10px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;font-weight:600;outline:none;"
+              style="width:100%;padding:12px 14px;border-radius:10px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;font-weight:600;outline:none;"
               onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#6366f1'">
-            <div style="background:${isDark?'rgba(245,158,11,0.08)':'rgba(245,158,11,0.1)'};border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;font-size:13px;color:${isDark?'#fcd34d':'#92400e'};line-height:1.7;margin-bottom:16px;">
-              📌 অর্ডার হওয়ার পর আপনাকে মেসেজ দিয়ে বিস্তারিত জানতে চাওয়া হবে। তাই অর্ডার করুন, পরে সংশোধন করতে পারবেন।
-            </div>
             <button onclick="pmxPlaceOrder('${p.id}')"
               style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:16px;border-radius:12px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;letter-spacing:0.3px;transition:.2s;box-shadow:0 4px 16px rgba(16,185,129,0.35);"
               onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(16,185,129,0.45)'"
@@ -12314,7 +12311,7 @@ function pmxOpenBuyModal(productId) {
     <!-- sticky top bar -->
     <div style="position:sticky;top:0;background:${headerBg};backdrop-filter:blur(10px);border-bottom:1px solid ${borderC};padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:10;">
       <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';"
-        style="background:${isDark?'#334155':'#f1f5f9'};border:1px solid ${borderC};color:${titleC};width:60px;height:60px;border-radius:50%;cursor:pointer;font-size:39px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
+        style="background:${isDark?'#334155':'#f1f5f9'};border:2px solid ${borderC};color:${titleC};width:90px;height:90px;border-radius:50%;cursor:pointer;font-size:55px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:900;">←</button>
       <div style="flex:1;overflow:hidden;">
         <div style="color:${titleC};font-size:42px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;">${p.name||''}</div>
         <div style="color:${priceC};font-size:39px;font-weight:800;">৳${p.price}</div>
@@ -12375,11 +12372,8 @@ function pmxOpenBuyModal(productId) {
           <div style="color:${isDark?'#94a3b8':'#6b7280'};font-size:39px;margin-top:6px;">(Send Money করুন)</div>
         </div>
         <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *"
-          style="width:100%;padding:14px 16px;border-radius:10px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:30px;font-weight:700;outline:none;"
+          style="width:100%;padding:18px 16px;border-radius:10px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:40px;font-weight:700;outline:none;min-height:80px;"
           onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#6366f1'">
-        <div style="background:${isDark?'rgba(245,158,11,0.08)':'rgba(245,158,11,0.1)'};border:1px solid #f59e0b;border-radius:8px;padding:12px 16px;font-size:39px;color:${isDark?'#fcd34d':'#92400e'};line-height:1.7;margin-bottom:16px;">
-          📌 অর্ডার হওয়ার পর আপনাকে মেসেজ দিয়ে বিস্তারিত জানতে চাওয়া হবে। তাই অর্ডার করুন, পরে সংশোধন করতে পারবেন।
-        </div>
         <button onclick="pmxPlaceOrder('${p.id}')"
           style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:20px;border-radius:12px;font-size:42px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 16px rgba(16,185,129,0.35);">
           🛒 Buy করুন — ৳${p.price}
