@@ -464,7 +464,8 @@
             </div>
         </div>
 
-        <div id="userDropdownMenu" style="display: none; position: absolute; right: 0; top: 55px; width: 260px; background: #0f172a; border-radius: 15px; border: 1px solid #334155; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 99999;">
+        <!-- ══ PC Dropdown ══ -->
+        <div id="userDropdownMenu" style="display: none; position: absolute; right: 0; top: 55px; width: 260px; background: #0f172a; border-radius: 15px; border: 1px solid #334155; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 99999; overflow: hidden;">
             
             <div style="padding: 20px; text-align: center; border-bottom: 1px solid #334155;">
                 <div style="position: relative; display: inline-block;">
@@ -480,8 +481,9 @@
                 <h4 style="color: #fff; margin: 10px 0 0 0; font-size: 16px;">আমার অ্যাকাউন্ট</h4>
             </div>
 
-            <ul style="list-style: none; padding: 10px; margin: 0;">
+            <ul style="list-style: none; padding: 10px; margin: 0; overflow-y: auto; max-height: 340px; scrollbar-width: none; -ms-overflow-style: none;">
                 <style>
+                    #userDropdownMenu ul::-webkit-scrollbar { display: none; }
                     .dp-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: #94a3b8; cursor: pointer; border-radius: 10px; transition: 0.2s; font-size: 14px; }
                     .dp-item:hover { background: #1e293b; color: #fff; }
                     .dp-item i { color: #6366f1; width: 18px; text-align: center; }
@@ -493,25 +495,14 @@
                 <li class="dp-item" onclick="openModal('addressModal')"><i class="fa fa-map-marker-alt"></i> নতুন এড্রেস সেভ</li>
                 <li class="dp-item" onclick="openHelpModal()"><i class="fa fa-headset"></i> হেল্প(সরাসরি)</li>
                 <li class="dp-item" onclick="openDiscountModule()" style="display: flex; align-items: center; justify-content: space-between; position: relative; cursor: pointer;">
-                <div>
-                 <i class="fa fa-ticket-alt"></i> 
-                 <span>ডিসকাউন্ট কোড ও কার্ড</span>
-                 </div>
-    
-                 <span id="discount-notif-dot" style="display: none; width: 10px; height: 10px;      background: #ff4757; border-radius: 50%; box-shadow: 0 0 8px #ff4757; margin-left: 10px;"></span>
+                    <div style="display:flex;align-items:center;gap:12px;"><i class="fa fa-ticket-alt"></i><span>ডিসকাউন্ট কোড ও কার্ড</span></div>
+                    <span id="discount-notif-dot" style="display: none; width: 10px; height: 10px; background: #ff4757; border-radius: 50%; box-shadow: 0 0 8px #ff4757;"></span>
                 </li>
                 <li class="dp-item" onclick="openModal('orderTrackingModal')"><i class="fa fa-box-open"></i> ভিউ অর্ডার (ট্র্যাকিং)</li>
                 <li class="dp-item" onclick="openUserOrders()"><i class="fa fa-shopping-bag"></i> আমার অর্ডার</li>
                 <li class="dp-item" onclick="pmxOpenUserOrders()" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);"><i class="fa fa-crown" style="color:#a78bfa;"></i> ⭐ প্রিমিয়াম ডিটেইলস</li>
-
-                <li class="dp-item" onclick="openUserCart()">
-                <i class="fa fa-shopping-cart"></i> ইউর কার্ট
-                 </li>
-                 
-                 <li class="dp-item" onclick="openUserReturnList()">
-                   <i class="fa fa-shipping-fast"></i> ইউর রিটার্ন অর্ডার
-                   </li>
-
+                <li class="dp-item" onclick="openUserCart()"><i class="fa fa-shopping-cart"></i> ইউর কার্ট</li>
+                <li class="dp-item" onclick="openUserReturnList()"><i class="fa fa-shipping-fast"></i> ইউর রিটার্ন অর্ডার</li>
             </ul>
                                                        
             <div style="padding: 10px; border-top: 1px solid #334155;">
@@ -523,47 +514,215 @@
     </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════
+     মোবাইল Account — Chrome-style Bottom Sheet
+══════════════════════════════════════════════════════ -->
+<!-- Backdrop -->
+<div id="mobileMenuBackdrop" onclick="closeMobileAccountMenu()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:9999990; backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);"></div>
+
+<!-- Bottom Sheet -->
+<div id="mobileAccountSheet" style="
+    display: none;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #1c1c1e;
+    border-radius: 20px 20px 0 0;
+    z-index: 9999999;
+    overflow: hidden;
+    max-height: 92vh;
+    flex-direction: column;
+    transform: translateY(100%);
+    transition: transform 0.32s cubic-bezier(0.32,0.72,0,1);
+    will-change: transform;
+    font-family: 'Hind Siliguri', sans-serif;
+">
+    <!-- Drag Handle -->
+    <div style="display:flex;justify-content:center;padding:10px 0 4px;">
+        <div style="width:40px;height:4px;background:#555;border-radius:4px;"></div>
+    </div>
+
+    <!-- User Info Header -->
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 20px 16px;border-bottom:1px solid #2c2c2e;">
+        <div style="position:relative;flex-shrink:0;">
+            <div id="mobileSheetAvatarWrap" style="width:56px;height:56px;border-radius:50%;background:#2c2c2e;display:flex;align-items:center;justify-content:center;overflow:hidden;border:2.5px solid #6366f1;">
+                <i id="mobileSheetAvatarIcon" class="fa fa-user" style="color:#94a3b8;font-size:26px;"></i>
+                <img id="mobileSheetAvatarImg" src="" style="display:none;width:100%;height:100%;object-fit:cover;">
+            </div>
+            <label for="avatarUploadMobile" style="position:absolute;bottom:-2px;right:-2px;background:#6366f1;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #1c1c1e;">
+                <i class="fa fa-camera" style="color:#fff;font-size:9px;"></i>
+            </label>
+            <input type="file" id="avatarUploadMobile" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
+        </div>
+        <div style="flex:1;min-width:0;">
+            <div style="font-size:11px;color:#8e8e93;margin-bottom:2px;">হ্যালো,</div>
+            <div id="mobileSheetUserName" style="font-size:17px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">User</div>
+        </div>
+        <!-- X Close -->
+        <button onclick="closeMobileAccountMenu()" style="background:#2c2c2e;border:none;color:#8e8e93;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;flex-shrink:0;">
+            <i class="fa fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Menu List — scrollable, invisible scrollbar -->
+    <div style="overflow-y:auto;flex:1;padding:6px 0 8px;scrollbar-width:none;-ms-overflow-style:none;" id="mobileSheetList">
+        <style>
+            #mobileSheetList::-webkit-scrollbar { display: none; }
+            .mob-sheet-item {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 15px 22px;
+                color: #ebebf5cc;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 500;
+                border-bottom: 1px solid #2c2c2e;
+                -webkit-tap-highlight-color: rgba(255,255,255,0.08);
+                transition: background 0.15s;
+                font-family: 'Hind Siliguri', sans-serif;
+            }
+            .mob-sheet-item:active { background: #2c2c2e; }
+            .mob-sheet-item:last-child { border-bottom: none; }
+            .mob-sheet-item .mob-icon-wrap {
+                width: 36px; height: 36px;
+                border-radius: 10px;
+                background: #2c2c2e;
+                display: flex; align-items: center; justify-content: center;
+                flex-shrink: 0;
+                font-size: 15px;
+            }
+        </style>
+
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openModal('resetPasswordModal')">
+            <div class="mob-icon-wrap" style="background:rgba(99,102,241,0.18);"><i class="fa fa-key" style="color:#818cf8;"></i></div>
+            পাসওয়ার্ড পরিবর্তন
+        </div>
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openModal('resetUsernameModal')">
+            <div class="mob-icon-wrap" style="background:rgba(99,102,241,0.18);"><i class="fa fa-user-edit" style="color:#818cf8;"></i></div>
+            ইউজারনেম পরিবর্তন
+        </div>
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();toggleThemeMode()">
+            <div class="mob-icon-wrap" style="background:rgba(251,191,36,0.15);"><i class="fa fa-moon" style="color:#fbbf24;"></i></div>
+            নাইট মোড (অন/অফ)
+        </div>
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openModal('addressModal')">
+            <div class="mob-icon-wrap" style="background:rgba(34,197,94,0.15);"><i class="fa fa-map-marker-alt" style="color:#22c55e;"></i></div>
+            নতুন এড্রেস সেভ
+        </div>
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openHelpModal()">
+            <div class="mob-icon-wrap" style="background:rgba(6,182,212,0.15);"><i class="fa fa-headset" style="color:#06b6d4;"></i></div>
+            হেল্প (সরাসরি)
+        </div>
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openDiscountModule()" style="justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:16px;">
+                <div class="mob-icon-wrap" style="background:rgba(245,158,11,0.15);"><i class="fa fa-ticket-alt" style="color:#f59e0b;"></i></div>
+                ডিসকাউন্ট কোড ও কার্ড
+            </div>
+            <span id="mobile-discount-notif-dot" style="display:none;width:10px;height:10px;background:#ff4757;border-radius:50%;box-shadow:0 0 8px #ff4757;"></span>
+        </div>
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openModal('orderTrackingModal')">
+            <div class="mob-icon-wrap" style="background:rgba(99,102,241,0.18);"><i class="fa fa-box-open" style="color:#818cf8;"></i></div>
+            ভিউ অর্ডার (ট্র্যাকিং)
+        </div>
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openUserOrders()">
+            <div class="mob-icon-wrap" style="background:rgba(236,72,153,0.15);"><i class="fa fa-shopping-bag" style="color:#ec4899;"></i></div>
+            আমার অর্ডার
+        </div>
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();pmxOpenUserOrders()" style="background:rgba(124,58,237,0.08);">
+            <div class="mob-icon-wrap" style="background:rgba(167,139,250,0.18);"><i class="fa fa-crown" style="color:#a78bfa;"></i></div>
+            ⭐ প্রিমিয়াম ডিটেইলস
+        </div>
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openUserCart()">
+            <div class="mob-icon-wrap" style="background:rgba(34,197,94,0.15);"><i class="fa fa-shopping-cart" style="color:#22c55e;"></i></div>
+            ইউর কার্ট
+        </div>
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openUserReturnList()">
+            <div class="mob-icon-wrap" style="background:rgba(239,68,68,0.15);"><i class="fa fa-shipping-fast" style="color:#ef4444;"></i></div>
+            ইউর রিটার্ন অর্ডার
+        </div>
+    </div>
+
+    <!-- Logout -->
+    <div style="padding:12px 16px 28px;border-top:1px solid #2c2c2e;">
+        <button onclick="closeMobileAccountMenu();performLogout()" style="width:100%;padding:15px;background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);border-radius:14px;cursor:pointer;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Hind Siliguri',sans-serif;">
+            <i class="fa fa-sign-out-alt"></i> লগআউট
+        </button>
+    </div>
+</div>
+
 <script>
-// ড্রপডাউন টগল করার জন্য পরিষ্কার ফাংশন
+/* ══════════════════════════════════════════
+   Account Menu — PC dropdown + Mobile bottom sheet
+══════════════════════════════════════════ */
+
 function toggleUserDropdown() {
-    const menu = document.getElementById('userDropdownMenu');
     const isMobile = document.documentElement.classList.contains('is-mobile');
-    if (menu.style.display === 'none' || menu.style.display === '') {
-        menu.style.display = isMobile ? 'flex' : 'block';
-        if (isMobile) document.body.style.overflow = 'hidden';
+    if (isMobile) {
+        openMobileAccountMenu();
     } else {
-        menu.style.display = 'none';
-        if (isMobile) document.body.style.overflow = '';
+        const menu = document.getElementById('userDropdownMenu');
+        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
     }
 }
 
-// মোবাইলে close বাটন একবার যোগ করা
-(function addMobileCloseBtn() {
-    function _inject() {
-        if (!document.documentElement.classList.contains('is-mobile')) return;
-        const menu = document.getElementById('userDropdownMenu');
-        if (!menu || menu.querySelector('#tmDropCloseBtn')) return;
-        const closeBtn = document.createElement('button');
-        closeBtn.id = 'tmDropCloseBtn';
-        closeBtn.innerHTML = '<i class="fa fa-times"></i>';
-        closeBtn.style.cssText = 'position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.12);border:none;color:#fff;width:60px;height:60px;border-radius:50%;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;';
-        closeBtn.onclick = function(e) {
-            e.stopPropagation();
-            menu.style.display = 'none';
-            document.body.style.overflow = '';
-        };
-        const firstDiv = menu.querySelector('div');
-        if (firstDiv) {
-            firstDiv.style.position = 'relative';
-            firstDiv.appendChild(closeBtn);
-        }
+/* ── Mobile bottom sheet open ── */
+function openMobileAccountMenu() {
+    // username sync
+    const nameEl = document.getElementById('headerUserName');
+    const sheetName = document.getElementById('mobileSheetUserName');
+    if (nameEl && sheetName) sheetName.textContent = nameEl.textContent;
+
+    // avatar sync
+    const hImg = document.getElementById('headerUserImage');
+    const sImg = document.getElementById('mobileSheetAvatarImg');
+    const sIcon = document.getElementById('mobileSheetAvatarIcon');
+    if (hImg && hImg.style.display !== 'none' && hImg.src && sImg) {
+        sImg.src = hImg.src;
+        sImg.style.display = 'block';
+        if (sIcon) sIcon.style.display = 'none';
     }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', _inject);
-    } else {
-        _inject();
+
+    // discount dot sync
+    const dot = document.getElementById('discount-notif-dot');
+    const mobDot = document.getElementById('mobile-discount-notif-dot');
+    if (dot && mobDot) mobDot.style.display = dot.style.display;
+
+    // show backdrop + sheet
+    const backdrop = document.getElementById('mobileMenuBackdrop');
+    const sheet    = document.getElementById('mobileAccountSheet');
+    backdrop.style.display = 'block';
+    sheet.style.display    = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // animate in (next frame)
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            sheet.style.transform = 'translateY(0)';
+        });
+    });
+}
+
+/* ── Mobile bottom sheet close ── */
+function closeMobileAccountMenu() {
+    const sheet    = document.getElementById('mobileAccountSheet');
+    const backdrop = document.getElementById('mobileMenuBackdrop');
+    sheet.style.transform = 'translateY(100%)';
+    document.body.style.overflow = '';
+    setTimeout(function() {
+        sheet.style.display    = 'none';
+        backdrop.style.display = 'none';
+    }, 320);
+}
+
+// PC — বাইরে ক্লিক করলে বন্ধ
+document.addEventListener('click', function(e) {
+    if (document.documentElement.classList.contains('is-mobile')) return;
+    const grp  = document.getElementById('userProfileGroup');
+    const menu = document.getElementById('userDropdownMenu');
+    if (grp && menu && !grp.contains(e.target)) {
+        menu.style.display = 'none';
     }
-})();
+});
 
 // ইমেজ আপলোড হ্যান্ডলার
 function handleImageUpload(input) {
@@ -571,54 +730,50 @@ function handleImageUpload(input) {
         const reader = new FileReader();
         reader.onload = function(e) {
             const imageData = e.target.result;
-            
-            // হেডার ইমেজ সেট করা
-            const headerImg = document.getElementById('headerUserImage');
+            // হেডার
+            const headerImg         = document.getElementById('headerUserImage');
             const headerPlaceholder = document.getElementById('headerUserPlaceholder');
-            headerImg.src = imageData;
+            headerImg.src           = imageData;
             headerImg.style.display = 'block';
             headerPlaceholder.style.display = 'none';
-
-            // ড্রপডাউন ইমেজ সেট করা
-            const dropImg = document.getElementById('dropdownAvatar');
+            // PC dropdown
+            const dropImg         = document.getElementById('dropdownAvatar');
             const dropPlaceholder = document.getElementById('dropdownUserPlaceholder');
-            dropImg.src = imageData;
-            dropImg.style.display = 'block';
-            dropPlaceholder.style.display = 'none';
+            if (dropImg) { dropImg.src = imageData; dropImg.style.display = 'block'; }
+            if (dropPlaceholder) dropPlaceholder.style.display = 'none';
+            // Mobile sheet
+            const sImg  = document.getElementById('mobileSheetAvatarImg');
+            const sIcon = document.getElementById('mobileSheetAvatarIcon');
+            if (sImg) { sImg.src = imageData; sImg.style.display = 'block'; }
+            if (sIcon) sIcon.style.display = 'none';
 
-            // IndexedDB-এ সেভ (idb-shim.js এর মাধ্যমে localStorage override ব্যবহার করে)
             localStorage.setItem('user_profile_pic', imageData);
         };
         reader.readAsDataURL(input.files[0]);
     }
 }
 
-// পেজ লোড হলে সেভ করা ছবি আছে কি না দেখা
-// TM_READY নিশ্চিত করে যে IndexedDB cache আগে hydrate হয়েছে
-window.addEventListener('load', () => {
-    (window.TM_READY || Promise.resolve()).then(() => {
+// পেজ লোড হলে saved ছবি দেখানো
+window.addEventListener('load', function() {
+    (window.TM_READY || Promise.resolve()).then(function() {
         const savedPic = localStorage.getItem('user_profile_pic');
-        if (savedPic) {
-            // হেডার
-            document.getElementById('headerUserImage').src = savedPic;
-            document.getElementById('headerUserImage').style.display = 'block';
-            document.getElementById('headerUserPlaceholder').style.display = 'none';
-            // ড্রপডাউন
-            document.getElementById('dropdownAvatar').src = savedPic;
-            document.getElementById('dropdownAvatar').style.display = 'block';
-            document.getElementById('dropdownUserPlaceholder').style.display = 'none';
-        }
+        if (!savedPic) return;
+        // header
+        const hImg  = document.getElementById('headerUserImage');
+        const hIcon = document.getElementById('headerUserPlaceholder');
+        if (hImg) { hImg.src = savedPic; hImg.style.display = 'block'; }
+        if (hIcon) hIcon.style.display = 'none';
+        // PC dropdown
+        const dImg  = document.getElementById('dropdownAvatar');
+        const dIcon = document.getElementById('dropdownUserPlaceholder');
+        if (dImg) { dImg.src = savedPic; dImg.style.display = 'block'; }
+        if (dIcon) dIcon.style.display = 'none';
+        // mobile sheet
+        const sImg  = document.getElementById('mobileSheetAvatarImg');
+        const sIcon = document.getElementById('mobileSheetAvatarIcon');
+        if (sImg) { sImg.src = savedPic; sImg.style.display = 'block'; }
+        if (sIcon) sIcon.style.display = 'none';
     });
-});
-
-// মেনুর বাইরে ক্লিক করলে বন্ধ হবে (শুধু PC-তে)
-document.addEventListener('click', function(event) {
-    const isMobile = document.documentElement.classList.contains('is-mobile');
-    if (isMobile) return; // মোবাইলে close button দিয়ে বন্ধ হবে
-    const isClickInside = document.getElementById('userProfileGroup').contains(event.target);
-    if (!isClickInside) {
-        document.getElementById('userDropdownMenu').style.display = 'none';
-    }
 });
 </script>
 
@@ -2047,83 +2202,21 @@ html.is-mobile .profile-trigger {
     gap: 0 !important;
 }
 
+/* ══ মোবাইলে Account Dropdown — পুরনো CSS সরানো হয়েছে (bottom sheet দিয়ে replace) ══ */
+
 /* ══════════════════════════════════════════════
-   মোবাইলে Account Dropdown — পূর্ণ স্ক্রিন পপআপ
-   ══════════════════════════════════════════════ */
-
-/* মোবাইলে ড্রপডাউন মেনু — fixed fullscreen overlay */
-html.is-mobile #userDropdownMenu {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 0 !important;
-    z-index: 9999999 !important;
-    overflow-y: auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    background: #0f172a !important;
+   পুরো সাইট — অদৃশ্য স্ক্রলবার (PC + Mobile)
+══════════════════════════════════════════════ */
+html, body, * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
 }
-
-/* মোবাইলে ড্রপডাউন — close বাটন যোগের জন্য header */
-html.is-mobile #userDropdownMenu > div:first-child {
-    padding: 50px 20px 30px !important;
-    position: relative !important;
-}
-
-/* মোবাইলে অ্যাভাটার বড় */
-html.is-mobile #dropdownImageWrapper {
-    width: 120px !important;
-    height: 120px !important;
-}
-html.is-mobile #dropdownUserPlaceholder {
-    font-size: 60px !important;
-}
-
-/* মোবাইলে মেনু আইটেম বড় ও স্পর্শযোগ্য */
-html.is-mobile .dp-item {
-    padding: 18px 20px !important;
-    font-size: 32px !important;
-    border-radius: 12px !important;
-    margin-bottom: 4px !important;
-}
-html.is-mobile .dp-item i {
-    font-size: 30px !important;
-    width: 40px !important;
-}
-
-/* মোবাইলে লগআউট বাটন */
-html.is-mobile #userDropdownMenu > div:last-child button {
-    padding: 22px !important;
-    font-size: 30px !important;
-    border-radius: 14px !important;
-}
-html.is-mobile #userDropdownMenu > div:last-child {
-    padding: 15px 20px 40px !important;
-}
-
-/* মোবাইলে অ্যাকাউন্ট হেডিং */
-html.is-mobile #userDropdownMenu h4 {
-    font-size: 36px !important;
-    margin-top: 16px !important;
-}
-
-/* মোবাইলে ul padding বড় */
-html.is-mobile #userDropdownMenu ul {
-    padding: 10px 15px !important;
-    flex: 1 !important;
-}
-
-/* মোবাইলে camera আইকন বড় */
-html.is-mobile #userDropdownMenu label[for="avatarUpload"] {
-    width: 44px !important;
-    height: 44px !important;
-}
-html.is-mobile #userDropdownMenu label[for="avatarUpload"] i {
-    font-size: 18px !important;
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 </style>
 </body>
