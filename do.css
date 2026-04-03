@@ -2377,15 +2377,3 @@ html.is-mobile .search-wrapper i {
     left: 16px !important;
 }
 
-
-/* ── Premium buy modal: mobile input placeholder & typed text ── */
-html.is-mobile .pmx-mob-field-input::placeholder {
-    font-size: 200px !important;
-    font-weight: 700 !important;
-    opacity: 0.6;
-}
-html.is-mobile .pmx-mob-trx-input::placeholder {
-    font-size: 200px !important;
-    font-weight: 700 !important;
-    opacity: 0.6;
-}
