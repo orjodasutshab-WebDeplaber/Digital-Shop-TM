@@ -11052,20 +11052,43 @@ function pmxOpenHeaderAdmin() {
             <div style="background:#0f172a;border-radius:12px;padding:16px;margin-bottom:16px;">
                 <input id="pmxHdrImg" type="text" placeholder="ছবির লিংক" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
                 <input id="pmxHdrName" type="text" placeholder="হেডারের নাম" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:10px;box-sizing:border-box;">
-                <input id="pmxHdrTB" type="text" placeholder="TB কোড (ঐচ্ছিক)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;">
+                <input id="pmxHdrTB" type="text" placeholder="TB কোড (ঐচ্ছিক)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:14px;box-sizing:border-box;">
+                <!-- অর্ডার ফর্মের কাস্টম ঘর -->
+                <div style="color:#a78bfa;font-size:13px;font-weight:700;margin-bottom:8px;">📝 অর্ডার ফর্মে যে ঘর থাকবে:</div>
+                <div id="pmxHdrFieldList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+                    <div class="pmx-field-row" style="display:flex;gap:6px;align-items:center;">
+                        <input type="text" placeholder="ঘরের নাম (যেমন: আইডি দাও)" style="flex:1;padding:9px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+                        <button onclick="this.closest('.pmx-field-row').remove()" style="background:#7f1d1d;color:#fff;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;flex-shrink:0;">✕</button>
+                    </div>
+                </div>
+                <button onclick="pmxAddFieldRow()" style="width:100%;background:#1e3a5f;color:#38bdf8;border:1px dashed #38bdf8;padding:9px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;font-family:'Hind Siliguri',sans-serif;">＋ আরো ঘর এড করুন</button>
                 <button onclick="pmxPublishHeader()" style="width:100%;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">✅ পাবলিশ করুন</button>
             </div>
             <div id="pmxHeaderList">${pmxRenderHeaderList()}</div>
         </div>
     </div>`);
 }
+function pmxAddFieldRow() {
+    const list = document.getElementById('pmxHdrFieldList');
+    if (!list) return;
+    const row = document.createElement('div');
+    row.className = 'pmx-field-row';
+    row.style.cssText = 'display:flex;gap:6px;align-items:center;';
+    row.innerHTML = `<input type="text" placeholder="ঘরের নাম (যেমন: মোবাইল নম্বর)" style="flex:1;padding:9px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+        <button onclick="this.closest('.pmx-field-row').remove()" style="background:#7f1d1d;color:#fff;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;flex-shrink:0;">✕</button>`;
+    list.appendChild(row);
+}
 function pmxPublishHeader() {
     const img = document.getElementById('pmxHdrImg')?.value.trim();
     const name = document.getElementById('pmxHdrName')?.value.trim();
     const tb = document.getElementById('pmxHdrTB')?.value.trim();
     if (!name) { showToast('❌ নাম দিন!'); return; }
+    // কাস্টম ঘর সংগ্রহ
+    const fieldInputs = document.querySelectorAll('#pmxHdrFieldList .pmx-field-row input');
+    const fields = [];
+    fieldInputs.forEach(inp => { const v = inp.value.trim(); if (v) fields.push(v); });
     const headers = pmxGetAll(PMX_KEYS.HEADERS);
-    const h = { id: Date.now(), img: img||'', name, tb: tb||'' };
+    const h = { id: Date.now(), img: img||'', name, tb: tb||'', fields };
     headers.push(h);
     localStorage.setItem(PMX_KEYS.HEADERS, JSON.stringify(headers));
     const db = pmxDb();
@@ -11086,6 +11109,7 @@ function pmxRenderHeaderList() {
             <div style="flex:1;">
                 <div style="color:#fff;font-weight:700;font-size:13px;">${h.name}</div>
                 ${h.tb ? `<div style="color:#6b7280;font-size:11px;">TB: ${h.tb}</div>` : ''}
+                ${h.fields && h.fields.length ? `<div style="color:#a78bfa;font-size:11px;margin-top:3px;">📝 ঘর: ${h.fields.join(', ')}</div>` : ''}
             </div>
             <button onclick="pmxDeleteHeader(${h.id})" style="background:#ef4444;color:#fff;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:13px;">🗑</button>
         </div>`).join('');
@@ -11263,7 +11287,11 @@ function pmxRenderAdminOrders() {
             <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
                 <div>
                     <div style="color:#fff;font-weight:700;font-size:14px;">${o.productName}</div>
-                    <div style="color:#94a3b8;font-size:12px;">💰 ৳${o.price} | 👤 ${o.userId||o.userMobile||'অজানা'}</div>
+                    <div style="color:#94a3b8;font-size:12px;">💰 ৳${o.price} | ${
+                        o.extraFields && Object.keys(o.extraFields).length
+                        ? '📝 ' + Object.entries(o.extraFields).slice(0,2).map(([k,v])=>`${k}: ${v||'-'}`).join(' | ')
+                        : '👤 ' + (o.userId||o.userMobile||'অজানা')
+                    }</div>
                     <div style="color:#6b7280;font-size:11px;">${new Date(o.createdAt).toLocaleString('bn-BD')}</div>
                 </div>
                 <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;">${statusLabels[o.status]||o.status}</span>
@@ -11344,7 +11372,17 @@ function pmxOpenOrderDetail(orderId) {
                 <div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:6px;">${o.productName}</div>
                 <div style="color:#10b981;font-size:15px;font-weight:700;margin-bottom:8px;">৳${o.price}</div>
                 <div style="color:#94a3b8;font-size:13px;margin-bottom:8px;">${prod?.desc||o.desc||''}</div>
-                <div style="color:#6b7280;font-size:12px;margin-bottom:8px;">👤 ${o.userId||'-'} | 📱 ${o.userMobile||'-'}</div>
+                <!-- কাস্টম ঘরের তথ্য -->
+                ${o.extraFields && Object.keys(o.extraFields).length ? `
+                <div style="background:rgba(99,102,241,0.1);border:1px solid #4f46e5;border-radius:8px;padding:10px;margin-bottom:10px;">
+                    <div style="color:#a78bfa;font-size:12px;font-weight:700;margin-bottom:8px;">📝 ইউজার প্রদত্ত তথ্য</div>
+                    ${Object.entries(o.extraFields).map(([k,v]) => `
+                    <div style="display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+                        <span style="color:#94a3b8;font-size:12px;font-weight:600;min-width:100px;">${k}:</span>
+                        <span style="color:#e2e8f0;font-size:13px;font-weight:700;">${v||'-'}</span>
+                    </div>`).join('')}
+                </div>` : `
+                <div style="color:#6b7280;font-size:12px;margin-bottom:8px;">👤 ${o.userId||'-'} | 📱 ${o.userMobile||o.loggedUserMobile||'-'}</div>`}
                 <!-- Payment info -->
                 ${o.payMethod ? `
                 <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:10px;margin-bottom:10px;border-left:3px solid ${payColor};">
@@ -12042,6 +12080,23 @@ function pmxOpenBuyModal(productId) {
         ? Math.round((dispOldPrice - parseFloat(p.price)) / dispOldPrice * 100)
         : 0;
 
+    // ── হেডারের কাস্টম ঘর লোড ──
+    const _headers = pmxGetAll(PMX_KEYS.HEADERS);
+    const _hdr = _headers.find(h => String(h.id) === String(p.headerId));
+    const _fields = (_hdr && _hdr.fields && _hdr.fields.length) ? _hdr.fields : [];
+
+    // ── PC ফর্মের কাস্টম ঘর HTML ──
+    const _pcFieldsHtml = _fields.map((f, i) => `
+        <input id="pmxExtraField_${i}" placeholder="${f}"
+          style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:10px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;outline:none;"
+          onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">`).join('');
+
+    // ── মোবাইল ফর্মের কাস্টম ঘর HTML ──
+    const _mobFieldsHtml = _fields.map((f, i) => `
+        <input id="pmxExtraField_${i}" placeholder="${f}"
+          style="width:100%;padding:14px 16px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:10px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:39px;outline:none;"
+          onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">`).join('');
+
     // ── Stars ──
     const spHash2 = _pid.split('').reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,0);
     const spRating = Math.min(5.0, Math.max(3.5, 3.5 + (spHash2 % 16) * 0.1));
@@ -12111,12 +12166,7 @@ function pmxOpenBuyModal(productId) {
           <!-- অর্ডার ফর্ম -->
           <div style="background:${sectionBg};border:1.5px solid ${sectionBdr};border-radius:16px;padding:20px;">
             <div style="color:${labelC};font-size:14px;font-weight:800;margin-bottom:16px;">🛒 এখনই অর্ডার করুন</div>
-            <input id="pmxBuyUserId" placeholder="ইউজার আইডি / মোবাইল / লিংক"
-              style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:10px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;outline:none;"
-              onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">
-            <input id="pmxBuyMobile" placeholder="আপনার মোবাইল নম্বর"
-              style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:14px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;outline:none;"
-              onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">
+            ${_pcFieldsHtml}
             <label style="color:${mutedC};font-size:13px;display:block;margin-bottom:8px;font-weight:600;">পেমেন্ট পদ্ধতি *</label>
             <div style="display:flex;gap:10px;margin-bottom:12px;">
               <label onclick="pmxSelectPayment('bkash')" id="pmxPayBkash" style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;background:${inputBg};border:2px solid #e91e8c;border-radius:10px;cursor:pointer;">
@@ -12155,12 +12205,12 @@ function pmxOpenBuyModal(productId) {
     <!-- sticky top bar -->
     <div style="position:sticky;top:0;background:${headerBg};backdrop-filter:blur(10px);border-bottom:1px solid ${borderC};padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:10;">
       <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';"
-        style="background:${isDark?'#334155':'#f1f5f9'};border:1px solid ${borderC};color:${titleC};width:60px;height:60px;border-radius:50%;cursor:pointer;font-size:39px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
+        style="background:${isDark?'#334155':'#f1f5f9'};border:1px solid ${borderC};color:${titleC};width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">←</button>
       <div style="flex:1;overflow:hidden;">
-        <div style="color:${titleC};font-size:42px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;">${p.name||''}</div>
-        <div style="color:${priceC};font-size:39px;font-weight:800;">৳${p.price}</div>
+        <div style="color:${titleC};font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;">${p.name||''}</div>
+        <div style="color:${priceC};font-size:13px;font-weight:800;">৳${p.price}</div>
       </div>
-      <span style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:39px;font-weight:800;padding:6px 14px;border-radius:20px;flex-shrink:0;">⭐ PREMIUM</span>
+      <span style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;flex-shrink:0;">⭐ PREMIUM</span>
     </div>
     <!-- ছবি উপরে -->
     <div style="width:100%;background:${isDark?'#111827':'#f9fafb'};aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;max-height:75vw;overflow:hidden;border-bottom:1px solid ${borderC};">
@@ -12169,65 +12219,60 @@ function pmxOpenBuyModal(productId) {
     <!-- তথ্য নিচে -->
     <div style="padding:16px;background:${pageBg};">
       <!-- নাম ও দাম -->
-      <h2 style="color:${titleC};font-size:50px;font-weight:800;margin:0 0 8px;line-height:1.5;font-family:'Hind Siliguri',sans-serif;">${p.name||''}</h2>
+      <h2 style="color:${titleC};font-size:19px;font-weight:800;margin:0 0 8px;line-height:1.5;font-family:'Hind Siliguri',sans-serif;">${p.name||''}</h2>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
-        <span style="color:${priceC};font-size:60px;font-weight:900;font-family:'Hind Siliguri',sans-serif;">৳${p.price}</span>
-        ${dispOldPrice?`<span style="color:${mutedC};font-size:42px;text-decoration:line-through;">৳${dispOldPrice}</span>`:''}
-        ${discPct?`<span style="background:#ef4444;color:#fff;font-size:39px;font-weight:800;padding:5px 14px;border-radius:6px;">${discPct}% ছাড়</span>`:''}
+        <span style="color:${priceC};font-size:30px;font-weight:900;font-family:'Hind Siliguri',sans-serif;">৳${p.price}</span>
+        ${dispOldPrice?`<span style="color:${mutedC};font-size:16px;text-decoration:line-through;">৳${dispOldPrice}</span>`:''}
+        ${discPct?`<span style="background:#ef4444;color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:6px;">${discPct}% ছাড়</span>`:''}
       </div>
       <!-- স্টার -->
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;">
-        <div style="font-size:44px;">${starsHtml2}</div>
-        <span style="color:${accentGold};font-size:42px;font-weight:700;">${spRating.toFixed(1)}</span>
-        <span style="color:${mutedC};font-size:39px;">(${spRevCnt})</span>
+        <div style="font-size:16px;">${starsHtml2}</div>
+        <span style="color:${accentGold};font-size:13px;font-weight:700;">${spRating.toFixed(1)}</span>
+        <span style="color:${mutedC};font-size:12px;">(${spRevCnt})</span>
       </div>
       <!-- সেল কাউন্টার -->
       <div style="display:flex;align-items:center;gap:10px;background:${isDark?'rgba(52,211,153,0.1)':'rgba(16,185,129,0.07)'};border:1.5px solid ${isDark?'#065f46':'#6ee7b7'};border-radius:12px;padding:12px 16px;margin-bottom:16px;">
-        <span style="font-size:50px;">🔥</span>
+        <span style="font-size:26px;">🔥</span>
         <div>
-          <div style="color:${priceC};font-size:50px;font-weight:900;font-family:'Hind Siliguri',sans-serif;">${_saleDisplay} জন</div>
-          <div style="color:${mutedC};font-size:39px;margin-top:1px;">এই পণ্য অর্ডার করেছেন</div>
+          <div style="color:${priceC};font-size:22px;font-weight:900;font-family:'Hind Siliguri',sans-serif;">${_saleDisplay} জন</div>
+          <div style="color:${mutedC};font-size:12px;margin-top:1px;">এই পণ্য অর্ডার করেছেন</div>
         </div>
       </div>
       <!-- বিস্তারিত -->
       ${p.desc?`
       <div style="background:${isDark?'#1e293b':'#f8fafc'};border:1px solid ${borderC};border-radius:12px;padding:14px;margin-bottom:16px;">
-        <div style="color:${isDark?'#7dd3fc':'#1d4ed8'};font-size:42px;font-weight:700;margin-bottom:8px;">📋 বিস্তারিত বিবরণ</div>
-        <div style="color:${isDark?'#cbd5e1':'#475569'};font-size:39px;line-height:1.8;">${p.desc}</div>
+        <div style="color:${isDark?'#7dd3fc':'#1d4ed8'};font-size:13px;font-weight:700;margin-bottom:8px;">📋 বিস্তারিত বিবরণ</div>
+        <div style="color:${isDark?'#cbd5e1':'#475569'};font-size:13px;line-height:1.8;">${p.desc}</div>
       </div>`:''}
       <!-- অর্ডার ফর্ম -->
       <div style="background:${sectionBg};border:1.5px solid ${sectionBdr};border-radius:16px;padding:16px;">
         <div style="color:${labelC};font-size:42px;font-weight:800;margin-bottom:14px;">🛒 এখনই অর্ডার করুন</div>
-        <input id="pmxBuyUserId" placeholder="ইউজার আইডি / মোবাইল / লিংক"
-          style="width:100%;padding:14px 16px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:10px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:39px;outline:none;"
-          onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">
-        <input id="pmxBuyMobile" placeholder="আপনার মোবাইল নম্বর"
-          style="width:100%;padding:14px 16px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:14px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:39px;outline:none;"
-          onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">
-        <label style="color:${mutedC};font-size:39px;display:block;margin-bottom:10px;font-weight:600;">পেমেন্ট পদ্ধতি *</label>
+        ${_mobFieldsHtml}
+        <label style="color:${mutedC};font-size:13px;display:block;margin-bottom:8px;font-weight:600;">পেমেন্ট পদ্ধতি *</label>
         <div style="display:flex;gap:10px;margin-bottom:12px;">
-          <label onclick="pmxSelectPayment('bkash')" id="pmxPayBkash" style="flex:1;display:flex;align-items:center;gap:8px;padding:14px;background:${inputBg};border:2px solid #e91e8c;border-radius:10px;cursor:pointer;">
-            <input type="radio" name="pmxPayMethod" value="bkash" checked style="accent-color:#e91e8c;width:24px;height:24px;">
-            <span style="color:${inputClr};font-size:39px;font-weight:700;">💳 বিকাশ</span>
+          <label onclick="pmxSelectPayment('bkash')" id="pmxPayBkash" style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;background:${inputBg};border:2px solid #e91e8c;border-radius:10px;cursor:pointer;">
+            <input type="radio" name="pmxPayMethod" value="bkash" checked style="accent-color:#e91e8c;">
+            <span style="color:${inputClr};font-size:13px;font-weight:700;">💳 বিকাশ</span>
           </label>
-          <label onclick="pmxSelectPayment('nagad')" id="pmxPayNagad" style="flex:1;display:flex;align-items:center;gap:8px;padding:14px;background:${inputBg};border:2px solid ${inputBdr};border-radius:10px;cursor:pointer;">
-            <input type="radio" name="pmxPayMethod" value="nagad" style="accent-color:#f97316;width:24px;height:24px;">
-            <span style="color:${inputClr};font-size:39px;font-weight:700;">💳 নগদ</span>
+          <label onclick="pmxSelectPayment('nagad')" id="pmxPayNagad" style="flex:1;display:flex;align-items:center;gap:8px;padding:12px;background:${inputBg};border:2px solid ${inputBdr};border-radius:10px;cursor:pointer;">
+            <input type="radio" name="pmxPayMethod" value="nagad" style="accent-color:#f97316;">
+            <span style="color:${inputClr};font-size:13px;font-weight:700;">💳 নগদ</span>
           </label>
         </div>
-        <div id="pmxPayInfoBox" style="background:rgba(233,30,140,0.12);border:1px solid #e91e8c;border-radius:10px;padding:14px;margin-bottom:12px;">
-          <div style="color:#f9a8d4;font-size:39px;margin-bottom:6px;">বিকাশ নম্বরে পাঠান:</div>
-          <div style="color:#fff;font-size:50px;font-weight:700;letter-spacing:1px;">018*********</div>
-          <div style="color:#94a3b8;font-size:39px;margin-top:6px;">(Send Money করুন)</div>
+        <div id="pmxPayInfoBox" style="background:rgba(233,30,140,0.12);border:1px solid #e91e8c;border-radius:10px;padding:12px;margin-bottom:12px;">
+          <div style="color:#f9a8d4;font-size:12px;margin-bottom:4px;">বিকাশ নম্বরে পাঠান:</div>
+          <div style="color:#fff;font-size:16px;font-weight:700;letter-spacing:1px;">018*********</div>
+          <div style="color:#94a3b8;font-size:11px;margin-top:4px;">(Send Money করুন)</div>
         </div>
         <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *"
-          style="width:100%;padding:14px 16px;border-radius:10px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:39px;font-weight:600;outline:none;"
+          style="width:100%;padding:12px 14px;border-radius:10px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;font-weight:600;outline:none;"
           onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#6366f1'">
-        <div style="background:${isDark?'rgba(245,158,11,0.08)':'rgba(245,158,11,0.1)'};border:1px solid #f59e0b;border-radius:8px;padding:12px 16px;font-size:39px;color:${isDark?'#fcd34d':'#92400e'};line-height:1.7;margin-bottom:16px;">
+        <div style="background:${isDark?'rgba(245,158,11,0.08)':'rgba(245,158,11,0.1)'};border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;font-size:13px;color:${isDark?'#fcd34d':'#92400e'};line-height:1.7;margin-bottom:16px;">
           📌 অর্ডার হওয়ার পর আপনাকে মেসেজ দিয়ে বিস্তারিত জানতে চাওয়া হবে। তাই অর্ডার করুন, পরে সংশোধন করতে পারবেন।
         </div>
         <button onclick="pmxPlaceOrder('${p.id}')"
-          style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:20px;border-radius:12px;font-size:42px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 16px rgba(16,185,129,0.35);">
+          style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:16px;border-radius:12px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 16px rgba(16,185,129,0.35);">
           🛒 Buy করুন — ৳${p.price}
         </button>
       </div>
@@ -12266,26 +12311,38 @@ function pmxSelectPayment(method) {
         if (nagad) nagad.style.borderColor = '#374151';
         box.style.background = 'rgba(233,30,140,0.1)';
         box.style.borderColor = '#e91e8c';
-        box.innerHTML = `<div style="color:#f9a8d4;font-size:39px;margin-bottom:6px;">বিকাশ নম্বরে পাঠান:</div>
-            <div style="color:#fff;font-size:50px;font-weight:700;letter-spacing:1px;">018*********</div>
-            <div style="color:#94a3b8;font-size:39px;margin-top:6px;">(Send Money করুন)</div>`;
+        box.innerHTML = `<div style="color:#f9a8d4;font-size:12px;margin-bottom:4px;">বিকাশ নম্বরে পাঠান:</div>
+            <div style="color:#fff;font-size:16px;font-weight:700;letter-spacing:1px;">018*********</div>
+            <div style="color:#94a3b8;font-size:11px;margin-top:4px;">(Send Money করুন)</div>`;
     } else {
         if (nagad) nagad.style.borderColor = '#f97316';
         if (bkash) bkash.style.borderColor = '#374151';
         box.style.background = 'rgba(249,115,22,0.1)';
         box.style.borderColor = '#f97316';
-        box.innerHTML = `<div style="color:#fed7aa;font-size:39px;margin-bottom:6px;">নগদ নম্বরে পাঠান:</div>
-            <div style="color:#fff;font-size:50px;font-weight:700;letter-spacing:1px;">01329885689</div>
-            <div style="color:#94a3b8;font-size:39px;margin-top:6px;">(Send Money করুন)</div>`;
+        box.innerHTML = `<div style="color:#fed7aa;font-size:12px;margin-bottom:4px;">নগদ নম্বরে পাঠান:</div>
+            <div style="color:#fff;font-size:16px;font-weight:700;letter-spacing:1px;">01329885689</div>
+            <div style="color:#94a3b8;font-size:11px;margin-top:4px;">(Send Money করুন)</div>`;
     }
 }
 function pmxPlaceOrder(productId) {
-    const userId = document.getElementById('pmxBuyUserId')?.value.trim();
-    const mobile = document.getElementById('pmxBuyMobile')?.value.trim();
     const trxId  = document.getElementById('pmxBuyTrxId')?.value.trim();
     const payMethod = document.querySelector('input[name="pmxPayMethod"]:checked')?.value || 'bkash';
-    if (!userId && !mobile) { showToast('❌ ইউজার আইডি বা মোবাইল দিন!'); return; }
     if (!trxId) { showToast('❌ TrxID দিন!'); return; }
+
+    // ── কাস্টম ঘরের মান সংগ্রহ ──
+    const extraFields = {};
+    let i = 0;
+    while (true) {
+        const el = document.getElementById('pmxExtraField_' + i);
+        if (!el) break;
+        const label = el.placeholder || ('ঘর ' + (i + 1));
+        extraFields[label] = el.value.trim();
+        i++;
+    }
+    // অন্তত একটা ঘর পূরণ হয়েছে কিনা চেক
+    const filled = Object.values(extraFields).some(v => v.length > 0);
+    if (!filled && i > 0) { showToast('❌ অন্তত একটা ঘর পূরণ করুন!'); return; }
+
     const products = pmxGetAll(PMX_KEYS.PRODUCTS);
     const p = products.find(p => String(p.id) === String(productId));
     if (!p) return;
@@ -12295,8 +12352,7 @@ function pmxPlaceOrder(productId) {
         id: 'PMX' + Date.now(),
         productId: p.id, productName: p.name, price: p.price,
         desc: p.desc||'', img: p.img||'', tbCode: p.tb||'',
-        userId: userId||'',
-        userMobile: mobile||(cu?.mobile||cu?.phone||''),
+        extraFields,
         payMethod, trxId,
         loggedUserId: cu ? String(cu.id) : '',
         loggedUserMobile: cu ? String(cu.mobile||cu.phone||'') : '',
@@ -12313,7 +12369,6 @@ function pmxPlaceOrder(productId) {
         const userRef = db.collection('users').doc(String(cu.id));
         userRef.get().then(doc => {
             const existing = doc.exists ? (doc.data().pmxOrders || []) : [];
-            // duplicate check
             if (!existing.find(o => o.id === order.id)) {
                 existing.push(order);
             }
@@ -12543,8 +12598,12 @@ function _pmxRenderUserDetailModal(o) {
                 <div style="color:#94a3b8;font-size:13px;margin-bottom:10px;">${o.desc||''}</div>
                 <!-- User info -->
                 <div style="background:rgba(99,102,241,0.1);border-radius:8px;padding:10px;margin-bottom:10px;border-left:3px solid #6366f1;">
-                    ${o.userId ? `<div style="color:#94a3b8;font-size:12px;">🆔 আইডি/মোবাইল/লিংক: <span style="color:#e2e8f0;">${o.userId}</span></div>` : ''}
-                    ${o.userMobile ? `<div style="color:#94a3b8;font-size:12px;margin-top:3px;">📱 মোবাইল: <span style="color:#e2e8f0;">${o.userMobile}</span></div>` : ''}
+                    ${o.extraFields && Object.keys(o.extraFields).length
+                        ? Object.entries(o.extraFields).map(([k,v]) => `
+                            <div style="color:#94a3b8;font-size:12px;margin-bottom:4px;">📝 ${k}: <span style="color:#e2e8f0;font-weight:700;">${v||'-'}</span></div>`).join('')
+                        : `${o.userId ? `<div style="color:#94a3b8;font-size:12px;">🆔 আইডি/মোবাইল/লিংক: <span style="color:#e2e8f0;">${o.userId}</span></div>` : ''}
+                           ${o.userMobile ? `<div style="color:#94a3b8;font-size:12px;margin-top:3px;">📱 মোবাইল: <span style="color:#e2e8f0;">${o.userMobile}</span></div>` : ''}`
+                    }
                 </div>
                 <!-- Status -->
                 <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">${statusLabels[o.status]||o.status}</span>
