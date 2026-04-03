@@ -778,36 +778,36 @@ document.addEventListener('click', function(event) {
                     <span class="pb-filter-arrow"><i class="fa fa-chevron-down"></i></span>
                 </button>
 
-                <div id="filterMenu" style="position: absolute; right: 0; top: 55px; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 60px 50px 80px; width: 560px; border-radius: 36px; display: none; z-index: 1000; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); transform-origin: top right; animation: scaleUp 0.2s ease-out;" class="filter-menu-popup">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 48px;">
-                        <div style="display: flex; align-items: center; gap: 16px;">
-                            <div style="width: 18px; height: 18px; background: #fbbf24; border-radius: 50%;"></div>
-                            <h4 style="margin: 0; color: #fff; font-size: 46px; font-weight: 700; letter-spacing: 0.5px;">অ্যাডভান্সড ফিল্টার</h4>
+                <div id="filterMenu" style="position: absolute; right: 0; top: 55px; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; width: 260px; border-radius: 20px; display: none; z-index: 1000; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); transform-origin: top right; animation: scaleUp 0.2s ease-out;" class="filter-menu-popup">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%;"></div>
+                            <h4 style="margin: 0; color: #fff; font-size: 15px; font-weight: 600; letter-spacing: 0.5px;">অ্যাডভান্সড ফিল্টার</h4>
                         </div>
-                        <button onclick="toggleFilterMenu(false)" style="background: rgba(255,255,255,0.1); border: none; color: #94a3b8; cursor: pointer; font-size: 36px; width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</button>
+                        <button onclick="toggleFilterMenu(false)" style="background: rgba(255,255,255,0.05); border: none; color: #94a3b8; cursor: pointer; font-size: 18px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</button>
                     </div>
                     
-                    <label style="color:#94a3b8; font-size:34px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 20px;">মূল্য সীমা (৳)</label>
-                    <div style="display: flex; gap: 20px; margin-bottom: 48px;">
-                        <input type="number" id="minPrice" placeholder="মিন" style="width:50%; background: rgba(15, 23, 42, 0.6); color:#fff; border:2px solid rgba(255,255,255,0.15); padding:26px 22px; border-radius:20px; font-size:36px; outline: none; transition: 0.3s; height: 110px;" onfocus="this.style.borderColor='#6366f1'">
-                        <input type="number" id="maxPrice" placeholder="ম্যাক্স" style="width:50%; background: rgba(15, 23, 42, 0.6); color:#fff; border:2px solid rgba(255,255,255,0.15); padding:26px 22px; border-radius:20px; font-size:36px; outline: none; transition: 0.3s; height: 110px;" onfocus="this.style.borderColor='#6366f1'">
+                    <label style="color:#94a3b8; font-size:12px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px;">মূল্য সীমা (৳)</label>
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <input type="number" id="minPrice" placeholder="মিন" style="width:50%; background: rgba(15, 23, 42, 0.6); color:#fff; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:10px; font-size:13px; outline: none; transition: 0.3s;" onfocus="this.style.borderColor='#6366f1'">
+                        <input type="number" id="maxPrice" placeholder="ম্যাক্স" style="width:50%; background: rgba(15, 23, 42, 0.6); color:#fff; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:10px; font-size:13px; outline: none; transition: 0.3s;" onfocus="this.style.borderColor='#6366f1'">
                     </div>
 
-                    <label style="color:#94a3b8; font-size:34px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 20px;">সাজানো (SORTING)</label>
-                    <div style="position: relative; margin-bottom: 52px;">
-                        <select id="priceSort" style="width:100%; background: rgba(15, 23, 42, 0.6); color:#fff; border:2px solid rgba(255,255,255,0.15); padding:26px 22px; border-radius:20px; font-size:36px; outline: none; cursor: pointer; appearance: none; height: 110px;">
+                    <label style="color:#94a3b8; font-size:12px; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 8px;">সাজানো (Sorting)</label>
+                    <div style="position: relative; margin-bottom: 25px;">
+                        <select id="priceSort" style="width:100%; background: rgba(15, 23, 42, 0.6); color:#fff; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:10px; font-size:13px; outline: none; cursor: pointer; appearance: none;">
                             <option value="none">ডিফল্ট ভিউ</option>
                             <option value="low">কম থেকে বেশি মূল্য ↓</option>
                             <option value="high">বেশি থেকে কম মূল্য ↑</option>
                         </select>
-                        <i class="fa fa-chevron-down" style="position: absolute; right: 24px; top: 38px; color: #64748b; pointer-events: none; font-size: 24px;"></i>
+                        <i class="fa fa-chevron-down" style="position: absolute; right: 12px; top: 12px; color: #64748b; pointer-events: none; font-size: 10px;"></i>
                     </div>
 
-                    <button onclick="applyAdvancedFilter()" style="width:100%; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color:white; border:none; padding:32px; border-radius:22px; cursor:pointer; font-weight:800; font-size:40px; margin-bottom: 24px; box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.3); transition: 0.3s;">
+                    <button onclick="applyAdvancedFilter()" style="width:100%; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color:white; border:none; padding:12px; border-radius:12px; cursor:pointer; font-weight:800; font-size:14px; margin-bottom: 12px; box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.2); transition: 0.3s;">
                         ফিল্টার সেট করুন
                     </button>
                     
-                    <button onclick="resetFilters()" style="width:100%; background:none; color:#64748b; border:none; cursor:pointer; font-size:32px; font-weight: 600; text-decoration: none; transition: 0.3s; padding: 16px;" onmouseover="this.style.color='#fff'">
+                    <button onclick="resetFilters()" style="width:100%; background:none; color:#64748b; border:none; cursor:pointer; font-size:12px; font-weight: 600; text-decoration: none; transition: 0.3s;" onmouseover="this.style.color='#fff'">
                         <i class="fa fa-undo"></i> রিসেট অল
                     </button>
                 </div>
@@ -963,18 +963,18 @@ body.dark-theme .pb-badge-2 {
 .pb-filter-btn.open .pb-filter-arrow { transform: rotate(180deg); }
 
 /* মোবাইল */
-body.is-mobile .popular-banner-wrap { padding: 9px 14px; }
-body.is-mobile .pb-main             { font-size: 28px !important; font-weight: 800 !important; }
-body.is-mobile .pb-icon             { font-size: 32px !important; }
-body.is-mobile .pb-badges-inline    { display: flex !important; gap: 10px !important; }
-body.is-mobile .pb-sub              { display: block !important; font-size: 22px !important; font-weight: 700 !important; }
-body.is-mobile .pb-badge            { font-size: 22px !important; font-weight: 700 !important; padding: 8px 16px !important; }
-body.is-mobile .pb-filter-text      { display: none; }
-body.is-mobile .pb-filter-btn       { padding: 9px 12px; border-radius: 50%; }
-body.is-mobile .pb-filter-arrow     { display: none; }
+html.is-mobile .popular-banner-wrap { padding: 9px 14px; }
+html.is-mobile .pb-main             { font-size: 28px !important; font-weight: 800 !important; }
+html.is-mobile .pb-icon             { font-size: 32px !important; }
+html.is-mobile .pb-badges-inline    { display: flex !important; gap: 10px !important; }
+html.is-mobile .pb-sub              { display: block !important; font-size: 22px !important; font-weight: 700 !important; }
+html.is-mobile .pb-badge            { font-size: 22px !important; font-weight: 700 !important; padding: 8px 16px !important; }
+html.is-mobile .pb-filter-text      { display: none; }
+html.is-mobile .pb-filter-btn       { padding: 9px 12px; border-radius: 50%; }
+html.is-mobile .pb-filter-arrow     { display: none; }
 
 /* ══ মোবাইলে ফিল্টার পপ — Fixed Bottom Sheet ══ */
-body.is-mobile .filter-menu-popup {
+html.is-mobile .filter-menu-popup {
     position: fixed !important;
     left: 0 !important;
     right: 0 !important;
@@ -982,8 +982,8 @@ body.is-mobile .filter-menu-popup {
     top: auto !important;
     width: 100% !important;
     max-width: 100% !important;
-    border-radius: 48px 48px 0 0 !important;
-    padding: 52px 48px 90px !important;
+    border-radius: 36px 36px 0 0 !important;
+    padding: 36px 36px 60px !important;
     z-index: 999999 !important;
     transform-origin: bottom center !important;
     animation: slideUpSheet 0.25s ease-out !important;
@@ -991,73 +991,73 @@ body.is-mobile .filter-menu-popup {
 }
 
 /* Bottom sheet overlay — মোবাইলে backdrop */
-body.is-mobile #filterOverlay {
-    display: block !important;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.55);
-    z-index: 999998;
-    backdrop-filter: blur(4px);
-    animation: fadeinOv 0.2s ease;
+html.is-mobile #filterOverlay {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0,0,0,0.55) !important;
+    z-index: 999998 !important;
+    backdrop-filter: blur(4px) !important;
+    animation: fadeinOv 0.2s ease !important;
+    /* display নিয়ন্ত্রণ JS করবে — এখানে শুধু style */
 }
 
 /* ইনপুট ও বাটনগুলো মোবাইলে বড় */
-body.is-mobile .filter-menu-popup input,
-body.is-mobile .filter-menu-popup select {
-    font-size: 42px !important;
-    padding: 28px 22px !important;
-    border-radius: 22px !important;
-    height: 110px !important;
+html.is-mobile .filter-menu-popup input,
+html.is-mobile .filter-menu-popup select {
+    font-size: 34px !important;
+    padding: 22px 18px !important;
+    border-radius: 18px !important;
+    height: 90px !important;
     font-family: 'Hind Siliguri', sans-serif !important;
 }
-body.is-mobile .filter-menu-popup label {
-    font-size: 34px !important;
-    margin-bottom: 20px !important;
+html.is-mobile .filter-menu-popup label {
+    font-size: 28px !important;
+    margin-bottom: 16px !important;
     display: block !important;
 }
-body.is-mobile .filter-menu-popup h4 {
-    font-size: 46px !important;
+html.is-mobile .filter-menu-popup h4 {
+    font-size: 38px !important;
 }
-body.is-mobile .filter-menu-popup > div:first-child {
+html.is-mobile .filter-menu-popup > div:first-child {
+    margin-bottom: 32px !important;
+}
+html.is-mobile .filter-menu-popup > div:nth-child(2) {
+    margin-bottom: 32px !important;
+}
+html.is-mobile .filter-menu-popup > div:nth-child(3) {
+    margin-bottom: 36px !important;
+}
+html.is-mobile .filter-menu-popup div[style*="display: flex; gap: 10px"] {
+    gap: 16px !important;
+    margin-bottom: 36px !important;
+}
+html.is-mobile .filter-menu-popup div[style*="position: relative"] {
     margin-bottom: 40px !important;
 }
-body.is-mobile .filter-menu-popup > div:nth-child(2) {
-    margin-bottom: 40px !important;
+html.is-mobile .filter-menu-popup div[style*="position: relative"] i {
+    font-size: 20px !important;
+    top: 34px !important;
+    right: 20px !important;
 }
-body.is-mobile .filter-menu-popup > div:nth-child(3) {
-    margin-bottom: 44px !important;
-}
-body.is-mobile .filter-menu-popup div[style*="display: flex; gap: 10px"] {
-    gap: 20px !important;
-    margin-bottom: 44px !important;
-}
-body.is-mobile .filter-menu-popup div[style*="position: relative"] {
-    margin-bottom: 50px !important;
-}
-body.is-mobile .filter-menu-popup div[style*="position: relative"] i {
-    font-size: 26px !important;
-    top: 42px !important;
-    right: 24px !important;
-}
-body.is-mobile .filter-menu-popup button[onclick="applyAdvancedFilter()"] {
-    font-size: 42px !important;
-    padding: 30px !important;
-    border-radius: 24px !important;
-    margin-bottom: 24px !important;
-}
-body.is-mobile .filter-menu-popup button[onclick="resetFilters()"] {
+html.is-mobile .filter-menu-popup button[onclick="applyAdvancedFilter()"] {
     font-size: 34px !important;
-    padding: 18px !important;
+    padding: 24px !important;
+    border-radius: 20px !important;
+    margin-bottom: 20px !important;
 }
-body.is-mobile .filter-menu-popup button[onclick="toggleFilterMenu(false)"] {
-    width: 64px !important;
-    height: 64px !important;
-    font-size: 34px !important;
+html.is-mobile .filter-menu-popup button[onclick="resetFilters()"] {
+    font-size: 28px !important;
+    padding: 14px !important;
+}
+html.is-mobile .filter-menu-popup button[onclick="toggleFilterMenu(false)"] {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 28px !important;
     border-radius: 50% !important;
 }
 
 /* Pull handle — bottom sheet এর টান-বার */
-body.is-mobile .filter-menu-popup::before {
+html.is-mobile .filter-menu-popup::before {
     content: '';
     display: block;
     width: 64px;
