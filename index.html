@@ -963,15 +963,15 @@ body.dark-theme .pb-badge-2 {
 .pb-filter-btn.open .pb-filter-arrow { transform: rotate(180deg); }
 
 /* মোবাইল */
-html.is-mobile .popular-banner-wrap { padding: 9px 14px; }
-html.is-mobile .pb-main             { font-size: 28px !important; font-weight: 800 !important; }
-html.is-mobile .pb-icon             { font-size: 32px !important; }
-html.is-mobile .pb-badges-inline    { display: flex !important; gap: 10px !important; }
-html.is-mobile .pb-sub              { display: block !important; font-size: 22px !important; font-weight: 700 !important; }
-html.is-mobile .pb-badge            { font-size: 22px !important; font-weight: 700 !important; padding: 8px 16px !important; }
-html.is-mobile .pb-filter-text      { display: none; }
-html.is-mobile .pb-filter-btn       { padding: 9px 12px; border-radius: 50%; }
-html.is-mobile .pb-filter-arrow     { display: none; }
+body.is-mobile .popular-banner-wrap { padding: 9px 14px; }
+body.is-mobile .pb-main             { font-size: 28px !important; font-weight: 800 !important; }
+body.is-mobile .pb-icon             { font-size: 32px !important; }
+body.is-mobile .pb-badges-inline    { display: flex !important; gap: 10px !important; }
+body.is-mobile .pb-sub              { display: block !important; font-size: 22px !important; font-weight: 700 !important; }
+body.is-mobile .pb-badge            { font-size: 22px !important; font-weight: 700 !important; padding: 8px 16px !important; }
+body.is-mobile .pb-filter-text      { display: none; }
+body.is-mobile .pb-filter-btn       { padding: 9px 12px; border-radius: 50%; }
+body.is-mobile .pb-filter-arrow     { display: none; }
 
 /* ══ মোবাইলে ফিল্টার পপ — Fixed Bottom Sheet ══ */
 html.is-mobile .filter-menu-popup {
@@ -998,7 +998,6 @@ html.is-mobile #filterOverlay {
     z-index: 999998 !important;
     backdrop-filter: blur(4px) !important;
     animation: fadeinOv 0.2s ease !important;
-    /* display নিয়ন্ত্রণ JS করবে — এখানে শুধু style */
 }
 
 /* ইনপুট ও বাটনগুলো মোবাইলে বড় */
