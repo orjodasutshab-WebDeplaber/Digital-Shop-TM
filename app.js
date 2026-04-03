@@ -12439,8 +12439,8 @@ function pmxOpenBuyModal(productId) {
             if (trxEl) {
                 trxEl.style.fontSize = '46px';
                 trxEl.style.fontWeight = '900';
-                trxEl.style.minHeight = '120px';
-                trxEl.style.padding = '28px 22px';
+                trxEl.style.minHeight = '70px';
+                trxEl.style.padding = '10px 22px';
                 trxEl.style.transform = 'scale(' + scale + ')';
                 trxEl.style.transformOrigin = 'left top';
                 trxEl.style.width = (100 / scale) + '%';
@@ -12452,8 +12452,8 @@ function pmxOpenBuyModal(productId) {
                 if (!exEl) break;
                 exEl.style.fontSize = '46px';
                 exEl.style.fontWeight = '700';
-                exEl.style.minHeight = '120px';
-                exEl.style.padding = '28px 22px';
+                exEl.style.minHeight = '70px';
+                exEl.style.padding = '10px 22px';
                 exEl.style.transform = 'scale(' + scale + ')';
                 exEl.style.transformOrigin = 'left top';
                 exEl.style.width = (100 / scale) + '%';
