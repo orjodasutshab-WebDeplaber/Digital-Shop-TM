@@ -12203,7 +12203,7 @@ function pmxOpenBuyModal(productId) {
     // ── মোবাইল ফর্মের কাস্টম ঘর HTML ──
     const _mobFieldsHtml = _fields.map((f, i) => `
         <input id="pmxExtraField_${i}" placeholder="${f}"
-          style="width:100%;padding:18px 16px;border-radius:10px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:12px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:40px;font-weight:700;outline:none;min-height:80px;"
+          style="width:100%;padding:22px 18px;border-radius:12px;border:1.5px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:14px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:42px;font-weight:700;outline:none;min-height:90px;"
           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">`).join('');
 
     // ── Stars ──
@@ -12372,13 +12372,69 @@ function pmxOpenBuyModal(productId) {
           <div style="color:${isDark?'#94a3b8':'#6b7280'};font-size:39px;margin-top:6px;">(Send Money করুন)</div>
         </div>
         <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *"
-          style="width:100%;padding:18px 16px;border-radius:10px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:40px;font-weight:700;outline:none;min-height:80px;"
+          style="width:100%;padding:22px 18px;border-radius:12px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:42px;font-weight:700;outline:none;min-height:90px;"
           onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#6366f1'">
         <button onclick="pmxPlaceOrder('${p.id}')"
           style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:20px;border-radius:12px;font-size:42px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 16px rgba(16,185,129,0.35);">
           🛒 Buy করুন — ৳${p.price}
         </button>
       </div>
+      <!-- Footer -->
+      <footer style="background:#111827;color:#d1d5db;padding:50px 20px 120px;border-top:1px solid #374151;font-family:'Hind Siliguri',sans-serif;margin-top:24px;">
+        <div style="display:flex;flex-direction:column;gap:36px;">
+          <div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:15px;">
+              <img src="ko.jpeg" alt="Logo" style="width:56px;height:56px;border-radius:10px;object-fit:fill;border:2px solid #10b981;" onerror="this.style.display='none'">
+              <h2 style="color:#10b981;margin:0;font-size:42px;">Digital Shop TM</h2>
+            </div>
+            <p style="font-size:39px;line-height:1.7;">আপনার বিশ্বস্ত অনলাইন শপ।</p>
+          </div>
+          <div>
+            <h3 style="color:white;font-size:44px;margin-bottom:20px;">COMPANY</h3>
+            <ul style="list-style:none;padding:0;font-size:39px;line-height:3;">
+              <li><a href="javascript:void(0)" onclick="openAboutModal()" style="color:#9ca3af;text-decoration:none;">About Us</a></li>
+              <li><a href="javascript:void(0)" onclick="openTermsModal()" style="color:#9ca3af;text-decoration:none;">Terms &amp; Conditions</a></li>
+              <li><a href="javascript:void(0)" onclick="openPrivacyModal()" style="color:#9ca3af;text-decoration:none;">Privacy Policy</a></li>
+              <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af;text-decoration:none;">Cancellation &amp; Return Policy</a></li>
+              <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af;text-decoration:none;">FAQs</a></li>
+            </ul>
+          </div>
+          <div>
+            <h3 style="color:white;font-size:44px;margin-bottom:20px;">QUICK HELP</h3>
+            <ul style="list-style:none;padding:0;font-size:39px;line-height:3;">
+              <li><a href="javascript:void(0)" onclick="openCustomerCareModal()" style="color:#9ca3af;text-decoration:none;">গ্রাহক সেবা</a></li>
+              <li><a href="javascript:void(0)" onclick="openFaqModal()" style="color:#9ca3af;text-decoration:none;">কিভাবে কিনবেন</a></li>
+              <li><a href="javascript:void(0)" onclick="openReturnPolicyModal()" style="color:#9ca3af;text-decoration:none;">রিটার্ন ও রিফান্ড</a></li>
+              <li><a href="tel:+8801707498418" style="color:#9ca3af;text-decoration:none;">যোগাযোগ: +8801707498418</a></li>
+            </ul>
+            <p style="margin-top:15px;font-size:39px;">Hotline: +8801707498418</p>
+          </div>
+          <div>
+            <h3 style="color:white;font-size:44px;margin-bottom:20px;">VERIFIED BY</h3>
+            <div style="margin-bottom:15px;">
+              <p style="font-size:39px;margin-bottom:8px;">DBID ID: 437361334</p>
+              <p style="font-size:39px;">Registration ID: 304903094</p>
+            </div>
+            <div style="margin-top:18px;">
+              <p style="font-size:39px;color:#6b7280;margin-bottom:12px;font-weight:600;text-transform:uppercase;">পেমেন্ট মেথড</p>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;"><img src="o1.jpg" alt="bKash" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#E2136E';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>bKash</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;"><img src="o2.png" alt="Nagad" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#F15922';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>Nagad</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;"><img src="o3.png" alt="Rocket" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#8B008B';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>Rocket</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;"><img src="o4.png" alt="Upay" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#EE3424';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>Upay</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;"><img src="o5.jpg" alt="DBBL" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#006838';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>DBBL</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;"><img src="o6.png" alt="City Bank" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#003087';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:20px;padding:0 8px>City Bank</span>'"></div>
+                <div style="background:#fff;border-radius:8px;padding:6px 8px;height:46px;display:flex;align-items:center;justify-content:center;"><img src="o7.jpg" alt="Islami Bank" style="height:34px;width:auto;object-fit:contain;" onerror="this.parentElement.style.background='#1d4ed8';this.outerHTML='<span style=color:#fff;font-weight:900;font-size:18px;padding:0 8px>Islami Bank</span>'"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:36px;font-size:39px;color:#6b7280;">
+          <hr style="border:0;border-top:1px solid #374151;margin-bottom:24px;">
+          <p>© 2026 <strong>Digital Shop TM</strong>. সর্বস্বত্ব সংরক্ষিত।</p>
+          <p style="margin-top:8px;">Developed by: <span style="color:#10b981;">Digital Shop TM Team</span></p>
+        </div>
+      </footer>
       <div style="height:20px;"></div>
     </div>`;
 
