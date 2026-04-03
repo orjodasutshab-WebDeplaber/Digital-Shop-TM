@@ -4980,7 +4980,8 @@ html.is-mobile #gpModalSpecTable table{width:100%;border-collapse:collapse;}
 html.is-mobile #gpModalSpecTable td{font-size:30px!important;padding:14px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
 html.is-mobile .gpd-desc-text{font-size:32px!important;line-height:1.8;color:#444;}
 html.is-mobile #gpModalTagsRow span{font-size:26px!important;padding:5px 14px!important;}
-html.is-mobile #gpModalSellerBox{font-size:29px!important;}
+html.is-mobile #gpModalSellerBox{font-size:30px!important;}
+html.is-mobile #gpModalSellerBox div{font-size:inherit!important;}
 html.is-mobile .gpd-rel-card-name{font-size:25px;min-height:60px;}
 html.is-mobile .gpd-rel-card-price{font-size:28px;}
 html.is-mobile .gpd-rel-card-tag{font-size:19px;padding:4px 10px;}
@@ -5750,7 +5751,33 @@ function openProductDetails(productId) {
 
         // seller
         const sellerBox=document.getElementById('gpModalSellerBox');
-        if(sellerBox){ sellerBox.innerHTML=`<div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:12px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:6px;">Sold By</div><div style="color:#1976d2;font-size:16px;font-weight:700;">${sName}</div>${sRating?`<div style="margin-top:8px;"><span style="font-size:12px;color:#888;">Positive Seller Ratings: </span><span style="font-size:20px;font-weight:800;color:#22c55e;">${sRating}%</span></div><div style="margin-top:4px;background:#e5e7eb;border-radius:10px;height:6px;overflow:hidden;"><div style="background:linear-gradient(90deg,#22c55e,#16a34a);width:${sRating}%;height:100%;border-radius:10px;"></div></div>`:''}</div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;margin-bottom:10px;"><div style="font-size:12px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Delivery</div><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:14px;font-weight:700;color:#222;">Standard Delivery</div><div style="font-size:12px;color:#888;">3–5 কার্যদিবস</div></div><div style="font-size:18px;font-weight:800;color:#f57224;">৳${dCharge}</div></div></div><div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:14px;"><div style="font-size:12px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Service</div><div style="color:#222;font-size:13px;margin-bottom:6px;"><i class="fa fa-undo" style="color:#22c55e;margin-right:6px;"></i>7 Days Returns</div><div style="color:#666;font-size:12px;"><i class="fa fa-shield-alt" style="color:#888;margin-right:6px;"></i>Authentic Product</div></div>`; }
+        if(sellerBox){ sellerBox.innerHTML=`
+            <div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:18px;margin-bottom:12px;">
+                <div style="font-size:28px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:8px;">Sold By</div>
+                <div style="color:#1976d2;font-size:34px;font-weight:700;">${sName}</div>
+                ${sRating?`<div style="margin-top:10px;">
+                    <span style="font-size:26px;color:#888;">Positive Seller Ratings: </span>
+                    <span style="font-size:36px;font-weight:800;color:#22c55e;">${sRating}%</span>
+                </div>
+                <div style="margin-top:6px;background:#e5e7eb;border-radius:10px;height:8px;overflow:hidden;">
+                    <div style="background:linear-gradient(90deg,#22c55e,#16a34a);width:${sRating}%;height:100%;border-radius:10px;"></div>
+                </div>`:''}
+            </div>
+            <div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:18px;margin-bottom:12px;">
+                <div style="font-size:28px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:10px;">Delivery</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <div style="font-size:32px;font-weight:700;color:#222;">Standard Delivery</div>
+                        <div style="font-size:28px;color:#888;">3–5 কার্যদিবস</div>
+                    </div>
+                    <div style="font-size:38px;font-weight:800;color:#f57224;">৳${dCharge}</div>
+                </div>
+            </div>
+            <div style="background:#f9fafb;border-radius:12px;border:1px solid #e5e7eb;padding:18px;">
+                <div style="font-size:28px;color:#888;font-weight:700;text-transform:uppercase;margin-bottom:10px;">Service</div>
+                <div style="color:#222;font-size:30px;margin-bottom:8px;"><i class="fa fa-undo" style="color:#22c55e;margin-right:8px;"></i>7 Days Returns</div>
+                <div style="color:#666;font-size:28px;"><i class="fa fa-shield-alt" style="color:#888;margin-right:8px;"></i>Authentic Product</div>
+            </div>`; }
 
         // Mobile accordion reset — open
         ['mspec','mdetails','mseller'].forEach(k=>{
