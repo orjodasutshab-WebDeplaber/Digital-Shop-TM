@@ -527,8 +527,43 @@
 // ড্রপডাউন টগল করার জন্য পরিষ্কার ফাংশন
 function toggleUserDropdown() {
     const menu = document.getElementById('userDropdownMenu');
-    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+    const isMobile = document.documentElement.classList.contains('is-mobile');
+    if (menu.style.display === 'none' || menu.style.display === '') {
+        menu.style.display = isMobile ? 'flex' : 'block';
+        if (isMobile) document.body.style.overflow = 'hidden';
+    } else {
+        menu.style.display = 'none';
+        if (isMobile) document.body.style.overflow = '';
+    }
 }
+
+// মোবাইলে close বাটন একবার যোগ করা
+(function addMobileCloseBtn() {
+    function _inject() {
+        if (!document.documentElement.classList.contains('is-mobile')) return;
+        const menu = document.getElementById('userDropdownMenu');
+        if (!menu || menu.querySelector('#tmDropCloseBtn')) return;
+        const closeBtn = document.createElement('button');
+        closeBtn.id = 'tmDropCloseBtn';
+        closeBtn.innerHTML = '<i class="fa fa-times"></i>';
+        closeBtn.style.cssText = 'position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.12);border:none;color:#fff;width:60px;height:60px;border-radius:50%;font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;';
+        closeBtn.onclick = function(e) {
+            e.stopPropagation();
+            menu.style.display = 'none';
+            document.body.style.overflow = '';
+        };
+        const firstDiv = menu.querySelector('div');
+        if (firstDiv) {
+            firstDiv.style.position = 'relative';
+            firstDiv.appendChild(closeBtn);
+        }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', _inject);
+    } else {
+        _inject();
+    }
+})();
 
 // ইমেজ আপলোড হ্যান্ডলার
 function handleImageUpload(input) {
@@ -576,8 +611,10 @@ window.addEventListener('load', () => {
     });
 });
 
-// মেনুর বাইরে ক্লিক করলে বন্ধ হবে
+// মেনুর বাইরে ক্লিক করলে বন্ধ হবে (শুধু PC-তে)
 document.addEventListener('click', function(event) {
+    const isMobile = document.documentElement.classList.contains('is-mobile');
+    if (isMobile) return; // মোবাইলে close button দিয়ে বন্ধ হবে
     const isClickInside = document.getElementById('userProfileGroup').contains(event.target);
     if (!isClickInside) {
         document.getElementById('userDropdownMenu').style.display = 'none';
@@ -2008,6 +2045,85 @@ html.is-mobile .profile-trigger > div:first-child {
 html.is-mobile .profile-trigger {
     padding: 5px 8px !important;
     gap: 0 !important;
+}
+
+/* ══════════════════════════════════════════════
+   মোবাইলে Account Dropdown — পূর্ণ স্ক্রিন পপআপ
+   ══════════════════════════════════════════════ */
+
+/* মোবাইলে ড্রপডাউন মেনু — fixed fullscreen overlay */
+html.is-mobile #userDropdownMenu {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    z-index: 9999999 !important;
+    overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #0f172a !important;
+}
+
+/* মোবাইলে ড্রপডাউন — close বাটন যোগের জন্য header */
+html.is-mobile #userDropdownMenu > div:first-child {
+    padding: 50px 20px 30px !important;
+    position: relative !important;
+}
+
+/* মোবাইলে অ্যাভাটার বড় */
+html.is-mobile #dropdownImageWrapper {
+    width: 120px !important;
+    height: 120px !important;
+}
+html.is-mobile #dropdownUserPlaceholder {
+    font-size: 60px !important;
+}
+
+/* মোবাইলে মেনু আইটেম বড় ও স্পর্শযোগ্য */
+html.is-mobile .dp-item {
+    padding: 18px 20px !important;
+    font-size: 32px !important;
+    border-radius: 12px !important;
+    margin-bottom: 4px !important;
+}
+html.is-mobile .dp-item i {
+    font-size: 30px !important;
+    width: 40px !important;
+}
+
+/* মোবাইলে লগআউট বাটন */
+html.is-mobile #userDropdownMenu > div:last-child button {
+    padding: 22px !important;
+    font-size: 30px !important;
+    border-radius: 14px !important;
+}
+html.is-mobile #userDropdownMenu > div:last-child {
+    padding: 15px 20px 40px !important;
+}
+
+/* মোবাইলে অ্যাকাউন্ট হেডিং */
+html.is-mobile #userDropdownMenu h4 {
+    font-size: 36px !important;
+    margin-top: 16px !important;
+}
+
+/* মোবাইলে ul padding বড় */
+html.is-mobile #userDropdownMenu ul {
+    padding: 10px 15px !important;
+    flex: 1 !important;
+}
+
+/* মোবাইলে camera আইকন বড় */
+html.is-mobile #userDropdownMenu label[for="avatarUpload"] {
+    width: 44px !important;
+    height: 44px !important;
+}
+html.is-mobile #userDropdownMenu label[for="avatarUpload"] i {
+    font-size: 18px !important;
 }
 </style>
 </body>
