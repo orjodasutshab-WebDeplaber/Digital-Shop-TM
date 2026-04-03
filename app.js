@@ -6121,27 +6121,31 @@ document.getElementById('productSearchInput').addEventListener('search', functio
 });
 
 // ১. ফিল্টার মেনু খোলা বা বন্ধ করার ফাংশন
-function toggleFilterMenu() {
-    const menu = document.getElementById('filterMenu');
-    if (menu) {
-        const isHidden = menu.style.display === 'none' || menu.style.display === '';
-        menu.style.display = isHidden ? 'block' : 'none';
-    }
-}
-
-// ২. মূল ফিল্টার ফাংশন (যেকোনো পেজে কাজ করবে)
-
 // ১. মেনু খোলা বা বন্ধ করার উন্নত ফাংশন
 function toggleFilterMenu(show = null) {
     const menu = document.getElementById('filterMenu');
+    const overlay = document.getElementById('filterOverlay');
     if (!menu) return;
 
+    const isMobile = document.body.classList.contains('is-mobile') || document.documentElement.classList.contains('is-mobile');
+
+    let willShow;
     if (show === true) {
-        menu.style.display = 'block';
+        willShow = true;
     } else if (show === false) {
-        menu.style.display = 'none';
+        willShow = false;
     } else {
-        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        willShow = (menu.style.display !== 'block');
+    }
+
+    if (willShow) {
+        menu.style.display = 'block';
+        if (overlay) overlay.style.display = isMobile ? 'block' : 'none';
+        if (isMobile) document.body.style.overflow = 'hidden';
+    } else {
+        menu.style.display = 'none';
+        if (overlay) overlay.style.display = 'none';
+        document.body.style.overflow = '';
     }
 }
 

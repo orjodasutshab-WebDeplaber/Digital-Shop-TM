@@ -778,7 +778,7 @@ document.addEventListener('click', function(event) {
                     <span class="pb-filter-arrow"><i class="fa fa-chevron-down"></i></span>
                 </button>
 
-                <div id="filterMenu" style="position: absolute; right: 0; top: 55px; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; width: 260px; border-radius: 20px; display: none; z-index: 1000; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); transform-origin: top right; animation: scaleUp 0.2s ease-out;">
+                <div id="filterMenu" style="position: absolute; right: 0; top: 55px; background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 20px; width: 260px; border-radius: 20px; display: none; z-index: 1000; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); transform-origin: top right; animation: scaleUp 0.2s ease-out;" class="filter-menu-popup">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <div style="width: 8px; height: 8px; background: #fbbf24; border-radius: 50%;"></div>
@@ -811,6 +811,8 @@ document.addEventListener('click', function(event) {
                         <i class="fa fa-undo"></i> রিসেট অল
                     </button>
                 </div>
+        <!-- মোবাইল bottom sheet এর backdrop overlay -->
+        <div id="filterOverlay" onclick="toggleFilterMenu(false)" style="display:none;"></div>
         </div><!-- /.pb-filter-wrap -->
 
 </div><!-- /#popularBanner -->
@@ -970,6 +972,80 @@ body.is-mobile .pb-badge            { font-size: 22px !important; font-weight: 7
 body.is-mobile .pb-filter-text      { display: none; }
 body.is-mobile .pb-filter-btn       { padding: 9px 12px; border-radius: 50%; }
 body.is-mobile .pb-filter-arrow     { display: none; }
+
+/* ══ মোবাইলে ফিল্টার পপ — Fixed Bottom Sheet ══ */
+body.is-mobile .filter-menu-popup {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 28px 28px 0 0 !important;
+    padding: 28px 24px 40px !important;
+    z-index: 999999 !important;
+    transform-origin: bottom center !important;
+    animation: slideUpSheet 0.25s ease-out !important;
+    box-sizing: border-box !important;
+}
+
+/* Bottom sheet overlay — মোবাইলে backdrop */
+body.is-mobile #filterOverlay {
+    display: block !important;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 999998;
+    backdrop-filter: blur(4px);
+    animation: fadeinOv 0.2s ease;
+}
+
+/* ইনপুট ও বাটনগুলো মোবাইলে বড় */
+body.is-mobile .filter-menu-popup input,
+body.is-mobile .filter-menu-popup select {
+    font-size: 26px !important;
+    padding: 16px 14px !important;
+    border-radius: 14px !important;
+    height: 70px !important;
+}
+body.is-mobile .filter-menu-popup label {
+    font-size: 22px !important;
+    margin-bottom: 12px !important;
+}
+body.is-mobile .filter-menu-popup h4 {
+    font-size: 28px !important;
+}
+body.is-mobile .filter-menu-popup button[onclick="applyAdvancedFilter()"] {
+    font-size: 26px !important;
+    padding: 18px !important;
+    border-radius: 16px !important;
+    margin-bottom: 16px !important;
+}
+body.is-mobile .filter-menu-popup button[onclick="resetFilters()"] {
+    font-size: 22px !important;
+    padding: 10px !important;
+}
+
+/* Pull handle — bottom sheet এর টান-বার */
+body.is-mobile .filter-menu-popup::before {
+    content: '';
+    display: block;
+    width: 48px;
+    height: 5px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 10px;
+    margin: -10px auto 22px;
+}
+
+@keyframes slideUpSheet {
+    from { opacity: 0; transform: translateY(100%); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeinOv {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
 </style>
      
 <div class="load-more-section">
