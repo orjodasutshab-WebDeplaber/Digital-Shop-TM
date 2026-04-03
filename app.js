@@ -12429,6 +12429,40 @@ function pmxOpenBuyModal(productId) {
 
     document.body.style.overflow = 'hidden';
 
+    // ── মোবাইলে TrxID ও ExtraField গুলো জোর করে বড় করা ──
+    // viewport scale bypass করতে transform:scale() ব্যবহার
+    if (isMob) {
+        setTimeout(function() {
+            var sw = window.screen.width;
+            var scale = sw < 800 ? (800 / sw) : 1; // reverse the viewport scale
+            var trxEl = document.getElementById('pmxBuyTrxId');
+            if (trxEl) {
+                trxEl.style.fontSize = '46px';
+                trxEl.style.fontWeight = '900';
+                trxEl.style.minHeight = '120px';
+                trxEl.style.padding = '28px 22px';
+                trxEl.style.transform = 'scale(' + scale + ')';
+                trxEl.style.transformOrigin = 'left top';
+                trxEl.style.width = (100 / scale) + '%';
+                trxEl.style.marginBottom = (16 * scale) + 'px';
+            }
+            var i = 0;
+            while (true) {
+                var exEl = document.getElementById('pmxExtraField_' + i);
+                if (!exEl) break;
+                exEl.style.fontSize = '46px';
+                exEl.style.fontWeight = '700';
+                exEl.style.minHeight = '120px';
+                exEl.style.padding = '28px 22px';
+                exEl.style.transform = 'scale(' + scale + ')';
+                exEl.style.transformOrigin = 'left top';
+                exEl.style.width = (100 / scale) + '%';
+                exEl.style.marginBottom = (16 * scale) + 'px';
+                i++;
+            }
+        }, 50);
+    }
+
     // ── সেল কাউন্টার লাইভ অ্যানিমেশন: ৫ সেকেন্ডে একবার +১ ──
     window._pmxSaleCntTimer = setInterval(() => {
         const modal = document.getElementById('pmxBuyModal');
