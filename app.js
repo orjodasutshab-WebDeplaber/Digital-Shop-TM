@@ -11111,8 +11111,83 @@ function pmxRenderHeaderList() {
                 ${h.tb ? `<div style="color:#6b7280;font-size:11px;">TB: ${h.tb}</div>` : ''}
                 ${h.fields && h.fields.length ? `<div style="color:#a78bfa;font-size:11px;margin-top:3px;">📝 ঘর: ${h.fields.join(', ')}</div>` : ''}
             </div>
+            <button onclick="pmxModifyHeader(${h.id})" style="background:#6366f1;color:#fff;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:13px;margin-right:4px;" title="পরিবর্তন করুন">✏️</button>
             <button onclick="pmxDeleteHeader(${h.id})" style="background:#ef4444;color:#fff;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:13px;">🗑</button>
         </div>`).join('');
+}
+function pmxModifyHeader(headerId) {
+    const headers = pmxGetAll(PMX_KEYS.HEADERS);
+    const h = headers.find(x => String(x.id) === String(headerId));
+    if (!h) return;
+    // বিদ্যমান ঘরের নাম গুলো row হিসেবে তৈরি করা
+    const existingFields = (h.fields || []).map(f => `
+        <div class="pmx-mod-field-row" style="display:flex;gap:6px;align-items:center;margin-bottom:8px;">
+            <input type="text" value="${f.replace(/"/g,'&quot;')}" placeholder="ঘরের নাম" style="flex:1;padding:9px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+            <button onclick="this.closest('.pmx-mod-field-row').remove()" style="background:#7f1d1d;color:#fff;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;flex-shrink:0;">✕</button>
+        </div>`).join('');
+    const el = document.getElementById('pmxModifyHeaderModal');
+    if (el) el.remove();
+    document.body.insertAdjacentHTML('beforeend', `
+    <div id="pmxModifyHeaderModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
+        <div style="background:#1e293b;border-radius:20px;padding:26px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;border:1px solid #6366f1;position:relative;">
+            <button onclick="document.getElementById('pmxModifyHeaderModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:20px;width:32px;height:32px;border-radius:50%;cursor:pointer;">✕</button>
+            <h3 style="color:#818cf8;margin:0 0 18px;font-size:16px;">✏️ হেডার পরিবর্তন</h3>
+            <div style="background:#0f172a;border-radius:12px;padding:16px;">
+                <!-- ছবির লিংক -->
+                <div style="color:#94a3b8;font-size:12px;font-weight:600;margin-bottom:6px;">ছবির লিংক</div>
+                <input id="pmxModImg" type="text" value="${(h.img||'').replace(/"/g,'&quot;')}" placeholder="ছবির লিংক"
+                    style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:12px;box-sizing:border-box;">
+                <!-- হেডারের নাম -->
+                <div style="color:#94a3b8;font-size:12px;font-weight:600;margin-bottom:6px;">হেডারের নাম</div>
+                <input id="pmxModName" type="text" value="${(h.name||'').replace(/"/g,'&quot;')}" placeholder="হেডারের নাম"
+                    style="width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;margin-bottom:14px;box-sizing:border-box;">
+                <!-- কাস্টম ঘর -->
+                <div style="color:#a78bfa;font-size:12px;font-weight:700;margin-bottom:8px;">📝 অর্ডার ফর্মের ঘর সমূহ</div>
+                <div id="pmxModFieldList" style="margin-bottom:8px;">
+                    ${existingFields || `<div class="pmx-mod-field-row" style="display:flex;gap:6px;align-items:center;margin-bottom:8px;">
+                        <input type="text" placeholder="ঘরের নাম (যেমন: আইডি দাও)" style="flex:1;padding:9px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+                        <button onclick="this.closest('.pmx-mod-field-row').remove()" style="background:#7f1d1d;color:#fff;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;flex-shrink:0;">✕</button>
+                    </div>`}
+                </div>
+                <button onclick="pmxModAddFieldRow()" style="width:100%;background:#1e3a5f;color:#38bdf8;border:1px dashed #38bdf8;padding:9px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:14px;font-family:'Hind Siliguri',sans-serif;">＋ আরো ঘর এড করুন</button>
+                <button onclick="pmxSaveModifiedHeader(${headerId})" style="width:100%;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">💾 সেভ করুন</button>
+            </div>
+        </div>
+    </div>`);
+}
+function pmxModAddFieldRow() {
+    const list = document.getElementById('pmxModFieldList');
+    if (!list) return;
+    const row = document.createElement('div');
+    row.className = 'pmx-mod-field-row';
+    row.style.cssText = 'display:flex;gap:6px;align-items:center;margin-bottom:8px;';
+    row.innerHTML = `<input type="text" placeholder="ঘরের নাম" style="flex:1;padding:9px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+        <button onclick="this.closest('.pmx-mod-field-row').remove()" style="background:#7f1d1d;color:#fff;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;flex-shrink:0;">✕</button>`;
+    list.appendChild(row);
+}
+function pmxSaveModifiedHeader(headerId) {
+    const img  = document.getElementById('pmxModImg')?.value.trim();
+    const name = document.getElementById('pmxModName')?.value.trim();
+    if (!name) { showToast('❌ হেডারের নাম দিন!'); return; }
+    // কাস্টম ঘর সংগ্রহ
+    const fieldInputs = document.querySelectorAll('#pmxModFieldList .pmx-mod-field-row input');
+    const fields = [];
+    fieldInputs.forEach(inp => { const v = inp.value.trim(); if (v) fields.push(v); });
+    // হেডার আপডেট
+    let headers = pmxGetAll(PMX_KEYS.HEADERS);
+    const idx = headers.findIndex(x => String(x.id) === String(headerId));
+    if (idx === -1) { showToast('❌ হেডার পাওয়া যায়নি!'); return; }
+    headers[idx] = { ...headers[idx], img: img||'', name, fields };
+    localStorage.setItem(PMX_KEYS.HEADERS, JSON.stringify(headers));
+    // Firebase আপডেট
+    const db = pmxDb();
+    if (db) db.collection('pmx_headers').doc(String(headerId)).update({ img: img||'', name, fields }).catch(()=>{});
+    // UI রিফ্রেশ
+    const list = document.getElementById('pmxHeaderList');
+    if (list) list.innerHTML = pmxRenderHeaderList();
+    pmxRefreshDisplay();
+    document.getElementById('pmxModifyHeaderModal')?.remove();
+    showToast('✅ হেডার আপডেট হয়েছে!');
 }
 function pmxDeleteHeader(id) {
     if (!confirm('এই হেডার ও এর সব প্রোডাক্ট ডিলিট হবে!')) return;
