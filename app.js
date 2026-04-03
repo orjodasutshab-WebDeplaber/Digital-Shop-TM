@@ -12441,10 +12441,10 @@ function pmxOpenBuyModal(productId) {
                 trxEl.style.fontWeight = '900';
                 trxEl.style.minHeight = '70px';
                 trxEl.style.padding = '10px 22px';
-                trxEl.style.transform = 'scale(' + scale + ')';
-                trxEl.style.transformOrigin = 'left top';
-                trxEl.style.width = (100 / scale) + '%';
-                trxEl.style.marginBottom = (16 * scale) + 'px';
+                trxEl.style.zoom = scale;
+                trxEl.style.width = '100%';
+                trxEl.style.marginBottom = '16px';
+                trxEl.style.boxSizing = 'border-box';
             }
             var i = 0;
             while (true) {
@@ -12454,10 +12454,10 @@ function pmxOpenBuyModal(productId) {
                 exEl.style.fontWeight = '700';
                 exEl.style.minHeight = '70px';
                 exEl.style.padding = '10px 22px';
-                exEl.style.transform = 'scale(' + scale + ')';
-                exEl.style.transformOrigin = 'left top';
-                exEl.style.width = (100 / scale) + '%';
-                exEl.style.marginBottom = (16 * scale) + 'px';
+                exEl.style.zoom = scale;
+                exEl.style.width = '100%';
+                exEl.style.marginBottom = '16px';
+                exEl.style.boxSizing = 'border-box';
                 i++;
             }
         }, 50);
