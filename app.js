@@ -12196,7 +12196,7 @@ function pmxOpenBuyModal(productId) {
     // ── মোবাইল ফর্মের কাস্টম ঘর HTML ──
     const _mobFieldsHtml = _fields.map((f, i) => `
         <input id="pmxExtraField_${i}" placeholder="${f}"
-          style="width:100%;padding:28px 22px;border-radius:14px;border:2px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:100px;font-weight:700;outline:none;min-height:150px;"
+          style="width:100%;padding:28px 22px;border-radius:14px;border:2px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:46px;font-weight:600;outline:none;min-height:120px;"
           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">`).join('');
 
     // ── Stars ──
