@@ -12135,13 +12135,10 @@ function pmxOpenBuyModal(productId) {
     const isDark = document.body.classList.contains('dark-theme');
     const isMob  = document.documentElement.classList.contains('is-mobile');
 
-    // ── মোবাইলে viewport scale compensate করে input font size ──
-    // viewport width=800, screen.width যত কম তত বেশি scale করতে হবে
-    const _sw = window.screen.width || 390;
-    const _scale = Math.min(1, _sw / 800);
-    const _inputFontPx = isMob ? Math.round(36 / _scale) : 14; // মোবাইলে 36px দেখাবে
-    const _inputHeightPx = isMob ? Math.round(60 / _scale) : 44;
-    const _inputPadPx = isMob ? Math.round(14 / _scale) : 10;
+    // viewport scale=1 করা হবে modal খোলার সময়, তাই স্বাভাবিক px দিলেই হবে
+    const _inputFontPx = isMob ? 36 : 14;
+    const _inputHeightPx = isMob ? 60 : 44;
+    const _inputPadPx = isMob ? 16 : 10;
 
     // ── থিম রঙ ──
     const pageBg   = isDark ? '#0f172a' : '#f8fafc';
@@ -12241,7 +12238,7 @@ function pmxOpenBuyModal(productId) {
             <span style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:1px;">⭐ PREMIUM</span>
             <span style="color:${mutedC};font-size:13px;">${p.name||''}</span>
           </div>
-          <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';"
+          <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';(function(){var sw=window.screen.width;var vp=document.querySelector('meta[name=viewport]');if(vp&&sw<800){var sc=sw/800;vp.content='width=800,initial-scale='+sc.toFixed(4)+',minimum-scale='+sc.toFixed(4)+',maximum-scale=3,user-scalable=yes';}})();"
             style="background:${isDark?'#334155':'#f1f5f9'};border:1px solid ${borderC};color:${titleC};width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.2s;"
             onmouseover="this.style.background='#ef4444';this.style.color='#fff'"
             onmouseout="this.style.background='${isDark?'#334155':'#f1f5f9'}';this.style.color='${titleC}'">✕</button>
@@ -12311,8 +12308,7 @@ function pmxOpenBuyModal(productId) {
     const mobLayout = `
     <!-- sticky top bar -->
     <div style="position:sticky;top:0;background:${headerBg};backdrop-filter:blur(10px);border-bottom:1px solid ${borderC};padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:10;">
-      <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';"
-        style="background:${isDark?'#334155':'#f1f5f9'};border:2px solid ${borderC};color:${titleC};width:90px;height:90px;border-radius:50%;cursor:pointer;font-size:55px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:900;">←</button>
+      <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';(function(){var sw=window.screen.width;var vp=document.querySelector('meta[name=viewport]');if(vp&&sw<800){var sc=sw/800;vp.content='width=800,initial-scale='+sc.toFixed(4)+',minimum-scale='+sc.toFixed(4)+',maximum-scale=3,user-scalable=yes';}})();"
       <div style="flex:1;overflow:hidden;">
         <div style="color:${titleC};font-size:42px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;">${p.name||''}</div>
         <div style="color:${priceC};font-size:39px;font-weight:800;">৳${p.price}</div>
@@ -12429,6 +12425,12 @@ function pmxOpenBuyModal(productId) {
       </footer>
       <div style="height:20px;"></div>
     </div>`;
+
+    // মোবাইলে modal খোলার সময় viewport স্বাভাবিক করো (scale=1)
+    if (isMob) {
+        const _vp = document.querySelector('meta[name=viewport]');
+        if (_vp) _vp.content = 'width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=3,user-scalable=yes';
+    }
 
     document.body.insertAdjacentHTML('beforeend', `
     <div id="pmxBuyModal" style="position:fixed;inset:0;background:${pageBg};z-index:9999999999;font-family:'Hind Siliguri',sans-serif;overflow-y:${isMob?'auto':'hidden'};-webkit-overflow-scrolling:touch;">
