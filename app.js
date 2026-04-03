@@ -12135,11 +12135,6 @@ function pmxOpenBuyModal(productId) {
     const isDark = document.body.classList.contains('dark-theme');
     const isMob  = document.documentElement.classList.contains('is-mobile');
 
-    // viewport scale=1 করা হবে modal খোলার সময়, তাই স্বাভাবিক px দিলেই হবে
-    const _inputFontPx = isMob ? 36 : 14;
-    const _inputHeightPx = isMob ? 60 : 44;
-    const _inputPadPx = isMob ? 16 : 10;
-
     // ── থিম রঙ ──
     const pageBg   = isDark ? '#0f172a' : '#f8fafc';
     const cardBg   = isDark ? '#1e293b' : '#ffffff';
@@ -12201,7 +12196,7 @@ function pmxOpenBuyModal(productId) {
     // ── মোবাইল ফর্মের কাস্টম ঘর HTML ──
     const _mobFieldsHtml = _fields.map((f, i) => `
         <input id="pmxExtraField_${i}" placeholder="${f}"
-          style="width:100%;padding:${_inputPadPx}px 18px;border-radius:14px;border:2px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:14px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:${_inputFontPx}px;font-weight:700;outline:none;min-height:${_inputHeightPx}px;line-height:1.1;display:block;"
+          style="width:100%;padding:28px 22px;border-radius:14px;border:2px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:100px;font-weight:700;outline:none;min-height:150px;"
           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">`).join('');
 
     // ── Stars ──
@@ -12238,7 +12233,7 @@ function pmxOpenBuyModal(productId) {
             <span style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;letter-spacing:1px;">⭐ PREMIUM</span>
             <span style="color:${mutedC};font-size:13px;">${p.name||''}</span>
           </div>
-          <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';(function(){var sw=window.screen.width;var vp=document.querySelector('meta[name=viewport]');if(vp&&sw<800){var sc=sw/800;vp.content='width=800,initial-scale='+sc.toFixed(4)+',minimum-scale='+sc.toFixed(4)+',maximum-scale=3,user-scalable=yes';}})();"
+          <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';"
             style="background:${isDark?'#334155':'#f1f5f9'};border:1px solid ${borderC};color:${titleC};width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.2s;"
             onmouseover="this.style.background='#ef4444';this.style.color='#fff'"
             onmouseout="this.style.background='${isDark?'#334155':'#f1f5f9'}';this.style.color='${titleC}'">✕</button>
@@ -12308,7 +12303,8 @@ function pmxOpenBuyModal(productId) {
     const mobLayout = `
     <!-- sticky top bar -->
     <div style="position:sticky;top:0;background:${headerBg};backdrop-filter:blur(10px);border-bottom:1px solid ${borderC};padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:10;">
-      <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';(function(){var sw=window.screen.width;var vp=document.querySelector('meta[name=viewport]');if(vp&&sw<800){var sc=sw/800;vp.content='width=800,initial-scale='+sc.toFixed(4)+',minimum-scale='+sc.toFixed(4)+',maximum-scale=3,user-scalable=yes';}})();"
+      <button onclick="document.getElementById('pmxBuyModal').remove();document.body.style.overflow='';"
+        style="background:${isDark?'#334155':'#f1f5f9'};border:2px solid ${borderC};color:${titleC};width:90px;height:90px;border-radius:50%;cursor:pointer;font-size:55px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-weight:900;">←</button>
       <div style="flex:1;overflow:hidden;">
         <div style="color:${titleC};font-size:42px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Hind Siliguri',sans-serif;">${p.name||''}</div>
         <div style="color:${priceC};font-size:39px;font-weight:800;">৳${p.price}</div>
@@ -12369,7 +12365,7 @@ function pmxOpenBuyModal(productId) {
           <div style="color:${isDark?'#94a3b8':'#6b7280'};font-size:39px;margin-top:6px;">(Send Money করুন)</div>
         </div>
         <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *"
-          style="width:100%;padding:${_inputPadPx}px 18px;border-radius:14px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:${_inputFontPx}px;font-weight:700;outline:none;min-height:${_inputHeightPx}px;line-height:1.1;display:block;"
+          style="width:100%;padding:28px 22px;border-radius:14px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:100px;font-weight:700;outline:none;min-height:150px;"
           onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#6366f1'">
         <button onclick="pmxPlaceOrder('${p.id}')"
           style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:20px;border-radius:12px;font-size:42px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 16px rgba(16,185,129,0.35);">
@@ -12425,12 +12421,6 @@ function pmxOpenBuyModal(productId) {
       </footer>
       <div style="height:20px;"></div>
     </div>`;
-
-    // মোবাইলে modal খোলার সময় viewport স্বাভাবিক করো (scale=1)
-    if (isMob) {
-        const _vp = document.querySelector('meta[name=viewport]');
-        if (_vp) _vp.content = 'width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=3,user-scalable=yes';
-    }
 
     document.body.insertAdjacentHTML('beforeend', `
     <div id="pmxBuyModal" style="position:fixed;inset:0;background:${pageBg};z-index:9999999999;font-family:'Hind Siliguri',sans-serif;overflow-y:${isMob?'auto':'hidden'};-webkit-overflow-scrolling:touch;">
