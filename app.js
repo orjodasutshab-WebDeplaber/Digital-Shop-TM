@@ -12286,7 +12286,7 @@ function pmxOpenBuyModal(productId) {
               <div style="color:#94a3b8;font-size:11px;margin-top:4px;">(Send Money করুন)</div>
             </div>
             <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *"
-              style="width:100%;padding:12px 14px;border-radius:10px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:46px;font-weight:800;outline:none;min-height:80px;"
+              style="width:100%;padding:12px 14px;border-radius:10px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:14px;font-weight:600;outline:none;"
               onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#6366f1'">
             <button onclick="pmxPlaceOrder('${p.id}')"
               style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:16px;border-radius:12px;font-size:17px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;letter-spacing:0.3px;transition:.2s;box-shadow:0 4px 16px rgba(16,185,129,0.35);"
@@ -12365,7 +12365,7 @@ function pmxOpenBuyModal(productId) {
           <div style="color:${isDark?'#94a3b8':'#6b7280'};font-size:39px;margin-top:6px;">(Send Money করুন)</div>
         </div>
         <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *"
-          style="width:100%;padding:28px 22px;border-radius:14px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:46px;font-weight:800;outline:none;min-height:120px;"
+          style="width:100%;padding:35px 28px;border-radius:14px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:200px;font-weight:900;outline:none;min-height:200px;"
           onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#6366f1'">
         <button onclick="pmxPlaceOrder('${p.id}')"
           style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:20px;border-radius:12px;font-size:42px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 16px rgba(16,185,129,0.35);">
