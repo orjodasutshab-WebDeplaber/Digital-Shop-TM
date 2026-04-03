@@ -13,11 +13,14 @@
             if(sw < dw){
                 var scale = sw / dw;
                 var vp = document.querySelector('meta[name=viewport]');
-                if(vp) vp.content = 'width='+dw+',initial-scale='+scale.toFixed(4)+',minimum-scale='+scale.toFixed(4)+',maximum-scale=3,user-scalable=yes';
+                if(vp) vp.content = 'width='+dw+',initial-scale='+scale.toFixed(4)+',minimum-scale='+scale.toFixed(4)+',maximum-scale='+scale.toFixed(4)+',user-scalable=no';
             }
         }
         setScale();
         window.addEventListener('resize', setScale);
+        // touch দিয়ে zoom পুরোপুরি বন্ধ
+        document.addEventListener('touchmove', function(e){ if(e.touches.length > 1) e.preventDefault(); }, { passive: false });
+        document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, { passive: false });
     })();
 
     // মোবাইল ডিটেক্ট করে html তে class যোগ করা (viewport lock bypass)
