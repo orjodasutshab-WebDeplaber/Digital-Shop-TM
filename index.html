@@ -982,8 +982,8 @@ body.is-mobile .filter-menu-popup {
     top: auto !important;
     width: 100% !important;
     max-width: 100% !important;
-    border-radius: 28px 28px 0 0 !important;
-    padding: 28px 24px 40px !important;
+    border-radius: 36px 36px 0 0 !important;
+    padding: 36px 36px 60px !important;
     z-index: 999999 !important;
     transform-origin: bottom center !important;
     animation: slideUpSheet 0.25s ease-out !important;
@@ -1004,38 +1004,67 @@ body.is-mobile #filterOverlay {
 /* ইনপুট ও বাটনগুলো মোবাইলে বড় */
 body.is-mobile .filter-menu-popup input,
 body.is-mobile .filter-menu-popup select {
-    font-size: 26px !important;
-    padding: 16px 14px !important;
-    border-radius: 14px !important;
-    height: 70px !important;
+    font-size: 34px !important;
+    padding: 22px 18px !important;
+    border-radius: 18px !important;
+    height: 90px !important;
+    font-family: 'Hind Siliguri', sans-serif !important;
 }
 body.is-mobile .filter-menu-popup label {
-    font-size: 22px !important;
-    margin-bottom: 12px !important;
+    font-size: 28px !important;
+    margin-bottom: 16px !important;
+    display: block !important;
 }
 body.is-mobile .filter-menu-popup h4 {
-    font-size: 28px !important;
+    font-size: 38px !important;
+}
+body.is-mobile .filter-menu-popup > div:first-child {
+    margin-bottom: 32px !important;
+}
+body.is-mobile .filter-menu-popup > div:nth-child(2) {
+    margin-bottom: 32px !important;
+}
+body.is-mobile .filter-menu-popup > div:nth-child(3) {
+    margin-bottom: 36px !important;
+}
+body.is-mobile .filter-menu-popup div[style*="display: flex; gap: 10px"] {
+    gap: 16px !important;
+    margin-bottom: 36px !important;
+}
+body.is-mobile .filter-menu-popup div[style*="position: relative"] {
+    margin-bottom: 40px !important;
+}
+body.is-mobile .filter-menu-popup div[style*="position: relative"] i {
+    font-size: 20px !important;
+    top: 34px !important;
+    right: 20px !important;
 }
 body.is-mobile .filter-menu-popup button[onclick="applyAdvancedFilter()"] {
-    font-size: 26px !important;
-    padding: 18px !important;
-    border-radius: 16px !important;
-    margin-bottom: 16px !important;
+    font-size: 34px !important;
+    padding: 24px !important;
+    border-radius: 20px !important;
+    margin-bottom: 20px !important;
 }
 body.is-mobile .filter-menu-popup button[onclick="resetFilters()"] {
-    font-size: 22px !important;
-    padding: 10px !important;
+    font-size: 28px !important;
+    padding: 14px !important;
+}
+body.is-mobile .filter-menu-popup button[onclick="toggleFilterMenu(false)"] {
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 28px !important;
+    border-radius: 50% !important;
 }
 
 /* Pull handle — bottom sheet এর টান-বার */
 body.is-mobile .filter-menu-popup::before {
     content: '';
     display: block;
-    width: 48px;
-    height: 5px;
-    background: rgba(255,255,255,0.25);
+    width: 64px;
+    height: 6px;
+    background: rgba(255,255,255,0.3);
     border-radius: 10px;
-    margin: -10px auto 22px;
+    margin: -14px auto 28px;
 }
 
 @keyframes slideUpSheet {
