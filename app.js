@@ -12196,7 +12196,7 @@ function pmxOpenBuyModal(productId) {
     // ── মোবাইল ফর্মের কাস্টম ঘর HTML ──
     const _mobFieldsHtml = _fields.map((f, i) => `
         <input id="pmxExtraField_${i}" placeholder="${f}"
-          style="width:100%;padding:28px 22px;border-radius:14px;border:2px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:46px;font-weight:600;outline:none;min-height:120px;"
+          style="width:100%;display:block;box-sizing:border-box;padding:14px 18px;border-radius:14px;border:2px solid ${inputBdr};background:${inputBg};color:${inputClr};margin-bottom:16px;font-family:'Hind Siliguri',sans-serif;font-size:32px;font-weight:800;outline:none;min-height:70px;position:static;"
           onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='${inputBdr}'">`).join('');
 
     // ── Stars ──
@@ -12365,7 +12365,7 @@ function pmxOpenBuyModal(productId) {
           <div style="color:${isDark?'#94a3b8':'#6b7280'};font-size:39px;margin-top:6px;">(Send Money করুন)</div>
         </div>
         <input id="pmxBuyTrxId" placeholder="TrxID দিন (অবশ্যই) *"
-          style="width:100%;padding:35px 28px;border-radius:14px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;font-size:200px;font-weight:900;outline:none;min-height:200px;"
+          style="width:100%;display:block;box-sizing:border-box;padding:14px 18px;border-radius:14px;border:2px solid #6366f1;background:${inputBg};color:${inputClr};margin-bottom:16px;font-family:'Hind Siliguri',sans-serif;font-size:32px;font-weight:900;outline:none;min-height:70px;position:static;"
           onfocus="this.style.borderColor='#818cf8'" onblur="this.style.borderColor='#6366f1'">
         <button onclick="pmxPlaceOrder('${p.id}')"
           style="width:100%;background:linear-gradient(135deg,#10b981,#047857);color:#fff;border:none;padding:20px;border-radius:12px;font-size:42px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;box-shadow:0 4px 16px rgba(16,185,129,0.35);">
@@ -12429,38 +12429,34 @@ function pmxOpenBuyModal(productId) {
 
     document.body.style.overflow = 'hidden';
 
-    // ── মোবাইলে TrxID ও ExtraField গুলো জোর করে বড় করা ──
-    // viewport scale bypass করতে transform:scale() ব্যবহার
+    // ── মোবাইলে input ঘরগুলো style tag দিয়ে জোর করে বড় করা ──
     if (isMob) {
-        setTimeout(function() {
-            var sw = window.screen.width;
-            var scale = sw < 800 ? (800 / sw) : 1; // reverse the viewport scale
-            var trxEl = document.getElementById('pmxBuyTrxId');
-            if (trxEl) {
-                trxEl.style.fontSize = '46px';
-                trxEl.style.fontWeight = '900';
-                trxEl.style.minHeight = '70px';
-                trxEl.style.padding = '10px 22px';
-                trxEl.style.zoom = scale;
-                trxEl.style.width = '100%';
-                trxEl.style.marginBottom = '16px';
-                trxEl.style.boxSizing = 'border-box';
-            }
-            var i = 0;
-            while (true) {
-                var exEl = document.getElementById('pmxExtraField_' + i);
-                if (!exEl) break;
-                exEl.style.fontSize = '46px';
-                exEl.style.fontWeight = '700';
-                exEl.style.minHeight = '70px';
-                exEl.style.padding = '10px 22px';
-                exEl.style.zoom = scale;
-                exEl.style.width = '100%';
-                exEl.style.marginBottom = '16px';
-                exEl.style.boxSizing = 'border-box';
-                i++;
-            }
-        }, 50);
+        var _oldFix = document.getElementById('pmx-mob-input-fix');
+        if (_oldFix) _oldFix.remove();
+        var _s = document.createElement('style');
+        _s.id = 'pmx-mob-input-fix';
+        _s.innerHTML =
+            'html.is-mobile #pmxBuyTrxId,' +
+            'html.is-mobile [id^="pmxExtraField_"] {' +
+            '  width: 100% !important;' +
+            '  display: block !important;' +
+            '  box-sizing: border-box !important;' +
+            '  padding: 14px 18px !important;' +
+            '  border-radius: 14px !important;' +
+            '  margin-bottom: 16px !important;' +
+            '  font-family: "Hind Siliguri", sans-serif !important;' +
+            '  font-size: 46px !important;' +
+            '  font-weight: 800 !important;' +
+            '  min-height: 70px !important;' +
+            '  outline: none !important;' +
+            '  position: static !important;' +
+            '  transform: none !important;' +
+            '  zoom: unset !important;' +
+            '  float: none !important;' +
+            '  margin-left: 0 !important;' +
+            '  margin-right: 0 !important;' +
+            '}';
+        document.head.appendChild(_s);
     }
 
     // ── সেল কাউন্টার লাইভ অ্যানিমেশন: ৫ সেকেন্ডে একবার +১ ──
