@@ -2858,6 +2858,8 @@ function updateCurrentUserRecord() {
 function openOrderTracking() {
     openModal('orderTrackingModal');
 
+    // modal display হতে সময় লাগে — setTimeout দিয়ে নিশ্চিত করা
+    setTimeout(function() {
     var list = document.getElementById('userOrderHistoryList');
     if(!list) return;
 
@@ -2937,6 +2939,7 @@ function openOrderTracking() {
     });
 
     list.innerHTML = finalHtml;
+    }, 50); // setTimeout শেষ
 }
 
 // PC li এ bind করা
