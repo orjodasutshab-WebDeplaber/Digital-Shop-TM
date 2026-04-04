@@ -2854,15 +2854,17 @@ function updateCurrentUserRecord() {
 }
 
 // Order Tracking View - Digital Shop TM (ছবি সহ আপডেট করা)
-document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclick = function() {
+// openOrderTracking: মোবাইল mob-sheet-item থেকেও call হয়
+function openOrderTracking() {
     openModal('orderTrackingModal');
-    
-    var list = document.getElementById('userOrderHistoryList');
-    if(!list) return; 
 
-    list.style.maxHeight = "450px"; 
-    list.style.overflowY = "auto";  
-    list.style.paddingRight = "5px"; 
+    var list = document.getElementById('userOrderHistoryList');
+    if(!list) return;
+
+    var isMob = document.documentElement.classList.contains('is-mobile');
+    list.style.maxHeight = isMob ? "72vh" : "450px";
+    list.style.overflowY = "auto";
+    list.style.paddingRight = "5px";
     list.style.scrollBehavior = "smooth";
 
     list.innerHTML = '<div style="text-align:center; padding:20px; color: #888;">অর্ডার চেক করা হচ্ছে...</div>';
@@ -2935,7 +2937,10 @@ document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclic
     });
 
     list.innerHTML = finalHtml;
-};
+}
+
+// PC li এ bind করা
+document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclick = openOrderTracking;
 
 // অর্ডার ডিলিট করার জন্য নতুন ফাংশন
 function cancelUserOrder(orderId) {
@@ -2949,7 +2954,7 @@ function cancelUserOrder(orderId) {
         saveData(DB_KEYS.ORDERS, appState.orders);
         
         // ভিউ আপডেট করা (আবার ট্র্যাকিং ওপেন করে রিফ্রেশ করা)
-        document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").click();
+        openOrderTracking();
         
         alert("অর্ডারটি সফলভাবে ডিলিট করা হয়েছে।");
     }
