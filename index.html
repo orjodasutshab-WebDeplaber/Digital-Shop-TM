@@ -2984,33 +2984,48 @@ html.is-mobile #userReturnListModal #userReturnListContent {
     font-size: 26px !important;
 }
 
-/* ══ Order Tracking Modal (app.js generated) ══ */
+/* ══ Order Tracking Modal — মোবাইলে পুরা স্ক্রিন ══ */
+html.is-mobile #orderTrackingModal {
+    align-items: stretch !important;
+    padding: 0 !important;
+}
 html.is-mobile #orderTrackingModal .modal-box,
 html.is-mobile #orderTrackingModal .medium-modal {
-    width: 98% !important;
+    width: 100% !important;
     max-width: 100% !important;
-    padding: 36px 22px 28px 22px !important;
-    border-radius: 28px !important;
-    max-height: 92vh !important;
+    min-height: 100vh !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    padding: 40px 20px 24px 20px !important;
     overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 html.is-mobile #orderTrackingModal h3 {
     font-size: 36px !important;
-    margin-bottom: 16px !important;
+    margin-bottom: 18px !important;
 }
 html.is-mobile #orderTrackingModal .close-btn {
-    font-size: 56px !important;
-    top: 16px !important;
-    right: 20px !important;
+    font-size: 58px !important;
+    top: 14px !important;
+    right: 18px !important;
+}
+html.is-mobile #orderTrackingModal .modal-body {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 html.is-mobile #orderTrackingModal .order-list-container {
-    font-size: 0 !important; /* নিচে inline style override করবে */
-    max-height: 65vh !important;
+    flex: 1 !important;
+    max-height: none !important;
+    height: auto !important;
     overflow-y: auto !important;
 }
 /* order card ভেতরের সব লেখা বড় */
 html.is-mobile #userOrderHistoryList > div {
-    padding: 22px !important;
+    padding: 24px !important;
     border-radius: 18px !important;
     margin-bottom: 18px !important;
 }
