@@ -505,7 +505,7 @@
                     <div style="display:flex;align-items:center;gap:12px;"><i class="fa fa-ticket-alt"></i><span>ডিসকাউন্ট কোড ও কার্ড</span></div>
                     <span id="discount-notif-dot" style="display: none; width: 10px; height: 10px; background: #ff4757; border-radius: 50%; box-shadow: 0 0 8px #ff4757;"></span>
                 </li>
-                <li class="dp-item" onclick="openOrderTracking()"><i class="fa fa-box-open"></i> ভিউ অর্ডার (ট্র্যাকিং)</li>
+                <li class="dp-item" onclick="openModal('orderTrackingModal')"><i class="fa fa-box-open"></i> ভিউ অর্ডার (ট্র্যাকিং)</li>
                 <li class="dp-item" onclick="openUserOrders()"><i class="fa fa-shopping-bag"></i> আমার অর্ডার</li>
                 <li class="dp-item" onclick="pmxOpenUserOrders()" style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);"><i class="fa fa-crown" style="color:#a78bfa;"></i> ⭐ প্রিমিয়াম ডিটেইলস</li>
                 <li class="dp-item" onclick="openUserCart()"><i class="fa fa-shopping-cart"></i> ইউর কার্ট</li>
@@ -645,7 +645,7 @@
             </div>
             <span id="mobile-discount-notif-dot" style="display:none;width:16px;height:16px;background:#ff4757;border-radius:50%;box-shadow:0 0 10px #ff4757;flex-shrink:0;"></span>
         </div>
-        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openOrderTracking()">
+        <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openModal('orderTrackingModal')">
             <div class="mob-icon-wrap" style="background:rgba(99,102,241,0.18);"><i class="fa fa-box-open" style="color:#818cf8;"></i></div>
             ভিউ অর্ডার (ট্র্যাকিং)
         </div>
@@ -2984,72 +2984,28 @@ html.is-mobile #userReturnListModal #userReturnListContent {
     font-size: 26px !important;
 }
 
-/* ══ Order Tracking Modal — মোবাইলে পুরা স্ক্রিন ══ */
-html.is-mobile #orderTrackingModal {
-    align-items: stretch !important;
-    padding: 0 !important;
-}
+/* ══ Order Tracking Modal (app.js generated) ══ */
 html.is-mobile #orderTrackingModal .modal-box,
 html.is-mobile #orderTrackingModal .medium-modal {
-    width: 100% !important;
+    width: 96% !important;
     max-width: 100% !important;
-    min-height: 100vh !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    padding: 40px 20px 24px 20px !important;
+    padding: 32px 24px !important;
+    border-radius: 32px !important;
+    max-height: 90vh !important;
     overflow-y: auto !important;
-    display: flex !important;
-    flex-direction: column !important;
 }
 html.is-mobile #orderTrackingModal h3 {
-    font-size: 36px !important;
-    margin-bottom: 18px !important;
+    font-size: 34px !important;
 }
 html.is-mobile #orderTrackingModal .close-btn {
-    font-size: 58px !important;
-    top: 14px !important;
-    right: 18px !important;
-}
-html.is-mobile #orderTrackingModal .modal-body {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
+    font-size: 52px !important;
 }
 html.is-mobile #orderTrackingModal .order-list-container {
-    flex: 1 !important;
-    max-height: none !important;
-    height: auto !important;
-    overflow-y: auto !important;
-}
-/* order card ভেতরের সব লেখা বড় */
-html.is-mobile #userOrderHistoryList > div {
-    padding: 24px !important;
-    border-radius: 18px !important;
-    margin-bottom: 18px !important;
-}
-html.is-mobile #userOrderHistoryList strong {
-    font-size: 30px !important;
-}
-html.is-mobile #userOrderHistoryList small {
-    font-size: 24px !important;
-}
-html.is-mobile #userOrderHistoryList span {
     font-size: 26px !important;
-}
-html.is-mobile #userOrderHistoryList img {
-    width: 90px !important;
-    height: 90px !important;
-}
-html.is-mobile #userOrderHistoryList button {
-    font-size: 26px !important;
-    padding: 10px 18px !important;
-    border-radius: 10px !important;
 }
 html.is-mobile #orderTrackingModal input,
 html.is-mobile #orderTrackingModal button {
-    font-size: 28px !important;
+    font-size: 26px !important;
     padding: 18px !important;
     border-radius: 14px !important;
 }
