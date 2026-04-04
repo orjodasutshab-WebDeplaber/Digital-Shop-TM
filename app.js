@@ -693,8 +693,8 @@ function initiateCheckout(productId) {
 
     const summaryBox = document.getElementById('checkoutSummaryBox');
     if (summaryBox) {
-        summaryBox.style.maxHeight = "350px"; 
-        summaryBox.style.overflowY = "auto"; 
+        summaryBox.style.maxHeight = ""; 
+        summaryBox.style.overflowY = ""; 
         summaryBox.style.display = "block"; 
         
         // এখানে শুধু এইচটিএমএল স্ট্রাকচারটা একবারই তৈরি হবে

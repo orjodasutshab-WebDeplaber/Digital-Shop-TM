@@ -1751,7 +1751,7 @@ window.toggleThemeMode = function() {
                 <h3 style="color: #27ae60; margin: 0;">অর্ডার কনফার্মেশন (ধাপ ১/২)</h3>
                 <p style="color: #000; font-size: 14px; margin-top: 5px; font-weight: 500;">দয়া করে আপনার সঠিক ঠিকানা দিন</p>
             </div>
-            <div class="checkout-summary" id="checkoutSummaryBox" style="max-height: 100px; overflow-y: auto; padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 20px; border: 1px solid #dee2e6; color: #000 !important; font-weight: 600;"></div>
+            <div class="checkout-summary" id="checkoutSummaryBox" style="max-height: 220px; overflow-y: auto; padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 20px; border: 1px solid #dee2e6; color: #000 !important; font-weight: 600;"></div>
             <div class="modal-body">
                 <div class="payment-method-selector" style="margin-bottom: 20px; padding: 15px; background: #f0f2f5; border-radius: 8px; border: 1px solid #ced4da;">
                     <p style="margin-bottom: 12px; font-weight: bold; color: #000; text-align: center;">পেমেন্ট পদ্ধতি:</p>
@@ -2039,6 +2039,85 @@ html.is-mobile #checkoutModal > div > div#checkoutStep2 > div:last-child button 
     padding: 24px !important;
     font-size: 28px !important;
     border-radius: 16px !important;
+}
+
+/* ══ Summary Box — পণ্য নাম ও পরিমাণ row ══ */
+html.is-mobile #checkoutModal #checkoutSummaryBox {
+    max-height: none !important;
+    overflow-y: visible !important;
+}
+html.is-mobile #checkoutModal #checkoutSummaryBox > div:first-child {
+    padding: 20px !important;
+    border-radius: 16px !important;
+    margin-bottom: 18px !important;
+}
+html.is-mobile #checkoutModal #checkoutSummaryBox p {
+    font-size: 26px !important;
+    margin-bottom: 14px !important;
+    line-height: 1.6 !important;
+}
+/* পণ্যের নাম */
+html.is-mobile #checkoutModal #checkoutSummaryBox strong {
+    font-size: 26px !important;
+}
+/* quantity row — flex container */
+html.is-mobile #checkoutModal #checkoutSummaryBox > div:first-child > div {
+    padding: 16px !important;
+    border-radius: 12px !important;
+    flex-wrap: wrap !important;
+    gap: 14px !important;
+}
+html.is-mobile #checkoutModal #checkoutSummaryBox > div:first-child > div > span {
+    font-size: 26px !important;
+}
+/* quantity +/- বাটন */
+html.is-mobile #checkoutModal #checkoutSummaryBox button {
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 32px !important;
+    border-radius: 10px !important;
+    min-height: unset !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+}
+/* quantity number */
+html.is-mobile #checkoutModal #stepQty {
+    font-size: 34px !important;
+    min-width: 40px !important;
+}
+/* price rows */
+html.is-mobile #checkoutModal #checkoutSummaryBox > div:nth-child(2) p {
+    font-size: 26px !important;
+    margin: 12px 0 !important;
+}
+html.is-mobile #checkoutModal #checkoutSummaryBox > div:nth-child(2) h4 {
+    font-size: 32px !important;
+    margin-top: 8px !important;
+}
+html.is-mobile #checkoutModal #checkoutSummaryBox #discountRow span {
+    font-size: 26px !important;
+}
+
+/* ══ ধাপ ১ — modal-box scroll fix ══ */
+html.is-mobile #checkoutModal .modal-box {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+/* ══ ধাপ ২ — back + confirm বাটন row ══ */
+html.is-mobile #checkoutModal #checkoutStep2 > div[style*="display: flex"],
+html.is-mobile #checkoutModal #checkoutStep2 > div[style*="display:flex"] {
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-top: 28px !important;
+}
+html.is-mobile #checkoutModal #checkoutStep2 > div[style*="display: flex"] button,
+html.is-mobile #checkoutModal #checkoutStep2 > div[style*="display:flex"] button {
+    flex: unset !important;
+    width: 100% !important;
+    padding: 26px !important;
+    font-size: 30px !important;
+    border-radius: 18px !important;
 }
 </style>
     <div class="modal-box fullscreen-modal">
