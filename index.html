@@ -2338,5 +2338,279 @@ html.is-mobile .profile-trigger {
 }
 
 /* ══ মোবাইলে Account Dropdown — পুরনো CSS সরানো হয়েছে (bottom sheet দিয়ে replace) ══ */
+
+/* ══════════════════════════════════════════════════════════════
+   মোবাইল — সব Account Modal এর Universal Fix
+   viewport: 800px scale, তাই সব কিছু ~2x বড় করতে হবে
+══════════════════════════════════════════════════════════════ */
+html.is-mobile .modal-overlay .modal-box,
+html.is-mobile .modal-overlay [class*="modal-box"] {
+    width: 96% !important;
+    max-width: 100% !important;
+    border-radius: 32px !important;
+    padding: 36px 28px 32px !important;
+    max-height: 88vh !important;
+    overflow-y: auto !important;
+}
+
+/* ── সব modal close বাটন ── */
+html.is-mobile .modal-overlay .close-btn {
+    font-size: 52px !important;
+    right: 24px !important;
+    top: 16px !important;
+    line-height: 1 !important;
+}
+
+/* ── সব modal heading ── */
+html.is-mobile .modal-overlay h2,
+html.is-mobile .modal-overlay h3 {
+    font-size: 34px !important;
+    margin-bottom: 24px !important;
+}
+
+/* ── সব input, select, textarea ── */
+html.is-mobile .modal-overlay input,
+html.is-mobile .modal-overlay select,
+html.is-mobile .modal-overlay textarea {
+    font-size: 28px !important;
+    padding: 20px 18px !important;
+    border-radius: 16px !important;
+    margin-bottom: 16px !important;
+    height: auto !important;
+}
+
+/* ── label ── */
+html.is-mobile .modal-overlay label {
+    font-size: 26px !important;
+    margin-bottom: 10px !important;
+    display: block !important;
+}
+
+/* ── সব button ── */
+html.is-mobile .modal-overlay button,
+html.is-mobile .modal-overlay .btn-primary {
+    font-size: 28px !important;
+    padding: 22px 20px !important;
+    border-radius: 18px !important;
+    min-height: 72px !important;
+}
+
+/* ── icon বড় ── */
+html.is-mobile .modal-overlay .modal-box > div > div[style*="width: 55px"],
+html.is-mobile .modal-overlay .modal-box > div > div[style*="width:55px"],
+html.is-mobile .modal-overlay .modal-box > div > div[style*="width: 60px"],
+html.is-mobile .modal-overlay .modal-box > div > div[style*="width:60px"] {
+    width: 100px !important;
+    height: 100px !important;
+    font-size: 44px !important;
+    border-radius: 26px !important;
+    margin-bottom: 18px !important;
+}
+
+/* ══ ইউজারনেম পরিবর্তন Modal ══ */
+html.is-mobile #resetUsernameModal .modal-box {
+    max-width: 100% !important;
+}
+html.is-mobile #resetUsernameModal input {
+    padding: 22px 22px 22px 66px !important;
+    font-size: 28px !important;
+}
+html.is-mobile #resetUsernameModal .fa-signature {
+    font-size: 26px !important;
+    left: 20px !important;
+}
+
+/* ══ এড্রেস Modal ══ */
+html.is-mobile #addressModal .addr-input {
+    font-size: 28px !important;
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+    margin-bottom: 0 !important;
+}
+html.is-mobile #addressModal .modal-body {
+    gap: 20px !important;
+}
+html.is-mobile #addressModal .modal-body > div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+}
+
+/* ══ হেল্প Modal ══ */
+html.is-mobile #helpModal .modal-box {
+    border-radius: 32px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+}
+html.is-mobile #helpModal .modal-box > div:first-child {
+    padding: 40px 24px !important;
+}
+html.is-mobile #helpModal .modal-box > div:first-child .close-btn {
+    font-size: 52px !important;
+    top: 18px !important;
+    right: 22px !important;
+}
+html.is-mobile #helpModal .modal-box > div:first-child > div[style*="font-size: 50px"],
+html.is-mobile #helpModal .modal-box > div:first-child > div[style*="font-size:50px"] {
+    font-size: 80px !important;
+    margin-bottom: 16px !important;
+}
+html.is-mobile #helpModal .modal-box > div:first-child h2,
+html.is-mobile #helpModal .modal-box > div:first-child h3 {
+    font-size: 38px !important;
+}
+html.is-mobile #helpModal .modal-box > div:first-child p,
+html.is-mobile #helpModal .modal-box > div:first-child span {
+    font-size: 24px !important;
+}
+html.is-mobile #helpModal .modal-box > div:nth-child(2) {
+    padding: 28px !important;
+}
+html.is-mobile #helpModal a {
+    font-size: 28px !important;
+    padding: 22px !important;
+    border-radius: 18px !important;
+    gap: 16px !important;
+}
+html.is-mobile #helpModal .fab,
+html.is-mobile #helpModal .fa {
+    font-size: 30px !important;
+}
+html.is-mobile #helpModal > div > div:last-child {
+    font-size: 22px !important;
+    padding: 18px !important;
+}
+html.is-mobile #helpModal > div > div:nth-child(2) > div[style*="grid"] {
+    gap: 14px !important;
+}
+
+/* ══ ডিসকাউন্ট Modal ══ */
+html.is-mobile #discountModal .modal-box {
+    padding: 0 !important;
+    border-radius: 32px !important;
+    overflow: hidden !important;
+}
+html.is-mobile #discountModal .modal-box > div:first-child {
+    padding: 36px 24px !important;
+}
+html.is-mobile #discountModal .modal-box > div:first-child h3 {
+    font-size: 36px !important;
+}
+html.is-mobile #discountModal .modal-box > div:first-child .close-btn {
+    font-size: 52px !important;
+    top: 18px !important;
+    right: 22px !important;
+}
+html.is-mobile #discountModal .modal-body {
+    padding: 28px !important;
+}
+html.is-mobile #discountModal label {
+    font-size: 24px !important;
+}
+html.is-mobile #discountModal #promo-input-box {
+    font-size: 28px !important;
+    padding: 20px 18px !important;
+    border-radius: 16px !important;
+}
+html.is-mobile #discountModal #reqBtn {
+    font-size: 28px !important;
+    padding: 24px !important;
+    border-radius: 18px !important;
+    gap: 14px !important;
+    margin-bottom: 28px !important;
+}
+html.is-mobile #discountModal > div > div:last-child div[style*="flex"] {
+    gap: 14px !important;
+}
+html.is-mobile #discountModal > div > div:last-child button {
+    font-size: 28px !important;
+    padding: 20px !important;
+    border-radius: 16px !important;
+}
+
+/* ══ রিটার্ন অর্ডার Modal ══ */
+html.is-mobile #userReturnListModal .modal-box {
+    border-radius: 32px !important;
+    padding: 28px !important;
+    max-height: 90vh !important;
+}
+html.is-mobile #userReturnListModal h3 {
+    font-size: 32px !important;
+}
+html.is-mobile #userReturnListModal span[style*="font-size:24px"] {
+    font-size: 52px !important;
+}
+html.is-mobile #userReturnListModal #userReturnListContent {
+    font-size: 26px !important;
+}
+
+/* ══ Order Tracking Modal (app.js generated) ══ */
+html.is-mobile #orderTrackingModal .modal-box,
+html.is-mobile #orderTrackingModal .medium-modal {
+    width: 96% !important;
+    max-width: 100% !important;
+    padding: 32px 24px !important;
+    border-radius: 32px !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+}
+html.is-mobile #orderTrackingModal h3 {
+    font-size: 34px !important;
+}
+html.is-mobile #orderTrackingModal .close-btn {
+    font-size: 52px !important;
+}
+html.is-mobile #orderTrackingModal .order-list-container {
+    font-size: 26px !important;
+}
+html.is-mobile #orderTrackingModal input,
+html.is-mobile #orderTrackingModal button {
+    font-size: 26px !important;
+    padding: 18px !important;
+    border-radius: 14px !important;
+}
+
+/* ══ User Orders, Cart, Premium (app.js dynamic modal) ══ */
+/* app.js এ position:fixed দিয়ে তৈরি হয় — font ও padding বড় করা */
+html.is-mobile [id^="tmUserOrders"],
+html.is-mobile [id^="tmCartModal"],
+html.is-mobile [id^="tmPmxUser"] {
+    font-size: 26px !important;
+}
+/* app.js generated modal — যেকোনো position:fixed modal যেটা body তে inject হয় */
+html.is-mobile .gp-modal-wrap,
+html.is-mobile #gpDetailModal {
+    font-size: 26px !important;
+}
+html.is-mobile .gp-modal-wrap button,
+html.is-mobile #gpDetailModal button {
+    font-size: 26px !important;
+    padding: 18px !important;
+    border-radius: 14px !important;
+    min-height: 64px !important;
+}
+html.is-mobile .gp-modal-wrap input,
+html.is-mobile #gpDetailModal input,
+html.is-mobile .gp-modal-wrap select,
+html.is-mobile #gpDetailModal select {
+    font-size: 26px !important;
+    padding: 18px !important;
+}
+
+/* ══ App.js inject করা যেকোনো modal overlay ══ */
+html.is-mobile body > div[style*="position:fixed"][style*="z-index"] .modal-inner,
+html.is-mobile body > div[style*="position: fixed"][style*="z-index"] > div {
+    font-size: 26px !important;
+}
+html.is-mobile body > div[style*="position:fixed"] > div > button,
+html.is-mobile body > div[style*="position: fixed"] > div > button {
+    font-size: 26px !important;
+    padding: 18px 16px !important;
+    border-radius: 14px !important;
+}
+html.is-mobile body > div[style*="position:fixed"] > div input,
+html.is-mobile body > div[style*="position: fixed"] > div input {
+    font-size: 26px !important;
+    padding: 18px !important;
+}
 </style>
 </body>
