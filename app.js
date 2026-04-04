@@ -2854,13 +2854,15 @@ function updateCurrentUserRecord() {
 }
 
 // Order Tracking View - Digital Shop TM (ছবি সহ আপডেট করা)
-document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclick = function() {
+function openOrderTracking() {
     openModal('orderTrackingModal');
     
     var list = document.getElementById('userOrderHistoryList');
     if(!list) return; 
 
-    list.style.maxHeight = "450px"; 
+    // মোবাইলে বড় height
+    var isMobile = document.documentElement.classList.contains('is-mobile');
+    list.style.maxHeight = isMobile ? "65vh" : "450px";
     list.style.overflowY = "auto";  
     list.style.paddingRight = "5px"; 
     list.style.scrollBehavior = "smooth";
@@ -2935,7 +2937,24 @@ document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclic
     });
 
     list.innerHTML = finalHtml;
-};
+}
+
+// PC ও মোবাইল উভয়কে openOrderTracking এ bind করা
+(function() {
+    // PC: li element
+    var pcLi = document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]]");
+    if (pcLi) { pcLi.onclick = openOrderTracking; }
+    // মোবাইল: mob-sheet-item div
+    var allMobItems = document.querySelectorAll('.mob-sheet-item');
+    allMobItems.forEach(function(el) {
+        if (el.textContent.indexOf('ভিউ অর্ডার') !== -1 || el.getAttribute('onclick') && el.getAttribute('onclick').indexOf('orderTrackingModal') !== -1) {
+            el.onclick = function() {
+                if (typeof closeMobileAccountMenu === 'function') closeMobileAccountMenu();
+                openOrderTracking();
+            };
+        }
+    });
+})();
 
 // অর্ডার ডিলিট করার জন্য নতুন ফাংশন
 function cancelUserOrder(orderId) {
@@ -2949,7 +2968,7 @@ function cancelUserOrder(orderId) {
         saveData(DB_KEYS.ORDERS, appState.orders);
         
         // ভিউ আপডেট করা (আবার ট্র্যাকিং ওপেন করে রিফ্রেশ করা)
-        document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").click();
+        openOrderTracking();
         
         alert("অর্ডারটি সফলভাবে ডিলিট করা হয়েছে।");
     }
