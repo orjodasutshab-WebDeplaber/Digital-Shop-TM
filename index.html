@@ -2221,30 +2221,5 @@ html.is-mobile .profile-trigger {
 }
 
 /* ══ মোবাইলে Account Dropdown — পুরনো CSS সরানো হয়েছে (bottom sheet দিয়ে replace) ══ */
-
-/* ══════════════════════════════════════════════
-   পুরো সাইট — অদৃশ্য স্ক্রলবার (PC + Mobile)
-   শুধু #mobileSheetList বাদে
-══════════════════════════════════════════════ */
-html, body {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-}
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-}
-
-/* সাইটের বাকি সব scroll container — hidden */
-*:not(#mobileSheetList)::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-}
-*:not(#mobileSheetList) {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-}
 </style>
 </body>
