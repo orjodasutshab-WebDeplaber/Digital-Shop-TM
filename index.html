@@ -1845,7 +1845,202 @@ window.toggleThemeMode = function() {
     </div>
 </div>
 
-<div id="adminPanelModal" class="modal-overlay">
+<style>
+/* ══════════════════════════════════════════════════════
+   মোবাইল — অর্ডার কনফার্মেশন Modal (ধাপ ১ ও ২)
+   viewport 800px scale → সব ~2× বড়
+══════════════════════════════════════════════════════ */
+html.is-mobile #checkoutModal .modal-box {
+    width: 97% !important;
+    max-width: 100% !important;
+    border-radius: 30px !important;
+    padding: 36px 26px 32px !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+}
+
+/* ── Close বাটন ── */
+html.is-mobile #checkoutModal .close-btn {
+    font-size: 56px !important;
+    right: 22px !important;
+    top: 12px !important;
+    line-height: 1 !important;
+}
+
+/* ── Heading ── */
+html.is-mobile #checkoutModal h3 {
+    font-size: 34px !important;
+    margin-bottom: 10px !important;
+}
+html.is-mobile #checkoutModal p {
+    font-size: 24px !important;
+}
+
+/* ── Summary box ── */
+html.is-mobile #checkoutModal #checkoutSummaryBox {
+    font-size: 26px !important;
+    padding: 18px !important;
+    border-radius: 16px !important;
+    max-height: 160px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 26px !important;
+}
+
+/* ── পেমেন্ট পদ্ধতি block ── */
+html.is-mobile #checkoutModal .payment-method-selector {
+    padding: 22px !important;
+    border-radius: 18px !important;
+    margin-bottom: 26px !important;
+}
+html.is-mobile #checkoutModal .payment-method-selector p {
+    font-size: 28px !important;
+    margin-bottom: 18px !important;
+}
+html.is-mobile #checkoutModal .payment-method-selector label {
+    padding: 20px 14px !important;
+    font-size: 26px !important;
+    border-radius: 14px !important;
+    gap: 10px !important;
+}
+html.is-mobile #checkoutModal .payment-method-selector input[type="radio"] {
+    width: 28px !important;
+    height: 28px !important;
+    margin-right: 10px !important;
+}
+html.is-mobile #checkoutModal #codInfoMessage {
+    font-size: 24px !important;
+    margin-top: 14px !important;
+}
+
+/* ── ডিসকাউন্ট section ── */
+html.is-mobile #checkoutModal #discount-section {
+    padding: 22px !important;
+    border-radius: 18px !important;
+    margin-bottom: 26px !important;
+}
+html.is-mobile #checkoutModal #discount-section label {
+    font-size: 26px !important;
+    margin-bottom: 14px !important;
+}
+html.is-mobile #checkoutModal #order-discount-card {
+    padding: 20px 16px !important;
+    font-size: 26px !important;
+    border-radius: 14px !important;
+}
+
+/* ── form label ── */
+html.is-mobile #checkoutModal .form-group label {
+    font-size: 26px !important;
+    margin-bottom: 10px !important;
+    font-weight: 700 !important;
+}
+
+/* ── input সব ── */
+html.is-mobile #checkoutModal input[type="text"],
+html.is-mobile #checkoutModal input[type="number"],
+html.is-mobile #checkoutModal input[type="url"],
+html.is-mobile #checkoutModal select,
+html.is-mobile #checkoutModal textarea {
+    padding: 20px 16px !important;
+    font-size: 26px !important;
+    border-radius: 14px !important;
+    margin-bottom: 0 !important;
+}
+
+/* ── ডেলিভারি ঠিকানা block ── */
+html.is-mobile #checkoutModal .form-group[style*="background: #f8fafc"] {
+    padding: 24px !important;
+    border-radius: 22px !important;
+    margin-bottom: 28px !important;
+}
+html.is-mobile #checkoutModal .form-group > label[style*="font-size: 16px"] {
+    font-size: 30px !important;
+    margin-bottom: 16px !important;
+}
+
+/* ── সেভ করা ঠিকানা box ── */
+html.is-mobile #checkoutModal #savedAddrBox {
+    padding: 22px !important;
+    border-radius: 16px !important;
+    border-width: 3px !important;
+}
+html.is-mobile #checkoutModal #savedAddrBox span {
+    font-size: 22px !important;
+    padding: 4px 14px !important;
+    border-radius: 8px !important;
+}
+html.is-mobile #checkoutModal #displaySavedAddr {
+    font-size: 26px !important;
+    margin-top: 12px !important;
+    line-height: 1.6 !important;
+}
+
+/* ── নতুন ঠিকানা input box ── */
+html.is-mobile #checkoutModal #newAddrInputBox {
+    padding: 22px !important;
+    border-radius: 18px !important;
+    border-width: 3px !important;
+}
+html.is-mobile #checkoutModal #newAddrInputBox span {
+    font-size: 22px !important;
+}
+html.is-mobile #checkoutModal #newAddrInputBox > div[style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    margin-top: 16px !important;
+}
+
+/* ── নতুন ঠিকানা বাটন জোড়া ── */
+html.is-mobile #checkoutModal #newAddrInputBox > div[style*="display:flex"] button {
+    padding: 22px !important;
+    font-size: 26px !important;
+    border-radius: 14px !important;
+}
+
+/* ── toggle নতুন ঠিকানা বাটন ── */
+html.is-mobile #checkoutModal #toggleNewAddrBtn {
+    padding: 22px !important;
+    font-size: 26px !important;
+    border-radius: 16px !important;
+    border-width: 3px !important;
+}
+
+/* ── পরবর্তী ধাপ বাটন ── */
+html.is-mobile #checkoutModal .btn-success,
+html.is-mobile #checkoutModal button.btn-success {
+    padding: 26px !important;
+    font-size: 32px !important;
+    border-radius: 18px !important;
+    margin-top: 10px !important;
+}
+
+/* ══ ধাপ ২ — পেমেন্ট ══ */
+html.is-mobile #checkoutModal .payment-details {
+    padding: 26px !important;
+    border-radius: 18px !important;
+    margin-bottom: 26px !important;
+}
+html.is-mobile #checkoutModal .payment-details p {
+    font-size: 28px !important;
+    margin-bottom: 10px !important;
+    line-height: 1.5 !important;
+}
+html.is-mobile #checkoutModal .form-group label {
+    font-size: 28px !important;
+    margin-bottom: 12px !important;
+}
+html.is-mobile #checkoutModal #paymentTrxID {
+    padding: 22px 18px !important;
+    font-size: 28px !important;
+    border-radius: 14px !important;
+}
+html.is-mobile #checkoutModal > div > div#checkoutStep2 > div[style*="display: flex"] button,
+html.is-mobile #checkoutModal > div > div#checkoutStep2 > div:last-child button {
+    padding: 24px !important;
+    font-size: 28px !important;
+    border-radius: 16px !important;
+}
+</style>
     <div class="modal-box fullscreen-modal">
         <div class="admin-top-bar">
             <div class="admin-brand"><i class="fa fa-user-shield"></i> Admin Panel (DigitalShopOrjo)</div>
