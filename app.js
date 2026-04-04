@@ -3815,12 +3815,23 @@ function openUserOrders() {
         document.body.appendChild(orderModal);
     }
 
+    const _isMob = document.documentElement.classList.contains('is-mobile');
+
+    // মোবাইলে পুরো স্ক্রিন, PC তে আগের মতো
+    const _overlayAlign = _isMob ? 'flex-start' : 'center';
+    const _boxStyle = _isMob
+        ? 'background:#0f172a; width:100%; min-height:100vh; height:100%; overflow-y:auto; border-radius:0; border:none; position:relative; padding:70px 18px 30px 18px; animation:modalSlideUp 0.3s ease;'
+        : 'background:#0f172a; width:90%; max-width:600px; max-height:85vh; overflow-y:auto; border-radius:20px; border:1px solid #334155; position:relative; padding:20px; animation:modalSlideUp 0.3s ease;';
+    const _closeBtnStyle = _isMob
+        ? 'position:fixed; right:16px; top:14px; background:#1e293b; border:none; color:#fff; width:64px; height:64px; border-radius:50%; cursor:pointer; font-size:40px; display:flex; align-items:center; justify-content:center; z-index:10; line-height:1;'
+        : 'position:absolute; right:15px; top:15px; background:#1e293b; border:none; color:#fff; width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:18px;';
+
     orderModal.innerHTML = `
-        <div id="orderOverlay" onclick="closeOrderModal()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
-            <div id="orderContent" onclick="event.stopPropagation()" style="background: #0f172a; width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; border-radius: 20px; border: 1px solid #334155; position: relative; padding: 20px; animation: modalSlideUp 0.3s ease;">
-                <button onclick="closeOrderModal()" style="position: absolute; right: 15px; top: 15px; background: #1e293b; border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">&times;</button>
+        <div id="orderOverlay" onclick="closeOrderModal()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000000; display:flex; align-items:${_overlayAlign}; justify-content:center; backdrop-filter:blur(8px);">
+            <div id="orderContent" onclick="event.stopPropagation()" style="${_boxStyle}">
+                <button onclick="closeOrderModal()" style="${_closeBtnStyle}">&times;</button>
                 <div id="orderDataArea">
-                    <div style="text-align: center; padding: 40px;"><div class="loader-spinner"></div></div>
+                    <div style="text-align:center; padding:40px;"><div class="loader-spinner"></div></div>
                 </div>
             </div>
         </div>
@@ -3846,37 +3857,38 @@ function openUserOrders() {
         const RETURN_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.RETURNS) ? DB_KEYS.RETURNS : 'returns';
         const allReturns = JSON.parse(localStorage.getItem(RETURN_KEY)) || [];
 
-        let html = `<h3 style="color: #fff; margin-bottom: 20px;"><i class="fa fa-shopping-bag" style="color:#6366f1"></i> আমার অর্ডারসমূহ (${myOrders.length})</h3>`;
+        const mob = document.documentElement.classList.contains('is-mobile');
+        const f = (pc, mo) => mob ? mo : pc;
+
+        let html = `<h3 style="color:#fff; margin-bottom:20px; font-size:${f('18px','34px')};"><i class="fa fa-shopping-bag" style="color:#6366f1"></i> আমার অর্ডারসমূহ (${myOrders.length})</h3>`;
 
         myOrders.reverse().forEach(order => {
             const isDelivered = (order.status === 'Delivered' || order.status === 'ডেলিভারি সম্পন্ন');
-            
-            // --- নতুন লজিক: চেক করা হচ্ছে এই অর্ডারের বিপরীতে কোনো রিটার্ন রিকোয়েস্ট অলরেডি আছে কি না ---
             const hasRequestedReturn = allReturns.some(ret => String(ret.orderId) === String(order.id));
 
             html += `
-                <div class="user-order-card" style="background: #1e293b; border: 1px solid #334155; border-radius: 15px; padding: 18px; margin-bottom: 15px; color: #fff;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
-                        <div>
-                            <span style="font-size: 10px; color: #94a3b8; font-weight: bold;">ID: #${order.id}</span>
-                            <h4 style="margin: 5px 0; color: #f8fafc; font-size: 15px;">${order.productName}</h4>
+                <div class="user-order-card" style="background:#1e293b; border:1px solid #334155; border-radius:${f('15px','20px')}; padding:${f('18px','26px')}; margin-bottom:${f('15px','18px')}; color:#fff;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; gap:8px;">
+                        <div style="min-width:0; flex:1;">
+                            <span style="font-size:${f('10px','22px')}; color:#94a3b8; font-weight:bold;">ID: #${order.id}</span>
+                            <h4 style="margin:5px 0; color:#f8fafc; font-size:${f('15px','30px')}; word-break:break-word;">${order.productName}</h4>
                         </div>
-                        <span style="background: ${isDelivered ? 'rgba(39, 174, 96, 0.2)' : 'rgba(243, 156, 18, 0.2)'}; color: ${isDelivered ? '#2ecc71' : '#f39c12'}; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold;">
+                        <span style="background:${isDelivered ? 'rgba(39,174,96,0.2)' : 'rgba(243,156,18,0.2)'}; color:${isDelivered ? '#2ecc71' : '#f39c12'}; padding:${f('4px 10px','8px 16px')}; border-radius:20px; font-size:${f('10px','22px')}; font-weight:bold; white-space:nowrap; flex-shrink:0;">
                             ${order.status}
                         </span>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                        <span style="color: #2ecc71; font-weight: 800; font-size: 18px;">${order.price} ৳</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; flex-wrap:wrap; gap:10px;">
+                        <span style="color:#2ecc71; font-weight:800; font-size:${f('18px','36px')};">${order.price} ৳</span>
                         
-                        <div style="display: flex; gap: 6px;">
-                            <button onclick="generateInvoice('${order.id}')" style="background: #0f172a; color: #3498db; border: 1px solid #3498db; padding: 6px 10px; border-radius: 8px; font-size: 11px; cursor: pointer;">রশিদ</button>
+                        <div style="display:flex; gap:${f('6px','10px')}; flex-wrap:wrap;">
+                            <button onclick="generateInvoice('${order.id}')" style="background:#0f172a; color:#3498db; border:1px solid #3498db; padding:${f('6px 10px','14px 22px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; cursor:pointer;">রশিদ</button>
                             
                             ${(isDelivered && !hasRequestedReturn) ? `
-                            <button onclick="openReturnModal('${order.id}')" style="background: #450a0a; color: #f87171; border: 1px solid #f87171; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer;">রিটার্ন</button>
-                            ` : (hasRequestedReturn ? '<span style="color:#94a3b8; font-size:11px; font-style:italic;">রিটার্ন করা হয়েছে</span>' : '')}
+                            <button onclick="openReturnModal('${order.id}')" style="background:#450a0a; color:#f87171; border:1px solid #f87171; padding:${f('6px 10px','14px 22px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; font-weight:bold; cursor:pointer;">রিটার্ন</button>
+                            ` : (hasRequestedReturn ? \`<span style="color:#94a3b8; font-size:${f('11px','24px')}; font-style:italic;">রিটার্ন করা হয়েছে</span>\` : '')}
 
-                            <button onclick="viewUserOrderDetails('${order.id}')" style="background: #3498db; color: white; border: none; padding: 7px 14px; border-radius: 8px; font-size: 11px; cursor: pointer;">বিস্তারিত</button>
+                            <button onclick="viewUserOrderDetails('${order.id}')" style="background:#3498db; color:white; border:none; padding:${f('7px 14px','14px 26px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; cursor:pointer;">বিস্তারিত</button>
                         </div>
                     </div>
                 </div>
