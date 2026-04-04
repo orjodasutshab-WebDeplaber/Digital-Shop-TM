@@ -1882,70 +1882,180 @@ window.toggleThemeMode = function() {
     </div>
 </div>
 
+<style>
+/* ══ Password Reset Modal — মোবাইল responsive ══ */
+#resetPasswordModal .rp-box {
+    background: #1e293b;
+    color: #fff;
+    border-radius: 24px;
+    padding: 30px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-family: 'Hind Siliguri', sans-serif;
+}
+/* label */
+#resetPasswordModal .rp-label {
+    color: #cbd5e1; font-weight: 600; display: block;
+    margin-bottom: 8px; font-size: 13px;
+}
+/* input */
+#resetPasswordModal .rp-input {
+    width: 100%; background: #0f172a; border: 1px solid #334155;
+    border-radius: 12px; color: #fff; outline: none;
+    box-sizing: border-box; font-family: 'Hind Siliguri', sans-serif;
+    padding: 12px 12px 12px 40px; font-size: 14px;
+}
+/* msg box */
+#resetPasswordModal .rp-msg {
+    display: none; padding: 10px; border-radius: 10px;
+    font-size: 13px; margin-bottom: 12px;
+}
+/* মোবাইলে সব বড় */
+html.is-mobile #resetPasswordModal .rp-box {
+    width: 96% !important;
+    max-width: 100% !important;
+    border-radius: 32px !important;
+    padding: 40px 30px 36px !important;
+}
+html.is-mobile #resetPasswordModal .rp-icon-wrap {
+    width: 100px !important; height: 100px !important;
+    font-size: 44px !important; margin-bottom: 18px !important;
+}
+html.is-mobile #resetPasswordModal .rp-title {
+    font-size: 36px !important;
+}
+html.is-mobile #resetPasswordModal .rp-close {
+    font-size: 40px !important;
+    right: 24px !important; top: 20px !important;
+}
+html.is-mobile #resetPasswordModal .rp-label {
+    font-size: 26px !important; margin-bottom: 12px !important;
+}
+html.is-mobile #resetPasswordModal .rp-input {
+    padding: 22px 22px 22px 64px !important;
+    font-size: 28px !important;
+    border-radius: 18px !important;
+    border-width: 2px !important;
+}
+html.is-mobile #resetPasswordModal .rp-input-icon {
+    font-size: 26px !important;
+    left: 20px !important;
+}
+html.is-mobile #resetPasswordModal .rp-btn {
+    padding: 22px !important;
+    font-size: 28px !important;
+    border-radius: 18px !important;
+}
+html.is-mobile #resetPasswordModal .rp-user-card {
+    padding: 20px !important;
+    border-radius: 18px !important;
+    margin-bottom: 20px !important;
+}
+html.is-mobile #resetPasswordModal .rp-user-avatar {
+    width: 68px !important; height: 68px !important;
+    font-size: 30px !important;
+}
+html.is-mobile #resetPasswordModal .rp-user-name {
+    font-size: 28px !important;
+}
+html.is-mobile #resetPasswordModal .rp-user-email {
+    font-size: 22px !important; margin-top: 4px !important;
+}
+html.is-mobile #resetPasswordModal .rp-mb { margin-bottom: 22px !important; }
+html.is-mobile #resetPasswordModal .rp-otp-sent {
+    font-size: 24px !important; padding: 18px !important;
+    border-radius: 16px !important; margin-bottom: 22px !important;
+}
+html.is-mobile #resetPasswordModal #resetOtpInput {
+    font-size: 42px !important; padding: 24px !important;
+    letter-spacing: 14px !important; border-radius: 18px !important;
+    border-width: 3px !important;
+}
+html.is-mobile #resetPasswordModal #otpTimer {
+    font-size: 24px !important; margin-top: 10px !important;
+}
+html.is-mobile #resetPasswordModal .rp-back-btn {
+    font-size: 26px !important; padding: 22px !important;
+    border-radius: 18px !important;
+}
+html.is-mobile #resetPasswordModal #resendBtn {
+    font-size: 26px !important; margin-top: 16px !important;
+}
+html.is-mobile #resetPasswordModal .rp-step2-msg {
+    font-size: 24px !important; padding: 16px !important;
+}
+</style>
+
 <div id="resetPasswordModal" class="modal-overlay" style="display: none !important; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999999; justify-content: center; align-items: center; backdrop-filter: blur(8px); font-family: 'Hind Siliguri', sans-serif;">
-    <div class="modal-box" style="background: #1e293b; color: #fff; border-radius: 24px; padding: 30px; width: 90%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); position: relative; border: 1px solid rgba(255,255,255,0.1);">
-        <span onclick="closeResetModal()" style="position: absolute; right: 20px; top: 15px; cursor: pointer; font-size: 24px; color: #64748b;"><i class="fa fa-times"></i></span>
+    <div class="modal-box rp-box">
+        <!-- Close -->
+        <span class="rp-close" onclick="closeResetModal()" style="position: absolute; right: 20px; top: 15px; cursor: pointer; font-size: 24px; color: #64748b;"><i class="fa fa-times"></i></span>
+
+        <!-- Header -->
         <div style="text-align: center; margin-bottom: 20px;">
-            <div style="width: 60px; height: 60px; background: rgba(231,76,60,0.15); color: #e74c3c; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 25px;"><i class="fa fa-shield-alt"></i></div>
-            <h3 style="color: #fff; margin: 0; font-size: 20px; font-weight: 700;">পাসওয়ার্ড পরিবর্তন</h3>
+            <div class="rp-icon-wrap" style="width: 60px; height: 60px; background: rgba(231,76,60,0.15); color: #e74c3c; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 25px;"><i class="fa fa-shield-alt"></i></div>
+            <h3 class="rp-title" style="color: #fff; margin: 0; font-size: 20px; font-weight: 700;">পাসওয়ার্ড পরিবর্তন</h3>
         </div>
 
-        <!-- Step 1: আইডি/মোবাইল/Email দিন — লগইন থাকলে auto-filled -->
+        <!-- Step 1 -->
         <div id="resetStep1">
-            <div style="margin-bottom: 15px;">
-                <label style="color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px;">আইডি / মোবাইল / ইমেইল</label>
+            <div class="rp-mb" style="margin-bottom: 15px;">
+                <label class="rp-label">আইডি / মোবাইল / ইমেইল</label>
                 <div style="position: relative;">
-                    <i class="fa fa-user" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
-                    <input type="text" id="resetUserId" placeholder="আইডি, মোবাইল বা ইমেইল দিন" style="width: 100%; padding: 12px 12px 12px 40px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: #fff; outline: none; box-sizing: border-box;">
+                    <i class="fa fa-user rp-input-icon" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
+                    <input type="text" id="resetUserId" placeholder="আইডি, মোবাইল বা ইমেইল দিন" class="rp-input">
                 </div>
             </div>
-            <div id="step1Msg" style="display:none; padding:10px; border-radius:10px; font-size:13px; margin-bottom:12px;"></div>
-            <!-- Step 1.5: ইউজার confirm card -->
-            <div id="resetUserCard" style="display:none; background:#0f172a; border:1px solid #334155; border-radius:12px; padding:14px; margin-bottom:14px;">
+            <div id="step1Msg" class="rp-msg"></div>
+            <!-- User confirm card -->
+            <div id="resetUserCard" class="rp-user-card" style="display:none; background:#0f172a; border:1px solid #334155; border-radius:12px; padding:14px; margin-bottom:14px;">
                 <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width:42px;height:42px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👤</div>
+                    <div class="rp-user-avatar" style="width:42px;height:42px;background:linear-gradient(135deg,#6366f1,#4f46e5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👤</div>
                     <div>
-                        <div id="resetUserName" style="color:#fff;font-weight:700;font-size:15px;"></div>
-                        <div id="resetUserEmail" style="color:#94a3b8;font-size:12px;margin-top:2px;"></div>
+                        <div id="resetUserName" class="rp-user-name" style="color:#fff;font-weight:700;font-size:15px;"></div>
+                        <div id="resetUserEmail" class="rp-user-email" style="color:#94a3b8;font-size:12px;margin-top:2px;"></div>
                     </div>
                 </div>
             </div>
             <div id="resetFindBtn" style="display:block;">
-                <button onclick="findUserForReset()" style="width: 100%; background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; padding: 14px; border-radius: 14px; cursor: pointer; font-weight: 800; font-size: 15px;">
+                <button onclick="findUserForReset()" class="rp-btn" style="width:100%;background:linear-gradient(135deg,#6366f1,#4f46e5);color:white;border:none;padding:14px;border-radius:14px;cursor:pointer;font-weight:800;font-size:15px;font-family:'Hind Siliguri',sans-serif;">
                     <i class="fa fa-search"></i> একাউন্ট খুঁজুন
                 </button>
             </div>
-            <div id="resetSendOtpBtn" style="display:none;">
-                <button onclick="sendOtpForReset()" id="sendOtpBtn" style="width: 100%; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 14px; border-radius: 14px; cursor: pointer; font-weight: 800; font-size: 15px;">
+            <div id="resetSendOtpBtn" style="display:none; margin-top:10px;">
+                <button onclick="sendOtpForReset()" id="sendOtpBtn" class="rp-btn" style="width:100%;background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;padding:14px;border-radius:14px;cursor:pointer;font-weight:800;font-size:15px;font-family:'Hind Siliguri',sans-serif;">
                     <i class="fa fa-paper-plane"></i> ইমেইলে OTP পাঠান
                 </button>
             </div>
         </div>
 
-        <!-- Step 2: OTP + নতুন পাসওয়ার্ড -->
+        <!-- Step 2 -->
         <div id="resetStep2" style="display:none;">
-            <div id="otpSentInfo" style="background:rgba(16,185,129,0.1); border:1px solid #10b981; border-radius:12px; padding:12px; margin-bottom:16px; font-size:13px; color:#6ee7b7; text-align:center;"></div>
-            <div style="margin-bottom: 15px;">
-                <label style="color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px;">OTP কোড</label>
-                <input type="number" id="resetOtpInput" placeholder="৬ ডিজিটের OTP" style="width:100%; padding: 14px; background: #0f172a; border: 2px solid #6366f1; border-radius: 12px; color: #fff; font-size:20px; font-weight:700; letter-spacing:6px; outline: none; text-align:center; box-sizing:border-box;">
-                <div id="otpTimer" style="color:#f59e0b; font-size:12px; margin-top:6px; text-align:center;"></div>
+            <div id="otpSentInfo" class="rp-otp-sent" style="background:rgba(16,185,129,0.1);border:1px solid #10b981;border-radius:12px;padding:12px;margin-bottom:16px;font-size:13px;color:#6ee7b7;text-align:center;"></div>
+            <div class="rp-mb" style="margin-bottom:15px;">
+                <label class="rp-label">OTP কোড</label>
+                <input type="number" id="resetOtpInput" placeholder="৬ ডিজিটের OTP" style="width:100%;padding:14px;background:#0f172a;border:2px solid #6366f1;border-radius:12px;color:#fff;font-size:20px;font-weight:700;letter-spacing:6px;outline:none;text-align:center;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
+                <div id="otpTimer" style="color:#f59e0b;font-size:12px;margin-top:6px;text-align:center;"></div>
             </div>
-            <div style="margin-bottom: 20px;">
-                <label style="color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 8px; font-size: 13px;">নতুন পাসওয়ার্ড</label>
-                <div style="position: relative;">
-                    <i class="fa fa-lock" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b;"></i>
-                    <input type="password" id="resetNewPass" placeholder="কমপক্ষে ৪ অক্ষর" style="width: 100%; padding: 12px 12px 12px 40px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; color: #fff; outline: none; box-sizing: border-box;">
+            <div class="rp-mb" style="margin-bottom:20px;">
+                <label class="rp-label">নতুন পাসওয়ার্ড</label>
+                <div style="position:relative;">
+                    <i class="fa fa-lock rp-input-icon" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#64748b;"></i>
+                    <input type="password" id="resetNewPass" placeholder="কমপক্ষে ৪ অক্ষর" class="rp-input">
                 </div>
             </div>
-            <div id="step2Msg" style="display:none; padding:10px; border-radius:10px; font-size:13px; margin-bottom:12px;"></div>
-            <div style="display:flex; gap:10px;">
-                <button onclick="goBackToStep1()" style="flex:1; background:#334155; color:#fff; border:none; padding:14px; border-radius:14px; cursor:pointer; font-weight:700;">← পেছনে</button>
-                <button onclick="verifyOtpAndReset()" style="flex:2; background: linear-gradient(135deg, #ef4444, #b91c1c); color: white; border: none; padding: 14px; border-radius: 14px; cursor: pointer; font-weight: 800; font-size: 15px;">
+            <div id="step2Msg" class="rp-msg rp-step2-msg"></div>
+            <div style="display:flex;gap:10px;">
+                <button onclick="goBackToStep1()" class="rp-back-btn" style="flex:1;background:#334155;color:#fff;border:none;padding:14px;border-radius:14px;cursor:pointer;font-weight:700;font-size:14px;font-family:'Hind Siliguri',sans-serif;">← পেছনে</button>
+                <button onclick="verifyOtpAndReset()" class="rp-btn" style="flex:2;background:linear-gradient(135deg,#ef4444,#b91c1c);color:white;border:none;padding:14px;border-radius:14px;cursor:pointer;font-weight:800;font-size:15px;font-family:'Hind Siliguri',sans-serif;">
                     <i class="fa fa-sync-alt"></i> রিসেট করুন
                 </button>
             </div>
-            <div style="text-align:center; margin-top:12px;">
-                <button onclick="resendOtp()" id="resendBtn" style="display:none; background:none; border:none; color:#6366f1; cursor:pointer; font-size:13px; text-decoration:underline;">পুনরায় OTP পাঠান</button>
+            <div style="text-align:center;margin-top:12px;">
+                <button onclick="resendOtp()" id="resendBtn" style="display:none;background:none;border:none;color:#6366f1;cursor:pointer;font-size:13px;text-decoration:underline;font-family:'Hind Siliguri',sans-serif;">পুনরায় OTP পাঠান</button>
             </div>
         </div>
         <div id="recaptcha-container"></div>
