@@ -693,8 +693,8 @@ function initiateCheckout(productId) {
 
     const summaryBox = document.getElementById('checkoutSummaryBox');
     if (summaryBox) {
-        summaryBox.style.maxHeight = ""; 
-        summaryBox.style.overflowY = ""; 
+        summaryBox.style.maxHeight = "350px"; 
+        summaryBox.style.overflowY = "auto"; 
         summaryBox.style.display = "block"; 
         
         // এখানে শুধু এইচটিএমএল স্ট্রাকচারটা একবারই তৈরি হবে
@@ -2854,19 +2854,15 @@ function updateCurrentUserRecord() {
 }
 
 // Order Tracking View - Digital Shop TM (ছবি সহ আপডেট করা)
-// openOrderTracking: মোবাইল mob-sheet-item থেকেও call হয়
-function openOrderTracking() {
+document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclick = function() {
     openModal('orderTrackingModal');
-
-    // modal display হতে সময় লাগে — setTimeout দিয়ে নিশ্চিত করা
-    setTimeout(function() {
+    
     var list = document.getElementById('userOrderHistoryList');
-    if(!list) return;
+    if(!list) return; 
 
-    var isMob = document.documentElement.classList.contains('is-mobile');
-    list.style.maxHeight = isMob ? "72vh" : "450px";
-    list.style.overflowY = "auto";
-    list.style.paddingRight = "5px";
+    list.style.maxHeight = "450px"; 
+    list.style.overflowY = "auto";  
+    list.style.paddingRight = "5px"; 
     list.style.scrollBehavior = "smooth";
 
     list.innerHTML = '<div style="text-align:center; padding:20px; color: #888;">অর্ডার চেক করা হচ্ছে...</div>';
@@ -2939,11 +2935,7 @@ function openOrderTracking() {
     });
 
     list.innerHTML = finalHtml;
-    }, 50); // setTimeout শেষ
-}
-
-// PC li এ bind করা
-document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclick = openOrderTracking;
+};
 
 // অর্ডার ডিলিট করার জন্য নতুন ফাংশন
 function cancelUserOrder(orderId) {
@@ -2957,7 +2949,7 @@ function cancelUserOrder(orderId) {
         saveData(DB_KEYS.ORDERS, appState.orders);
         
         // ভিউ আপডেট করা (আবার ট্র্যাকিং ওপেন করে রিফ্রেশ করা)
-        openOrderTracking();
+        document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").click();
         
         alert("অর্ডারটি সফলভাবে ডিলিট করা হয়েছে।");
     }
@@ -3815,23 +3807,12 @@ function openUserOrders() {
         document.body.appendChild(orderModal);
     }
 
-    const _isMob = document.documentElement.classList.contains('is-mobile');
-
-    // মোবাইলে পুরো স্ক্রিন, PC তে আগের মতো
-    const _overlayAlign = _isMob ? 'flex-start' : 'center';
-    const _boxStyle = _isMob
-        ? 'background:#0f172a; width:100%; min-height:100vh; height:100%; overflow-y:auto; border-radius:0; border:none; position:relative; padding:70px 18px 30px 18px; animation:modalSlideUp 0.3s ease;'
-        : 'background:#0f172a; width:90%; max-width:600px; max-height:85vh; overflow-y:auto; border-radius:20px; border:1px solid #334155; position:relative; padding:20px; animation:modalSlideUp 0.3s ease;';
-    const _closeBtnStyle = _isMob
-        ? 'position:fixed; right:16px; top:14px; background:#1e293b; border:none; color:#fff; width:64px; height:64px; border-radius:50%; cursor:pointer; font-size:40px; display:flex; align-items:center; justify-content:center; z-index:10; line-height:1;'
-        : 'position:absolute; right:15px; top:15px; background:#1e293b; border:none; color:#fff; width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:18px;';
-
     orderModal.innerHTML = `
-        <div id="orderOverlay" onclick="closeOrderModal()" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000000; display:flex; align-items:${_overlayAlign}; justify-content:center; backdrop-filter:blur(8px);">
-            <div id="orderContent" onclick="event.stopPropagation()" style="${_boxStyle}">
-                <button onclick="closeOrderModal()" style="${_closeBtnStyle}">&times;</button>
+        <div id="orderOverlay" onclick="closeOrderModal()" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+            <div id="orderContent" onclick="event.stopPropagation()" style="background: #0f172a; width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; border-radius: 20px; border: 1px solid #334155; position: relative; padding: 20px; animation: modalSlideUp 0.3s ease;">
+                <button onclick="closeOrderModal()" style="position: absolute; right: 15px; top: 15px; background: #1e293b; border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;">&times;</button>
                 <div id="orderDataArea">
-                    <div style="text-align:center; padding:40px;"><div class="loader-spinner"></div></div>
+                    <div style="text-align: center; padding: 40px;"><div class="loader-spinner"></div></div>
                 </div>
             </div>
         </div>
@@ -3857,38 +3838,37 @@ function openUserOrders() {
         const RETURN_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.RETURNS) ? DB_KEYS.RETURNS : 'returns';
         const allReturns = JSON.parse(localStorage.getItem(RETURN_KEY)) || [];
 
-        const mob = document.documentElement.classList.contains('is-mobile');
-        const f = (pc, mo) => mob ? mo : pc;
-
-        let html = `<h3 style="color:#fff; margin-bottom:20px; font-size:${f('18px','34px')};"><i class="fa fa-shopping-bag" style="color:#6366f1"></i> আমার অর্ডারসমূহ (${myOrders.length})</h3>`;
+        let html = `<h3 style="color: #fff; margin-bottom: 20px;"><i class="fa fa-shopping-bag" style="color:#6366f1"></i> আমার অর্ডারসমূহ (${myOrders.length})</h3>`;
 
         myOrders.reverse().forEach(order => {
             const isDelivered = (order.status === 'Delivered' || order.status === 'ডেলিভারি সম্পন্ন');
+            
+            // --- নতুন লজিক: চেক করা হচ্ছে এই অর্ডারের বিপরীতে কোনো রিটার্ন রিকোয়েস্ট অলরেডি আছে কি না ---
             const hasRequestedReturn = allReturns.some(ret => String(ret.orderId) === String(order.id));
 
             html += `
-                <div class="user-order-card" style="background:#1e293b; border:1px solid #334155; border-radius:${f('15px','20px')}; padding:${f('18px','26px')}; margin-bottom:${f('15px','18px')}; color:#fff;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; gap:8px;">
-                        <div style="min-width:0; flex:1;">
-                            <span style="font-size:${f('10px','22px')}; color:#94a3b8; font-weight:bold;">ID: #${order.id}</span>
-                            <h4 style="margin:5px 0; color:#f8fafc; font-size:${f('15px','30px')}; word-break:break-word;">${order.productName}</h4>
+                <div class="user-order-card" style="background: #1e293b; border: 1px solid #334155; border-radius: 15px; padding: 18px; margin-bottom: 15px; color: #fff;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div>
+                            <span style="font-size: 10px; color: #94a3b8; font-weight: bold;">ID: #${order.id}</span>
+                            <h4 style="margin: 5px 0; color: #f8fafc; font-size: 15px;">${order.productName}</h4>
                         </div>
-                        <span style="background:${isDelivered ? 'rgba(39,174,96,0.2)' : 'rgba(243,156,18,0.2)'}; color:${isDelivered ? '#2ecc71' : '#f39c12'}; padding:${f('4px 10px','8px 16px')}; border-radius:20px; font-size:${f('10px','22px')}; font-weight:bold; white-space:nowrap; flex-shrink:0;">
+                        <span style="background: ${isDelivered ? 'rgba(39, 174, 96, 0.2)' : 'rgba(243, 156, 18, 0.2)'}; color: ${isDelivered ? '#2ecc71' : '#f39c12'}; padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: bold;">
                             ${order.status}
                         </span>
                     </div>
 
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; flex-wrap:wrap; gap:10px;">
-                        <span style="color:#2ecc71; font-weight:800; font-size:${f('18px','36px')};">${order.price} ৳</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                        <span style="color: #2ecc71; font-weight: 800; font-size: 18px;">${order.price} ৳</span>
                         
-                        <div style="display:flex; gap:${f('6px','10px')}; flex-wrap:wrap;">
-                            <button onclick="generateInvoice('${order.id}')" style="background:#0f172a; color:#3498db; border:1px solid #3498db; padding:${f('6px 10px','14px 22px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; cursor:pointer;">রশিদ</button>
+                        <div style="display: flex; gap: 6px;">
+                            <button onclick="generateInvoice('${order.id}')" style="background: #0f172a; color: #3498db; border: 1px solid #3498db; padding: 6px 10px; border-radius: 8px; font-size: 11px; cursor: pointer;">রশিদ</button>
                             
                             ${(isDelivered && !hasRequestedReturn) ? `
-                            <button onclick="openReturnModal('${order.id}')" style="background:#450a0a; color:#f87171; border:1px solid #f87171; padding:${f('6px 10px','14px 22px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; font-weight:bold; cursor:pointer;">রিটার্ন</button>
-                            ` : (hasRequestedReturn ? \`<span style="color:#94a3b8; font-size:${f('11px','24px')}; font-style:italic;">রিটার্ন করা হয়েছে</span>\` : '')}
+                            <button onclick="openReturnModal('${order.id}')" style="background: #450a0a; color: #f87171; border: 1px solid #f87171; padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer;">রিটার্ন</button>
+                            ` : (hasRequestedReturn ? '<span style="color:#94a3b8; font-size:11px; font-style:italic;">রিটার্ন করা হয়েছে</span>' : '')}
 
-                            <button onclick="viewUserOrderDetails('${order.id}')" style="background:#3498db; color:white; border:none; padding:${f('7px 14px','14px 26px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; cursor:pointer;">বিস্তারিত</button>
+                            <button onclick="viewUserOrderDetails('${order.id}')" style="background: #3498db; color: white; border: none; padding: 7px 14px; border-radius: 8px; font-size: 11px; cursor: pointer;">বিস্তারিত</button>
                         </div>
                     </div>
                 </div>
@@ -7002,7 +6982,12 @@ function openDiscountModule() {
     }
 
     // --- এখানে পরিবর্তন ---
-    if (typeof renderUserCards === 'function') renderUserCards();
+    // renderUserCards এর বদলে renderUserInventory কল করুন
+    if (typeof renderUserInventory === 'function') {
+        renderUserInventory(); 
+    } else if (typeof renderUserCards === 'function') {
+        renderUserCards();
+    }
     
 }
 
@@ -7024,30 +7009,18 @@ function renderUserCards() {
         return;
     }
 
-    // ৪টি রঙের প্যালেট — নীল, সবুজ, বেগুনি, কমলা — cycle করবে
-    const cardThemes = [
-        { left: 'linear-gradient(135deg,#1e3a8a,#1d4ed8)', right: '#1e40af', border: '#bfdbfe', accent: '#60a5fa', text: '#bfdbfe', expiryText: '#93c5fd' },
-        { left: 'linear-gradient(135deg,#064e3b,#059669)', right: '#065f46', border: '#a7f3d0', accent: '#34d399', text: '#a7f3d0', expiryText: '#6ee7b7' },
-        { left: 'linear-gradient(135deg,#3b0764,#7c3aed)', right: '#4c1d95', border: '#ddd6fe', accent: '#a78bfa', text: '#ddd6fe', expiryText: '#c4b5fd' },
-        { left: 'linear-gradient(135deg,#7c2d12,#ea580c)', right: '#9a3412', border: '#fed7aa', accent: '#fb923c', text: '#fed7aa', expiryText: '#fdba74' },
-    ];
-
-    let validIndex = 0;
     container.innerHTML = userDiscounts.map(card => {
         const expiryDate = new Date(card.expiry);
         const isExpired = expiryDate.getTime() < new Date().getTime();
         if (isExpired) return '';
 
-        const theme = cardThemes[validIndex % cardThemes.length];
-        validIndex++;
-
-        // সময় এবং তারিখ সুন্দর করে ফরমেট করা
+        // সময় এবং তারিখ সুন্দর করে ফরমেট করা
         const dateStr = expiryDate.toLocaleDateString('bn-BD');
         const timeStr = expiryDate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
 
         return `
-        <div class="premium-discount-card" style="background:${theme.right}; border-color:${theme.border};">
-            <div class="card-left" style="background:${theme.left};">
+        <div class="premium-discount-card">
+            <div class="card-left">
                 <div class="discount-badge">
                     <span class="amount">${card.amount}</span>
                     <span class="type">${card.type === '%' ? '%' : '৳'}</span>
@@ -7055,30 +7028,119 @@ function renderUserCards() {
                 <div class="off-text">OFF</div>
             </div>
             
-            <div class="card-right" style="background:${theme.right};">
-                <h5 class="card-title" style="color:#ffffff;">${card.name}</h5>
-                <div class="card-details" style="color:${theme.text};">
-                    <span><i class="fa fa-shopping-bag" style="color:${theme.accent};"></i> মিন: ৳${card.min || 0}</span>
-                    <span><i class="fa fa-arrow-up" style="color:${theme.accent};"></i> ম্যাক্স: ৳${card.max || 'N/A'}</span>
+            <div class="card-right">
+                <h5 class="card-title">${card.name}</h5>
+                <div class="card-details">
+                    <span><i class="fa fa-shopping-bag"></i> মিন: ৳${card.min || 0}</span>
+                    <span><i class="fa fa-arrow-up"></i> ম্যাক্স: ৳${card.max || 'N/A'}</span>
                 </div>
                 
-                <div class="promo-box" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.3);">
-                    <span class="code-label" style="color:${theme.text};">CODE:</span>
-                    <span class="code-value" style="color:#ffffff;">${card.code}</span>
+                <div class="promo-box">
+                    <span class="code-label">CODE:</span>
+                    <span class="code-value">${card.code}</span>
                 </div>
 
-                <div class="expiry-box" style="color:${theme.expiryText};">
+                <div class="expiry-box">
                     <i class="fa fa-clock"></i> শেষ: ${dateStr} | ${timeStr}
                 </div>
             </div>
             
-            <div class="punch-hole top" style="border-color:${theme.border};"></div>
-            <div class="punch-hole bottom" style="border-color:${theme.border};"></div>
+            <div class="punch-hole top"></div>
+            <div class="punch-hole bottom"></div>
         </div>`;
     }).join('');
 }
 
 
+function renderUserInventory() {
+    const container = document.getElementById('userCardList');
+    if (!container) return;
+
+    const now = new Date().getTime();
+    const me = appState.users.find(u => u.id === appState.currentUser?.id);
+
+    // expired বাদ দিয়ে valid cards
+    const myCards = (me?.myDiscounts || []).filter(d => {
+        const exp = new Date(d.expiry).getTime();
+        return isNaN(exp) || exp > now;
+    });
+
+    if (myCards.length === 0) {
+        container.innerHTML = `
+            <div id="noCardMsg" style="text-align:center; padding:30px 15px; background:#fdfdfd; border:2px dashed #e2e8f0; border-radius:15px;">
+                <i class="fa fa-folder-open" style="font-size:30px; color:#cbd5e1; margin-bottom:10px; display:block;"></i>
+                <p style="color:#94a3b8; font-size:13px; margin:0;">আপনার কাছে বর্তমানে কোনো<br>অ্যাক্টিভ ডিসকাউন্ট কার্ড নেই।</p>
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = myCards.map(card => {
+        const exp = new Date(card.expiry);
+        const dateStr = exp.toLocaleDateString('bn-BD');
+        const timeStr = exp.toLocaleTimeString('bn-BD', {hour:'2-digit', minute:'2-digit'});
+        // Public card: admin-panel থেকে claim করা (target=public বা code আছে)
+        // User card: gift-engine থেকে সরাসরি পাওয়া বা parentCardId আছে
+        const isUserCard = (card.origin === 'gift-engine') || 
+                           (card.parentCardId && (appState.globalDiscounts||[]).find(g => g.id === card.parentCardId && g.target === 'user'));
+        const isPublicCard = !isUserCard;
+
+        if (isUserCard) {
+            // ── User card design (সবুজ, gift style) ──
+            return `
+            <div style="background:linear-gradient(135deg,#0f4c2a,#1a6b3c); border-radius:18px; padding:16px; margin-bottom:12px; position:relative; overflow:hidden; box-shadow:0 6px 20px rgba(15,76,42,0.3);">
+                <!-- decorative circles -->
+                <div style="position:absolute; top:-20px; right:-20px; width:80px; height:80px; background:rgba(255,255,255,0.05); border-radius:50%;"></div>
+                <div style="position:absolute; bottom:-15px; left:30px; width:60px; height:60px; background:rgba(255,255,255,0.04); border-radius:50%;"></div>
+
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
+                    <div>
+                        <div style="background:rgba(255,255,255,0.15); display:inline-block; padding:2px 10px; border-radius:20px; font-size:10px; color:#a7f3d0; font-weight:700; margin-bottom:6px;">🎁 গিফট কার্ড</div>
+                        <h4 style="margin:0; color:#fff; font-size:16px; font-weight:800;">${card.name}</h4>
+                        <div style="color:#a7f3d0; font-size:11px; margin-top:4px;">🛒 মিন: ৳${card.minAmount||card.min||0} &nbsp;|&nbsp; ম্যাক্স: ৳${card.maxAmount||card.max||'N/A'}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:28px; font-weight:900; color:#4ade80; line-height:1;">${card.amount}${card.type==='%'?'%':'৳'}</div>
+                        <div style="font-size:10px; color:#a7f3d0; font-weight:600;">OFF</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:12px; border-top:1px dashed rgba(255,255,255,0.2); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="background:rgba(255,255,255,0.1); border:1px dashed rgba(255,255,255,0.3); padding:5px 14px; border-radius:8px;">
+                        <span style="color:#fff; font-size:13px; font-weight:800; letter-spacing:2px;">CODE: ${card.code||'N/A'}</span>
+                    </div>
+                    <div style="font-size:10px; color:#a7f3d0;">⏰ ${dateStr} | ${timeStr}</div>
+                </div>
+            </div>`;
+        } else {
+            // ── Public card design (নীল, promo style) ──
+            return `
+            <div style="background:linear-gradient(135deg,#1e3a8a,#1d4ed8); border-radius:18px; padding:16px; margin-bottom:12px; position:relative; overflow:hidden; box-shadow:0 6px 20px rgba(30,58,138,0.3);">
+                <!-- decorative -->
+                <div style="position:absolute; top:-20px; right:-20px; width:80px; height:80px; background:rgba(255,255,255,0.06); border-radius:50%;"></div>
+                <div style="position:absolute; bottom:-15px; left:30px; width:60px; height:60px; background:rgba(255,255,255,0.04); border-radius:50%;"></div>
+
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
+                    <div>
+                        <div style="background:rgba(255,255,255,0.15); display:inline-block; padding:2px 10px; border-radius:20px; font-size:10px; color:#bfdbfe; font-weight:700; margin-bottom:6px;">🏷️ প্রোমো কার্ড</div>
+                        <h4 style="margin:0; color:#fff; font-size:16px; font-weight:800;">${card.name}</h4>
+                        <div style="color:#bfdbfe; font-size:11px; margin-top:4px;">🛒 মিন: ৳${card.minAmount||card.min||0} &nbsp;|&nbsp; ম্যাক্স: ৳${card.maxAmount||card.max||'N/A'}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:28px; font-weight:900; color:#60a5fa; line-height:1;">${card.amount}${card.type==='%'?'%':'৳'}</div>
+                        <div style="font-size:10px; color:#bfdbfe; font-weight:600;">OFF</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:12px; border-top:1px dashed rgba(255,255,255,0.2); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="background:rgba(255,255,255,0.1); border:1px dashed rgba(255,255,255,0.3); padding:5px 14px; border-radius:8px;">
+                        <span style="color:#fff; font-size:13px; font-weight:800; letter-spacing:2px;">CODE: ${card.code||'N/A'}</span>
+                    </div>
+                    <div style="font-size:10px; color:#bfdbfe;">⏰ ${dateStr} | ${timeStr}</div>
+                </div>
+            </div>`;
+        }
+    }).join('');
+}
 function claimPublicDiscount() {
     const inputBox = document.getElementById('promo-input-box');
     const codeInput = inputBox.value.trim().toUpperCase();
@@ -7157,7 +7219,8 @@ function claimPublicDiscount() {
     } catch(e) {}
 
     // ৯. UI refresh
-    if (typeof renderUserCards === 'function') renderUserCards();
+    if (typeof renderUserInventory === 'function') renderUserInventory();
+    else if (typeof renderUserCards === 'function') renderUserCards();
 
     alert("✅ অভিনন্দন! '" + targetCard.name + "' সফলভাবে আপনার ওয়ালেটে যোগ হয়েছে।");
     inputBox.value = "";
