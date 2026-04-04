@@ -7009,18 +7009,30 @@ function renderUserCards() {
         return;
     }
 
+    // ৪টি রঙের প্যালেট — নীল, সবুজ, বেগুনি, কমলা — cycle করবে
+    const cardThemes = [
+        { left: 'linear-gradient(135deg,#1e3a8a,#1d4ed8)', right: '#1e40af', border: '#bfdbfe', accent: '#60a5fa', text: '#bfdbfe', expiryText: '#93c5fd' },
+        { left: 'linear-gradient(135deg,#064e3b,#059669)', right: '#065f46', border: '#a7f3d0', accent: '#34d399', text: '#a7f3d0', expiryText: '#6ee7b7' },
+        { left: 'linear-gradient(135deg,#3b0764,#7c3aed)', right: '#4c1d95', border: '#ddd6fe', accent: '#a78bfa', text: '#ddd6fe', expiryText: '#c4b5fd' },
+        { left: 'linear-gradient(135deg,#7c2d12,#ea580c)', right: '#9a3412', border: '#fed7aa', accent: '#fb923c', text: '#fed7aa', expiryText: '#fdba74' },
+    ];
+
+    let validIndex = 0;
     container.innerHTML = userDiscounts.map(card => {
         const expiryDate = new Date(card.expiry);
         const isExpired = expiryDate.getTime() < new Date().getTime();
         if (isExpired) return '';
 
-        // সময় এবং তারিখ সুন্দর করে ফরমেট করা
+        const theme = cardThemes[validIndex % cardThemes.length];
+        validIndex++;
+
+        // সময় এবং তারিখ সুন্দর করে ফরমেট করা
         const dateStr = expiryDate.toLocaleDateString('bn-BD');
         const timeStr = expiryDate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
 
         return `
-        <div class="premium-discount-card">
-            <div class="card-left">
+        <div class="premium-discount-card" style="background:${theme.right}; border-color:${theme.border};">
+            <div class="card-left" style="background:${theme.left};">
                 <div class="discount-badge">
                     <span class="amount">${card.amount}</span>
                     <span class="type">${card.type === '%' ? '%' : '৳'}</span>
@@ -7028,25 +7040,25 @@ function renderUserCards() {
                 <div class="off-text">OFF</div>
             </div>
             
-            <div class="card-right">
-                <h5 class="card-title">${card.name}</h5>
-                <div class="card-details">
-                    <span><i class="fa fa-shopping-bag"></i> মিন: ৳${card.min || 0}</span>
-                    <span><i class="fa fa-arrow-up"></i> ম্যাক্স: ৳${card.max || 'N/A'}</span>
+            <div class="card-right" style="background:${theme.right};">
+                <h5 class="card-title" style="color:#ffffff;">${card.name}</h5>
+                <div class="card-details" style="color:${theme.text};">
+                    <span><i class="fa fa-shopping-bag" style="color:${theme.accent};"></i> মিন: ৳${card.min || 0}</span>
+                    <span><i class="fa fa-arrow-up" style="color:${theme.accent};"></i> ম্যাক্স: ৳${card.max || 'N/A'}</span>
                 </div>
                 
-                <div class="promo-box">
-                    <span class="code-label">CODE:</span>
-                    <span class="code-value">${card.code}</span>
+                <div class="promo-box" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.3);">
+                    <span class="code-label" style="color:${theme.text};">CODE:</span>
+                    <span class="code-value" style="color:#ffffff;">${card.code}</span>
                 </div>
 
-                <div class="expiry-box">
+                <div class="expiry-box" style="color:${theme.expiryText};">
                     <i class="fa fa-clock"></i> শেষ: ${dateStr} | ${timeStr}
                 </div>
             </div>
             
-            <div class="punch-hole top"></div>
-            <div class="punch-hole bottom"></div>
+            <div class="punch-hole top" style="border-color:${theme.border};"></div>
+            <div class="punch-hole bottom" style="border-color:${theme.border};"></div>
         </div>`;
     }).join('');
 }
@@ -7074,71 +7086,45 @@ function renderUserInventory() {
         return;
     }
 
-    container.innerHTML = myCards.map(card => {
+    // ৪টি রঙের প্যালেট — নীল, সবুজ, বেগুনি, কমলা — cycle করবে
+    const invThemes = [
+        { bg: 'linear-gradient(135deg,#1e3a8a,#1d4ed8)', shadow: 'rgba(30,58,138,0.3)', sub: '#bfdbfe', accent: '#60a5fa', label: '🏷️ প্রোমো কার্ড' },
+        { bg: 'linear-gradient(135deg,#064e3b,#059669)',  shadow: 'rgba(6,78,59,0.3)',   sub: '#a7f3d0', accent: '#4ade80', label: '🎁 গিফট কার্ড' },
+        { bg: 'linear-gradient(135deg,#3b0764,#7c3aed)', shadow: 'rgba(59,7,100,0.3)',  sub: '#ddd6fe', accent: '#a78bfa', label: '💜 স্পেশাল কার্ড' },
+        { bg: 'linear-gradient(135deg,#7c2d12,#ea580c)', shadow: 'rgba(124,45,18,0.3)', sub: '#fed7aa', accent: '#fb923c', label: '🔥 অফার কার্ড' },
+    ];
+
+    container.innerHTML = myCards.map((card, idx) => {
         const exp = new Date(card.expiry);
         const dateStr = exp.toLocaleDateString('bn-BD');
         const timeStr = exp.toLocaleTimeString('bn-BD', {hour:'2-digit', minute:'2-digit'});
-        // Public card: admin-panel থেকে claim করা (target=public বা code আছে)
-        // User card: gift-engine থেকে সরাসরি পাওয়া বা parentCardId আছে
-        const isUserCard = (card.origin === 'gift-engine') || 
-                           (card.parentCardId && (appState.globalDiscounts||[]).find(g => g.id === card.parentCardId && g.target === 'user'));
-        const isPublicCard = !isUserCard;
 
-        if (isUserCard) {
-            // ── User card design (সবুজ, gift style) ──
-            return `
-            <div style="background:linear-gradient(135deg,#0f4c2a,#1a6b3c); border-radius:18px; padding:16px; margin-bottom:12px; position:relative; overflow:hidden; box-shadow:0 6px 20px rgba(15,76,42,0.3);">
-                <!-- decorative circles -->
-                <div style="position:absolute; top:-20px; right:-20px; width:80px; height:80px; background:rgba(255,255,255,0.05); border-radius:50%;"></div>
-                <div style="position:absolute; bottom:-15px; left:30px; width:60px; height:60px; background:rgba(255,255,255,0.04); border-radius:50%;"></div>
+        const t = invThemes[idx % invThemes.length];
 
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
-                    <div>
-                        <div style="background:rgba(255,255,255,0.15); display:inline-block; padding:2px 10px; border-radius:20px; font-size:10px; color:#a7f3d0; font-weight:700; margin-bottom:6px;">🎁 গিফট কার্ড</div>
-                        <h4 style="margin:0; color:#fff; font-size:16px; font-weight:800;">${card.name}</h4>
-                        <div style="color:#a7f3d0; font-size:11px; margin-top:4px;">🛒 মিন: ৳${card.minAmount||card.min||0} &nbsp;|&nbsp; ম্যাক্স: ৳${card.maxAmount||card.max||'N/A'}</div>
-                    </div>
-                    <div style="text-align:right;">
-                        <div style="font-size:28px; font-weight:900; color:#4ade80; line-height:1;">${card.amount}${card.type==='%'?'%':'৳'}</div>
-                        <div style="font-size:10px; color:#a7f3d0; font-weight:600;">OFF</div>
-                    </div>
+        return `
+        <div style="background:${t.bg}; border-radius:18px; padding:16px; margin-bottom:12px; position:relative; overflow:hidden; box-shadow:0 6px 20px ${t.shadow};">
+            <div style="position:absolute; top:-20px; right:-20px; width:80px; height:80px; background:rgba(255,255,255,0.05); border-radius:50%;"></div>
+            <div style="position:absolute; bottom:-15px; left:30px; width:60px; height:60px; background:rgba(255,255,255,0.04); border-radius:50%;"></div>
+
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
+                <div>
+                    <div style="background:rgba(255,255,255,0.15); display:inline-block; padding:2px 10px; border-radius:20px; font-size:10px; color:${t.sub}; font-weight:700; margin-bottom:6px;">${t.label}</div>
+                    <h4 style="margin:0; color:#fff; font-size:16px; font-weight:800;">${card.name}</h4>
+                    <div style="color:${t.sub}; font-size:11px; margin-top:4px;">🛒 মিন: ৳${card.minAmount||card.min||0} &nbsp;|&nbsp; ম্যাক্স: ৳${card.maxAmount||card.max||'N/A'}</div>
                 </div>
-
-                <div style="margin-top:12px; border-top:1px dashed rgba(255,255,255,0.2); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="background:rgba(255,255,255,0.1); border:1px dashed rgba(255,255,255,0.3); padding:5px 14px; border-radius:8px;">
-                        <span style="color:#fff; font-size:13px; font-weight:800; letter-spacing:2px;">CODE: ${card.code||'N/A'}</span>
-                    </div>
-                    <div style="font-size:10px; color:#a7f3d0;">⏰ ${dateStr} | ${timeStr}</div>
+                <div style="text-align:right;">
+                    <div style="font-size:28px; font-weight:900; color:${t.accent}; line-height:1;">${card.amount}${card.type==='%'?'%':'৳'}</div>
+                    <div style="font-size:10px; color:${t.sub}; font-weight:600;">OFF</div>
                 </div>
-            </div>`;
-        } else {
-            // ── Public card design (নীল, promo style) ──
-            return `
-            <div style="background:linear-gradient(135deg,#1e3a8a,#1d4ed8); border-radius:18px; padding:16px; margin-bottom:12px; position:relative; overflow:hidden; box-shadow:0 6px 20px rgba(30,58,138,0.3);">
-                <!-- decorative -->
-                <div style="position:absolute; top:-20px; right:-20px; width:80px; height:80px; background:rgba(255,255,255,0.06); border-radius:50%;"></div>
-                <div style="position:absolute; bottom:-15px; left:30px; width:60px; height:60px; background:rgba(255,255,255,0.04); border-radius:50%;"></div>
+            </div>
 
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
-                    <div>
-                        <div style="background:rgba(255,255,255,0.15); display:inline-block; padding:2px 10px; border-radius:20px; font-size:10px; color:#bfdbfe; font-weight:700; margin-bottom:6px;">🏷️ প্রোমো কার্ড</div>
-                        <h4 style="margin:0; color:#fff; font-size:16px; font-weight:800;">${card.name}</h4>
-                        <div style="color:#bfdbfe; font-size:11px; margin-top:4px;">🛒 মিন: ৳${card.minAmount||card.min||0} &nbsp;|&nbsp; ম্যাক্স: ৳${card.maxAmount||card.max||'N/A'}</div>
-                    </div>
-                    <div style="text-align:right;">
-                        <div style="font-size:28px; font-weight:900; color:#60a5fa; line-height:1;">${card.amount}${card.type==='%'?'%':'৳'}</div>
-                        <div style="font-size:10px; color:#bfdbfe; font-weight:600;">OFF</div>
-                    </div>
+            <div style="margin-top:12px; border-top:1px dashed rgba(255,255,255,0.2); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                <div style="background:rgba(255,255,255,0.1); border:1px dashed rgba(255,255,255,0.3); padding:5px 14px; border-radius:8px;">
+                    <span style="color:#fff; font-size:13px; font-weight:800; letter-spacing:2px;">CODE: ${card.code||'N/A'}</span>
                 </div>
-
-                <div style="margin-top:12px; border-top:1px dashed rgba(255,255,255,0.2); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="background:rgba(255,255,255,0.1); border:1px dashed rgba(255,255,255,0.3); padding:5px 14px; border-radius:8px;">
-                        <span style="color:#fff; font-size:13px; font-weight:800; letter-spacing:2px;">CODE: ${card.code||'N/A'}</span>
-                    </div>
-                    <div style="font-size:10px; color:#bfdbfe;">⏰ ${dateStr} | ${timeStr}</div>
-                </div>
-            </div>`;
-        }
+                <div style="font-size:10px; color:${t.sub};">⏰ ${dateStr} | ${timeStr}</div>
+            </div>
+        </div>`;
     }).join('');
 }
 function claimPublicDiscount() {
