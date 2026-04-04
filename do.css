@@ -7,45 +7,10 @@
    1. GLOBAL VARIABLES & THEME CONFIGURATION
    ------------------------------------------------------- */
 /* --- Digital Shop TM Custom Scrollbar Design --- */
+/* --- Scrollbar: শুধু account popup এ দেখাবে, বাকি সব hidden --- */
+::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+* { scrollbar-width: none !important; -ms-overflow-style: none !important; }
 
-/* ১. পুরো সাইটের জন্য স্ক্রলবার উইথ (Width) */
-::-webkit-scrollbar {
-    width: 8px; /* ভার্টিক্যাল স্ক্রলবার */
-    height: 8px; /* হরিজন্টাল স্ক্রলবার */
-}
-
-/* ২. স্ক্রলবার ট্র্যাক (যেটার ওপর দিয়ে স্ক্রলবার চলে) */
-::-webkit-scrollbar-track {
-    background: #0f172a; /* আপনার সাইটের ব্যাকগ্রাউন্ডের সাথে মিল রেখে */
-    border-radius: 10px;
-}
-
-/* ৩. স্ক্রলবার থাম্ব (যেটা আমরা ধরি বা যেটা নড়াচড়া করে) */
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #38bdf8, #1e293b); /* সুন্দর ব্লু গ্রেডিয়েন্ট */
-    border-radius: 10px;
-    border: 2px solid #0f172a; /* ট্র্যাকের সাথে আলাদা করার জন্য গ্যাপ */
-    transition: 0.3s;
-}
-
-/* ৪. থাম্ব হোভার ইফেক্ট (মাউস ধরলে রঙ বদলাবে) */
-::-webkit-scrollbar-thumb:hover {
-    background: #38bdf8; /* উজ্জ্বল স্কাই ব্লু */
-    cursor: pointer;
-}
-
-/* ৫. ফায়ারফক্স ব্রাউজারের জন্য সাপোর্ট (Firefox Support) */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: #38bdf8 #0f172a;
-}
-
-/* ৬. বিশেষ করে চ্যাট বক্স বা মোডালের জন্য ডিজাইন ফিক্স */
-.modal-box::-webkit-scrollbar,
-#userChatBox::-webkit-scrollbar,
-#returnChatBox::-webkit-scrollbar {
-    width: 5px; /* ছোট বক্সের জন্য চিকন স্ক্রলবার */
-}
 
    :root {
     /* Color Palette - Light Mode (Default) */
@@ -2379,26 +2344,50 @@ html.is-mobile .search-wrapper i {
 
 
 /* ══════════════════════════════════════════════
-   PC Scrollbar — সবসময় দৃশ্যমান (final override)
+   সব জায়গায় scrollbar hidden — শুধু account popup বাদে
 ══════════════════════════════════════════════ */
-html:not(.is-mobile) ::-webkit-scrollbar {
-    display: block !important;
-    width: 8px !important;
-    height: 8px !important;
+*:not(#userDropdownMenu ul):not(#mobileSheetList)::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
-html:not(.is-mobile) ::-webkit-scrollbar-track {
+*:not(#userDropdownMenu ul):not(#mobileSheetList) {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+/* PC account popup scrollbar */
+#userDropdownMenu ul::-webkit-scrollbar {
+    display: block !important;
+    width: 5px !important;
+}
+#userDropdownMenu ul::-webkit-scrollbar-track {
     background: #0f172a !important;
     border-radius: 10px !important;
 }
-html:not(.is-mobile) ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #38bdf8, #6366f1) !important;
+#userDropdownMenu ul::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #6366f1, #a855f7) !important;
     border-radius: 10px !important;
-    border: 2px solid #0f172a !important;
 }
-html:not(.is-mobile) ::-webkit-scrollbar-thumb:hover {
-    background: #38bdf8 !important;
-}
-html:not(.is-mobile) * {
+#userDropdownMenu ul {
     scrollbar-width: thin !important;
-    scrollbar-color: #38bdf8 #0f172a !important;
+    scrollbar-color: #6366f1 #0f172a !important;
+}
+
+/* Mobile account sheet scrollbar */
+#mobileSheetList::-webkit-scrollbar {
+    display: block !important;
+    width: 5px !important;
+}
+#mobileSheetList::-webkit-scrollbar-track {
+    background: #2c2c2e !important;
+    border-radius: 10px !important;
+}
+#mobileSheetList::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #6366f1, #a855f7) !important;
+    border-radius: 10px !important;
+}
+#mobileSheetList {
+    scrollbar-width: thin !important;
+    scrollbar-color: #6366f1 #2c2c2e !important;
 }
