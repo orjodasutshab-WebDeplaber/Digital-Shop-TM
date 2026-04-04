@@ -465,9 +465,14 @@
         </div>
 
         <!-- ══ PC Dropdown ══ -->
-        <div id="userDropdownMenu" style="display: none; position: absolute; right: 0; top: 55px; width: 260px; background: #0f172a; border-radius: 15px; border: 1px solid #334155; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 99999; overflow: hidden;">
-            
-            <div style="padding: 20px; text-align: center; border-bottom: 1px solid #334155;">
+        <div id="userDropdownMenu" style="display: none; position: absolute; right: 0; top: 55px; width: 270px; background: #0f172a; border-radius: 15px; border: 1px solid #334155; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 99999; overflow: hidden;">
+
+            <!-- Header: avatar + close btn -->
+            <div style="position: relative; padding: 20px 20px 16px; text-align: center; border-bottom: 1px solid #334155;">
+                <!-- ✕ Close -->
+                <button onclick="document.getElementById('userDropdownMenu').style.display='none'" style="position:absolute;top:10px;right:10px;background:#1e293b;border:1px solid #334155;color:#94a3b8;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;transition:0.2s;" onmouseover="this.style.background='#ef4444';this.style.color='#fff';this.style.borderColor='#ef4444'" onmouseout="this.style.background='#1e293b';this.style.color='#94a3b8';this.style.borderColor='#334155'">
+                    <i class="fa fa-times"></i>
+                </button>
                 <div style="position: relative; display: inline-block;">
                     <div id="dropdownImageWrapper" style="width: 80px; height: 80px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 3px solid #6366f1;">
                         <i id="dropdownUserPlaceholder" class="fa fa-user" style="color: #94a3b8; font-size: 40px;"></i>
@@ -481,9 +486,11 @@
                 <h4 style="color: #fff; margin: 10px 0 0 0; font-size: 16px;">আমার অ্যাকাউন্ট</h4>
             </div>
 
-            <ul style="list-style: none; padding: 10px; margin: 0; overflow-y: auto; max-height: 340px; scrollbar-width: none; -ms-overflow-style: none;">
+            <ul style="list-style: none; padding: 10px; margin: 0; overflow-y: auto; max-height: 340px; scrollbar-width: thin; scrollbar-color: #6366f1 #0f172a;">
                 <style>
-                    #userDropdownMenu ul::-webkit-scrollbar { display: none; }
+                    #userDropdownMenu ul::-webkit-scrollbar { display: block !important; width: 5px; }
+                    #userDropdownMenu ul::-webkit-scrollbar-track { background: #0f172a; border-radius: 10px; }
+                    #userDropdownMenu ul::-webkit-scrollbar-thumb { background: linear-gradient(180deg,#6366f1,#a855f7); border-radius: 10px; }
                     .dp-item { display: flex; align-items: center; gap: 12px; padding: 10px 15px; color: #94a3b8; cursor: pointer; border-radius: 10px; transition: 0.2s; font-size: 14px; }
                     .dp-item:hover { background: #1e293b; color: #fff; }
                     .dp-item i { color: #6366f1; width: 18px; text-align: center; }
@@ -558,7 +565,7 @@
             <div id="mobileSheetUserName" style="font-size:32px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">User</div>
         </div>
         <!-- X Close -->
-        <button onclick="closeMobileAccountMenu()" style="background:#3a3a3c;border:none;color:#ebebf5;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;flex-shrink:0;">
+        <button onclick="closeMobileAccountMenu()" style="background:#3a3a3c;border:none;color:#ebebf5;width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;flex-shrink:0;">
             <i class="fa fa-times"></i>
         </button>
     </div>

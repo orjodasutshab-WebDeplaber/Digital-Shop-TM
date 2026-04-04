@@ -2377,3 +2377,28 @@ html.is-mobile .search-wrapper i {
     left: 16px !important;
 }
 
+
+/* ══════════════════════════════════════════════
+   PC Scrollbar — সবসময় দৃশ্যমান (final override)
+══════════════════════════════════════════════ */
+html:not(.is-mobile) ::-webkit-scrollbar {
+    display: block !important;
+    width: 8px !important;
+    height: 8px !important;
+}
+html:not(.is-mobile) ::-webkit-scrollbar-track {
+    background: #0f172a !important;
+    border-radius: 10px !important;
+}
+html:not(.is-mobile) ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #38bdf8, #6366f1) !important;
+    border-radius: 10px !important;
+    border: 2px solid #0f172a !important;
+}
+html:not(.is-mobile) ::-webkit-scrollbar-thumb:hover {
+    background: #38bdf8 !important;
+}
+html:not(.is-mobile) * {
+    scrollbar-width: thin !important;
+    scrollbar-color: #38bdf8 #0f172a !important;
+}
