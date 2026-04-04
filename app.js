@@ -6982,12 +6982,7 @@ function openDiscountModule() {
     }
 
     // --- এখানে পরিবর্তন ---
-    // renderUserCards এর বদলে renderUserInventory কল করুন
-    if (typeof renderUserInventory === 'function') {
-        renderUserInventory(); 
-    } else if (typeof renderUserCards === 'function') {
-        renderUserCards();
-    }
+    if (typeof renderUserCards === 'function') renderUserCards();
     
 }
 
@@ -7064,69 +7059,6 @@ function renderUserCards() {
 }
 
 
-function renderUserInventory() {
-    const container = document.getElementById('userCardList');
-    if (!container) return;
-
-    const now = new Date().getTime();
-    const me = appState.users.find(u => u.id === appState.currentUser?.id);
-
-    // expired বাদ দিয়ে valid cards
-    const myCards = (me?.myDiscounts || []).filter(d => {
-        const exp = new Date(d.expiry).getTime();
-        return isNaN(exp) || exp > now;
-    });
-
-    if (myCards.length === 0) {
-        container.innerHTML = `
-            <div id="noCardMsg" style="text-align:center; padding:30px 15px; background:#fdfdfd; border:2px dashed #e2e8f0; border-radius:15px;">
-                <i class="fa fa-folder-open" style="font-size:30px; color:#cbd5e1; margin-bottom:10px; display:block;"></i>
-                <p style="color:#94a3b8; font-size:13px; margin:0;">আপনার কাছে বর্তমানে কোনো<br>অ্যাক্টিভ ডিসকাউন্ট কার্ড নেই।</p>
-            </div>`;
-        return;
-    }
-
-    // ৪টি রঙের প্যালেট — নীল, সবুজ, বেগুনি, কমলা — cycle করবে
-    const invThemes = [
-        { bg: 'linear-gradient(135deg,#1e3a8a,#1d4ed8)', shadow: 'rgba(30,58,138,0.3)', sub: '#bfdbfe', accent: '#60a5fa', label: '🏷️ প্রোমো কার্ড' },
-        { bg: 'linear-gradient(135deg,#064e3b,#059669)',  shadow: 'rgba(6,78,59,0.3)',   sub: '#a7f3d0', accent: '#4ade80', label: '🎁 গিফট কার্ড' },
-        { bg: 'linear-gradient(135deg,#3b0764,#7c3aed)', shadow: 'rgba(59,7,100,0.3)',  sub: '#ddd6fe', accent: '#a78bfa', label: '💜 স্পেশাল কার্ড' },
-        { bg: 'linear-gradient(135deg,#7c2d12,#ea580c)', shadow: 'rgba(124,45,18,0.3)', sub: '#fed7aa', accent: '#fb923c', label: '🔥 অফার কার্ড' },
-    ];
-
-    container.innerHTML = myCards.map((card, idx) => {
-        const exp = new Date(card.expiry);
-        const dateStr = exp.toLocaleDateString('bn-BD');
-        const timeStr = exp.toLocaleTimeString('bn-BD', {hour:'2-digit', minute:'2-digit'});
-
-        const t = invThemes[idx % invThemes.length];
-
-        return `
-        <div style="background:${t.bg}; border-radius:18px; padding:16px; margin-bottom:12px; position:relative; overflow:hidden; box-shadow:0 6px 20px ${t.shadow};">
-            <div style="position:absolute; top:-20px; right:-20px; width:80px; height:80px; background:rgba(255,255,255,0.05); border-radius:50%;"></div>
-            <div style="position:absolute; bottom:-15px; left:30px; width:60px; height:60px; background:rgba(255,255,255,0.04); border-radius:50%;"></div>
-
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
-                <div>
-                    <div style="background:rgba(255,255,255,0.15); display:inline-block; padding:2px 10px; border-radius:20px; font-size:10px; color:${t.sub}; font-weight:700; margin-bottom:6px;">${t.label}</div>
-                    <h4 style="margin:0; color:#fff; font-size:16px; font-weight:800;">${card.name}</h4>
-                    <div style="color:${t.sub}; font-size:11px; margin-top:4px;">🛒 মিন: ৳${card.minAmount||card.min||0} &nbsp;|&nbsp; ম্যাক্স: ৳${card.maxAmount||card.max||'N/A'}</div>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:28px; font-weight:900; color:${t.accent}; line-height:1;">${card.amount}${card.type==='%'?'%':'৳'}</div>
-                    <div style="font-size:10px; color:${t.sub}; font-weight:600;">OFF</div>
-                </div>
-            </div>
-
-            <div style="margin-top:12px; border-top:1px dashed rgba(255,255,255,0.2); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                <div style="background:rgba(255,255,255,0.1); border:1px dashed rgba(255,255,255,0.3); padding:5px 14px; border-radius:8px;">
-                    <span style="color:#fff; font-size:13px; font-weight:800; letter-spacing:2px;">CODE: ${card.code||'N/A'}</span>
-                </div>
-                <div style="font-size:10px; color:${t.sub};">⏰ ${dateStr} | ${timeStr}</div>
-            </div>
-        </div>`;
-    }).join('');
-}
 function claimPublicDiscount() {
     const inputBox = document.getElementById('promo-input-box');
     const codeInput = inputBox.value.trim().toUpperCase();
@@ -7205,8 +7137,7 @@ function claimPublicDiscount() {
     } catch(e) {}
 
     // ৯. UI refresh
-    if (typeof renderUserInventory === 'function') renderUserInventory();
-    else if (typeof renderUserCards === 'function') renderUserCards();
+    if (typeof renderUserCards === 'function') renderUserCards();
 
     alert("✅ অভিনন্দন! '" + targetCard.name + "' সফলভাবে আপনার ওয়ালেটে যোগ হয়েছে।");
     inputBox.value = "";
