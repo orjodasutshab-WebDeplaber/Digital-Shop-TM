@@ -526,7 +526,7 @@
     position: fixed;
     bottom: 0; left: 0; right: 0;
     background: #1c1c1e;
-    border-radius: 20px 20px 0 0;
+    border-radius: 36px 36px 0 0;
     z-index: 9999999;
     overflow: hidden;
     max-height: 92vh;
@@ -537,59 +537,77 @@
     font-family: 'Hind Siliguri', sans-serif;
 ">
     <!-- Drag Handle -->
-    <div style="display:flex;justify-content:center;padding:10px 0 4px;">
-        <div style="width:40px;height:4px;background:#555;border-radius:4px;"></div>
+    <div style="display:flex;justify-content:center;padding:18px 0 6px;">
+        <div style="width:72px;height:6px;background:#555;border-radius:6px;"></div>
     </div>
 
     <!-- User Info Header -->
-    <div style="display:flex;align-items:center;gap:14px;padding:14px 20px 16px;border-bottom:1px solid #2c2c2e;">
+    <div style="display:flex;align-items:center;gap:22px;padding:20px 28px 22px;border-bottom:2px solid #2c2c2e;">
         <div style="position:relative;flex-shrink:0;">
-            <div id="mobileSheetAvatarWrap" style="width:56px;height:56px;border-radius:50%;background:#2c2c2e;display:flex;align-items:center;justify-content:center;overflow:hidden;border:2.5px solid #6366f1;">
-                <i id="mobileSheetAvatarIcon" class="fa fa-user" style="color:#94a3b8;font-size:26px;"></i>
+            <div id="mobileSheetAvatarWrap" style="width:88px;height:88px;border-radius:50%;background:#2c2c2e;display:flex;align-items:center;justify-content:center;overflow:hidden;border:3px solid #6366f1;">
+                <i id="mobileSheetAvatarIcon" class="fa fa-user" style="color:#94a3b8;font-size:42px;"></i>
                 <img id="mobileSheetAvatarImg" src="" style="display:none;width:100%;height:100%;object-fit:cover;">
             </div>
-            <label for="avatarUploadMobile" style="position:absolute;bottom:-2px;right:-2px;background:#6366f1;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #1c1c1e;">
-                <i class="fa fa-camera" style="color:#fff;font-size:9px;"></i>
+            <label for="avatarUploadMobile" style="position:absolute;bottom:-2px;right:-2px;background:#6366f1;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:3px solid #1c1c1e;">
+                <i class="fa fa-camera" style="color:#fff;font-size:14px;"></i>
             </label>
             <input type="file" id="avatarUploadMobile" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
         </div>
         <div style="flex:1;min-width:0;">
-            <div style="font-size:11px;color:#8e8e93;margin-bottom:2px;">হ্যালো,</div>
-            <div id="mobileSheetUserName" style="font-size:17px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">User</div>
+            <div style="font-size:22px;color:#8e8e93;margin-bottom:4px;">হ্যালো,</div>
+            <div id="mobileSheetUserName" style="font-size:32px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">User</div>
         </div>
         <!-- X Close -->
-        <button onclick="closeMobileAccountMenu()" style="background:#2c2c2e;border:none;color:#8e8e93;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;flex-shrink:0;">
+        <button onclick="closeMobileAccountMenu()" style="background:#3a3a3c;border:none;color:#ebebf5;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;flex-shrink:0;">
             <i class="fa fa-times"></i>
         </button>
     </div>
 
-    <!-- Menu List — scrollable, invisible scrollbar -->
-    <div style="overflow-y:auto;flex:1;padding:6px 0 8px;scrollbar-width:none;-ms-overflow-style:none;" id="mobileSheetList">
+    <!-- Menu List — scrollable + দৃশ্যমান custom scrollbar -->
+    <div id="mobileSheetList" style="overflow-y:auto;flex:1;padding:8px 0 10px;">
         <style>
-            #mobileSheetList::-webkit-scrollbar { display: none; }
+            /* ── দৃশ্যমান custom scrollbar শুধু মোবাইল শীটে ── */
+            #mobileSheetList::-webkit-scrollbar {
+                display: block !important;
+                width: 5px;
+            }
+            #mobileSheetList::-webkit-scrollbar-track {
+                background: #2c2c2e;
+                border-radius: 10px;
+            }
+            #mobileSheetList::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, #6366f1, #a855f7);
+                border-radius: 10px;
+            }
+            #mobileSheetList {
+                scrollbar-width: thin !important;
+                scrollbar-color: #6366f1 #2c2c2e !important;
+            }
+
             .mob-sheet-item {
                 display: flex;
                 align-items: center;
-                gap: 16px;
-                padding: 15px 22px;
-                color: #ebebf5cc;
+                gap: 24px;
+                padding: 22px 28px;
+                color: #ebebf5;
                 cursor: pointer;
-                font-size: 16px;
+                font-size: 28px;
                 font-weight: 500;
                 border-bottom: 1px solid #2c2c2e;
                 -webkit-tap-highlight-color: rgba(255,255,255,0.08);
                 transition: background 0.15s;
                 font-family: 'Hind Siliguri', sans-serif;
+                line-height: 1.3;
             }
             .mob-sheet-item:active { background: #2c2c2e; }
             .mob-sheet-item:last-child { border-bottom: none; }
             .mob-sheet-item .mob-icon-wrap {
-                width: 36px; height: 36px;
-                border-radius: 10px;
+                width: 60px; height: 60px;
+                border-radius: 16px;
                 background: #2c2c2e;
                 display: flex; align-items: center; justify-content: center;
                 flex-shrink: 0;
-                font-size: 15px;
+                font-size: 26px;
             }
         </style>
 
@@ -614,11 +632,11 @@
             হেল্প (সরাসরি)
         </div>
         <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openDiscountModule()" style="justify-content:space-between;">
-            <div style="display:flex;align-items:center;gap:16px;">
+            <div style="display:flex;align-items:center;gap:24px;">
                 <div class="mob-icon-wrap" style="background:rgba(245,158,11,0.15);"><i class="fa fa-ticket-alt" style="color:#f59e0b;"></i></div>
                 ডিসকাউন্ট কোড ও কার্ড
             </div>
-            <span id="mobile-discount-notif-dot" style="display:none;width:10px;height:10px;background:#ff4757;border-radius:50%;box-shadow:0 0 8px #ff4757;"></span>
+            <span id="mobile-discount-notif-dot" style="display:none;width:16px;height:16px;background:#ff4757;border-radius:50%;box-shadow:0 0 10px #ff4757;flex-shrink:0;"></span>
         </div>
         <div class="mob-sheet-item" onclick="closeMobileAccountMenu();openModal('orderTrackingModal')">
             <div class="mob-icon-wrap" style="background:rgba(99,102,241,0.18);"><i class="fa fa-box-open" style="color:#818cf8;"></i></div>
@@ -643,8 +661,8 @@
     </div>
 
     <!-- Logout -->
-    <div style="padding:12px 16px 28px;border-top:1px solid #2c2c2e;">
-        <button onclick="closeMobileAccountMenu();performLogout()" style="width:100%;padding:15px;background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.25);border-radius:14px;cursor:pointer;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Hind Siliguri',sans-serif;">
+    <div style="padding:16px 20px 36px;border-top:2px solid #2c2c2e;">
+        <button onclick="closeMobileAccountMenu();performLogout()" style="width:100%;padding:22px;background:rgba(239,68,68,0.12);color:#ef4444;border:2px solid rgba(239,68,68,0.3);border-radius:20px;cursor:pointer;font-weight:700;font-size:30px;display:flex;align-items:center;justify-content:center;gap:16px;font-family:'Hind Siliguri',sans-serif;">
             <i class="fa fa-sign-out-alt"></i> লগআউট
         </button>
     </div>
@@ -2206,17 +2224,27 @@ html.is-mobile .profile-trigger {
 
 /* ══════════════════════════════════════════════
    পুরো সাইট — অদৃশ্য স্ক্রলবার (PC + Mobile)
+   শুধু #mobileSheetList বাদে
 ══════════════════════════════════════════════ */
-html, body, * {
+html, body {
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
 }
 html::-webkit-scrollbar,
-body::-webkit-scrollbar,
-*::-webkit-scrollbar {
+body::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+}
+
+/* সাইটের বাকি সব scroll container — hidden */
+*:not(#mobileSheetList)::-webkit-scrollbar {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
+}
+*:not(#mobileSheetList) {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
 }
 </style>
 </body>
