@@ -3390,6 +3390,8 @@ function generateInvoice(orderId) {
     const order = appState.orders.find(o => o.id === orderId);
     if (!order) return alert("অর্ডার পাওয়া যায়নি!");
 
+    const isMobile = window.innerWidth <= 768;
+
     const isPaid = order.paymentStatus === 'পেইড';
     const statusColor = isPaid ? '#10b981' : '#f59e0b';
     const statusText = order.paymentStatus || 'বকেয়া';
@@ -3412,6 +3414,101 @@ function generateInvoice(orderId) {
     const dateStr = orderDate.toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' });
     const timeStr = orderDate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
 
+    // ── পিসি ডিজাইন (আগের মতো) ──
+    const desktopHTML = `<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice - ${order.id}</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #334155; line-height: 1.6; background: #f1f5f9; }
+        .invoice-card { background: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 800px; margin: auto; position: relative; overflow: hidden; }
+        .invoice-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: #3b82f6; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 30px; }
+        .logo-area h1 { margin: 0; color: #3b82f6; font-size: 28px; letter-spacing: -1px; }
+        .logo-area p { margin: 0; font-size: 12px; color: #64748b; text-transform: uppercase; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px; }
+        .info-box h4 { margin: 0 0 10px 0; color: #1e293b; text-transform: uppercase; font-size: 13px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        .info-box p { margin: 4px 0; font-size: 14px; }
+        .status-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; background: ${statusColor}; margin-top: 10px; }
+        .invoice-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .invoice-table th { background: #f8fafc; padding: 12px; text-align: left; font-size: 13px; color: #64748b; border-bottom: 2px solid #e2e8f0; }
+        .invoice-table td { padding: 15px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .summary { margin-left: auto; width: 300px; margin-top: 20px; }
+        .summary-item { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
+        .summary-item.grand-total { border-top: 2px solid #f1f5f9; margin-top: 10px; padding-top: 10px; font-size: 18px; font-weight: bold; color: #1e293b; }
+        .payment-stamp { position: absolute; top: 150px; right: 50px; border: 4px solid ${statusColor}; color: ${statusColor}; padding: 10px 20px; transform: rotate(-15deg); font-size: 30px; font-weight: 800; border-radius: 12px; opacity: 0.2; pointer-events: none; text-transform: uppercase; }
+        .footer { margin-top: 50px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 20px; color: #94a3b8; font-size: 12px; }
+        .print-btn { background: #3b82f6; color: white; border: none; padding: 10px 30px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 20px; transition: 0.3s; }
+        .print-btn:hover { background: #2563eb; }
+        @media print { .print-btn { display: none; } body { background: white; padding: 0; } .invoice-card { box-shadow: none; border: none; } }
+    </style>
+</head>
+<body>
+    <div class="invoice-card">
+        <div class="payment-stamp">${isPaid ? 'PAID' : 'UNPAID'}</div>
+        <div class="header">
+            <div class="logo-area">
+                <h1>Digital Shop TM</h1>
+                <p>Your Trusted Online Marketplace</p>
+            </div>
+            <div style="text-align: right;">
+                <h2 style="margin:0; color:#1e293b;">INVOICE</h2>
+                <p style="margin:0; font-size:14px; color:#64748b;">Order ID: #${order.id}</p>
+                <p style="margin:0; font-size:14px; color:#64748b;">Date: ${new Date(order.date || Date.now()).toLocaleDateString('bn-BD')}</p>
+            </div>
+        </div>
+        <div class="info-grid">
+            <div class="info-box">
+                <h4>বিলেবল গ্রাহক (Bill To):</h4>
+                <p><strong>${order.customerName}</strong></p>
+                <p>ফোন: ${order.customerPhone}</p>
+                <p>ঠিকানা: ${order.address || 'উল্লেখ্য নেই'}</p>
+            </div>
+            <div class="info-box">
+                <h4>পেমেন্ট ইনফো:</h4>
+                <p>পদ্ধতি: ${order.paymentMethod === 'COD' ? 'ক্যাশ অন ডেলিভারি' : 'অনলাইন পেমেন্ট'}</p>
+                <p>ট্রানজেকশন আইডি: ${order.trxId || 'N/A'}</p>
+                <div class="status-badge">${statusText}</div>
+            </div>
+        </div>
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>পণ্যের বিবরণ</th>
+                    <th style="text-align: center;">পরিমাণ (Qty)</th>
+                    <th style="text-align: right;">ইউনিট মূল্য</th>
+                    <th style="text-align: right;">মোট</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>${order.productName}</strong><br>
+                        <small style="color: #64748b;">ক্যাটাগরি: ${order.category || 'জেনারেল'}</small>
+                    </td>
+                    <td style="text-align: center;">${qty} পিস</td>
+                    <td style="text-align: right;">৳ ${unitPrice.toFixed(0)}</td>
+                    <td style="text-align: right;">৳ ${totalProductValue.toFixed(0)}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="summary">
+            <div class="summary-item"><span>পণ্যের মোট দাম:</span><span>৳ ${totalProductValue.toFixed(0)}</span></div>
+            <div class="summary-item"><span>ডেলিভারি চার্জ (${qty} পিস):</span><span>৳ ${delivery}</span></div>
+            ${discount > 0 ? `<div class="summary-item" style="color:#ef4444;"><span>ডিসকাউন্ট (১টি পণ্যে):</span><span>- ৳ ${discount}</span></div>` : ''}
+            <div class="summary-item grand-total"><span>সর্বমোট প্রদেয়:</span><span>৳ ${finalTotal}</span></div>
+        </div>
+        <div class="footer">
+            <p>Digital Shop TM - এ শপিং করার জন্য আপনাকে ধন্যবাদ।</p>
+            <p>এটি একটি কম্পিউটার জেনারেটেড ইনভয়েস, কোনো স্বাক্ষর প্রয়োজন নেই।</p>
+            <button class="print-btn" onclick="window.print()">Download & Print Invoice</button>
+        </div>
+    </div>
+</body>
+</html>`;
+
+    // ── মোবাইল ডিজাইন (নতুন) ──
     const statusOrder = ['pending','confirmed','delivered'];
     const curIdx = statusOrder.indexOf(order.status === 'rejected' ? 'pending' : (order.status || 'pending'));
     const trackIcons = ['📋','✅','📦'];
@@ -3428,7 +3525,7 @@ function generateInvoice(orderId) {
     const barcodeWidths = [2,1,3,1,2,1,1,2,3,1,2,1,1,3,2,1,2,1,3,1,2,2,1,3,1,2,1,2];
     const barcodeBars = barcodeWidths.map(w => `<span style="display:inline-block;width:${w}px;height:28px;background:#334155;border-radius:1px;margin:0 1px;"></span>`).join('');
 
-    const invoiceHTML = `<!DOCTYPE html>
+    const mobileHTML = `<!DOCTYPE html>
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
@@ -3509,7 +3606,6 @@ html,body{width:100%;min-height:100vh;background:#0f172a;font-family:'Hind Silig
   <div class="status-pill">${isPaid ? '✅ পেইড' : '⏳ বকেয়া'}</div>
 </div>
 <div class="receipt-body">
-
   <div class="prod-card">
     <div class="prod-img-wrap">${order.productImage ? `<img src="${order.productImage}" alt="${order.productName}" onerror="this.style.display='none'">` : '<span style="font-size:48px">📦</span>'}</div>
     <div class="prod-info">
@@ -3522,21 +3618,18 @@ html,body{width:100%;min-height:100vh;background:#0f172a;font-family:'Hind Silig
       </div>
     </div>
   </div>
-
   <div class="info-section">
     <div class="info-section-head">👤 গ্রাহকের তথ্য</div>
     <div class="info-row"><span class="info-key">নাম</span><span class="info-val">${order.customerName || '—'}</span></div>
     <div class="info-row"><span class="info-key">ফোন</span><span class="info-val">${order.customerPhone || '—'}</span></div>
     <div class="info-row"><span class="info-key">ঠিকানা</span><span class="info-val">${order.address || 'উল্লেখ নেই'}</span></div>
   </div>
-
   <div class="info-section">
     <div class="info-section-head">💳 পেমেন্ট তথ্য</div>
     <div class="info-row"><span class="info-key">পদ্ধতি</span><span class="info-val">${order.paymentMethod === 'COD' ? '💵 ক্যাশ অন ডেলিভারি' : '📱 অনলাইন পেমেন্ট'}</span></div>
     ${order.trxId ? `<div class="info-row"><span class="info-key">ট্রানজেকশন ID</span><span class="info-val">${order.trxId}</span></div>` : ''}
     <div class="info-row"><span class="info-key">সময়</span><span class="info-val">${dateStr}, ${timeStr}</span></div>
   </div>
-
   <div class="price-section">
     <div class="info-section-head">🧾 মূল্য বিবরণ</div>
     <div class="price-row"><span class="price-label">পণ্যের মূল্য (${qty} পিস)</span><span class="price-amount">৳${totalProductValue.toFixed(0)}</span></div>
@@ -3544,18 +3637,15 @@ html,body{width:100%;min-height:100vh;background:#0f172a;font-family:'Hind Silig
     ${discount > 0 ? `<div class="price-row disc"><span class="price-label">ডিসকাউন্ট</span><span class="price-amount">− ৳${discount}</span></div>` : ''}
     <div class="price-row total"><span class="price-label">সর্বমোট প্রদেয়</span><span class="price-amount">৳${finalTotal}</span></div>
   </div>
-
   <div class="delivery-track">
     <div class="delivery-track-title">🚚 ডেলিভারি অবস্থা</div>
     <div class="track-steps">${trackSteps}</div>
     ${order.status === 'rejected' ? `<div style="margin-top:14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#f87171;text-align:center;">❌ এই অর্ডারটি বাতিল করা হয়েছে</div>` : ''}
   </div>
-
   <div class="note-box">
     <span style="font-size:16px">💡</span>
     <p>যেকোনো সমস্যায় অ্যাডমিনের সাথে যোগাযোগ করুন। রশিদটি সংরক্ষণ করে রাখুন।</p>
   </div>
-
   <div class="action-row">
     <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট / ডাউনলোড</button>
     <button class="btn-close" onclick="window.close()">✕ বন্ধ</button>
@@ -3570,7 +3660,7 @@ html,body{width:100%;min-height:100vh;background:#0f172a;font-family:'Hind Silig
 </html>`;
 
     const invoiceWindow = window.open('', '_blank');
-    invoiceWindow.document.write(invoiceHTML);
+    invoiceWindow.document.write(isMobile ? mobileHTML : desktopHTML);
     invoiceWindow.document.close();
 }
 // ১. স্টোরেজ ক্যালকুলেটর (ফাইল এর নিচে যোগ করুন)
