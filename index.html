@@ -2027,25 +2027,32 @@ html.is-mobile #checkoutModal #toggleNewAddrBtn {
     border-width: 3px !important;
 }
 
-/* ── পরবর্তী ধাপ বাটন — স্ক্রিনের একদম নিচে fixed ── */
+/* ── পরবর্তী ধাপ বাটন ── */
 html.is-mobile #checkoutModal .btn-success,
 html.is-mobile #checkoutModal button.btn-success {
+    padding: 26px !important;
+    font-size: 32px !important;
+    border-radius: 18px !important;
+    margin-top: 10px !important;
+}
+
+/* ✅ মোবাইলে বাটন সবসময় স্ক্রিনের নিচে fixed — scroll হবে না */
+html.is-mobile #checkoutModal #checkoutStep1 .btn-success,
+html.is-mobile #checkoutModal #checkoutStep1 button.btn-success {
     position: fixed !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
-    padding: 26px !important;
-    font-size: 32px !important;
     border-radius: 0 !important;
-    margin-top: 0 !important;
-    z-index: 999999999 !important;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.18) !important;
+    z-index: 9999999999 !important;
+    box-shadow: 0 -4px 18px rgba(0,0,0,0.18) !important;
     box-sizing: border-box !important;
+    margin: 0 !important;
 }
-/* modal scroll করলে বাটন content এর উপর না পড়ে — নিচে ফাঁকা রাখা */
+/* বাটনের উচ্চতা সমান নিচে ফাঁকা রাখা — content ঢাকা না পড়ে */
 html.is-mobile #checkoutModal .modal-box {
-    padding-bottom: 140px !important;
+    padding-bottom: 130px !important;
 }
 
 /* ══ ধাপ ২ — পেমেন্ট ══ */
