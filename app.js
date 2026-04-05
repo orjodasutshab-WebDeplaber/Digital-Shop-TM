@@ -2027,15 +2027,6 @@ function adminViewOrderDetails(orderId) {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-    // ✅ মোবাইলে জোর করে পুরো স্ক্রিন
-    const _rm = document.getElementById('returnModal');
-    const _rmi = document.getElementById('returnModalInner');
-    if (_rm && _rmi) {
-        _rm.style.cssText = 'position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;margin:0!important;padding:0!important;z-index:2147483647!important;background:rgba(15,23,42,0.85)!important;display:flex!important;align-items:stretch!important;';
-        _rmi.style.cssText = 'width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;border-radius:0!important;margin:0!important;flex:1!important;display:flex!important;flex-direction:column!important;background:#fff!important;overflow:hidden!important;';
-    }
-
     const chatBox = document.getElementById('adminChatList');
     chatBox.scrollTop = chatBox.scrollHeight;
 }
@@ -4038,12 +4029,6 @@ function openUserOrders() {
 
 
 function openReturnModal(orderId) {
-    // ✅ আগের সব মোডাল বন্ধ করো — নইলে parent stacking context এ আটকে যাবে
-    const _om = document.getElementById('dynamicOrderModal');
-    if (_om) _om.innerHTML = '';
-    const _am = document.getElementById('accountModal');
-    if (_am) _am.style.display = 'none';
-
     // ১. ডুপ্লিকেট রিকোয়েস্ট চেক
     const RETURN_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.RETURNS) ? DB_KEYS.RETURNS : 'returns';
     const allReturns = JSON.parse(localStorage.getItem(RETURN_KEY)) || [];
@@ -4059,8 +4044,8 @@ function openReturnModal(orderId) {
     if (!order) return alert("অর্ডার পাওয়া যায়নি!");
 
     const modalHtml = `
-    <div id="returnModal" style="position:fixed; top:0; left:0; right:0; bottom:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.85); display:flex; align-items:stretch; justify-content:center; z-index:999999999; backdrop-filter: blur(15px); font-family: 'Inter', sans-serif; padding: 0; box-sizing:border-box;">
-        <div id="returnModalInner" style="background:#fff; width:100%; height:100%; display:flex; flex-direction:column; animation: modalPopUp 0.35s ease-out; position:relative; overflow:hidden; border:none; border-radius:0; max-width:none;">
+    <div id="returnModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.85); display:flex; align-items:center; justify-content:center; z-index:999999999; backdrop-filter: blur(15px); font-family: 'Inter', sans-serif; padding: 15px;">
+        <div style="background:#fff; width:100%; max-width:420px; max-height: 92vh; border-radius:32px; display:flex; flex-direction:column; box-shadow:0 50px 100px -20px rgba(0,0,0,0.6); animation: modalPopUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position:relative; overflow:hidden; border: 1px solid rgba(255,255,255,0.3);">
             
             <div style="background: linear-gradient(90deg, #fff7ed, #ffedd5); padding: 12px 20px; border-bottom: 1px solid #fed7aa; display: flex; align-items: center; justify-content: center; gap: 8px;">
                 <i class="fa fa-info-circle" style="color: #f97316; font-size: 14px;"></i>
@@ -4155,13 +4140,9 @@ function openReturnModal(orderId) {
         </div>
     </div>
     <style>
-        @keyframes modalPopUp { 0% { opacity:0; transform:translateY(30px); } 100% { opacity:1; transform:translateY(0); } }
+        @keyframes modalPopUp { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
         .custom-modal-body::-webkit-scrollbar { width: 4px; }
         .custom-modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        @media (min-width: 769px) {
-            #returnModal { align-items: center !important; justify-content: center !important; padding: 20px !important; }
-            #returnModalInner { max-width: 460px !important; height: auto !important; max-height: 92vh !important; border-radius: 28px !important; overflow-y: auto !important; }
-        }
     </style>`;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
