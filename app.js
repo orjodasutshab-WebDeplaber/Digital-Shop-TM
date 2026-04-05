@@ -3755,9 +3755,23 @@ body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri',
 </body>
 </html>`;
 
-    const invoiceWindow = window.open('', '_blank');
-    invoiceWindow.document.write(isMobile ? mobileHTML : desktopHTML);
-    invoiceWindow.document.close();
+    if (isMobile) {
+        const blob = new Blob([mobileHTML], { type: 'text/html;charset=utf-8' });
+        const blobURL = URL.createObjectURL(blob);
+        const invoiceWindow = window.open(blobURL, '_blank');
+        if (!invoiceWindow || invoiceWindow.closed) {
+            const a = document.createElement('a');
+            a.href = blobURL;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            a.click();
+        }
+        setTimeout(() => URL.revokeObjectURL(blobURL), 60000);
+    } else {
+        const invoiceWindow = window.open('', '_blank');
+        invoiceWindow.document.write(desktopHTML);
+        invoiceWindow.document.close();
+    }
 }
 // ১. স্টোরেজ ক্যালকুলেটর (ফাইল এর নিচে যোগ করুন)
 function checkStorageUsage() {
