@@ -1859,13 +1859,18 @@ html.is-mobile #checkoutModal .modal-box {
     width: 100% !important;
     max-width: 100% !important;
     min-height: 100vh !important;
+    min-height: 100dvh !important;
     height: auto !important;
     max-height: 100vh !important;
+    max-height: 100dvh !important;
     border-radius: 0 !important;
-    padding: 36px 26px 48px !important;
+    padding: 36px 26px 20px !important;
     overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
     margin: 0 !important;
     box-shadow: none !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 /* ── Close বাটন ── */
@@ -2028,12 +2033,27 @@ html.is-mobile #checkoutModal #toggleNewAddrBtn {
 }
 
 /* ── পরবর্তী ধাপ বাটন ── */
+html.is-mobile #checkoutModal .checkout-step-container {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+html.is-mobile #checkoutModal .checkout-step-container .modal-body {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
 html.is-mobile #checkoutModal .btn-success,
 html.is-mobile #checkoutModal button.btn-success {
     padding: 26px !important;
     font-size: 32px !important;
     border-radius: 18px !important;
     margin-top: 10px !important;
+    /* মোবাইলে কীবোর্ড উঠলেও বাটন সর্বদা দৃশ্যমান থাকবে */
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 99 !important;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.10) !important;
 }
 
 /* ══ ধাপ ২ — পেমেন্ট ══ */
