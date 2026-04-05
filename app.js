@@ -10960,17 +10960,14 @@ function _initMobileFixes() {
         }
     });
 
-    // ৫. Keyboard উঠলে checkout modal বাটন না লুকাতে — visualViewport fix
+    // ৫. Keyboard উঠলে fixed বাটন কীবোর্ডের উপরে রাখা
     if (window.visualViewport) {
-        var _vvHandler = function() {
-            var modalBox = document.querySelector('#checkoutModal .modal-box');
-            if (!modalBox) return;
-            var vvH = Math.round(window.visualViewport.height);
-            // modal-box কে viewport height এ সীমাবদ্ধ করি
-            modalBox.style.height = vvH + 'px';
-            modalBox.style.maxHeight = vvH + 'px';
-        };
-        window.visualViewport.addEventListener('resize', _vvHandler);
+        window.visualViewport.addEventListener('resize', function() {
+            var btn = document.querySelector('#checkoutModal .btn-success');
+            if (!btn) return;
+            var offsetFromBottom = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
+            btn.style.bottom = (offsetFromBottom > 0 ? offsetFromBottom : 0) + 'px';
+        });
     }
 
     console.log('[TM] Mobile fixes applied ✅');
