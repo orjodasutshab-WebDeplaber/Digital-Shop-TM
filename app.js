@@ -10960,6 +10960,24 @@ function _initMobileFixes() {
         }
     });
 
+    // ৫. Keyboard উঠলে checkout modal বাটন না লুকাতে — visualViewport fix
+    if (window.visualViewport) {
+        var _vvHandler = function() {
+            var modalBox = document.querySelector('#checkoutModal .modal-box');
+            if (!modalBox) return;
+            var vvH = window.visualViewport.height;
+            modalBox.style.maxHeight = vvH + 'px';
+            // sticky বাটন scroll করে দেখাই
+            var btnWrap = document.getElementById('nextStepBtnWrap');
+            if (btnWrap) {
+                setTimeout(function() {
+                    btnWrap.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                }, 80);
+            }
+        };
+        window.visualViewport.addEventListener('resize', _vvHandler);
+    }
+
     console.log('[TM] Mobile fixes applied ✅');
 }
 // ╔══════════════════════════════════════════════════════════════════╗
