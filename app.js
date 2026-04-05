@@ -4305,6 +4305,119 @@ function openReturnModal(orderId) {
         @keyframes modalPopUp { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
         .custom-modal-body::-webkit-scrollbar { width: 4px; }
         .custom-modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        @media (max-width: 640px) {
+            /* ── Overlay: নিচ থেকে উঠবে, প্যাডিং শূন্য ── */
+            #returnModal {
+                padding: 0 !important;
+                align-items: flex-end !important;
+                background: rgba(0, 0, 0, 0.75) !important;
+            }
+
+            /* ── মূল কার্ড: পুরো প্রস্থ, নিচ থেকে উঠে আসা ── */
+            #returnModal > div {
+                max-width: 100% !important;
+                width: 100% !important;
+                max-height: 92vh !important;
+                border-radius: 24px 24px 0 0 !important;
+                animation: mobileSlideUp 0.38s cubic-bezier(0.25, 1.35, 0.45, 1) forwards !important;
+                border: none !important;
+                box-shadow: 0 -8px 50px rgba(0, 0, 0, 0.45) !important;
+            }
+
+            /* ── টপ ব্যানার ── */
+            #returnModal > div > div:first-child {
+                padding: 13px 20px !important;
+                border-radius: 0 !important;
+            }
+            #returnModal > div > div:first-child span {
+                font-size: 12px !important;
+            }
+
+            /* ── হেডার রো ── */
+            #returnModal > div > div:nth-child(2) {
+                padding: 16px 20px !important;
+            }
+            #returnModal > div > div:nth-child(2) h3 {
+                font-size: 19px !important;
+                font-weight: 900 !important;
+            }
+            #returnModal > div > div:nth-child(2) p {
+                font-size: 12px !important;
+            }
+            #returnModal > div > div:nth-child(2) > div:first-child > div:first-child {
+                width: 44px !important;
+                height: 44px !important;
+                border-radius: 14px !important;
+            }
+            #returnModal > div > div:nth-child(2) > div:first-child > div:first-child i {
+                font-size: 17px !important;
+            }
+            #returnModal > div > div:nth-child(2) button {
+                width: 36px !important;
+                height: 36px !important;
+                font-size: 22px !important;
+                border-radius: 50% !important;
+            }
+
+            /* ── বডি স্ক্রলএলাকা ── */
+            #returnModal .custom-modal-body {
+                padding: 20px 18px !important;
+                max-height: calc(92vh - 210px) !important;
+            }
+
+            /* ── লেবেল ── */
+            #returnModal label {
+                font-size: 14px !important;
+            }
+
+            /* ── Image input group ── */
+            #returnModal .img-input-group {
+                padding: 16px !important;
+                border-radius: 18px !important;
+            }
+            #returnModal .img-input-group > div > label {
+                font-size: 14px !important;
+                padding: 13px 16px !important;
+                border-radius: 14px !important;
+                gap: 10px !important;
+            }
+
+            /* ── Textarea ── */
+            #returnModal textarea {
+                height: 100px !important;
+                font-size: 15px !important;
+                padding: 14px !important;
+                border-radius: 16px !important;
+            }
+
+            /* ── Select & inputs ── */
+            #returnModal select,
+            #returnModal input[type="url"],
+            #returnModal input[type="number"] {
+                font-size: 15px !important;
+                padding: 14px 16px !important;
+                border-radius: 16px !important;
+            }
+
+            /* ── সাবমিট বাটন ── */
+            #returnModal button[onclick*="submitReturnRequest"] {
+                padding: 20px !important;
+                font-size: 17px !important;
+                border-radius: 18px !important;
+                letter-spacing: 0.4px !important;
+            }
+
+            /* ── ফুটার প্যাডিং ── */
+            #returnModal > div > div:last-child {
+                padding: 16px 18px 28px !important;
+            }
+        }
+
+        @keyframes mobileSlideUp {
+            0%   { opacity: 0; transform: translateY(60%); }
+            100% { opacity: 1; transform: translateY(0);   }
+        }
     </style>`;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
