@@ -4615,39 +4615,40 @@ function openUserReturnList() {
             }
         }
 
+        const isMob = window.screen.width < 600 || window.innerWidth < 600;
+        const f = (pc, mo) => isMob ? mo : pc;
+
         html += `
-        <div style="background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; padding: 20px; margin-bottom: 20px; border-radius: 24px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+        <div style="background:linear-gradient(145deg,#1e293b,#0f172a); border:1px solid #334155; padding:${f('20px','24px')}; margin-bottom:${f('20px','18px')}; border-radius:${f('24px','20px')}; position:relative; box-shadow:0 10px 25px rgba(0,0,0,0.3);">
             
-            <div style="position:absolute; top:0; left:0; width:5px; height:100%; background:${statusColor};"></div>
+            <div style="position:absolute; top:0; left:0; width:5px; height:100%; background:${statusColor}; border-radius:4px 0 0 4px;"></div>
             
-            <div style="display:flex; justify-content:space-between; align-items: flex-start; margin-bottom:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
                 <div>
-                    <span style="color:#94a3b8; font-weight:600; font-size:11px; display:block; margin-bottom:5px;">ID: #${ret.id}</span>
-                    <h4 style="margin:0; font-size:15px; color:#f8fafc; font-weight:600;">📦 অর্ডার আইডি: ${ret.orderId}</h4>
-                    <div style="display:flex; align-items:center; gap:8px; margin-top:6px; color:#64748b; font-size:12px;">
+                    <span style="color:#94a3b8; font-weight:600; font-size:${f('11px','22px')}; display:block; margin-bottom:5px;">ID: #${ret.id}</span>
+                    <h4 style="margin:0; font-size:${f('15px','28px')}; color:#f8fafc; font-weight:600;">📦 অর্ডার আইডি: ${ret.orderId}</h4>
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:6px; color:#64748b; font-size:${f('12px','24px')};">
                         <i class="fa fa-calendar-alt"></i>
                         <span>${ret.date || 'N/A'}</span>
                     </div>
                 </div>
 
-                <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
-                    <span style="background:${statusColor}22; color:${statusColor}; border: 1px solid ${statusColor}44; padding:4px 10px; border-radius:10px; font-size:10px; font-weight:bold;">
+                <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:10px;">
+                    <span style="background:${statusColor}22; color:${statusColor}; border:1px solid ${statusColor}44; padding:${f('4px 10px','8px 16px')}; border-radius:10px; font-size:${f('10px','22px')}; font-weight:bold;">
                         ${ret.statusHeader || 'পেন্ডিং'}
                     </span>
-                    
-                    <img src="${pImage}" 
-                         style="width: 55px; height: 55px; border-radius: 12px; object-fit: fill; border: 2px solid #334155; background: #0f172a;">
+                    <img src="${pImage}" style="width:${f('55px','80px')}; height:${f('55px','80px')}; border-radius:12px; object-fit:fill; border:2px solid #334155; background:#0f172a;">
                 </div>
             </div>
 
-            <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:15px; border:1px solid #1e293b; margin-bottom:15px;">
-                <p style="font-size:10px; color:#38bdf8; margin:0 0 4px; font-weight:bold;">এডমিন আপডেট:</p>
-                <p style="font-size:13px; color:#cbd5e1; margin:0;">
+            <div style="background:rgba(0,0,0,0.2); padding:${f('12px','16px')}; border-radius:15px; border:1px solid #1e293b; margin-bottom:15px;">
+                <p style="font-size:${f('10px','22px')}; color:#38bdf8; margin:0 0 4px; font-weight:bold;">এডমিন আপডেট:</p>
+                <p style="font-size:${f('13px','26px')}; color:#cbd5e1; margin:0;">
                     ${ret.statusHistory && ret.statusHistory.length > 0 ? ret.statusHistory[ret.statusHistory.length - 1].text : 'রিভিউ করা হচ্ছে...'}
                 </p>
             </div>
 
-            <button onclick="openUserReturnChat('${ret.id}')" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:12px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:13px; display:flex; align-items:center; justify-content:center; gap:10px;">
+            <button onclick="openUserReturnChat('${ret.id}')" style="width:100%; background:#1e293b; color:#fff; border:1px solid #334155; padding:${f('12px','18px')}; border-radius:15px; cursor:pointer; font-weight:bold; font-size:${f('13px','26px')}; display:flex; align-items:center; justify-content:center; gap:10px;">
                 <i class="fa fa-comments" style="color:#38bdf8;"></i> বিস্তারিত ও চ্যাট
             </button>
         </div>`;

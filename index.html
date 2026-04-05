@@ -2968,21 +2968,49 @@ html.is-mobile #discountModal #noCardMsg p {
     line-height: 1.6 !important;
 }
 
-/* ══ রিটার্ন অর্ডার Modal ══ */
+/* ══ রিটার্ন অর্ডার Modal — মোবাইলে পুরো স্ক্রিন ══ */
+html.is-mobile #userReturnListModal {
+    align-items: stretch !important;
+    padding: 0 !important;
+}
 html.is-mobile #userReturnListModal .modal-box {
-    border-radius: 32px !important;
-    padding: 28px !important;
-    max-height: 90vh !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    padding: 28px 18px 24px 18px !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 html.is-mobile #userReturnListModal h3 {
-    font-size: 32px !important;
+    font-size: 34px !important;
 }
 html.is-mobile #userReturnListModal span[style*="font-size:24px"] {
-    font-size: 52px !important;
+    font-size: 72px !important;
+    line-height: 1 !important;
 }
 html.is-mobile #userReturnListModal #userReturnListContent {
-    font-size: 26px !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
 }
+/* রিটার্ন কার্ডের ভেতরের লেখা বড় */
+html.is-mobile #userReturnListContent > div {
+    padding: 24px 20px !important;
+    border-radius: 20px !important;
+    margin-bottom: 18px !important;
+}
+html.is-mobile #userReturnListContent span[style*="font-size:11px"] { font-size: 22px !important; }
+html.is-mobile #userReturnListContent h4 { font-size: 28px !important; }
+html.is-mobile #userReturnListContent span[style*="font-size:12px"] { font-size: 24px !important; }
+html.is-mobile #userReturnListContent span[style*="font-size:10px"] { font-size: 22px !important; }
+html.is-mobile #userReturnListContent img { width: 80px !important; height: 80px !important; }
+html.is-mobile #userReturnListContent p[style*="font-size:10px"] { font-size: 22px !important; }
+html.is-mobile #userReturnListContent p[style*="font-size:13px"] { font-size: 26px !important; }
+html.is-mobile #userReturnListContent button { font-size: 26px !important; padding: 18px !important; border-radius: 14px !important; }
 
 /* ══ Order Tracking Modal (app.js generated) ══ */
 /* মোবাইলে orderTrackingModal পুরো স্ক্রিন */
