@@ -3418,6 +3418,7 @@ function generateInvoice(orderId) {
         <html lang="bn">
         <head>
             <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Invoice - ${order.id}</title>
             <style>
                 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #334155; line-height: 1.6; background: #f1f5f9; }
@@ -3449,6 +3450,38 @@ function generateInvoice(orderId) {
                 .print-btn:hover { background: #2563eb; }
 
                 @media print { .print-btn { display: none; } body { background: white; padding: 0; } .invoice-card { box-shadow: none; border: none; } }
+
+                @media screen and (max-width: 600px) {
+                    body { padding: 10px; font-size: 28px; }
+                    .invoice-card { padding: 28px 20px; border-radius: 10px; }
+                    .invoice-card::before { height: 10px; }
+
+                    .header { flex-direction: column; align-items: flex-start; gap: 16px; padding-bottom: 24px; margin-bottom: 24px; }
+                    .logo-area h1 { font-size: 52px; }
+                    .logo-area p { font-size: 26px; }
+                    .header > div:last-child { text-align: left; }
+                    .header h2 { font-size: 44px !important; }
+                    .header p { font-size: 28px !important; }
+
+                    .info-grid { grid-template-columns: 1fr; gap: 20px; margin-bottom: 24px; }
+                    .info-box h4 { font-size: 28px; padding-bottom: 8px; margin-bottom: 12px; }
+                    .info-box p { font-size: 28px; margin: 6px 0; }
+                    .status-badge { font-size: 26px; padding: 8px 22px; border-radius: 30px; margin-top: 14px; }
+
+                    .invoice-table { font-size: 26px; }
+                    .invoice-table th { font-size: 26px; padding: 14px 10px; }
+                    .invoice-table td { font-size: 26px; padding: 16px 10px; }
+                    .invoice-table td small { font-size: 24px; }
+
+                    .summary { width: 100%; margin-left: 0; margin-top: 24px; }
+                    .summary-item { font-size: 28px; padding: 8px 0; }
+                    .summary-item.grand-total { font-size: 34px; padding-top: 14px; margin-top: 14px; }
+
+                    .payment-stamp { font-size: 52px; top: 120px; right: 20px; padding: 12px 20px; border-width: 5px; }
+
+                    .footer p { font-size: 24px; }
+                    .print-btn { font-size: 32px; padding: 18px 40px; border-radius: 12px; width: 100%; margin-top: 24px; }
+                }
             </style>
         </head>
         <body>
