@@ -3390,151 +3390,186 @@ function generateInvoice(orderId) {
     const order = appState.orders.find(o => o.id === orderId);
     if (!order) return alert("অর্ডার পাওয়া যায়নি!");
 
-    const invoiceWindow = window.open('', '_blank', 'width=850,height=950');
-    
     const isPaid = order.paymentStatus === 'পেইড';
-    const statusColor = isPaid ? '#10b981' : '#ef4444';
+    const statusColor = isPaid ? '#10b981' : '#f59e0b';
     const statusText = order.paymentStatus || 'বকেয়া';
+    const statusBg = isPaid ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)';
 
-    // ১. ডাটা প্রসেসিং (অর্ডার অবজেক্ট থেকে সঠিক তথ্য নেয়া)
-    const qty = parseInt(order.orderQty || 1); // অর্ডারে থাকা পরিমাণ
-    const finalTotal = parseInt(order.price); // সর্বমোট টাকা
-    const discount = parseInt(order.discountAmount || 0); // ডিসকাউন্ট (যা ১টি পণ্যে দেওয়া হয়েছে)
-    
-    // ২. ডাইনামিক ডেলিভারি চার্জ নির্ধারণ (পরিমাণ অনুযায়ী)
+    const qty = parseInt(order.orderQty || 1);
+    const finalTotal = parseInt(order.price);
+    const discount = parseInt(order.discountAmount || 0);
+
     let delivery = 150;
     if (qty >= 4 && qty <= 5) delivery = 200;
     else if (qty >= 6 && qty <= 7) delivery = 250;
     else if (qty >= 8 && qty <= 9) delivery = 300;
     else if (qty === 10) delivery = 350;
 
-    // ৩. সাবটোটাল বা আসল পণ্যের দাম বের করা
-    // মোট দাম = (ইউনিট প্রাইস * পরিমাণ) - ডিসকাউন্ট + ডেলিভারি
-    // তাই, (ইউনিট প্রাইস * পরিমাণ) = ফাইনাল টোটাল + ডিসকাউন্ট - ডেলিভারি
     const totalProductValue = (finalTotal + discount) - delivery;
     const unitPrice = totalProductValue / qty;
 
-    const invoiceHTML = `
-        <!DOCTYPE html>
-        <html lang="bn">
-        <head>
-            <meta charset="UTF-8">
-            <title>Invoice - ${order.id}</title>
-            <style>
-                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #334155; line-height: 1.6; background: #f1f5f9; }
-                .invoice-card { background: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 800px; margin: auto; position: relative; overflow: hidden; }
-                .invoice-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: #3b82f6; }
-                
-                .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 30px; }
-                .logo-area h1 { margin: 0; color: #3b82f6; font-size: 28px; letter-spacing: -1px; }
-                .logo-area p { margin: 0; font-size: 12px; color: #64748b; text-transform: uppercase; }
-                
-                .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px; }
-                .info-box h4 { margin: 0 0 10px 0; color: #1e293b; text-transform: uppercase; font-size: 13px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
-                .info-box p { margin: 4px 0; font-size: 14px; }
+    const orderDate = new Date(order.date || Date.now());
+    const dateStr = orderDate.toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = orderDate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
 
-                .status-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; background: ${statusColor}; margin-top: 10px; }
+    const statusOrder = ['pending','confirmed','delivered'];
+    const curIdx = statusOrder.indexOf(order.status === 'rejected' ? 'pending' : (order.status || 'pending'));
+    const trackIcons = ['📋','✅','📦'];
+    const trackLabels = ['অর্ডার<br>হয়েছে','কনফার্ম<br>হয়েছে','ডেলিভারি<br>হয়েছে'];
+    const trackSteps = trackIcons.map((icon, i) => {
+        const isDone = i < curIdx;
+        const isActive = i === curIdx;
+        return `<div class="track-step">
+            <div class="step-dot ${isDone ? 'done' : isActive ? 'active' : ''}">${icon}</div>
+            <span class="step-label ${isDone ? 'done' : isActive ? 'active' : ''}">${trackLabels[i]}</span>
+        </div>`;
+    }).join('');
 
-                .invoice-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                .invoice-table th { background: #f8fafc; padding: 12px; text-align: left; font-size: 13px; color: #64748b; border-bottom: 2px solid #e2e8f0; }
-                .invoice-table td { padding: 15px 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
-                
-                .summary { margin-left: auto; width: 300px; margin-top: 20px; }
-                .summary-item { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
-                .summary-item.grand-total { border-top: 2px solid #f1f5f9; margin-top: 10px; padding-top: 10px; font-size: 18px; font-weight: bold; color: #1e293b; }
+    const barcodeWidths = [2,1,3,1,2,1,1,2,3,1,2,1,1,3,2,1,2,1,3,1,2,2,1,3,1,2,1,2];
+    const barcodeBars = barcodeWidths.map(w => `<span style="display:inline-block;width:${w}px;height:28px;background:#334155;border-radius:1px;margin:0 1px;"></span>`).join('');
 
-                .payment-stamp { position: absolute; top: 150px; right: 50px; border: 4px solid ${statusColor}; color: ${statusColor}; padding: 10px 20px; transform: rotate(-15deg); font-size: 30px; font-weight: 800; border-radius: 12px; opacity: 0.2; pointer-events: none; text-transform: uppercase; }
-                
-                .footer { margin-top: 50px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 20px; color: #94a3b8; font-size: 12px; }
-                .print-btn { background: #3b82f6; color: white; border: none; padding: 10px 30px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 20px; transition: 0.3s; }
-                .print-btn:hover { background: #2563eb; }
+    const invoiceHTML = `<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>রশিদ #${order.id}</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100vh;background:#0f172a;font-family:'Hind Siliguri','Segoe UI',sans-serif;color:#e2e8f0;-webkit-tap-highlight-color:transparent}
+.page-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding-bottom:40px}
+.top-bar{width:100%;background:linear-gradient(135deg,#1e3a5f 0%,#0f172a 100%);padding:18px 20px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(99,102,241,0.3);position:sticky;top:0;z-index:10}
+.top-bar-logo{display:flex;flex-direction:column}
+.top-bar-logo span:first-child{font-size:18px;font-weight:700;color:#fff}
+.top-bar-logo span:last-child{font-size:11px;color:#94a3b8;margin-top:2px}
+.top-bar-order{text-align:right}
+.top-bar-order span:first-child{display:block;font-size:11px;color:#94a3b8}
+.top-bar-order span:last-child{font-size:15px;font-weight:700;color:#818cf8}
+.status-banner{width:100%;background:${statusBg};border-bottom:2px solid ${statusColor};padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.s-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
+.s-val{font-size:16px;font-weight:700;color:${statusColor}}
+.status-pill{background:${statusColor};color:#fff;padding:6px 16px;border-radius:30px;font-size:13px;font-weight:700;white-space:nowrap}
+.receipt-body{width:100%;max-width:500px;padding:0 16px;margin-top:4px}
+.prod-card{background:#1e293b;border-radius:16px;overflow:hidden;margin-top:16px;border:1px solid #334155}
+.prod-img-wrap{width:100%;aspect-ratio:16/7;overflow:hidden;background:#0f172a;display:flex;align-items:center;justify-content:center}
+.prod-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.prod-info{padding:16px}
+.prod-name{font-size:17px;font-weight:700;color:#f1f5f9;line-height:1.4}
+.prod-cat{display:inline-block;margin-top:6px;font-size:11px;background:rgba(99,102,241,0.2);color:#818cf8;padding:3px 10px;border-radius:20px}
+.prod-meta{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.prod-meta-pill{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:6px 12px;font-size:12px;color:#94a3b8}
+.prod-meta-pill strong{color:#e2e8f0;font-weight:600}
+.info-section{background:#1e293b;border-radius:16px;margin-top:12px;border:1px solid #334155;overflow:hidden}
+.info-section-head{padding:13px 16px;background:rgba(99,102,241,0.1);border-bottom:1px solid #334155;font-size:12px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:8px}
+.info-row{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 16px;border-bottom:1px solid rgba(51,65,85,0.5);gap:12px}
+.info-row:last-child{border-bottom:none}
+.info-key{font-size:13px;color:#64748b;flex-shrink:0}
+.info-val{font-size:13px;color:#e2e8f0;font-weight:600;text-align:right;word-break:break-word;max-width:65%}
+.price-section{background:#1e293b;border-radius:16px;margin-top:12px;border:1px solid #334155;overflow:hidden}
+.price-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(51,65,85,0.4)}
+.price-row:last-child{border-bottom:none}
+.price-label{font-size:14px;color:#94a3b8}
+.price-amount{font-size:14px;color:#e2e8f0;font-weight:600}
+.price-row.disc .price-label,.price-row.disc .price-amount{color:#f87171}
+.price-row.total{background:rgba(99,102,241,0.12);border-top:1.5px solid rgba(99,102,241,0.4)}
+.price-row.total .price-label{font-size:15px;font-weight:700;color:#e2e8f0}
+.price-row.total .price-amount{font-size:20px;font-weight:800;color:#818cf8}
+.delivery-track{background:#1e293b;border-radius:16px;margin-top:12px;border:1px solid #334155;padding:16px}
+.delivery-track-title{font-size:12px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.track-steps{display:flex;justify-content:space-between;position:relative}
+.track-steps::before{content:'';position:absolute;top:14px;left:14px;right:14px;height:2px;background:#334155;z-index:0}
+.track-step{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1;flex:1}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;border:2px solid #334155;background:#0f172a}
+.step-dot.done{background:#10b981;border-color:#10b981}
+.step-dot.active{background:#6366f1;border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,0.25)}
+.step-label{font-size:10px;color:#64748b;text-align:center;line-height:1.3}
+.step-label.done{color:#10b981}
+.step-label.active{color:#818cf8;font-weight:700}
+.note-box{background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);border-radius:12px;padding:13px 16px;margin-top:12px;display:flex;gap:10px;align-items:flex-start}
+.note-box p{font-size:12px;color:#fbbf24;line-height:1.5}
+.action-row{display:flex;gap:10px;margin-top:16px}
+.btn-print{flex:1;background:#6366f1;color:#fff;border:none;padding:15px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-close{flex:0 0 auto;background:#334155;color:#94a3b8;border:none;padding:15px 20px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
+.receipt-footer{width:100%;max-width:500px;padding:20px 16px 0;text-align:center}
+.receipt-footer p{font-size:11px;color:#475569;line-height:1.7}
+.barcode-area{display:flex;flex-direction:column;align-items:center;margin-top:14px;gap:4px}
+.barcode-id{font-size:10px;color:#475569;letter-spacing:3px;margin-top:2px}
+@media print{.top-bar{position:relative}.action-row{display:none!important}body{background:#fff;color:#000}.top-bar,.status-banner{background:#f1f5f9!important;color:#000!important}.prod-card,.info-section,.price-section,.delivery-track{background:#fff!important;border:1px solid #ddd!important}}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+<div class="top-bar">
+  <div class="top-bar-logo"><span>🛍 Digital Shop TM</span><span>অর্ডার রশিদ</span></div>
+  <div class="top-bar-order"><span>অর্ডার নম্বর</span><span>#${order.id}</span></div>
+</div>
+<div class="status-banner">
+  <div><span class="s-label">পেমেন্ট স্ট্যাটাস</span><span class="s-val">${statusText}</span></div>
+  <div class="status-pill">${isPaid ? '✅ পেইড' : '⏳ বকেয়া'}</div>
+</div>
+<div class="receipt-body">
 
-                @media print { .print-btn { display: none; } body { background: white; padding: 0; } .invoice-card { box-shadow: none; border: none; } }
-            </style>
-        </head>
-        <body>
-            <div class="invoice-card">
-                <div class="payment-stamp">${isPaid ? 'PAID' : 'UNPAID'}</div>
+  <div class="prod-card">
+    <div class="prod-img-wrap">${order.productImage ? `<img src="${order.productImage}" alt="${order.productName}" onerror="this.style.display='none'">` : '<span style="font-size:48px">📦</span>'}</div>
+    <div class="prod-info">
+      <div class="prod-name">${order.productName}</div>
+      <span class="prod-cat">${order.category || 'জেনারেল'}</span>
+      <div class="prod-meta">
+        <div class="prod-meta-pill">পরিমাণ: <strong>${qty} পিস</strong></div>
+        <div class="prod-meta-pill">ইউনিট: <strong>৳${unitPrice.toFixed(0)}</strong></div>
+        <div class="prod-meta-pill">তারিখ: <strong>${dateStr}</strong></div>
+      </div>
+    </div>
+  </div>
 
-                <div class="header">
-                    <div class="logo-area">
-                        <h1>Digital Shop TM</h1>
-                        <p>Your Trusted Online Marketplace</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <h2 style="margin:0; color:#1e293b;">INVOICE</h2>
-                        <p style="margin:0; font-size:14px; color:#64748b;">Order ID: #${order.id}</p>
-                        <p style="margin:0; font-size:14px; color:#64748b;">Date: ${new Date(order.date || Date.now()).toLocaleDateString('bn-BD')}</p>
-                    </div>
-                </div>
+  <div class="info-section">
+    <div class="info-section-head">👤 গ্রাহকের তথ্য</div>
+    <div class="info-row"><span class="info-key">নাম</span><span class="info-val">${order.customerName || '—'}</span></div>
+    <div class="info-row"><span class="info-key">ফোন</span><span class="info-val">${order.customerPhone || '—'}</span></div>
+    <div class="info-row"><span class="info-key">ঠিকানা</span><span class="info-val">${order.address || 'উল্লেখ নেই'}</span></div>
+  </div>
 
-                <div class="info-grid">
-                    <div class="info-box">
-                        <h4>বিলেবল গ্রাহক (Bill To):</h4>
-                        <p><strong>${order.customerName}</strong></p>
-                        <p>ফোন: ${order.customerPhone}</p>
-                        <p>ঠিকানা: ${order.address || 'উল্লেখ্য নেই'}</p>
-                    </div>
-                    <div class="info-box">
-                        <h4>পেমেন্ট ইনফো:</h4>
-                        <p>পদ্ধতি: ${order.paymentMethod === 'COD' ? 'ক্যাশ অন ডেলিভারি' : 'অনলাইন পেমেন্ট'}</p>
-                        <p>ট্রানজেকশন আইডি: ${order.trxId || 'N/A'}</p>
-                        <div class="status-badge">${statusText}</div>
-                    </div>
-                </div>
+  <div class="info-section">
+    <div class="info-section-head">💳 পেমেন্ট তথ্য</div>
+    <div class="info-row"><span class="info-key">পদ্ধতি</span><span class="info-val">${order.paymentMethod === 'COD' ? '💵 ক্যাশ অন ডেলিভারি' : '📱 অনলাইন পেমেন্ট'}</span></div>
+    ${order.trxId ? `<div class="info-row"><span class="info-key">ট্রানজেকশন ID</span><span class="info-val">${order.trxId}</span></div>` : ''}
+    <div class="info-row"><span class="info-key">সময়</span><span class="info-val">${dateStr}, ${timeStr}</span></div>
+  </div>
 
-                <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th>পণ্যের বিবরণ</th>
-                            <th style="text-align: center;">পরিমাণ (Qty)</th>
-                            <th style="text-align: right;">ইউনিট মূল্য</th>
-                            <th style="text-align: right;">মোট</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <strong>${order.productName}</strong><br>
-                                <small style="color: #64748b;">ক্যাটাগরি: ${order.category || 'জেনারেল'}</small>
-                            </td>
-                            <td style="text-align: center;">${qty} পিস</td>
-                            <td style="text-align: right;">${SYSTEM_CONFIG.CURRENCY} ${unitPrice.toFixed(0)}</td>
-                            <td style="text-align: right;">${SYSTEM_CONFIG.CURRENCY} ${totalProductValue.toFixed(0)}</td>
-                        </tr>
-                    </tbody>
-                </table>
+  <div class="price-section">
+    <div class="info-section-head">🧾 মূল্য বিবরণ</div>
+    <div class="price-row"><span class="price-label">পণ্যের মূল্য (${qty} পিস)</span><span class="price-amount">৳${totalProductValue.toFixed(0)}</span></div>
+    <div class="price-row"><span class="price-label">ডেলিভারি চার্জ</span><span class="price-amount">৳${delivery}</span></div>
+    ${discount > 0 ? `<div class="price-row disc"><span class="price-label">ডিসকাউন্ট</span><span class="price-amount">− ৳${discount}</span></div>` : ''}
+    <div class="price-row total"><span class="price-label">সর্বমোট প্রদেয়</span><span class="price-amount">৳${finalTotal}</span></div>
+  </div>
 
-                <div class="summary">
-                    <div class="summary-item">
-                        <span>পণ্যের মোট দাম:</span>
-                        <span>${SYSTEM_CONFIG.CURRENCY} ${totalProductValue.toFixed(0)}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>ডেলিভারি চার্জ (${qty} পিস):</span>
-                        <span>${SYSTEM_CONFIG.CURRENCY} ${delivery}</span>
-                    </div>
-                    ${discount > 0 ? `
-                    <div class="summary-item" style="color: #ef4444;">
-                        <span>ডিসকাউন্ট (১টি পণ্যে):</span>
-                        <span>- ${SYSTEM_CONFIG.CURRENCY} ${discount}</span>
-                    </div>` : ''}
-                    <div class="summary-item grand-total">
-                        <span>সর্বমোট প্রদেয়:</span>
-                        <span>${SYSTEM_CONFIG.CURRENCY} ${finalTotal}</span>
-                    </div>
-                </div>
+  <div class="delivery-track">
+    <div class="delivery-track-title">🚚 ডেলিভারি অবস্থা</div>
+    <div class="track-steps">${trackSteps}</div>
+    ${order.status === 'rejected' ? `<div style="margin-top:14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#f87171;text-align:center;">❌ এই অর্ডারটি বাতিল করা হয়েছে</div>` : ''}
+  </div>
 
-                <div class="footer">
-                    <p>Digital Shop TM - এ শপিং করার জন্য আপনাকে ধন্যবাদ।</p>
-                    <p>এটি একটি কম্পিউটার জেনারেটেড ইনভয়েস, কোনো স্বাক্ষর প্রয়োজন নেই।</p>
-                    <button class="print-btn" onclick="window.print()">Download & Print Invoice</button>
-                </div>
-            </div>
-        </body>
-        </html>
-    `;
+  <div class="note-box">
+    <span style="font-size:16px">💡</span>
+    <p>যেকোনো সমস্যায় অ্যাডমিনের সাথে যোগাযোগ করুন। রশিদটি সংরক্ষণ করে রাখুন।</p>
+  </div>
 
+  <div class="action-row">
+    <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট / ডাউনলোড</button>
+    <button class="btn-close" onclick="window.close()">✕ বন্ধ</button>
+  </div>
+</div>
+<div class="receipt-footer">
+  <div class="barcode-area"><div>${barcodeBars}</div><div class="barcode-id">${order.id}</div></div>
+  <p style="margin-top:12px">Digital Shop TM — কেনাকাটার জন্য ধন্যবাদ 🙏<br>এটি একটি স্বয়ংক্রিয় রশিদ — কোনো স্বাক্ষর প্রয়োজন নেই।</p>
+</div>
+</div>
+</body>
+</html>`;
+
+    const invoiceWindow = window.open('', '_blank');
     invoiceWindow.document.write(invoiceHTML);
     invoiceWindow.document.close();
 }
