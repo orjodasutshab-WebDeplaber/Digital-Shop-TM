@@ -8694,7 +8694,7 @@ function openUserCart() {
     // ২. লেআউট ও ক্লোজ বাটন
     cartOverlay.innerHTML = '<div style="' + boxStyle + '">'
 
-        + '<div style="padding:20px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center;background:#1e293b;flex-shrink:0;">'
+        + '<div style="padding:' + f('20px','60px 20px 20px 20px') + ';border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center;background:#1e293b;flex-shrink:0;">'
         +   '<h2 style="color:#fff;margin:0;font-size:' + f('20px','34px') + ';display:flex;align-items:center;gap:10px;">'
         +     '<i class="fa fa-shopping-cart" style="color:#3498db;"></i> Your Cart (' + updatedCart.length + ')'
         +   '</h2>'
