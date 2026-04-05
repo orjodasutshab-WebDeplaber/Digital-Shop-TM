@@ -8681,7 +8681,7 @@ function openUserCart() {
         : "background:#0f172a;width:95%;max-width:1000px;height:90vh;border-radius:25px;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;box-shadow:0 0 50px rgba(0,0,0,0.8);animation:fadeIn 0.3s ease-out;";
 
     const closeBtnStyle = isMob
-        ? "background:#ef4444;color:#fff;border:none;border-radius:50%;width:64px;height:64px;cursor:pointer;font-weight:bold;font-size:36px;display:flex;align-items:center;justify-content:center;"
+        ? "background:#ef4444;color:#fff;border:none;border-radius:50%;width:72px;height:72px;cursor:pointer;font-weight:bold;font-size:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;"
         : "background:#ef4444;color:#fff;border:none;border-radius:50%;width:35px;height:35px;cursor:pointer;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;";
 
     const cardGrid = isMob ? "display:flex;flex-direction:column;gap:16px;" : "display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;";
