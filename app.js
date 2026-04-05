@@ -8673,61 +8673,68 @@ function openUserCart() {
     const updatedCart = cartItems.filter(item => activeProducts.includes(item.id));
     localStorage.setItem(_cartKey(), JSON.stringify(updatedCart));
 
-    // ২. ৯০% ডিসপ্লে লেআউট ও ক্লোজ বাটন
-    cartOverlay.innerHTML = `
-        <div style="background: #0f172a; width: 95%; max-width: 1000px; height: 90vh; border-radius: 25px; overflow: hidden; position: relative; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; box-shadow: 0 0 50px rgba(0,0,0,0.8); animation: fadeIn 0.3s ease-out;">
-            
-            <div style="padding: 20px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; background: #1e293b;">
-                <h2 style="color: #fff; margin: 0; font-size: 20px; display: flex; align-items: center; gap: 10px;">
-                    <i class="fa fa-shopping-cart" style="color: #3498db;"></i> Your Cart (${updatedCart.length})
-                </h2>
-                <button onclick="document.getElementById('cartOverlayModal').style.display='none'" 
-                    style="background: #ef4444; color: #fff; border: none; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                    ✕
-                </button>
-            </div>
+    const isMob = window.screen.width < 600 || window.innerWidth < 600;
+    const f = (pc, mo) => isMob ? mo : pc;
 
-            <div style="flex: 1; overflow-y: auto; padding: 20px; background: #0f172a;" class="modal-scroll">
-                ${updatedCart.length === 0 ? `
-                    <div style="text-align:center; margin-top:100px;">
-                        <i class="fa fa-shopping-basket" style="font-size: 60px; color: #334155;"></i>
-                        <p style="color:#64748b; margin-top:15px; font-size: 18px;">আপনার কার্টটি বর্তমানে খালি আছে।</p>
-                        <button onclick="document.getElementById('cartOverlayModal').style.display='none'" style="margin-top: 20px; padding: 10px 25px; background: #3498db; color: #fff; border: none; border-radius: 10px; cursor: pointer;">শপিং শুরু করুন</button>
-                    </div>
-                ` : `
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px;">
-                        ${updatedCart.map(item => `
-                            <div style="background: #1e293b; border-radius: 15px; padding: 12px; display: flex; gap: 12px; border: 1px solid #334155; position: relative; transition: 0.3s;" onmouseover="this.style.borderColor='#3498db'">
-                                <img src="${item.image || item.images[0]}" style="width: 80px; height: 80px; object-fit: fill; border-radius: 10px; cursor: pointer;" onclick="openProductDetails('${item.id}')">
-                                
-                                <div style="flex: 1;">
-                                    <h4 style="margin: 0; font-size: 15px; color: #fff; cursor: pointer;" onclick="openProductDetails('${item.id}')">${item.title}</h4>
-                                    <p style="color: #2ecc71; font-weight: bold; margin: 5px 0; font-size: 16px;">${SYSTEM_CONFIG.CURRENCY} ${item.price}</p>
-                                    
-                                    <div style="display: flex; gap: 8px; margin-top: 10px;">
-                                        <button onclick="document.getElementById('cartOverlayModal').style.display='none'; initiateCheckout('${item.id}')" style="background: #3498db; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; flex: 1;">অর্ডার</button>
-                                        <button onclick="removeFromCart('${item.id}')" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid #ef4444; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; flex: 1;">ডিলিট</button>
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `}
-            </div>
-            
-            ${updatedCart.length > 0 ? `
-            <div style="padding: 20px; border-top: 1px solid #334155; text-align: center; background: #1e293b;">
-                <p style="color: #94a3b8; font-size: 13px;">পণ্য ডিলিট করলে সেটি আপনার কার্ট থেকে স্থায়ীভাবে মুছে যাবে।</p>
-            </div>
-            ` : ''}
-        </div>
+    const boxStyle = isMob
+        ? "background:#0f172a;width:100%;height:100vh;min-height:100vh;border-radius:0;overflow:hidden;position:relative;display:flex;flex-direction:column;border:none;"
+        : "background:#0f172a;width:95%;max-width:1000px;height:90vh;border-radius:25px;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;box-shadow:0 0 50px rgba(0,0,0,0.8);animation:fadeIn 0.3s ease-out;";
 
-        <style>
-            @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-            .modal-scroll::-webkit-scrollbar { width: 5px; }
-            .modal-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        </style>
-    `;
+    const closeBtnStyle = isMob
+        ? "background:#ef4444;color:#fff;border:none;border-radius:50%;width:64px;height:64px;cursor:pointer;font-weight:bold;font-size:36px;display:flex;align-items:center;justify-content:center;"
+        : "background:#ef4444;color:#fff;border:none;border-radius:50%;width:35px;height:35px;cursor:pointer;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;";
+
+    const cardGrid = isMob ? "display:flex;flex-direction:column;gap:16px;" : "display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:15px;";
+    const imgSize  = isMob ? "width:110px;height:110px;" : "width:80px;height:80px;";
+    const btnPad   = isMob ? "padding:14px 16px;font-size:26px;border-radius:10px;" : "padding:6px 12px;font-size:12px;border-radius:6px;";
+
+    // ২. লেআউট ও ক্লোজ বাটন
+    cartOverlay.innerHTML = '<div style="' + boxStyle + '">'
+
+        + '<div style="padding:20px;border-bottom:1px solid #334155;display:flex;justify-content:space-between;align-items:center;background:#1e293b;flex-shrink:0;">'
+        +   '<h2 style="color:#fff;margin:0;font-size:' + f('20px','34px') + ';display:flex;align-items:center;gap:10px;">'
+        +     '<i class="fa fa-shopping-cart" style="color:#3498db;"></i> Your Cart (' + updatedCart.length + ')'
+        +   '</h2>'
+        +   '<button onclick="document.getElementById(\'cartOverlayModal\').style.display=\'none\'" style="' + closeBtnStyle + '">✕</button>'
+        + '</div>'
+
+        + '<div style="flex:1;overflow-y:auto;padding:' + f('20px','16px') + ';background:#0f172a;" class="modal-scroll">'
+        + (updatedCart.length === 0
+            ? '<div style="text-align:center;margin-top:100px;">'
+            +   '<i class="fa fa-shopping-basket" style="font-size:' + f('60px','80px') + ';color:#334155;"></i>'
+            +   '<p style="color:#64748b;margin-top:15px;font-size:' + f('18px','28px') + ';">আপনার কার্টটি বর্তমানে খালি আছে।</p>'
+            +   '<button onclick="document.getElementById(\'cartOverlayModal\').style.display=\'none\'" style="margin-top:20px;padding:' + f('10px 25px','16px 40px') + ';background:#3498db;color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:' + f('14px','26px') + ';">শপিং শুরু করুন</button>'
+            + '</div>'
+            : '<div style="' + cardGrid + '">'
+            + updatedCart.map(function(item) {
+                return '<div style="background:#1e293b;border-radius:' + f('15px','18px') + ';padding:' + f('12px','18px') + ';display:flex;gap:' + f('12px','16px') + ';border:1px solid #334155;position:relative;">'
+                    + '<img src="' + (item.image || item.images[0]) + '" style="' + imgSize + 'object-fit:fill;border-radius:12px;cursor:pointer;flex-shrink:0;" onclick="openProductDetails(\'' + item.id + '\')">'
+                    + '<div style="flex:1;min-width:0;">'
+                    +   '<h4 style="margin:0;font-size:' + f('15px','28px') + ';color:#fff;cursor:pointer;word-break:break-word;" onclick="openProductDetails(\'' + item.id + '\')">' + item.title + '</h4>'
+                    +   '<p style="color:#2ecc71;font-weight:bold;margin:' + f('5px 0','8px 0') + ';font-size:' + f('16px','30px') + ';">' + SYSTEM_CONFIG.CURRENCY + ' ' + item.price + '</p>'
+                    +   '<div style="display:flex;gap:' + f('8px','12px') + ';margin-top:' + f('10px','14px') + ';">'
+                    +     '<button onclick="document.getElementById(\'cartOverlayModal\').style.display=\'none\'; initiateCheckout(\'' + item.id + '\')" style="background:#3498db;color:#fff;border:none;cursor:pointer;font-weight:bold;flex:1;' + btnPad + '">অর্ডার</button>'
+                    +     '<button onclick="removeFromCart(\'' + item.id + '\')" style="background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid #ef4444;cursor:pointer;flex:1;' + btnPad + '">ডিলিট</button>'
+                    +   '</div>'
+                    + '</div>'
+                    + '</div>';
+              }).join('')
+            + '</div>'
+          )
+        + '</div>'
+
+        + (updatedCart.length > 0
+            ? '<div style="padding:15px 20px;border-top:1px solid #334155;text-align:center;background:#1e293b;flex-shrink:0;">'
+            +   '<p style="color:#94a3b8;font-size:' + f('13px','24px') + ';margin:0;">পণ্য ডিলিট করলে সেটি আপনার কার্ট থেকে স্থায়ীভাবে মুছে যাবে।</p>'
+            + '</div>'
+            : '')
+
+        + '</div>'
+        + '<style>'
+        + '@keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }'
+        + '.modal-scroll::-webkit-scrollbar { width:5px; }'
+        + '.modal-scroll::-webkit-scrollbar-thumb { background:#334155; border-radius:10px; }'
+        + '</style>';
 
     cartOverlay.style.display = 'flex';
     
