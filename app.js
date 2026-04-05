@@ -3390,7 +3390,7 @@ function generateInvoice(orderId) {
     const order = appState.orders.find(o => o.id === orderId);
     if (!order) return alert("অর্ডার পাওয়া যায়নি!");
 
-    const isMobile = window.innerWidth <= 768;
+    const isMobile = document.documentElement.classList.contains('is-mobile') || screen.width <= 768;
 
     const isPaid = order.paymentStatus === 'পেইড';
     const statusColor = isPaid ? '#10b981' : '#f59e0b';
@@ -3756,17 +3756,28 @@ body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri',
 </html>`;
 
     if (isMobile) {
-        const blob = new Blob([mobileHTML], { type: 'text/html;charset=utf-8' });
-        const blobURL = URL.createObjectURL(blob);
-        const invoiceWindow = window.open(blobURL, '_blank');
-        if (!invoiceWindow || invoiceWindow.closed) {
-            const a = document.createElement('a');
-            a.href = blobURL;
-            a.target = '_blank';
-            a.rel = 'noopener';
-            a.click();
+        try {
+            const blob = new Blob([mobileHTML], { type: 'text/html;charset=utf-8' });
+            const blobURL = URL.createObjectURL(blob);
+            const win = window.open(blobURL, '_blank');
+            if (!win || win.closed || typeof win.closed === 'undefined') {
+                // popup blocked — iframe fallback
+                const overlay = document.createElement('div');
+                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;background:#070d1a';
+                const iframe = document.createElement('iframe');
+                iframe.style.cssText = 'width:100%;height:100%;border:none';
+                iframe.src = blobURL;
+                overlay.appendChild(iframe);
+                document.body.appendChild(overlay);
+                iframe.onload = () => setTimeout(() => URL.revokeObjectURL(blobURL), 60000);
+            } else {
+                setTimeout(() => URL.revokeObjectURL(blobURL), 60000);
+            }
+        } catch(e) {
+            // blob ব্যর্থ হলে সরাসরি document.write
+            const invoiceWindow = window.open('', '_blank');
+            if (invoiceWindow) { invoiceWindow.document.write(mobileHTML); invoiceWindow.document.close(); }
         }
-        setTimeout(() => URL.revokeObjectURL(blobURL), 60000);
     } else {
         const invoiceWindow = window.open('', '_blank');
         invoiceWindow.document.write(desktopHTML);
