@@ -8676,6 +8676,9 @@ function openUserCart() {
     const isMob = window.screen.width < 600 || window.innerWidth < 600;
     const f = (pc, mo) => isMob ? mo : pc;
 
+    // প্রতিবার overlay এর style আপডেট করা
+    cartOverlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);z-index:999999;display:flex;justify-content:center;align-items:" + (isMob ? "flex-start" : "center") + ";padding:" + (isMob ? "0" : "10px") + ";font-family:'Hind Siliguri',sans-serif;";
+
     const boxStyle = isMob
         ? "background:#0f172a;width:100%;height:100vh;min-height:100vh;border-radius:0;overflow:hidden;position:relative;display:flex;flex-direction:column;border:none;"
         : "background:#0f172a;width:95%;max-width:1000px;height:90vh;border-radius:25px;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;box-shadow:0 0 50px rgba(0,0,0,0.8);animation:fadeIn 0.3s ease-out;";
