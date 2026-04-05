@@ -3390,7 +3390,7 @@ function generateInvoice(orderId) {
     const order = appState.orders.find(o => o.id === orderId);
     if (!order) return alert("অর্ডার পাওয়া যায়নি!");
 
-    const isMobile = document.documentElement.classList.contains('is-mobile') || screen.width <= 768;
+    const isMobile = screen.width <= 768 || document.documentElement.classList.contains('is-mobile');
 
     const isPaid = order.paymentStatus === 'পেইড';
     const statusColor = isPaid ? '#10b981' : '#f59e0b';
@@ -3755,33 +3755,64 @@ body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri',
 </body>
 </html>`;
 
+    // ── রশিদ দেখানো — iframe overlay (viewport problem সম্পূর্ণ bypass) ──
+    const htmlContent = isMobile ? mobileHTML : desktopHTML;
+
+    // পুরানো overlay থাকলে সরাও
+    const oldOverlay = document.getElementById('_tm_receipt_overlay');
+    if (oldOverlay) oldOverlay.remove();
+
     if (isMobile) {
-        try {
-            const blob = new Blob([mobileHTML], { type: 'text/html;charset=utf-8' });
-            const blobURL = URL.createObjectURL(blob);
-            const win = window.open(blobURL, '_blank');
-            if (!win || win.closed || typeof win.closed === 'undefined') {
-                // popup blocked — iframe fallback
-                const overlay = document.createElement('div');
-                overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;background:#070d1a';
-                const iframe = document.createElement('iframe');
-                iframe.style.cssText = 'width:100%;height:100%;border:none';
-                iframe.src = blobURL;
-                overlay.appendChild(iframe);
-                document.body.appendChild(overlay);
-                iframe.onload = () => setTimeout(() => URL.revokeObjectURL(blobURL), 60000);
-            } else {
-                setTimeout(() => URL.revokeObjectURL(blobURL), 60000);
-            }
-        } catch(e) {
-            // blob ব্যর্থ হলে সরাসরি document.write
-            const invoiceWindow = window.open('', '_blank');
-            if (invoiceWindow) { invoiceWindow.document.write(mobileHTML); invoiceWindow.document.close(); }
-        }
+        // মোবাইলে: fullscreen iframe overlay — নতুন window খোলার দরকার নেই
+        const overlay = document.createElement('div');
+        overlay.id = '_tm_receipt_overlay';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:2147483647;background:#070d1a;overflow:hidden';
+
+        const iframe = document.createElement('iframe');
+        iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;margin:0;padding:0';
+        iframe.setAttribute('scrolling', 'yes');
+
+        // close button (overlay এর উপরে)
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '✕';
+        closeBtn.style.cssText = 'position:absolute;top:12px;right:12px;z-index:10;background:rgba(0,0,0,0.6);color:#fff;border:none;width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer;display:none';
+        closeBtn.onclick = () => overlay.remove();
+
+        overlay.appendChild(iframe);
+        overlay.appendChild(closeBtn);
+        document.body.appendChild(overlay);
+
+        // iframe এ HTML লোড করো
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const blobURL = URL.createObjectURL(blob);
+        iframe.src = blobURL;
+
+        iframe.onload = function() {
+            // iframe এর ভেতরে close button inject করো
+            try {
+                const iDoc = iframe.contentDocument || iframe.contentWindow.document;
+                // window.close() কে overlay close করতে override করো
+                iframe.contentWindow._overlayClose = () => { overlay.remove(); URL.revokeObjectURL(blobURL); };
+                const closeScript = iDoc.createElement('script');
+                closeScript.textContent = 'window.close = function(){ window._overlayClose && window._overlayClose(); };';
+                iDoc.head.appendChild(closeScript);
+            } catch(e) { /* cross-origin fallback */ closeBtn.style.display = 'block'; }
+            setTimeout(() => URL.revokeObjectURL(blobURL), 120000);
+        };
+
+        // body scroll বন্ধ
+        document.body.style.overflow = 'hidden';
+        overlay.addEventListener('remove', () => { document.body.style.overflow = ''; });
+        const origRemove = overlay.remove.bind(overlay);
+        overlay.remove = function() { document.body.style.overflow = ''; origRemove(); };
+
     } else {
+        // PC তে আগের মতো নতুন window
         const invoiceWindow = window.open('', '_blank');
-        invoiceWindow.document.write(desktopHTML);
-        invoiceWindow.document.close();
+        if (invoiceWindow) {
+            invoiceWindow.document.write(desktopHTML);
+            invoiceWindow.document.close();
+        }
     }
 }
 // ১. স্টোরেজ ক্যালকুলেটর (ফাইল এর নিচে যোগ করুন)
