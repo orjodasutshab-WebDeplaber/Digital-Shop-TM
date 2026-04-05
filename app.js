@@ -4038,6 +4038,12 @@ function openUserOrders() {
 
 
 function openReturnModal(orderId) {
+    // ✅ আগের সব মোডাল বন্ধ করো — নইলে parent stacking context এ আটকে যাবে
+    const _om = document.getElementById('dynamicOrderModal');
+    if (_om) _om.innerHTML = '';
+    const _am = document.getElementById('accountModal');
+    if (_am) _am.style.display = 'none';
+
     // ১. ডুপ্লিকেট রিকোয়েস্ট চেক
     const RETURN_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.RETURNS) ? DB_KEYS.RETURNS : 'returns';
     const allReturns = JSON.parse(localStorage.getItem(RETURN_KEY)) || [];
