@@ -10960,13 +10960,13 @@ function _initMobileFixes() {
         }
     });
 
-    // ৫. Keyboard উঠলে fixed বাটন কীবোর্ডের উপরে রাখা
+    // মোবাইলে কীবোর্ড উঠলে fixed বাটন কীবোর্ডের উপরে রাখা
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', function() {
             var btn = document.querySelector('#checkoutModal .btn-success');
             if (!btn) return;
-            var offsetFromBottom = window.innerHeight - window.visualViewport.height - window.visualViewport.offsetTop;
-            btn.style.bottom = (offsetFromBottom > 0 ? offsetFromBottom : 0) + 'px';
+            var kbHeight = window.innerHeight - window.visualViewport.height;
+            btn.style.bottom = (kbHeight > 0 ? kbHeight : 0) + 'px';
         });
     }
 
