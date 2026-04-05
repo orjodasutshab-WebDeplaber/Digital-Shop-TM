@@ -4303,6 +4303,7 @@ function openReturnModal(orderId) {
     </div>
     <style>
         @keyframes modalPopUp { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes mobileSlideUp { 0% { transform: translateY(100%); } 100% { transform: translateY(0); } }
         .custom-modal-body::-webkit-scrollbar { width: 4px; }
         .custom-modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
@@ -4421,6 +4422,18 @@ function openReturnModal(orderId) {
     </style>`;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // মোবাইলে পুরো স্ক্রিন জুড়ে দেখাবে
+    if (window.innerWidth <= 768) {
+        const overlay = document.getElementById('returnModal');
+        const inner = overlay ? overlay.firstElementChild : null;
+        if (overlay) {
+            overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:flex-end; justify-content:center; z-index:999999999; padding:0;';
+        }
+        if (inner) {
+            inner.style.cssText = 'background:#fff; width:100%; max-width:100%; height:95vh; max-height:95vh; border-radius:24px 24px 0 0; display:flex; flex-direction:column; box-shadow:0 -10px 40px rgba(0,0,0,0.3); position:relative; overflow:hidden; animation: mobileSlideUp 0.35s ease-out;';
+        }
+    }
 }
 
 // এই ফাংশনগুলো অবশ্যই openReturnModal এর বাইরে রাখবেন
