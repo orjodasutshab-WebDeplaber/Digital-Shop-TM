@@ -2033,12 +2033,15 @@ html.is-mobile #checkoutModal #toggleNewAddrBtn {
 }
 
 /* ── পরবর্তী ধাপ বাটন ── */
-html.is-mobile #checkoutModal .checkout-step-container {
+html.is-mobile #checkoutModal .checkout-step-container:not(.hidden) {
     flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
 }
-html.is-mobile #checkoutModal .checkout-step-container .modal-body {
+html.is-mobile #checkoutModal .checkout-step-container.hidden {
+    display: none !important;
+}
+html.is-mobile #checkoutModal .checkout-step-container:not(.hidden) .modal-body {
     flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
