@@ -3529,133 +3529,229 @@ function generateInvoice(orderId) {
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>রশিদ #${order.id}</title>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;min-height:100vh;background:#0f172a;font-family:'Hind Siliguri','Segoe UI',sans-serif;color:#e2e8f0;-webkit-tap-highlight-color:transparent}
-.page-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding-bottom:40px}
-.top-bar{width:100%;background:linear-gradient(135deg,#1e3a5f 0%,#0f172a 100%);padding:18px 20px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(99,102,241,0.3);position:sticky;top:0;z-index:10}
-.top-bar-logo{display:flex;flex-direction:column}
-.top-bar-logo span:first-child{font-size:18px;font-weight:700;color:#fff}
-.top-bar-logo span:last-child{font-size:11px;color:#94a3b8;margin-top:2px}
-.top-bar-order{text-align:right}
-.top-bar-order span:first-child{display:block;font-size:11px;color:#94a3b8}
-.top-bar-order span:last-child{font-size:15px;font-weight:700;color:#818cf8}
-.status-banner{width:100%;background:${statusBg};border-bottom:2px solid ${statusColor};padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
-.s-label{font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
-.s-val{font-size:16px;font-weight:700;color:${statusColor}}
-.status-pill{background:${statusColor};color:#fff;padding:6px 16px;border-radius:30px;font-size:13px;font-weight:700;white-space:nowrap}
-.receipt-body{width:100%;max-width:500px;padding:0 16px;margin-top:4px}
-.prod-card{background:#1e293b;border-radius:16px;overflow:hidden;margin-top:16px;border:1px solid #334155}
-.prod-img-wrap{width:100%;aspect-ratio:16/7;overflow:hidden;background:#0f172a;display:flex;align-items:center;justify-content:center}
+html{width:100%;height:100%}
+body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri','Segoe UI',sans-serif;color:#e2e8f0;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+
+/* ── TOP HEADER ── */
+.top-bar{width:100%;background:linear-gradient(135deg,#1a2744 0%,#0d1829 100%);padding:16px 18px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid rgba(99,102,241,0.4);position:sticky;top:0;z-index:20;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
+.top-bar-logo{display:flex;flex-direction:column;gap:2px}
+.shop-name{font-size:19px;font-weight:800;color:#fff;letter-spacing:-0.3px}
+.shop-sub{font-size:10px;color:#6366f1;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
+.top-bar-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.order-label{font-size:10px;color:#64748b;letter-spacing:.5px;text-transform:uppercase}
+.order-num{font-size:16px;font-weight:800;color:#818cf8;letter-spacing:-0.5px}
+
+/* ── HERO STATUS BANNER ── */
+.hero-banner{width:100%;padding:20px 18px;background:${statusBg};border-bottom:2px solid ${statusColor};display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
+.hero-banner::before{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:${statusColor};opacity:0.06}
+.hero-banner::after{content:'';position:absolute;right:30px;bottom:-30px;width:70px;height:70px;border-radius:50%;background:${statusColor};opacity:0.04}
+.pay-label{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:4px;font-weight:600}
+.pay-status{font-size:22px;font-weight:800;color:${statusColor};line-height:1}
+.status-badge{background:${statusColor};color:#fff;padding:8px 18px;border-radius:50px;font-size:13px;font-weight:800;white-space:nowrap;box-shadow:0 4px 15px ${statusColor}55;letter-spacing:.3px}
+
+/* ── PRODUCT HERO CARD ── */
+.prod-hero{width:100%;background:linear-gradient(180deg,#1a2744 0%,#111827 100%);border-bottom:1px solid #1e293b;position:relative}
+.prod-img-wrap{width:100%;height:200px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0d1829}
 .prod-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-.prod-info{padding:16px}
-.prod-name{font-size:17px;font-weight:700;color:#f1f5f9;line-height:1.4}
-.prod-cat{display:inline-block;margin-top:6px;font-size:11px;background:rgba(99,102,241,0.2);color:#818cf8;padding:3px 10px;border-radius:20px}
-.prod-meta{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-.prod-meta-pill{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:6px 12px;font-size:12px;color:#94a3b8}
-.prod-meta-pill strong{color:#e2e8f0;font-weight:600}
-.info-section{background:#1e293b;border-radius:16px;margin-top:12px;border:1px solid #334155;overflow:hidden}
-.info-section-head{padding:13px 16px;background:rgba(99,102,241,0.1);border-bottom:1px solid #334155;font-size:12px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:.6px;display:flex;align-items:center;gap:8px}
-.info-row{display:flex;justify-content:space-between;align-items:flex-start;padding:11px 16px;border-bottom:1px solid rgba(51,65,85,0.5);gap:12px}
+.prod-img-placeholder{font-size:64px;display:flex;align-items:center;justify-content:center;height:200px;background:linear-gradient(135deg,#1e293b,#0f172a)}
+.prod-info-overlay{padding:16px 18px 20px;background:linear-gradient(180deg,transparent,#111827 30%)}
+.prod-cat-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(99,102,241,0.18);color:#818cf8;padding:4px 12px;border-radius:50px;font-size:11px;font-weight:700;margin-bottom:10px;border:1px solid rgba(99,102,241,0.25)}
+.prod-name{font-size:19px;font-weight:800;color:#f8fafc;line-height:1.35;margin-bottom:12px}
+.prod-chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:7px 14px;font-size:12px;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:80px;flex:1}
+.chip strong{color:#e2e8f0;font-size:14px;font-weight:700}
+.chip span{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+
+/* ── SECTIONS ── */
+.page-body{padding:0 14px 100px}
+.section{background:#111827;border-radius:18px;margin-top:14px;border:1px solid #1e293b;overflow:hidden}
+.sec-head{padding:12px 16px;background:rgba(99,102,241,0.08);border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:8px}
+.sec-head-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.sec-head-text{font-size:11px;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid rgba(30,41,59,0.8);gap:10px}
 .info-row:last-child{border-bottom:none}
-.info-key{font-size:13px;color:#64748b;flex-shrink:0}
-.info-val{font-size:13px;color:#e2e8f0;font-weight:600;text-align:right;word-break:break-word;max-width:65%}
-.price-section{background:#1e293b;border-radius:16px;margin-top:12px;border:1px solid #334155;overflow:hidden}
-.price-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(51,65,85,0.4)}
+.ikey{font-size:13px;color:#64748b;flex-shrink:0;font-weight:500}
+.ival{font-size:13px;color:#e2e8f0;font-weight:700;text-align:right;word-break:break-word;max-width:62%}
+
+/* ── PRICE SECTION ── */
+.price-row{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid rgba(30,41,59,0.8)}
 .price-row:last-child{border-bottom:none}
-.price-label{font-size:14px;color:#94a3b8}
-.price-amount{font-size:14px;color:#e2e8f0;font-weight:600}
-.price-row.disc .price-label,.price-row.disc .price-amount{color:#f87171}
-.price-row.total{background:rgba(99,102,241,0.12);border-top:1.5px solid rgba(99,102,241,0.4)}
-.price-row.total .price-label{font-size:15px;font-weight:700;color:#e2e8f0}
-.price-row.total .price-amount{font-size:20px;font-weight:800;color:#818cf8}
-.delivery-track{background:#1e293b;border-radius:16px;margin-top:12px;border:1px solid #334155;padding:16px}
-.delivery-track-title{font-size:12px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.track-steps{display:flex;justify-content:space-between;position:relative}
-.track-steps::before{content:'';position:absolute;top:14px;left:14px;right:14px;height:2px;background:#334155;z-index:0}
-.track-step{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1;flex:1}
-.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;border:2px solid #334155;background:#0f172a}
-.step-dot.done{background:#10b981;border-color:#10b981}
-.step-dot.active{background:#6366f1;border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,0.25)}
-.step-label{font-size:10px;color:#64748b;text-align:center;line-height:1.3}
+.plabel{font-size:14px;color:#94a3b8;font-weight:500}
+.pamount{font-size:14px;color:#e2e8f0;font-weight:700}
+.price-row.disc .plabel,.price-row.disc .pamount{color:#f87171}
+.price-row.total-row{background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.1));border-top:2px solid rgba(99,102,241,0.35);padding:16px}
+.price-row.total-row .plabel{font-size:15px;font-weight:800;color:#c7d2fe}
+.price-row.total-row .pamount{font-size:26px;font-weight:800;color:#818cf8;letter-spacing:-1px}
+
+/* ── DELIVERY TRACK ── */
+.track-wrap{padding:16px}
+.track-title{font-size:11px;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.track-steps{display:flex;justify-content:space-between;position:relative;padding:0 8px}
+.track-line{position:absolute;top:16px;left:30px;right:30px;height:3px;background:#1e293b;border-radius:2px;z-index:0}
+.track-line-fill{position:absolute;top:0;left:0;height:100%;border-radius:2px;background:linear-gradient(90deg,#10b981,#6366f1);transition:width .5s ease}
+.track-step{display:flex;flex-direction:column;align-items:center;gap:8px;z-index:1;flex:1;position:relative}
+.step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2.5px solid #1e293b;background:#0d1829;transition:all .3s}
+.step-dot.done{background:#10b981;border-color:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,0.2)}
+.step-dot.active{background:linear-gradient(135deg,#6366f1,#818cf8);border-color:#818cf8;box-shadow:0 0 0 5px rgba(99,102,241,0.25),0 0 15px rgba(99,102,241,0.3)}
+.step-label{font-size:10px;color:#475569;text-align:center;line-height:1.4;font-weight:600}
 .step-label.done{color:#10b981}
-.step-label.active{color:#818cf8;font-weight:700}
-.note-box{background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.25);border-radius:12px;padding:13px 16px;margin-top:12px;display:flex;gap:10px;align-items:flex-start}
-.note-box p{font-size:12px;color:#fbbf24;line-height:1.5}
-.action-row{display:flex;gap:10px;margin-top:16px}
-.btn-print{flex:1;background:#6366f1;color:#fff;border:none;padding:15px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-close{flex:0 0 auto;background:#334155;color:#94a3b8;border:none;padding:15px 20px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif}
-.receipt-footer{width:100%;max-width:500px;padding:20px 16px 0;text-align:center}
-.receipt-footer p{font-size:11px;color:#475569;line-height:1.7}
-.barcode-area{display:flex;flex-direction:column;align-items:center;margin-top:14px;gap:4px}
-.barcode-id{font-size:10px;color:#475569;letter-spacing:3px;margin-top:2px}
-@media print{.top-bar{position:relative}.action-row{display:none!important}body{background:#fff;color:#000}.top-bar,.status-banner{background:#f1f5f9!important;color:#000!important}.prod-card,.info-section,.price-section,.delivery-track{background:#fff!important;border:1px solid #ddd!important}}
+.step-label.active{color:#818cf8;font-weight:800}
+.rejected-box{margin-top:16px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:12px 16px;font-size:13px;color:#f87171;text-align:center;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+
+/* ── NOTE BOX ── */
+.note-box{background:rgba(234,179,8,0.06);border:1px solid rgba(234,179,8,0.2);border-radius:14px;padding:14px 16px;margin-top:14px;display:flex;gap:12px;align-items:flex-start}
+.note-icon{width:32px;height:32px;border-radius:10px;background:rgba(234,179,8,0.12);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.note-text{font-size:12.5px;color:#fbbf24;line-height:1.6;font-weight:500}
+
+/* ── FOOTER BARCODE ── */
+.receipt-footer{padding:20px 18px 10px;text-align:center}
+.barcode-area{display:flex;flex-direction:column;align-items:center;margin-bottom:14px;gap:5px;background:#111827;border-radius:14px;padding:16px;border:1px solid #1e293b}
+.barcode-bars{display:flex;align-items:flex-end;gap:1px;height:36px}
+.barcode-id{font-size:10px;color:#475569;letter-spacing:4px;margin-top:6px;font-weight:600}
+.footer-note{font-size:11px;color:#334155;line-height:1.8;font-weight:500}
+.footer-brand{font-size:13px;color:#475569;font-weight:700;margin-bottom:4px}
+
+/* ── STICKY ACTION BAR ── */
+.action-bar{position:fixed;bottom:0;left:0;right:0;padding:12px 16px 20px;background:linear-gradient(180deg,transparent,#070d1a 30%,#070d1a 100%);display:flex;gap:10px;z-index:30}
+.btn-print{flex:1;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;padding:16px;border-radius:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 25px rgba(99,102,241,0.4);letter-spacing:.3px}
+.btn-close{width:56px;height:56px;background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:16px;font-size:18px;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-close:active,.btn-print:active{transform:scale(0.97)}
+
+/* ── PRINT ── */
+@media print{
+  .top-bar{position:relative;background:#f8fafc!important;color:#1e293b!important;border-bottom:2px solid #e2e8f0}
+  .shop-name{color:#1e293b!important}.shop-sub{color:#6366f1!important}.order-num{color:#6366f1!important}
+  .action-bar{display:none!important}
+  body{background:#f8fafc!important;color:#1e293b!important}
+  .hero-banner{background:#f1f5f9!important;border-bottom-color:#e2e8f0!important}
+  .prod-hero,.section,.prod-info-overlay{background:#fff!important}
+  .section{border:1px solid #e2e8f0!important}
+  .info-row,.price-row{border-bottom-color:#f1f5f9!important}
+  .barcode-area{background:#f8fafc!important;border-color:#e2e8f0!important}
+}
 </style>
 </head>
 <body>
-<div class="page-wrap">
+<!-- TOP HEADER -->
 <div class="top-bar">
-  <div class="top-bar-logo"><span>🛍 Digital Shop TM</span><span>অর্ডার রশিদ</span></div>
-  <div class="top-bar-order"><span>অর্ডার নম্বর</span><span>#${order.id}</span></div>
+  <div class="top-bar-logo">
+    <span class="shop-name">🛍 Digital Shop TM</span>
+    <span class="shop-sub">অর্ডার রশিদ</span>
+  </div>
+  <div class="top-bar-right">
+    <span class="order-label">অর্ডার নং</span>
+    <span class="order-num">#${order.id}</span>
+  </div>
 </div>
-<div class="status-banner">
-  <div><span class="s-label">পেমেন্ট স্ট্যাটাস</span><span class="s-val">${statusText}</span></div>
-  <div class="status-pill">${isPaid ? '✅ পেইড' : '⏳ বকেয়া'}</div>
+
+<!-- STATUS HERO -->
+<div class="hero-banner">
+  <div>
+    <span class="pay-label">পেমেন্ট স্ট্যাটাস</span>
+    <span class="pay-status">${statusText}</span>
+  </div>
+  <div class="status-badge">${isPaid ? '✅ পেইড' : '⏳ বকেয়া'}</div>
 </div>
-<div class="receipt-body">
-  <div class="prod-card">
-    <div class="prod-img-wrap">${order.productImage ? `<img src="${order.productImage}" alt="${order.productName}" onerror="this.style.display='none'">` : '<span style="font-size:48px">📦</span>'}</div>
-    <div class="prod-info">
-      <div class="prod-name">${order.productName}</div>
-      <span class="prod-cat">${order.category || 'জেনারেল'}</span>
-      <div class="prod-meta">
-        <div class="prod-meta-pill">পরিমাণ: <strong>${qty} পিস</strong></div>
-        <div class="prod-meta-pill">ইউনিট: <strong>৳${unitPrice.toFixed(0)}</strong></div>
-        <div class="prod-meta-pill">তারিখ: <strong>${dateStr}</strong></div>
-      </div>
+
+<!-- PRODUCT HERO -->
+<div class="prod-hero">
+  ${order.productImage
+    ? `<div class="prod-img-wrap"><img src="${order.productImage}" alt="${order.productName}" onerror="this.parentNode.innerHTML='<div class=prod-img-placeholder>📦</div>'"></div>`
+    : `<div class="prod-img-placeholder">📦</div>`}
+  <div class="prod-info-overlay">
+    <div class="prod-cat-tag">🏷 ${order.category || 'জেনারেল'}</div>
+    <div class="prod-name">${order.productName}</div>
+    <div class="prod-chips">
+      <div class="chip"><strong>${qty}</strong><span>পরিমাণ</span></div>
+      <div class="chip"><strong>৳${unitPrice.toFixed(0)}</strong><span>ইউনিট দাম</span></div>
+      <div class="chip"><strong>${dateStr.split(' ').slice(0,2).join(' ')}</strong><span>তারিখ</span></div>
     </div>
   </div>
-  <div class="info-section">
-    <div class="info-section-head">👤 গ্রাহকের তথ্য</div>
-    <div class="info-row"><span class="info-key">নাম</span><span class="info-val">${order.customerName || '—'}</span></div>
-    <div class="info-row"><span class="info-key">ফোন</span><span class="info-val">${order.customerPhone || '—'}</span></div>
-    <div class="info-row"><span class="info-key">ঠিকানা</span><span class="info-val">${order.address || 'উল্লেখ নেই'}</span></div>
+</div>
+
+<!-- BODY SECTIONS -->
+<div class="page-body">
+
+  <!-- গ্রাহকের তথ্য -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-head-icon" style="background:rgba(99,102,241,0.15)">👤</div>
+      <span class="sec-head-text">গ্রাহকের তথ্য</span>
+    </div>
+    <div class="info-row"><span class="ikey">নাম</span><span class="ival">${order.customerName || '—'}</span></div>
+    <div class="info-row"><span class="ikey">ফোন</span><span class="ival">${order.customerPhone || '—'}</span></div>
+    <div class="info-row"><span class="ikey">ঠিকানা</span><span class="ival">${order.address || 'উল্লেখ নেই'}</span></div>
   </div>
-  <div class="info-section">
-    <div class="info-section-head">💳 পেমেন্ট তথ্য</div>
-    <div class="info-row"><span class="info-key">পদ্ধতি</span><span class="info-val">${order.paymentMethod === 'COD' ? '💵 ক্যাশ অন ডেলিভারি' : '📱 অনলাইন পেমেন্ট'}</span></div>
-    ${order.trxId ? `<div class="info-row"><span class="info-key">ট্রানজেকশন ID</span><span class="info-val">${order.trxId}</span></div>` : ''}
-    <div class="info-row"><span class="info-key">সময়</span><span class="info-val">${dateStr}, ${timeStr}</span></div>
+
+  <!-- পেমেন্ট তথ্য -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-head-icon" style="background:rgba(16,185,129,0.15)">💳</div>
+      <span class="sec-head-text">পেমেন্ট তথ্য</span>
+    </div>
+    <div class="info-row"><span class="ikey">পদ্ধতি</span><span class="ival">${order.paymentMethod === 'COD' ? '💵 ক্যাশ অন ডেলিভারি' : '📱 অনলাইন পেমেন্ট'}</span></div>
+    ${order.trxId ? `<div class="info-row"><span class="ikey">ট্রানজেকশন ID</span><span class="ival">${order.trxId}</span></div>` : ''}
+    <div class="info-row"><span class="ikey">সময়</span><span class="ival">${dateStr}, ${timeStr}</span></div>
   </div>
-  <div class="price-section">
-    <div class="info-section-head">🧾 মূল্য বিবরণ</div>
-    <div class="price-row"><span class="price-label">পণ্যের মূল্য (${qty} পিস)</span><span class="price-amount">৳${totalProductValue.toFixed(0)}</span></div>
-    <div class="price-row"><span class="price-label">ডেলিভারি চার্জ</span><span class="price-amount">৳${delivery}</span></div>
-    ${discount > 0 ? `<div class="price-row disc"><span class="price-label">ডিসকাউন্ট</span><span class="price-amount">− ৳${discount}</span></div>` : ''}
-    <div class="price-row total"><span class="price-label">সর্বমোট প্রদেয়</span><span class="price-amount">৳${finalTotal}</span></div>
+
+  <!-- মূল্য বিবরণ -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-head-icon" style="background:rgba(245,158,11,0.15)">🧾</div>
+      <span class="sec-head-text">মূল্য বিবরণ</span>
+    </div>
+    <div class="price-row"><span class="plabel">পণ্যের মূল্য (${qty} পিস)</span><span class="pamount">৳${totalProductValue.toFixed(0)}</span></div>
+    <div class="price-row"><span class="plabel">ডেলিভারি চার্জ</span><span class="pamount">৳${delivery}</span></div>
+    ${discount > 0 ? `<div class="price-row disc"><span class="plabel">ডিসকাউন্ট</span><span class="pamount">− ৳${discount}</span></div>` : ''}
+    <div class="price-row total-row"><span class="plabel">সর্বমোট প্রদেয়</span><span class="pamount">৳${finalTotal}</span></div>
   </div>
-  <div class="delivery-track">
-    <div class="delivery-track-title">🚚 ডেলিভারি অবস্থা</div>
-    <div class="track-steps">${trackSteps}</div>
-    ${order.status === 'rejected' ? `<div style="margin-top:14px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:10px 14px;font-size:13px;color:#f87171;text-align:center;">❌ এই অর্ডারটি বাতিল করা হয়েছে</div>` : ''}
+
+  <!-- ডেলিভারি ট্র্যাক -->
+  <div class="section">
+    <div class="sec-head">
+      <div class="sec-head-icon" style="background:rgba(99,102,241,0.15)">🚚</div>
+      <span class="sec-head-text">ডেলিভারি অবস্থা</span>
+    </div>
+    <div class="track-wrap">
+      <div class="track-steps">
+        <div class="track-line">
+          <div class="track-line-fill" style="width:${curIdx === 0 ? '0%' : curIdx === 1 ? '50%' : '100%'}"></div>
+        </div>
+        ${trackSteps}
+      </div>
+      ${order.status === 'rejected' ? `<div class="rejected-box">❌ এই অর্ডারটি বাতিল করা হয়েছে</div>` : ''}
+    </div>
   </div>
+
+  <!-- নোট -->
   <div class="note-box">
-    <span style="font-size:16px">💡</span>
-    <p>যেকোনো সমস্যায় অ্যাডমিনের সাথে যোগাযোগ করুন। রশিদটি সংরক্ষণ করে রাখুন।</p>
+    <div class="note-icon">💡</div>
+    <p class="note-text">যেকোনো সমস্যায় অ্যাডমিনের সাথে যোগাযোগ করুন। রশিদটি সংরক্ষণ করে রাখুন।</p>
   </div>
-  <div class="action-row">
-    <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট / ডাউনলোড</button>
-    <button class="btn-close" onclick="window.close()">✕ বন্ধ</button>
+
+  <!-- ফুটার বারকোড -->
+  <div class="receipt-footer">
+    <div class="barcode-area">
+      <div class="barcode-bars">${barcodeBars}</div>
+      <div class="barcode-id">${order.id}</div>
+    </div>
+    <p class="footer-brand">Digital Shop TM</p>
+    <p class="footer-note">কেনাকাটার জন্য ধন্যবাদ 🙏<br>এটি একটি স্বয়ংক্রিয় রশিদ — কোনো স্বাক্ষর প্রয়োজন নেই।</p>
   </div>
+
 </div>
-<div class="receipt-footer">
-  <div class="barcode-area"><div>${barcodeBars}</div><div class="barcode-id">${order.id}</div></div>
-  <p style="margin-top:12px">Digital Shop TM — কেনাকাটার জন্য ধন্যবাদ 🙏<br>এটি একটি স্বয়ংক্রিয় রশিদ — কোনো স্বাক্ষর প্রয়োজন নেই।</p>
+
+<!-- STICKY ACTION BAR -->
+<div class="action-bar">
+  <button class="btn-print" onclick="window.print()">🖨️ প্রিন্ট / ডাউনলোড</button>
+  <button class="btn-close" onclick="window.close()">✕</button>
 </div>
-</div>
+
 </body>
 </html>`;
 
