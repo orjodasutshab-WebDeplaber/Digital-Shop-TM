@@ -4933,7 +4933,7 @@ html.is-mobile #gpdPcNavTabs{display:none!important;}
 
 /* MOBILE VIEW */
 .gpd-topbar{position:fixed;top:0;left:0;right:0;z-index:986783999999991;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
-.gpd-back-btn{background:none;border:none;font-size:60px;cursor:pointer;color:#222;padding:4px 8px;line-height:1;width:70px;font-weight:900;}
+.gpd-back-btn{background:rgba(0,0,0,0.07);border:none;font-size:90px;cursor:pointer;color:#111;padding:0;line-height:1;width:110px;height:110px;min-width:110px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center;}
 .gpd-topbar-title{flex:1;font-size:40px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .gpd-topbar-icons{display:flex;gap:39px;align-items:center;}
 .gpd-topbar-icons i{font-size:40px;color:#444;cursor:pointer;}
