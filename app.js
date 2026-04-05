@@ -3886,7 +3886,7 @@ function openUserOrders() {
                             
                             ${(isDelivered && !hasRequestedReturn) ? `
                             <button onclick="openReturnModal('${order.id}')" style="background:#450a0a; color:#f87171; border:1px solid #f87171; padding:${f('6px 10px','14px 22px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; font-weight:bold; cursor:pointer;">রিটার্ন</button>
-                            ` : (hasRequestedReturn ? \`<span style="color:#94a3b8; font-size:${f('11px','24px')}; font-style:italic;">রিটার্ন করা হয়েছে</span>\` : '')}
+                            ` : (hasRequestedReturn ? '<span style="color:#94a3b8; font-size:'+f('11px','24px')+'; font-style:italic;">রিটার্ন করা হয়েছে</span>' : '')}
 
                             <button onclick="viewUserOrderDetails('${order.id}')" style="background:#3498db; color:white; border:none; padding:${f('7px 14px','14px 26px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; cursor:pointer;">বিস্তারিত</button>
                         </div>
