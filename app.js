@@ -2027,6 +2027,15 @@ function adminViewOrderDetails(orderId) {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // ✅ মোবাইলে জোর করে পুরো স্ক্রিন
+    const _rm = document.getElementById('returnModal');
+    const _rmi = document.getElementById('returnModalInner');
+    if (_rm && _rmi) {
+        _rm.style.cssText = 'position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100vh!important;margin:0!important;padding:0!important;z-index:2147483647!important;background:rgba(15,23,42,0.85)!important;display:flex!important;align-items:stretch!important;';
+        _rmi.style.cssText = 'width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;border-radius:0!important;margin:0!important;flex:1!important;display:flex!important;flex-direction:column!important;background:#fff!important;overflow:hidden!important;';
+    }
+
     const chatBox = document.getElementById('adminChatList');
     chatBox.scrollTop = chatBox.scrollHeight;
 }
