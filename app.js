@@ -10965,15 +10965,10 @@ function _initMobileFixes() {
         var _vvHandler = function() {
             var modalBox = document.querySelector('#checkoutModal .modal-box');
             if (!modalBox) return;
-            var vvH = window.visualViewport.height;
+            var vvH = Math.round(window.visualViewport.height);
+            // modal-box কে viewport height এ সীমাবদ্ধ করি
+            modalBox.style.height = vvH + 'px';
             modalBox.style.maxHeight = vvH + 'px';
-            // sticky বাটন scroll করে দেখাই
-            var btnWrap = document.getElementById('nextStepBtnWrap');
-            if (btnWrap) {
-                setTimeout(function() {
-                    btnWrap.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-                }, 80);
-            }
         };
         window.visualViewport.addEventListener('resize', _vvHandler);
     }
