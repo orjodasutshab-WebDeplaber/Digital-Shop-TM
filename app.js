@@ -1,5 +1,6 @@
 
 
+
 // System Constants
 const SYSTEM_CONFIG = {
     ADMIN_ID: 'DigitalShopOrjo',    // Admin Username
@@ -1922,9 +1923,6 @@ function adminViewOrderDetails(orderId) {
     const discount = parseFloat(order.discountAmount) || 0;
     const total = parseFloat(order.price);
 
-    const _isMobReturn = document.documentElement.classList.contains('is-mobile');
-    const _f = (pc, mo) => _isMobReturn ? mo : pc;
-
     const modalHtml = `
         <div id="adminOrderModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.9); display:flex; align-items:center; justify-content:center; z-index:99999999; backdrop-filter: blur(8px); font-family: 'Segoe UI', Roboto, sans-serif;">
             <div style="background:#f1f5f9; width:98%; height:95%; max-width:1100px; border-radius:20px; overflow:hidden; display:flex; flex-direction:column; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border:1px solid #34495e;">
@@ -2170,39 +2168,36 @@ function viewUserOrderDetails(orderId) {
     const discount = parseFloat(order.discountAmount) || 0;
     const total = parseFloat(order.price);
 
-    const _isMobReturn = document.documentElement.classList.contains('is-mobile');
-    const _f = (pc, mo) => _isMobReturn ? mo : pc;
-
     const modalHtml = `
-        <div id="userOrderModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:${_isMobReturn?'flex-start':'center'}; justify-content:center; z-index:10000000; backdrop-filter: blur(8px); font-family: 'Hind Siliguri', sans-serif;">
-            <div style="background:#fff; width:${_isMobReturn?'100%':'95%'}; height:${_isMobReturn?'100%':'92%'}; max-width:${_isMobReturn?'100%':'600px'}; border-radius:${_isMobReturn?'0':'25px'}; overflow:hidden; display:flex; flex-direction:column; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border:${_isMobReturn?'none':'1px solid #3498db'}; animation: zoomIn 0.3s ease;">
+        <div id="userOrderModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center; z-index:10000000; backdrop-filter: blur(8px); font-family: 'Hind Siliguri', sans-serif;">
+            <div style="background:#fff; width:95%; height:92%; max-width:600px; border-radius:25px; overflow:hidden; display:flex; flex-direction:column; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border:1px solid #3498db; animation: zoomIn 0.3s ease;">
                 
-                <div style="background:#3498db; color:white; padding:${_f('20px','24px 20px')}; text-align:center; position:relative; flex-shrink:0;">
-                    <h3 style="margin:0; font-size:${_f('18px','32px')};">অর্ডার ডিটেইলস ও ট্র্যাকিং</h3>
-                    <p style="margin:5px 0 0; opacity:0.8; font-size:${_f('12px','24px')};">অর্ডার আইডি: #${order.id}</p>
-                    <span onclick="document.getElementById('userOrderModal').remove()" style="position:absolute; top:${_f('15px','18px')}; right:20px; cursor:pointer; font-size:${_f('28px','56px')}; line-height:1;">&times;</span>
+                <div style="background:#3498db; color:white; padding:20px; text-align:center; position:relative;">
+                    <h3 style="margin:0; font-size:18px;">অর্ডার ডিটেইলস ও ট্র্যাকিং</h3>
+                    <p style="margin:5px 0 0; opacity:0.8; font-size:12px;">অর্ডার আইডি: #${order.id}</p>
+                    <span onclick="document.getElementById('userOrderModal').remove()" style="position:absolute; top:15px; right:20px; cursor:pointer; font-size:28px; line-height:1;">&times;</span>
                 </div>
 
-                <div id="userModalBody" style="flex:1; overflow-y:auto; padding:${_f('15px','20px')}; background:#f8fafc; -webkit-overflow-scrolling:touch;">
+                <div id="userModalBody" style="flex:1; overflow-y:auto; padding:15px; background:#f8fafc;">
                     
-                    <div style="background:#fff; border-radius:${_f('20px','16px')}; padding:${_f('20px','22px')}; margin-bottom:${_f('20px','18px')}; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border:1px solid #e2e8f0;">
-                        <div style="display:flex; gap:${_f('15px','18px')}; margin-bottom:${_f('15px','18px')}; border-bottom:1px dashed #cbd5e1; padding-bottom:${_f('15px','18px')};">
-                            <div style="position:relative; cursor:pointer; flex-shrink:0;" onclick="document.getElementById('userOrderModal').remove(); openProductDetails('${productId}')">
-                                <img src="${productImage}" onerror="this.src='https://via.placeholder.com/150'" alt="Product" style="width:${_f('100px','130px')}; height:${_f('100px','130px')}; object-fit:contain; border-radius:15px; border:2px solid #3498db; background:#f1f5f9;">
-                                <div style="position:absolute; bottom:0; width:100%; background:rgba(52, 152, 219, 0.9); color:white; font-size:${_f('10px','20px')}; text-align:center; border-radius:0 0 15px 15px; padding:${_f('4px','7px')} 0; font-weight:bold;">বিস্তারিত দেখুন</div>
+                    <div style="background:#fff; border-radius:20px; padding:20px; margin-bottom:20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border:1px solid #e2e8f0;">
+                        <div style="display:flex; gap:15px; margin-bottom:15px; border-bottom:1px dashed #cbd5e1; padding-bottom:15px;">
+                            <div style="position:relative; cursor:pointer;" onclick="document.getElementById('userOrderModal').remove(); openProductDetails('${productId}')">
+                                <img src="${productImage}" onerror="this.src='https://via.placeholder.com/150'" alt="Product" style="width:100px; height:100px; object-fit:contain; border-radius:15px; border:2px solid #3498db; background:#f1f5f9;">
+                                <div style="position:absolute; bottom:0; width:100%; background:rgba(52, 152, 219, 0.9); color:white; font-size:10px; text-align:center; border-radius:0 0 15px 15px; padding:4px 0; font-weight:bold;">বিস্তারিত দেখুন</div>
                             </div>
-                            <div style="flex:1; min-width:0;">
-                                <h4 style="margin:0 0 ${_f('8px','12px')} 0; color:#1e293b; font-size:${_f('17px','28px')}; line-height:1.4;">${order.productName || 'পণ্যটির নাম পাওয়া যায়নি'}</h4>
-                                <div style="margin-bottom:${_f('10px','14px')};">
-                                    <span style="background:#dcfce7; color:#166534; padding:${_f('3px 10px','6px 14px')}; border-radius:20px; font-size:${_f('11px','22px')}; font-weight:bold; border:1px solid #bdf0d2;">
+                            <div style="flex:1;">
+                                <h4 style="margin:0 0 8px 0; color:#1e293b; font-size:17px; line-height:1.3;">${order.productName || 'পণ্যটির নাম পাওয়া যায়নি'}</h4>
+                                <div style="margin-bottom:10px;">
+                                    <span style="background:#dcfce7; color:#166534; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; border:1px solid #bdf0d2;">
                                         পেমেন্ট: ${order.paymentStatus}
                                     </span>
                                 </div>
-                                <p style="margin:0; font-size:${_f('13px','24px')}; color:#64748b;">পরিমাণ: ${order.orderQty || 1} পিস</p>
+                                <p style="margin:0; font-size:13px; color:#64748b;">পরিমাণ: ${order.orderQty || 1} পিস</p>
                             </div>
                         </div>
 
-                        <div style="display:flex; flex-direction:column; gap:${_f('8px','12px')}; font-size:${_f('14px','26px')}; color:#475569;">
+                        <div style="display:flex; flex-direction:column; gap:8px; font-size:14px; color:#475569;">
                             <div style="display:flex; justify-content:space-between;">
                                 <span>পণ্যের দাম:</span>
                                 <span>৳${itemPrice.toFixed(2)}</span>
@@ -2215,32 +2210,32 @@ function viewUserOrderDetails(orderId) {
                                 <span>ডিসকাউন্ট:</span>
                                 <span>- ৳${discount.toFixed(2)}</span>
                             </div>
-                            <div style="display:flex; justify-content:space-between; margin-top:5px; padding-top:${_f('10px','14px')}; border-top:2px solid #3498db; color:#1e293b; font-weight:bold; font-size:${_f('18px','30px')};">
+                            <div style="display:flex; justify-content:space-between; margin-top:5px; padding-top:10px; border-top:2px solid #3498db; color:#1e293b; font-weight:bold; font-size:18px;">
                                 <span>সর্বমোট মূল্য:</span>
                                 <span style="color:#3498db;">৳${total.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
 
-                    <h4 style="margin:${_f('25px','20px')} 0 ${_f('15px','14px')} 5px; color:#1e293b; font-size:${_f('16px','28px')}; display:flex; align-items:center; gap:10px;">
+                    <h4 style="margin:25px 0 15px 5px; color:#1e293b; font-size:16px; display:flex; align-items:center; gap:10px;">
                         <i class="fas fa-truck-fast" style="color:#3498db;"></i> অর্ডার আপডেট হিস্টোরি
                     </h4>
                     <div style="display:flex; flex-direction:column; padding-left:5px; margin-bottom:20px;">
                         ${history.map((item, index) => `
-                            <div style="display:flex; gap:${_f('15px','16px')};">
-                                <div style="display:flex; flex-direction:column; align-items:center; min-width:${_f('40px','52px')};">
-                                    <div style="width:${_f('30px','46px')}; height:${_f('30px','46px')}; background:${index === 0 ? '#3498db' : '#fff'}; color:${index === 0 ? 'white' : '#3498db'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:${_f('14px','22px')}; z-index:2; border:2px solid #3498db; flex-shrink:0;">
+                            <div style="display:flex; gap:15px;">
+                                <div style="display:flex; flex-direction:column; align-items:center; min-width:40px;">
+                                    <div style="width:30px; height:30px; background:${index === 0 ? '#3498db' : '#fff'}; color:${index === 0 ? 'white' : '#3498db'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; z-index:2; border:2px solid #3498db;">
                                         <i class="fas ${item.icon || 'fa-check'}"></i>
                                     </div>
                                     ${index !== history.length - 1 ? '<div style="width:2px; flex:1; background:#3498db; opacity:0.2; margin:2px 0;"></div>' : ''}
                                 </div>
-                                <div style="flex:1; padding-bottom:${_f('20px','18px')};">
-                                    <div style="background:${index === 0 ? '#fff9c4' : '#fff'}; padding:${_f('15px','18px')}; border-radius:15px; border:1px solid ${index === 0 ? '#fbc02d' : '#e2e8f0'}; position:relative;">
-                                        <div style="display:flex; justify-content:space-between; margin-bottom:${_f('5px','8px')}; flex-wrap:wrap; gap:4px;">
-                                            <strong style="color:#1e293b; font-size:${_f('14px','26px')};">${item.status}</strong>
-                                            <small style="color:#94a3b8; font-size:${_f('10px','20px')};">${item.time}</small>
+                                <div style="flex:1; padding-bottom:20px;">
+                                    <div style="background:${index === 0 ? '#fff9c4' : '#fff'}; padding:15px; border-radius:15px; border:1px solid ${index === 0 ? '#fbc02d' : '#e2e8f0'}; position:relative;">
+                                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                                            <strong style="color:#1e293b; font-size:14px;">${item.status}</strong>
+                                            <small style="color:#94a3b8; font-size:10px;">${item.time}</small>
                                         </div>
-                                        <p style="margin:0; font-size:${_f('13px','24px')}; color:#475569; line-height:1.6;">${item.comment}</p>
+                                        <p style="margin:0; font-size:13px; color:#475569; line-height:1.5;">${item.comment}</p>
                                     </div>
                                 </div>
                             </div>
@@ -2249,14 +2244,14 @@ function viewUserOrderDetails(orderId) {
 
                     <hr style="border:0; border-top:1px solid #e2e8f0; margin:20px 0;">
                     
-                    <h4 style="margin:0 0 ${_f('15px','14px')} 5px; color:#1e293b; font-size:${_f('16px','28px')}; display:flex; align-items:center; gap:10px;">
+                    <h4 style="margin:0 0 15px 5px; color:#1e293b; font-size:16px; display:flex; align-items:center; gap:10px;">
                         <i class="fas fa-comments" style="color:#3498db;"></i> মেসেজ এবং সাপোর্ট
                     </h4>
 
                     <div style="background:#fff; border-radius:20px; padding:15px; border:1px solid #3498db; margin-bottom:20px;">
-                        <div style="display:flex; gap:10px; margin-bottom:${_f('15px','18px')};">
-                            <input id="userCommentInput" type="text" placeholder="অর্ডার নিয়ে কিছু লিখুন..." style="flex:1; padding:${_f('12px','18px')}; border-radius:12px; border:1px solid #ddd; outline:none; font-size:${_f('14px','26px')};">
-                            <button onclick="saveUserComment('${order.id}')" style="background:#3498db; color:white; border:none; width:${_f('45px','70px')}; height:${_f('45px','70px')}; border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:${_f('14px','24px')};">
+                        <div style="display:flex; gap:10px; margin-bottom:15px;">
+                            <input id="userCommentInput" type="text" placeholder="অর্ডার নিয়ে কিছু লিখুন..." style="flex:1; padding:12px; border-radius:12px; border:1px solid #ddd; outline:none; font-size:14px;">
+                            <button onclick="saveUserComment('${order.id}')" style="background:#3498db; color:white; border:none; width:45px; height:45px; border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
@@ -2272,21 +2267,21 @@ function viewUserOrderDetails(orderId) {
                                                     border-radius: ${isAdmin ? '15px 15px 15px 0' : '15px 15px 0 15px'}; 
                                                     border: 1px solid ${isAdmin ? '#e2e8f0' : '#bae6fd'};
                                                     position: relative;">
-                                            <small style="display:block; font-size:${_f('9px','20px')}; font-weight:bold; margin-bottom:3px; color:${isAdmin ? '#64748b' : '#0ea5e9'};">
+                                            <small style="display:block; font-size:9px; font-weight:bold; margin-bottom:3px; color:${isAdmin ? '#64748b' : '#0ea5e9'};">
                                                 ${isAdmin ? 'Digital Shop TM (Admin)' : 'আপনি'}
                                             </small>
-                                            <p style="margin:0; font-size:${_f('13px','24px')};">${c.text}</p>
-                                            <small style="display:block; text-align:right; font-size:${_f('8px','18px')}; color:#94a3b8; margin-top:4px;">${c.time}</small>
+                                            <p style="margin:0; font-size:13px;">${c.text}</p>
+                                            <small style="display:block; text-align:right; font-size:8px; color:#94a3b8; margin-top:4px;">${c.time}</small>
                                         </div>
                                     </div>
                                 `;
-                            }).join('') : '<p style="text-align:center; color:#94a3b8; font-size:${_f('12px','24px')}; margin:10px 0;">কোনো মেসেজ নেই</p>'}
+                            }).join('') : '<p style="text-align:center; color:#94a3b8; font-size:12px; margin:10px 0;">কোনো মেসেজ নেই</p>'}
                         </div>
                     </div>
                 </div>
 
-                <div style="padding:${_f('15px','18px')}; background:#fff; text-align:center; border-top:1px solid #e2e8f0; flex-shrink:0;">
-                    <button onclick="document.getElementById('userOrderModal').remove()" style="width:100%; padding:${_f('14px','22px')}; background:#3498db; color:white; border:none; border-radius:15px; font-weight:bold; cursor:pointer; font-size:${_f('16px','30px')};">বন্ধ করুন</button>
+                <div style="padding:15px; background:#fff; text-align:center; border-top:1px solid #e2e8f0;">
+                    <button onclick="document.getElementById('userOrderModal').remove()" style="width:100%; padding:14px; background:#3498db; color:white; border:none; border-radius:15px; font-weight:bold; cursor:pointer; font-size:16px;">বন্ধ করুন</button>
                 </div>
             </div>
         </div>
@@ -3060,9 +3055,6 @@ window.openEditModal = function(productId) {
         </div>
     `).join('');
 
-    const _isMobReturn = document.documentElement.classList.contains('is-mobile');
-    const _f = (pc, mo) => _isMobReturn ? mo : pc;
-
     const modalHtml = `
         <div id="editProductModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.8); display:flex; align-items:center; justify-content:center; z-index:10089760000; backdrop-filter:blur(8px); font-family: 'Inter', sans-serif;">
             <div style="background:#fff; width:95%; max-width:550px; border-radius:24px; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); animation: modalBounce 0.4s ease;">
@@ -3398,7 +3390,7 @@ function generateInvoice(orderId) {
     const order = appState.orders.find(o => o.id === orderId);
     if (!order) return alert("অর্ডার পাওয়া যায়নি!");
 
-    const invoiceWindow = window.open('', '_blank');
+    const invoiceWindow = window.open('', '_blank', 'width=850,height=950');
     
     const isPaid = order.paymentStatus === 'পেইড';
     const statusColor = isPaid ? '#10b981' : '#ef4444';
@@ -3427,11 +3419,10 @@ function generateInvoice(orderId) {
         <html lang="bn">
         <head>
             <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Invoice - ${order.id}</title>
             <style>
-                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #334155; line-height: 1.6; background: #f1f5f9; margin: 0; }
-                .invoice-card { background: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 800px; margin: auto; position: relative; overflow: hidden; width: 100%; box-sizing: border-box; }
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #334155; line-height: 1.6; background: #f1f5f9; }
+                .invoice-card { background: #fff; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 800px; margin: auto; position: relative; overflow: hidden; }
                 .invoice-card::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: #3b82f6; }
                 
                 .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 30px; }
@@ -3459,39 +3450,6 @@ function generateInvoice(orderId) {
                 .print-btn:hover { background: #2563eb; }
 
                 @media print { .print-btn { display: none; } body { background: white; padding: 0; } .invoice-card { box-shadow: none; border: none; } }
-
-                @media screen and (max-width: 768px) {
-                    body { padding: 0; background: #fff; }
-                    .invoice-card { padding: 24px 18px; border-radius: 0; box-shadow: none; max-width: 100%; }
-                    .invoice-card::before { height: 8px; }
-
-                    .header { flex-direction: column; align-items: flex-start; gap: 12px; padding-bottom: 18px; margin-bottom: 20px; }
-                    .logo-area h1 { font-size: 36px; }
-                    .logo-area p { font-size: 18px; }
-                    .header > div:last-child { text-align: left; width: 100%; }
-                    .header h2 { font-size: 30px !important; margin: 0 !important; }
-                    .header p { font-size: 18px !important; margin: 4px 0 !important; }
-
-                    .info-grid { grid-template-columns: 1fr; gap: 14px; margin-bottom: 18px; }
-                    .info-box h4 { font-size: 18px; }
-                    .info-box p { font-size: 17px; margin: 5px 0; }
-                    .status-badge { font-size: 17px; padding: 6px 16px; margin-top: 10px; }
-
-                    .invoice-table { font-size: 16px; }
-                    .invoice-table th { font-size: 16px; padding: 10px 8px; }
-                    .invoice-table td { font-size: 16px; padding: 12px 8px; }
-                    .invoice-table td small { font-size: 14px; }
-
-                    .summary { width: 100%; margin-left: 0; margin-top: 18px; }
-                    .summary-item { font-size: 17px; padding: 7px 0; }
-                    .summary-item.grand-total { font-size: 22px; padding-top: 12px; margin-top: 12px; }
-
-                    .payment-stamp { font-size: 36px; top: 100px; right: 14px; padding: 8px 14px; border-width: 3px; }
-
-                    .footer { margin-top: 30px; padding-top: 16px; }
-                    .footer p { font-size: 15px; }
-                    .print-btn { font-size: 20px; padding: 16px; border-radius: 10px; width: 100%; margin-top: 16px; display: block; }
-                }
             </style>
         </head>
         <body>
@@ -3960,37 +3918,34 @@ function openReturnModal(orderId) {
     const order = appState.orders.find(o => String(o.id) === String(orderId));
     if (!order) return alert("অর্ডার পাওয়া যায়নি!");
 
-    const _isMobReturn = document.documentElement.classList.contains('is-mobile');
-    const _f = (pc, mo) => _isMobReturn ? mo : pc;
-
     const modalHtml = `
-    <div id="returnModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.85); display:flex; align-items:${_isMobReturn?'flex-start':'center'}; justify-content:center; z-index:999999999; backdrop-filter: blur(15px); font-family: 'Inter', sans-serif; padding: ${_isMobReturn?'0':'15px'};">
-        <div style="background:#fff; width:100%; max-width:${_isMobReturn?'100%':'420px'}; height:${_isMobReturn?'100%':'auto'}; max-height:${_isMobReturn?'100vh':'92vh'}; max-height:${_isMobReturn?'100dvh':'92vh'}; border-radius:${_isMobReturn?'0':'32px'}; display:flex; flex-direction:column; box-shadow:0 50px 100px -20px rgba(0,0,0,0.6); animation: modalPopUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position:relative; overflow:hidden; border: 1px solid rgba(255,255,255,0.3);">
+    <div id="returnModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.85); display:flex; align-items:center; justify-content:center; z-index:999999999; backdrop-filter: blur(15px); font-family: 'Inter', sans-serif; padding: 15px;">
+        <div style="background:#fff; width:100%; max-width:420px; max-height: 92vh; border-radius:32px; display:flex; flex-direction:column; box-shadow:0 50px 100px -20px rgba(0,0,0,0.6); animation: modalPopUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position:relative; overflow:hidden; border: 1px solid rgba(255,255,255,0.3);">
             
-            <div style="background: linear-gradient(90deg, #fff7ed, #ffedd5); padding: ${_f('12px 20px','18px 24px')}; border-bottom: 1px solid #fed7aa; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <i class="fa fa-info-circle" style="color: #f97316; font-size: ${_f('14px','28px')};"></i>
-                <span style="font-size: ${_f('11px','26px')}; color: #9a3412; font-weight: 700;">ছবি আপলোড করতে না পারলে <a href="https://wa.me/8801822963824" target="_blank" style="color: #ea580c; text-decoration: underline; font-weight: 800;">এখানে যোগাযোগ করুন</a></span>
+            <div style="background: linear-gradient(90deg, #fff7ed, #ffedd5); padding: 12px 20px; border-bottom: 1px solid #fed7aa; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <i class="fa fa-info-circle" style="color: #f97316; font-size: 14px;"></i>
+                <span style="font-size: 11px; color: #9a3412; font-weight: 700;">ছবি আপলোড করতে না পারলে <a href="https://wa.me/8801822963824" target="_blank" style="color: #ea580c; text-decoration: underline; font-weight: 800;">এখানে যোগাযোগ করুন</a></span>
             </div>
 
-            <div style="padding: ${_f('15px 24px','22px 28px')}; background: #fff; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display:flex; align-items:center; gap:${_f('12px','18px')};">
-                    <div style="background:linear-gradient(135deg, #ef4444, #b91c1c); width:${_f('36px','64px')}; height:${_f('36px','64px')}; border-radius:${_f('12px','18px')}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                        <i class="fa fa-undo" style="color:#fff; font-size:${_f('13px','28px')};"></i>
+            <div style="padding: 15px 24px; background: #fff; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="background:linear-gradient(135deg, #ef4444, #b91c1c); width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa fa-undo" style="color:#fff; font-size:13px;"></i>
                     </div>
                     <div>
-                        <h3 style="margin:0; color:#0f172a; font-size:${_f('16px','34px')}; font-weight:800;">রিটার্ন পোর্টাল</h3>
-                        <p style="margin:0; font-size:${_f('10px','24px')}; color:#94a3b8; font-weight:600;">অর্ডার: #${orderId}</p>
+                        <h3 style="margin:0; color:#0f172a; font-size:16px; font-weight:800;">রিটার্ন পোর্টাল</h3>
+                        <p style="margin:0; font-size:10px; color:#94a3b8; font-weight:600;">অর্ডার: #${orderId}</p>
                     </div>
                 </div>
-                <button onclick="document.getElementById('returnModal').remove()" style="width:${_f('30px','70px')}; height:${_f('30px','70px')}; background:#f1f5f9; border:none; border-radius:50%; cursor:pointer; color:#64748b; font-size:${_f('18px','42px')}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">&times;</button>
+                <button onclick="document.getElementById('returnModal').remove()" style="width:30px; height:30px; background:#f1f5f9; border:none; border-radius:50%; cursor:pointer; color:#64748b; font-size:18px;">&times;</button>
             </div>
 
-            <div class="custom-modal-body" style="padding: ${_f('20px 24px','28px 30px')}; overflow-y: auto; flex: 1; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+            <div class="custom-modal-body" style="padding: 20px 24px; overflow-y: auto; flex: 1; scroll-behavior: smooth;">
                 
                 <div style="margin-bottom:20px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <label style="font-size:${_f('13px','28px')}; font-weight:700; color:#334155;">প্রমাণস্বরূপ ছবি</label>
-                        <button onclick="addNewImageInput()" style="font-size:${_f('11px','24px')}; color:#3b82f6; border:1px solid #3b82f6; background:#eff6ff; padding:${_f('6px 12px','12px 20px')}; border-radius:${_f('10px','14px')}; cursor:pointer; font-weight:700;">
+                        <label style="font-size:13px; font-weight:700; color:#334155;">প্রমাণস্বরূপ ছবি</label>
+                        <button onclick="addNewImageInput()" style="font-size:11px; color:#3b82f6; border:1px solid #3b82f6; background:#eff6ff; padding:6px 12px; border-radius:10px; cursor:pointer; font-weight:700;">
                             <i class="fa fa-plus-circle"></i> আরো ছবি যোগ করুন
                         </button>
                     </div>
@@ -4000,11 +3955,11 @@ function openReturnModal(orderId) {
                             
                             <!-- ফাইল আপলোড বাটন -->
                             <div style="margin-bottom:10px;">
-                                <label style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:${_f('10px 16px','18px 20px')}; border-radius:${_f('12px','16px')}; cursor:pointer; font-size:${_f('13px','28px')}; font-weight:700; text-align:center;">
+                                <label style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:10px 16px; border-radius:12px; cursor:pointer; font-size:13px; font-weight:700; text-align:center;">
                                     <i class="fa fa-upload"></i> ফাইল থেকে ছবি আপলোড করুন
                                     <input type="file" accept="image/*" class="return-img-file" style="display:none;" onchange="uploadReturnImageFile(this)">
                                 </label>
-                                <div class="img-upload-status" style="display:none; margin-top:8px; font-size:${_f('12px','24px')}; color:#6366f1; font-weight:600; text-align:center;">
+                                <div class="img-upload-status" style="display:none; margin-top:8px; font-size:12px; color:#6366f1; font-weight:600; text-align:center;">
                                     <i class="fa fa-spinner fa-spin"></i> আপলোড হচ্ছে...
                                 </div>
                             </div>
@@ -4012,50 +3967,50 @@ function openReturnModal(orderId) {
                             <!-- OR divider -->
                             <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
                                 <div style="flex:1; height:1px; background:#e2e8f0;"></div>
-                                <span style="font-size:${_f('11px','24px')}; color:#94a3b8; font-weight:600;">অথবা লিংক দিন</span>
+                                <span style="font-size:11px; color:#94a3b8; font-weight:600;">অথবা লিংক দিন</span>
                                 <div style="flex:1; height:1px; background:#e2e8f0;"></div>
                             </div>
 
                             <!-- লিংক input -->
                             <input type="url" class="return-image-url" placeholder="ছবির ডিরেক্ট লিংক দিন..." 
-                                style="width:100%; padding:${_f('11px 14px','18px 16px')}; border:2px solid #e2e8f0; border-radius:${_f('12px','16px')}; outline:none; font-size:${_f('12px','26px')}; background:#fff; box-sizing:border-box;"
+                                style="width:100%; padding:11px 14px; border:2px solid #e2e8f0; border-radius:12px; outline:none; font-size:12px; background:#fff; box-sizing:border-box;"
                                 oninput="previewSingleImage(this)">
 
                             <!-- Preview -->
                             <div class="single-preview" style="margin-top:10px; display:none;">
-                                <div style="width:${_f('80px','140px')}; height:${_f('80px','140px')}; border-radius:12px; overflow:hidden; border:2px solid #6366f1;">
+                                <div style="width:80px; height:80px; border-radius:12px; overflow:hidden; border:2px solid #6366f1;">
                                     <img src="" style="width:100%; height:100%; object-fit:fill;">
                                 </div>
-                                <span class="preview-ok" style="display:block; font-size:${_f('11px','24px')}; color:#10b981; font-weight:700; margin-top:4px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
+                                <span class="preview-ok" style="display:block; font-size:11px; color:#10b981; font-weight:700; margin-top:4px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div style="margin-bottom:20px;">
-                    <label style="display:block; margin-bottom:${_f('8px','14px')}; font-size:${_f('13px','28px')}; font-weight:700; color:#334155;">বিস্তারিত কারণ</label>
-                    <textarea id="returnReason" placeholder="বিস্তারিত লিখুন..." style="width:100%; padding:${_f('14px','20px 18px')}; border:2px solid #f1f5f9; border-radius:20px; font-family:inherit; resize:none; height:${_f('80px','140px')}; outline:none; font-size:${_f('13px','28px')}; background:#f8fafc; box-sizing: border-box;"></textarea>
+                    <label style="display:block; margin-bottom:8px; font-size:13px; font-weight:700; color:#334155;">বিস্তারিত কারণ</label>
+                    <textarea id="returnReason" placeholder="বিস্তারিত লিখুন..." style="width:100%; padding:14px; border:2px solid #f1f5f9; border-radius:20px; font-family:inherit; resize:none; height:80px; outline:none; font-size:13px; background:#f8fafc; box-sizing: border-box;"></textarea>
                 </div>
 
                 <div style="margin-bottom:20px;">
-                    <label style="display:block; margin-bottom:${_f('8px','14px')}; font-size:${_f('13px','28px')}; font-weight:700; color:#334155;">রিফান্ড মাধ্যম</label>
-                    <select id="refundMethod" onchange="toggleRefundFields()" style="width:100%; padding:${_f('14px','20px 18px')}; border:2px solid #f1f5f9; border-radius:20px; background:#f8fafc; font-size:${_f('14px','28px')}; font-weight:700;">
+                    <label style="display:block; margin-bottom:8px; font-size:13px; font-weight:700; color:#334155;">রিফান্ড মাধ্যম</label>
+                    <select id="refundMethod" onchange="toggleRefundFields()" style="width:100%; padding:14px; border:2px solid #f1f5f9; border-radius:20px; background:#f8fafc; font-size:14px; font-weight:700;">
                         <option value="voucher">🎁 শপিং ভাউচার</option>
                         <option value="payment">📱 পার্সোনাল পেমেন্ট</option>
                     </select>
                 </div>
 
-                <div id="paymentFields" style="display:none; background:#eff6ff; padding:${_f('15px','22px')}; border-radius:24px; border:1px solid #bfdbfe; margin-bottom:15px;">
-                    <select id="paymentType" style="width:100%; padding:${_f('10px','18px')}; border-radius:12px; border:1.5px solid #fff; margin-bottom:${_f('10px','16px')}; font-size:${_f('14px','26px')};">
+                <div id="paymentFields" style="display:none; background:#eff6ff; padding:15px; border-radius:24px; border:1px solid #bfdbfe; margin-bottom:15px;">
+                    <select id="paymentType" style="width:100%; padding:10px; border-radius:12px; border:1.5px solid #fff; margin-bottom:10px;">
                         <option value="Bkash">বিকাশ (bKash)</option>
                         <option value="Nagad">নগদ (Nagad)</option>
                     </select>
-                    <input type="number" id="refundNumber" placeholder="নম্বর দিন" style="width:100%; padding:${_f('12px','18px')}; border-radius:12px; border:1.5px solid #fff; box-sizing:border-box; font-size:${_f('14px','26px')};">
+                    <input type="number" id="refundNumber" placeholder="নম্বর দিন" style="width:100%; padding:12px; border-radius:12px; border:1.5px solid #fff; width:100%; box-sizing:border-box;">
                 </div>
             </div>
 
-            <div style="padding: ${_f('18px 24px','22px 28px')}; background: #fff; border-top: 1px solid #f1f5f9;">
-                <button onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0f172a; color:#fff; border:none; padding:${_f('18px','26px')}; border-radius:20px; font-weight:800; cursor:pointer; font-size:${_f('16px','34px')};">সাবমিট করুন</button>
+            <div style="padding: 18px 24px; background: #fff; border-top: 1px solid #f1f5f9;">
+                <button onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0f172a; color:#fff; border:none; padding:18px; border-radius:20px; font-weight:800; cursor:pointer; font-size:16px;">সাবমিট করুন</button>
             </div>
         </div>
     </div>
@@ -4354,9 +4309,6 @@ function openAdminReturnDetail(retId) {
     const productSKUDisplay = item ? item.sku : (order.sku || 'N/A');
     const productID = order.productId || ret.productId || order.id;
 
-    const _isMobReturn = document.documentElement.classList.contains('is-mobile');
-    const _f = (pc, mo) => _isMobReturn ? mo : pc;
-
     const modalHtml = `
     <style>
         .admin-scroll::-webkit-scrollbar { width: 6px; }
@@ -4513,9 +4465,6 @@ function openUserReturnChat(retId) {
 
     // অর্ডার থেকে পণ্যের বিস্তারিত তথ্য বের করা
     const order = appState.orders.find(o => o.id === ret.orderId) || {};
-
-    const _isMobReturn = document.documentElement.classList.contains('is-mobile');
-    const _f = (pc, mo) => _isMobReturn ? mo : pc;
 
     const modalHtml = `
     <div id="userRetDetailModal" class="modal-overlay" style="display:flex; z-index:20000; background:rgba(0,0,0,0.85); position:fixed; top:0; left:0; width:100%; height:100%; align-items:center; justify-content:center; backdrop-filter: blur(10px);">
@@ -4984,8 +4933,8 @@ html.is-mobile #gpdPcNavTabs{display:none!important;}
 .gpd-rel-card-cat{background:#e0f2fe;color:#0284c7;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 
 /* MOBILE VIEW */
-.gpd-topbar{position:fixed;top:0;left:0;right:0;z-index:986783999999991;background:#fff;display:flex;align-items:center;padding:14px 14px;border-bottom:1px solid #ebebeb;gap:12px;min-height:180px;}
-.gpd-back-btn{background:rgba(0,0,0,0.07);border:none;font-size:130px !important;cursor:pointer;color:#111 !important;padding:0 !important;line-height:1 !important;width:150px !important;height:150px !important;min-width:150px !important;font-weight:900;border-radius:50%;display:flex !important;align-items:center;justify-content:center;flex-shrink:0;}
+.gpd-topbar{position:fixed;top:0;left:0;right:0;z-index:986783999999991;background:#fff;display:flex;align-items:center;padding:11px 14px;border-bottom:1px solid #ebebeb;gap:12px;}
+.gpd-back-btn{background:rgba(0,0,0,0.07);border:none;font-size:90px;cursor:pointer;color:#111;padding:0;line-height:1;width:110px;height:110px;min-width:110px;font-weight:900;border-radius:50%;display:flex;align-items:center;justify-content:center;}
 .gpd-topbar-title{flex:1;font-size:40px;font-weight:700;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .gpd-topbar-icons{display:flex;gap:39px;align-items:center;}
 .gpd-topbar-icons i{font-size:40px;color:#444;cursor:pointer;}
@@ -9181,9 +9130,6 @@ function openLoadLimitSettings() {
     // বর্তমান লিমিট সিকুয়েন্স লোড করা
     const currentSeq = appState.productLoadSequence || [35, 50];
     
-    const _isMobReturn = document.documentElement.classList.contains('is-mobile');
-    const _f = (pc, mo) => _isMobReturn ? mo : pc;
-
     const modalHtml = `
         <div id="limitModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center; z-index:10000; font-family:'Hind Siliguri', sans-serif;">
             <div style="background:#1e293b; width:90%; max-width:400px; padding:25px; border-radius:20px; border:1px solid #3498db; box-shadow:0 20px 50px rgba(0,0,0,0.5);">
