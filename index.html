@@ -1821,7 +1821,7 @@ window.toggleThemeMode = function() {
                     </div>
                     <input type="hidden" id="orderAddress" name="orderAddress">
                 </div>
-                <button class="btn-success" onclick="goToPaymentStep()" style="width: 100%; padding: 15px; background: #27ae60; color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer;">পরবর্তী ধাপ (কনফার্ম করুন)</button>
+                <!-- বাটন JS দিয়ে body তে যোগ করা হয় — নিচে দেখুন -->
             </div>
         </div>
         <div id="checkoutStep2" class="checkout-step-container hidden" style="display: none;">
@@ -2034,25 +2034,6 @@ html.is-mobile #checkoutModal button.btn-success {
     font-size: 32px !important;
     border-radius: 18px !important;
     margin-top: 10px !important;
-}
-
-/* ✅ মোবাইলে বাটন সবসময় স্ক্রিনের নিচে fixed — scroll হবে না */
-html.is-mobile #checkoutModal #checkoutStep1 .btn-success,
-html.is-mobile #checkoutModal #checkoutStep1 button.btn-success {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    border-radius: 0 !important;
-    z-index: 9999999999 !important;
-    box-shadow: 0 -4px 18px rgba(0,0,0,0.18) !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-}
-/* বাটনের উচ্চতা সমান নিচে ফাঁকা রাখা — content ঢাকা না পড়ে */
-html.is-mobile #checkoutModal .modal-box {
-    padding-bottom: 130px !important;
 }
 
 /* ══ ধাপ ২ — পেমেন্ট ══ */

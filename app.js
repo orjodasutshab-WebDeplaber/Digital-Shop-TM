@@ -807,6 +807,16 @@ function initiateCheckout(productId) {
     
     populateDiscountDropdown(unitPrice); 
     openModal('checkoutModal');
+
+    // মোবাইলে floating বাটন দেখাও
+    var _mb = document.getElementById('mobileNextStepBtn');
+    if (_mb) {
+        _mb.style.display = 'block';
+        _mb.style.bottom = '0px';
+        // modal-box এ padding যাতে বাটন content ঢেকে না ফেলে
+        var mbox = document.querySelector('#checkoutModal .modal-box');
+        if (mbox) mbox.style.paddingBottom = '110px';
+    }
 }
 function backToStep1() {
     document.getElementById('checkoutStep2').classList.add('hidden');
@@ -6553,6 +6563,13 @@ function closeModal(modalId) {
 
     // চেকআউট মোডাল রিসেট লজিক (সাদা সরু বক্স ঠেকাতে মাস্টার সলিউশন)
     if (modalId === 'checkoutModal') {
+        // মোবাইল floating বাটন লুকাও
+        var _mb = document.getElementById('mobileNextStepBtn');
+        if (_mb) _mb.style.display = 'none';
+        // padding reset
+        var mbox = document.querySelector('#checkoutModal .modal-box');
+        if (mbox) mbox.style.paddingBottom = '';
+
         const step1 = document.getElementById('checkoutStep1');
         const step2 = document.getElementById('checkoutStep2');
         
@@ -6640,6 +6657,9 @@ function goToPaymentStep() {
         if (step1 && step2) {
             step1.style.display = 'none'; 
             step1.classList.add('hidden');
+            // মোবাইল floating বাটন লুকাও — step2 তে দরকার নেই
+            var _mb = document.getElementById('mobileNextStepBtn');
+            if (_mb) _mb.style.display = 'none';
             
             step2.style.display = 'block'; 
             step2.classList.remove('hidden');
@@ -6713,6 +6733,10 @@ function backToStep1() {
     
     document.getElementById('checkoutStep1').style.display = 'block';
     document.getElementById('checkoutStep1').classList.remove('hidden');
+
+    // মোবাইল floating বাটন আবার দেখাও
+    var _mb = document.getElementById('mobileNextStepBtn');
+    if (_mb) { _mb.style.display = 'block'; _mb.style.bottom = '0px'; }
 }
 function confirmFinalOrder(isCOD = false) {
     // ১. ডিসকাউন্ট ব্যবহারের চূড়ান্ত লজিক
@@ -10960,13 +10984,39 @@ function _initMobileFixes() {
         }
     });
 
-    // ✅ কীবোর্ড উঠলে fixed বাটন কীবোর্ডের উপরে থাকবে
+    // ✅ মোবাইলে "পরবর্তী ধাপ" বাটন — body তে fixed, কখনো scroll হবে না
+    var _floatBtn = document.createElement('button');
+    _floatBtn.id = 'mobileNextStepBtn';
+    _floatBtn.textContent = 'পরবর্তী ধাপ (কনফার্ম করুন)';
+    _floatBtn.onclick = function() { goToPaymentStep(); };
+    _floatBtn.style.cssText = [
+        'display:none',
+        'position:fixed',
+        'bottom:0',
+        'left:0',
+        'right:0',
+        'width:100%',
+        'padding:22px',
+        'background:#27ae60',
+        'color:#fff',
+        'border:none',
+        'border-radius:0',
+        'font-weight:bold',
+        'font-size:28px',
+        'cursor:pointer',
+        'z-index:9999999999',
+        'box-shadow:0 -4px 18px rgba(0,0,0,0.20)',
+        'box-sizing:border-box',
+        'font-family:Hind Siliguri,sans-serif'
+    ].join(';');
+    document.body.appendChild(_floatBtn);
+
+    // কীবোর্ড উঠলে বাটন কীবোর্ডের উপরে যাবে
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', function() {
-            var btn = document.querySelector('#checkoutStep1 .btn-success');
-            if (!btn) return;
-            var kbHeight = window.innerHeight - window.visualViewport.height;
-            btn.style.bottom = (kbHeight > 0 ? kbHeight : 0) + 'px';
+            if (_floatBtn.style.display === 'none') return;
+            var kbH = window.innerHeight - window.visualViewport.height;
+            _floatBtn.style.bottom = (kbH > 0 ? kbH : 0) + 'px';
         });
     }
 
