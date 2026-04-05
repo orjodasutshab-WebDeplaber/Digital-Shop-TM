@@ -12589,26 +12589,30 @@ function _pmxRenderUserOrderModal(orders) {
     const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
     const statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
 
-    const isMob = document.documentElement.classList.contains('is-mobile');
+    const isMob = window.screen.width < 600 || window.innerWidth < 600;
     const f = (pc, mo) => isMob ? mo : pc;
 
     // Overlay
     const overlay = document.createElement('div');
     overlay.id = 'pmxUserOrderModal';
-    overlay.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999999999;display:flex;align-items:" + f('center','flex-start') + ";justify-content:center;font-family:'Hind Siliguri',sans-serif;";
+    overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:999999999;display:flex;align-items:" + (isMob?'flex-start':'center') + ";justify-content:center;font-family:'Hind Siliguri',sans-serif;overflow:hidden;";
 
-    // Inner box — মোবাইলে পুরো স্ক্রিন
+    // Inner box — মোবাইলে জোর করে পুরো স্ক্রিন
     const box = document.createElement('div');
-    box.style.cssText = isMob
-        ? "background:#1e293b;border-radius:0;padding:70px 18px 30px 18px;width:100%;min-height:100vh;overflow-y:auto;border:none;position:relative;"
-        : "background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:600px;max-height:90vh;overflow-y:auto;border:1px solid #7c3aed;position:relative;";
+    if (isMob) {
+        box.style.cssText = "background:#1e293b;border-radius:0;padding:80px 18px 30px 18px;width:100vw;min-width:100%;min-height:100vh;height:auto;overflow-y:auto;border:none;position:relative;box-sizing:border-box;";
+    } else {
+        box.style.cssText = "background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:600px;max-height:90vh;overflow-y:auto;border:1px solid #7c3aed;position:relative;";
+    }
 
     // Close button
     const closeBtn = document.createElement('button');
     closeBtn.innerHTML = '✕';
-    closeBtn.style.cssText = isMob
-        ? "position:fixed;top:14px;right:14px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:38px;width:64px;height:64px;border-radius:50%;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;line-height:1;"
-        : "position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;";
+    if (isMob) {
+        closeBtn.style.cssText = "position:fixed;top:14px;right:14px;background:rgba(255,255,255,0.2);border:none;color:#fff;font-size:38px;width:64px;height:64px;border-radius:50%;cursor:pointer;z-index:9999999999;display:flex;align-items:center;justify-content:center;line-height:1;";
+    } else {
+        closeBtn.style.cssText = "position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;";
+    }
     closeBtn.onclick = () => overlay.remove();
     box.appendChild(closeBtn);
 
