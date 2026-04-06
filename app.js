@@ -3550,19 +3550,19 @@ body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri',
 /* ── TOP HEADER ── */
 .top-bar{width:100%;background:linear-gradient(135deg,#1a2744 0%,#0d1829 100%);padding:1.1em 1.25em 0.9em;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid rgba(99,102,241,0.4);position:sticky;top:0;z-index:20;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
 .top-bar-logo{display:flex;flex-direction:column;gap:3px}
-.shop-name{font-size:1.625em;font-weight:800;color:#fff;letter-spacing:-0.3px}
-.shop-sub{font-size:0.875em;color:#6366f1;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
+.shop-name{font-size:2.2em;font-weight:800;color:#fff;letter-spacing:-0.3px}
+.shop-sub{font-size:1.2em;color:#6366f1;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
 .top-bar-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.order-label{font-size:0.8em;color:#64748b;letter-spacing:.5px;text-transform:uppercase}
-.order-num{font-size:1.375em;font-weight:800;color:#818cf8;letter-spacing:-0.5px}
+.order-label{font-size:1.1em;color:#64748b;letter-spacing:.5px;text-transform:uppercase}
+.order-num{font-size:1.9em;font-weight:800;color:#818cf8;letter-spacing:-0.5px}
 
 /* ── HERO STATUS BANNER ── */
 .hero-banner{width:100%;padding:1.375em 1.25em;background:${statusBg};border-bottom:2px solid ${statusColor};display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
 .hero-banner::before{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:${statusColor};opacity:0.06}
 .hero-banner::after{content:'';position:absolute;right:30px;bottom:-30px;width:70px;height:70px;border-radius:50%;background:${statusColor};opacity:0.04}
-.pay-label{font-size:0.875em;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:5px;font-weight:600}
-.pay-status{font-size:1.75em;font-weight:800;color:${statusColor};line-height:1}
-.status-badge{background:${statusColor};color:#fff;padding:0.625em 1.375em;border-radius:50px;font-size:1em;font-weight:800;white-space:nowrap;box-shadow:0 4px 15px ${statusColor}55;letter-spacing:.3px}
+.pay-label{font-size:1.2em;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:5px;font-weight:600}
+.pay-status{font-size:2.4em;font-weight:800;color:${statusColor};line-height:1}
+.status-badge{background:${statusColor};color:#fff;padding:0.8em 1.6em;border-radius:50px;font-size:1.35em;font-weight:800;white-space:nowrap;box-shadow:0 4px 15px ${statusColor}55;letter-spacing:.3px}
 
 /* ── PRODUCT HERO CARD ── */
 .prod-hero{width:100%;background:linear-gradient(180deg,#1a2744 0%,#111827 100%);border-bottom:1px solid #1e293b;position:relative}
@@ -3570,66 +3570,66 @@ body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri',
 .prod-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 .prod-img-placeholder{font-size:4.5em;display:flex;align-items:center;justify-content:center;height:220px;background:linear-gradient(135deg,#1e293b,#0f172a)}
 .prod-info-overlay{padding:1.125em 1.25em 1.375em;background:linear-gradient(180deg,transparent,#111827 30%)}
-.prod-cat-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(99,102,241,0.18);color:#818cf8;padding:0.375em 0.875em;border-radius:50px;font-size:0.875em;font-weight:700;margin-bottom:0.75em;border:1px solid rgba(99,102,241,0.25)}
-.prod-name{font-size:1.5em;font-weight:800;color:#f8fafc;line-height:1.35;margin-bottom:0.875em}
+.prod-cat-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(99,102,241,0.18);color:#818cf8;padding:0.5em 1.1em;border-radius:50px;font-size:1.2em;font-weight:700;margin-bottom:0.75em;border:1px solid rgba(99,102,241,0.25)}
+.prod-name{font-size:2em;font-weight:800;color:#f8fafc;line-height:1.35;margin-bottom:0.875em}
 .prod-chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.625em 0.875em;font-size:0.9em;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:80px;flex:1}
-.chip strong{color:#e2e8f0;font-size:1.125em;font-weight:700}
-.chip span{font-size:0.75em;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.8em 1em;font-size:1.15em;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:80px;flex:1}
+.chip strong{color:#e2e8f0;font-size:1.3em;font-weight:700}
+.chip span{font-size:0.95em;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
 
 /* ── SECTIONS ── */
 .page-body{padding:0 14px 110px}
 .section{background:#111827;border-radius:18px;margin-top:14px;border:1px solid #1e293b;overflow:hidden}
 .sec-head{padding:0.875em 1.125em;background:rgba(99,102,241,0.08);border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:10px}
 .sec-head-icon{width:2em;height:2em;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1em;flex-shrink:0}
-.sec-head-text{font-size:0.875em;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px}
+.sec-head-text{font-size:1.25em;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px}
 .info-row{display:flex;justify-content:space-between;align-items:center;padding:0.9375em 1.125em;border-bottom:1px solid rgba(30,41,59,0.8);gap:10px}
 .info-row:last-child{border-bottom:none}
-.ikey{font-size:1em;color:#64748b;flex-shrink:0;font-weight:500}
-.ival{font-size:1em;color:#e2e8f0;font-weight:700;text-align:right;word-break:break-word;max-width:62%}
+.ikey{font-size:1.35em;color:#64748b;flex-shrink:0;font-weight:500}
+.ival{font-size:1.35em;color:#e2e8f0;font-weight:700;text-align:right;word-break:break-word;max-width:62%}
 
 /* ── PRICE SECTION ── */
 .price-row{display:flex;justify-content:space-between;align-items:center;padding:0.9375em 1.125em;border-bottom:1px solid rgba(30,41,59,0.8)}
 .price-row:last-child{border-bottom:none}
-.plabel{font-size:1.0625em;color:#94a3b8;font-weight:500}
-.pamount{font-size:1.0625em;color:#e2e8f0;font-weight:700}
+.plabel{font-size:1.4em;color:#94a3b8;font-weight:500}
+.pamount{font-size:1.4em;color:#e2e8f0;font-weight:700}
 .price-row.disc .plabel,.price-row.disc .pamount{color:#f87171}
 .price-row.total-row{background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.1));border-top:2px solid rgba(99,102,241,0.35);padding:1.125em}
-.price-row.total-row .plabel{font-size:1.1875em;font-weight:800;color:#c7d2fe}
-.price-row.total-row .pamount{font-size:2em;font-weight:800;color:#818cf8;letter-spacing:-1px}
+.price-row.total-row .plabel{font-size:1.55em;font-weight:800;color:#c7d2fe}
+.price-row.total-row .pamount{font-size:2.6em;font-weight:800;color:#818cf8;letter-spacing:-1px}
 
 /* ── DELIVERY TRACK ── */
 .track-wrap{padding:1.125em}
-.track-title{font-size:0.875em;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:1.25em;display:flex;align-items:center;gap:8px}
+.track-title{font-size:1.2em;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:1.25em;display:flex;align-items:center;gap:8px}
 .track-steps{display:flex;justify-content:space-between;position:relative;padding:0 8px}
 .track-line{position:absolute;top:18px;left:30px;right:30px;height:3px;background:#1e293b;border-radius:2px;z-index:0}
 .track-line-fill{position:absolute;top:0;left:0;height:100%;border-radius:2px;background:linear-gradient(90deg,#10b981,#6366f1);transition:width .5s ease}
 .track-step{display:flex;flex-direction:column;align-items:center;gap:10px;z-index:1;flex:1;position:relative}
-.step-dot{width:2.25em;height:2.25em;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1em;border:2.5px solid #1e293b;background:#0d1829;transition:all .3s}
+.step-dot{width:3em;height:3em;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3em;border:2.5px solid #1e293b;background:#0d1829;transition:all .3s}
 .step-dot.done{background:#10b981;border-color:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,0.2)}
 .step-dot.active{background:linear-gradient(135deg,#6366f1,#818cf8);border-color:#818cf8;box-shadow:0 0 0 5px rgba(99,102,241,0.25),0 0 15px rgba(99,102,241,0.3)}
-.step-label{font-size:0.8125em;color:#475569;text-align:center;line-height:1.4;font-weight:600}
+.step-label{font-size:1.1em;color:#475569;text-align:center;line-height:1.4;font-weight:600}
 .step-label.done{color:#10b981}
 .step-label.active{color:#818cf8;font-weight:800}
-.rejected-box{margin-top:16px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:0.875em 1em;font-size:1em;color:#f87171;text-align:center;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+.rejected-box{margin-top:16px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:0.875em 1em;font-size:1.35em;color:#f87171;text-align:center;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
 
 /* ── NOTE BOX ── */
 .note-box{background:rgba(234,179,8,0.06);border:1px solid rgba(234,179,8,0.2);border-radius:14px;padding:1em 1.125em;margin-top:14px;display:flex;gap:12px;align-items:flex-start}
-.note-icon{width:2.25em;height:2.25em;border-radius:10px;background:rgba(234,179,8,0.12);display:flex;align-items:center;justify-content:center;font-size:1em;flex-shrink:0}
-.note-text{font-size:0.9375em;color:#fbbf24;line-height:1.6;font-weight:500}
+.note-icon{width:2.8em;height:2.8em;border-radius:10px;background:rgba(234,179,8,0.12);display:flex;align-items:center;justify-content:center;font-size:1.3em;flex-shrink:0}
+.note-text{font-size:1.3em;color:#fbbf24;line-height:1.6;font-weight:500}
 
 /* ── FOOTER BARCODE ── */
 .receipt-footer{padding:1.25em 1.125em 0.625em;text-align:center}
 .barcode-area{display:flex;flex-direction:column;align-items:center;margin-bottom:14px;gap:5px;background:#111827;border-radius:14px;padding:16px;border:1px solid #1e293b}
 .barcode-bars{display:flex;align-items:flex-end;gap:1px;height:36px}
-.barcode-id{font-size:0.8125em;color:#475569;letter-spacing:4px;margin-top:6px;font-weight:600}
-.footer-note{font-size:0.875em;color:#334155;line-height:1.8;font-weight:500}
-.footer-brand{font-size:1em;color:#475569;font-weight:700;margin-bottom:4px}
+.barcode-id{font-size:1.1em;color:#475569;letter-spacing:4px;margin-top:6px;font-weight:600}
+.footer-note{font-size:1.2em;color:#334155;line-height:1.8;font-weight:500}
+.footer-brand{font-size:1.4em;color:#475569;font-weight:700;margin-bottom:4px}
 
 /* ── STICKY ACTION BAR ── */
 .action-bar{position:fixed;bottom:0;left:0;right:0;padding:0.75em 1em 1.5em;background:linear-gradient(180deg,transparent,#070d1a 30%,#070d1a 100%);display:flex;gap:10px;z-index:30}
-.btn-print{flex:1;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;padding:1.125em;border-radius:16px;font-size:1.125em;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 25px rgba(99,102,241,0.4);letter-spacing:.3px}
-.btn-close{width:3.75em;height:3.75em;background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:16px;font-size:1.125em;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-print{flex:1;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;padding:1.5em;border-radius:16px;font-size:1.5em;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 25px rgba(99,102,241,0.4);letter-spacing:.3px}
+.btn-close{width:4.5em;height:4.5em;background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:16px;font-size:1.5em;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .btn-close:active,.btn-print:active{transform:scale(0.97)}
 
 /* ── PRINT ── */
@@ -4303,137 +4303,11 @@ function openReturnModal(orderId) {
     </div>
     <style>
         @keyframes modalPopUp { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
-        @keyframes mobileSlideUp { 0% { transform: translateY(100%); } 100% { transform: translateY(0); } }
         .custom-modal-body::-webkit-scrollbar { width: 4px; }
         .custom-modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
-        @media (max-width: 640px) {
-            /* ── Overlay: নিচ থেকে উঠবে, প্যাডিং শূন্য ── */
-            #returnModal {
-                padding: 0 !important;
-                align-items: flex-end !important;
-                background: rgba(0, 0, 0, 0.75) !important;
-            }
-
-            /* ── মূল কার্ড: পুরো প্রস্থ, নিচ থেকে উঠে আসা ── */
-            #returnModal > div {
-                max-width: 100% !important;
-                width: 100% !important;
-                max-height: 92vh !important;
-                border-radius: 24px 24px 0 0 !important;
-                animation: mobileSlideUp 0.38s cubic-bezier(0.25, 1.35, 0.45, 1) forwards !important;
-                border: none !important;
-                box-shadow: 0 -8px 50px rgba(0, 0, 0, 0.45) !important;
-            }
-
-            /* ── টপ ব্যানার ── */
-            #returnModal > div > div:first-child {
-                padding: 13px 20px !important;
-                border-radius: 0 !important;
-            }
-            #returnModal > div > div:first-child span {
-                font-size: 12px !important;
-            }
-
-            /* ── হেডার রো ── */
-            #returnModal > div > div:nth-child(2) {
-                padding: 16px 20px !important;
-            }
-            #returnModal > div > div:nth-child(2) h3 {
-                font-size: 19px !important;
-                font-weight: 900 !important;
-            }
-            #returnModal > div > div:nth-child(2) p {
-                font-size: 12px !important;
-            }
-            #returnModal > div > div:nth-child(2) > div:first-child > div:first-child {
-                width: 44px !important;
-                height: 44px !important;
-                border-radius: 14px !important;
-            }
-            #returnModal > div > div:nth-child(2) > div:first-child > div:first-child i {
-                font-size: 17px !important;
-            }
-            #returnModal > div > div:nth-child(2) button {
-                width: 36px !important;
-                height: 36px !important;
-                font-size: 22px !important;
-                border-radius: 50% !important;
-            }
-
-            /* ── বডি স্ক্রলএলাকা ── */
-            #returnModal .custom-modal-body {
-                padding: 20px 18px !important;
-                max-height: calc(92vh - 210px) !important;
-            }
-
-            /* ── লেবেল ── */
-            #returnModal label {
-                font-size: 14px !important;
-            }
-
-            /* ── Image input group ── */
-            #returnModal .img-input-group {
-                padding: 16px !important;
-                border-radius: 18px !important;
-            }
-            #returnModal .img-input-group > div > label {
-                font-size: 14px !important;
-                padding: 13px 16px !important;
-                border-radius: 14px !important;
-                gap: 10px !important;
-            }
-
-            /* ── Textarea ── */
-            #returnModal textarea {
-                height: 100px !important;
-                font-size: 15px !important;
-                padding: 14px !important;
-                border-radius: 16px !important;
-            }
-
-            /* ── Select & inputs ── */
-            #returnModal select,
-            #returnModal input[type="url"],
-            #returnModal input[type="number"] {
-                font-size: 15px !important;
-                padding: 14px 16px !important;
-                border-radius: 16px !important;
-            }
-
-            /* ── সাবমিট বাটন ── */
-            #returnModal button[onclick*="submitReturnRequest"] {
-                padding: 20px !important;
-                font-size: 17px !important;
-                border-radius: 18px !important;
-                letter-spacing: 0.4px !important;
-            }
-
-            /* ── ফুটার প্যাডিং ── */
-            #returnModal > div > div:last-child {
-                padding: 16px 18px 28px !important;
-            }
-        }
-
-        @keyframes mobileSlideUp {
-            0%   { opacity: 0; transform: translateY(60%); }
-            100% { opacity: 1; transform: translateY(0);   }
-        }
     </style>`;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-    // মোবাইলে পুরো স্ক্রিন জুড়ে দেখাবে
-    if (window.innerWidth <= 768) {
-        const overlay = document.getElementById('returnModal');
-        const inner = overlay ? overlay.firstElementChild : null;
-        if (overlay) {
-            overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; align-items:flex-end; justify-content:center; z-index:999999999; padding:0;';
-        }
-        if (inner) {
-            inner.style.cssText = 'background:#fff; width:100%; max-width:100%; height:95vh; max-height:95vh; border-radius:24px 24px 0 0; display:flex; flex-direction:column; box-shadow:0 -10px 40px rgba(0,0,0,0.3); position:relative; overflow:hidden; animation: mobileSlideUp 0.35s ease-out;';
-        }
-    }
 }
 
 // এই ফাংশনগুলো অবশ্যই openReturnModal এর বাইরে রাখবেন
