@@ -2673,7 +2673,7 @@ html.is-mobile .modal-overlay [class*="modal-box"] {
     overflow-y: auto !important;
 }
 
-/* ── userOrderModal মোবাইলে পুরো স্ক্রিন ── */
+/* ── userOrderModal — fullscreen mobile ── */
 #userOrderModal {
     align-items: flex-start !important;
     padding: 0 !important;
@@ -2683,11 +2683,28 @@ html.is-mobile .modal-overlay [class*="modal-box"] {
     height: 100% !important;
     max-width: 100% !important;
     max-height: 100% !important;
-    min-height: 100% !important;
     border-radius: 0 !important;
     border: none !important;
     margin: 0 !important;
     padding: 0 !important;
+}
+
+/* ── pmxUserDetailModal — fullscreen mobile ── */
+@media (max-width: 768px) {
+    #pmxUserDetailModal {
+        align-items: flex-start !important;
+        padding: 0 !important;
+    }
+    #pmxUserDetailModal > div {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        min-height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+    }
 }
 
 /* ── সব modal close বাটন ── */

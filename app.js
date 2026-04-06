@@ -2168,21 +2168,14 @@ function viewUserOrderDetails(orderId) {
     const discount = parseFloat(order.discountAmount) || 0;
     const total = parseFloat(order.price);
 
-    const isMobileView = window.innerWidth <= 768;
-    const _mW = isMobileView ? '100%' : '95%';
-    const _mH = isMobileView ? '100%' : '92%';
-    const _mMW = isMobileView ? '100%' : '600px';
-    const _mBR = isMobileView ? '0' : '25px';
-    const _mBD = isMobileView ? 'none' : '1px solid #3498db';
-    const _mAL = isMobileView ? 'flex-start' : 'center';
     const modalHtml = `
-        <div id="userOrderModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:${_mAL}; justify-content:center; z-index:10000000; backdrop-filter: blur(8px); font-family: 'Hind Siliguri', sans-serif;">
-            <div style="background:#fff; width:${_mW}; height:${_mH}; max-width:${_mMW}; border-radius:${_mBR}; overflow:hidden; display:flex; flex-direction:column; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border:${_mBD}; animation: zoomIn 0.3s ease;">
+        <div id="userOrderModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:center; z-index:10000000; backdrop-filter: blur(8px); font-family: 'Hind Siliguri', sans-serif;">
+            <div style="background:#fff; width:95%; height:92%; max-width:600px; border-radius:25px; overflow:hidden; display:flex; flex-direction:column; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border:1px solid #3498db; animation: zoomIn 0.3s ease;">
                 
                 <div style="background:#3498db; color:white; padding:20px; text-align:center; position:relative;">
-                    <h3 style="margin:0; font-size:24px;">অর্ডার ডিটেইলস ও ট্র্যাকিং</h3>
-                    <p style="margin:5px 0 0; opacity:0.8; font-size:17px;">অর্ডার আইডি: #${order.id}</p>
-                    <span onclick="document.getElementById('userOrderModal').remove()" style="position:absolute; top:15px; right:20px; cursor:pointer; font-size:46px; line-height:1;">&times;</span>
+                    <h3 style="margin:0; font-size:18px;">অর্ডার ডিটেইলস ও ট্র্যাকিং</h3>
+                    <p style="margin:5px 0 0; opacity:0.8; font-size:12px;">অর্ডার আইডি: #${order.id}</p>
+                    <span onclick="document.getElementById('userOrderModal').remove()" style="position:absolute; top:15px; right:20px; cursor:pointer; font-size:28px; line-height:1;">&times;</span>
                 </div>
 
                 <div id="userModalBody" style="flex:1; overflow-y:auto; padding:15px; background:#f8fafc;">
@@ -2190,21 +2183,21 @@ function viewUserOrderDetails(orderId) {
                     <div style="background:#fff; border-radius:20px; padding:20px; margin-bottom:20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border:1px solid #e2e8f0;">
                         <div style="display:flex; gap:15px; margin-bottom:15px; border-bottom:1px dashed #cbd5e1; padding-bottom:15px;">
                             <div style="position:relative; cursor:pointer;" onclick="document.getElementById('userOrderModal').remove(); openProductDetails('${productId}')">
-                                <img src="${productImage}" onerror="this.src='https://via.placeholder.com/150'" alt="Product" style="width:130px; height:130px; object-fit:contain; border-radius:15px; border:2px solid #3498db; background:#f1f5f9;">
-                                <div style="position:absolute; bottom:0; width:100%; background:rgba(52, 152, 219, 0.9); color:white; font-size:14px; text-align:center; border-radius:0 0 15px 15px; padding:7px 0; font-weight:bold;">বিস্তারিত দেখুন</div>
+                                <img src="${productImage}" onerror="this.src='https://via.placeholder.com/150'" alt="Product" style="width:100px; height:100px; object-fit:contain; border-radius:15px; border:2px solid #3498db; background:#f1f5f9;">
+                                <div style="position:absolute; bottom:0; width:100%; background:rgba(52, 152, 219, 0.9); color:white; font-size:10px; text-align:center; border-radius:0 0 15px 15px; padding:4px 0; font-weight:bold;">বিস্তারিত দেখুন</div>
                             </div>
                             <div style="flex:1;">
-                                <h4 style="margin:0 0 8px 0; color:#1e293b; font-size:22px; line-height:1.3;">${order.productName || 'পণ্যটির নাম পাওয়া যায়নি'}</h4>
+                                <h4 style="margin:0 0 8px 0; color:#1e293b; font-size:17px; line-height:1.3;">${order.productName || 'পণ্যটির নাম পাওয়া যায়নি'}</h4>
                                 <div style="margin-bottom:10px;">
-                                    <span style="background:#dcfce7; color:#166534; padding:6px 14px; border-radius:20px; font-size:16px; font-weight:bold; border:1px solid #bdf0d2;">
+                                    <span style="background:#dcfce7; color:#166534; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; border:1px solid #bdf0d2;">
                                         পেমেন্ট: ${order.paymentStatus}
                                     </span>
                                 </div>
-                                <p style="margin:0; font-size:18px; color:#64748b;">পরিমাণ: ${order.orderQty || 1} পিস</p>
+                                <p style="margin:0; font-size:13px; color:#64748b;">পরিমাণ: ${order.orderQty || 1} পিস</p>
                             </div>
                         </div>
 
-                        <div style="display:flex; flex-direction:column; gap:12px; font-size:19px; color:#475569;">
+                        <div style="display:flex; flex-direction:column; gap:8px; font-size:14px; color:#475569;">
                             <div style="display:flex; justify-content:space-between;">
                                 <span>পণ্যের দাম:</span>
                                 <span>৳${itemPrice.toFixed(2)}</span>
@@ -2217,21 +2210,21 @@ function viewUserOrderDetails(orderId) {
                                 <span>ডিসকাউন্ট:</span>
                                 <span>- ৳${discount.toFixed(2)}</span>
                             </div>
-                            <div style="display:flex; justify-content:space-between; margin-top:5px; padding-top:12px; border-top:2px solid #3498db; color:#1e293b; font-weight:bold; font-size:24px;">
+                            <div style="display:flex; justify-content:space-between; margin-top:5px; padding-top:10px; border-top:2px solid #3498db; color:#1e293b; font-weight:bold; font-size:18px;">
                                 <span>সর্বমোট মূল্য:</span>
                                 <span style="color:#3498db;">৳${total.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
 
-                    <h4 style="margin:25px 0 15px 5px; color:#1e293b; font-size:21px; display:flex; align-items:center; gap:10px;">
+                    <h4 style="margin:25px 0 15px 5px; color:#1e293b; font-size:16px; display:flex; align-items:center; gap:10px;">
                         <i class="fas fa-truck-fast" style="color:#3498db;"></i> অর্ডার আপডেট হিস্টোরি
                     </h4>
                     <div style="display:flex; flex-direction:column; padding-left:5px; margin-bottom:20px;">
                         ${history.map((item, index) => `
                             <div style="display:flex; gap:15px;">
                                 <div style="display:flex; flex-direction:column; align-items:center; min-width:40px;">
-                                    <div style="width:42px; height:42px; background:${index === 0 ? '#3498db' : '#fff'}; color:${index === 0 ? 'white' : '#3498db'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:19px; z-index:2; border:2px solid #3498db;">
+                                    <div style="width:30px; height:30px; background:${index === 0 ? '#3498db' : '#fff'}; color:${index === 0 ? 'white' : '#3498db'}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; z-index:2; border:2px solid #3498db;">
                                         <i class="fas ${item.icon || 'fa-check'}"></i>
                                     </div>
                                     ${index !== history.length - 1 ? '<div style="width:2px; flex:1; background:#3498db; opacity:0.2; margin:2px 0;"></div>' : ''}
@@ -2239,10 +2232,10 @@ function viewUserOrderDetails(orderId) {
                                 <div style="flex:1; padding-bottom:20px;">
                                     <div style="background:${index === 0 ? '#fff9c4' : '#fff'}; padding:15px; border-radius:15px; border:1px solid ${index === 0 ? '#fbc02d' : '#e2e8f0'}; position:relative;">
                                         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                                            <strong style="color:#1e293b; font-size:19px;">${item.status}</strong>
-                                            <small style="color:#94a3b8; font-size:15px;">${item.time}</small>
+                                            <strong style="color:#1e293b; font-size:14px;">${item.status}</strong>
+                                            <small style="color:#94a3b8; font-size:10px;">${item.time}</small>
                                         </div>
-                                        <p style="margin:0; font-size:17px; color:#475569; line-height:1.6;">${item.comment}</p>
+                                        <p style="margin:0; font-size:13px; color:#475569; line-height:1.5;">${item.comment}</p>
                                     </div>
                                 </div>
                             </div>
@@ -2251,14 +2244,14 @@ function viewUserOrderDetails(orderId) {
 
                     <hr style="border:0; border-top:1px solid #e2e8f0; margin:20px 0;">
                     
-                    <h4 style="margin:0 0 15px 5px; color:#1e293b; font-size:21px; display:flex; align-items:center; gap:10px;">
+                    <h4 style="margin:0 0 15px 5px; color:#1e293b; font-size:16px; display:flex; align-items:center; gap:10px;">
                         <i class="fas fa-comments" style="color:#3498db;"></i> মেসেজ এবং সাপোর্ট
                     </h4>
 
                     <div style="background:#fff; border-radius:20px; padding:15px; border:1px solid #3498db; margin-bottom:20px;">
                         <div style="display:flex; gap:10px; margin-bottom:15px;">
-                            <input id="userCommentInput" type="text" placeholder="অর্ডার নিয়ে কিছু লিখুন..." style="flex:1; padding:16px; border-radius:12px; border:1px solid #ddd; outline:none; font-size:19px;">
-                            <button onclick="saveUserComment('${order.id}')" style="background:#3498db; color:white; border:none; width:60px; height:60px; border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:22px;">
+                            <input id="userCommentInput" type="text" placeholder="অর্ডার নিয়ে কিছু লিখুন..." style="flex:1; padding:12px; border-radius:12px; border:1px solid #ddd; outline:none; font-size:14px;">
+                            <button onclick="saveUserComment('${order.id}')" style="background:#3498db; color:white; border:none; width:45px; height:45px; border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
@@ -2274,21 +2267,21 @@ function viewUserOrderDetails(orderId) {
                                                     border-radius: ${isAdmin ? '15px 15px 15px 0' : '15px 15px 0 15px'}; 
                                                     border: 1px solid ${isAdmin ? '#e2e8f0' : '#bae6fd'};
                                                     position: relative;">
-                                            <small style="display:block; font-size:14px; font-weight:bold; margin-bottom:4px; color:${isAdmin ? '#64748b' : '#0ea5e9'};">
+                                            <small style="display:block; font-size:9px; font-weight:bold; margin-bottom:3px; color:${isAdmin ? '#64748b' : '#0ea5e9'};">
                                                 ${isAdmin ? 'Digital Shop TM (Admin)' : 'আপনি'}
                                             </small>
-                                            <p style="margin:0; font-size:18px;">${c.text}</p>
-                                            <small style="display:block; text-align:right; font-size:13px; color:#94a3b8; margin-top:5px;">${c.time}</small>
+                                            <p style="margin:0; font-size:13px;">${c.text}</p>
+                                            <small style="display:block; text-align:right; font-size:8px; color:#94a3b8; margin-top:4px;">${c.time}</small>
                                         </div>
                                     </div>
                                 `;
-                            }).join('') : '<p style="text-align:center; color:#94a3b8; font-size:17px; margin:10px 0;">কোনো মেসেজ নেই</p>'}
+                            }).join('') : '<p style="text-align:center; color:#94a3b8; font-size:12px; margin:10px 0;">কোনো মেসেজ নেই</p>'}
                         </div>
                     </div>
                 </div>
 
                 <div style="padding:15px; background:#fff; text-align:center; border-top:1px solid #e2e8f0;">
-                    <button onclick="document.getElementById('userOrderModal').remove()" style="width:100%; padding:22px; background:#3498db; color:white; border:none; border-radius:15px; font-weight:bold; cursor:pointer; font-size:24px;">বন্ধ করুন</button>
+                    <button onclick="document.getElementById('userOrderModal').remove()" style="width:100%; padding:14px; background:#3498db; color:white; border:none; border-radius:15px; font-weight:bold; cursor:pointer; font-size:16px;">বন্ধ করুন</button>
                 </div>
             </div>
         </div>
@@ -13073,34 +13066,35 @@ function _pmxRenderUserDetailModal(o) {
     const comments = o.comments || [];
     const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
     const statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
+    const _pmxMobile = window.innerWidth <= 768;
     document.body.insertAdjacentHTML('beforeend', `
-    <div id="pmxUserDetailModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999999999;display:flex;align-items:center;justify-content:center;font-family:'Hind Siliguri',sans-serif;">
-        <div style="background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;border:1px solid #334155;position:relative;">
-            <button onclick="document.getElementById('pmxUserDetailModal').remove()" style="position:absolute;top:12px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;">✕</button>
-            ${o.img ? `<img src="${o.img}" style="width:100%;max-height:160px;object-fit:fill;border-radius:10px;margin-bottom:14px;" onerror="this.style.display='none'">` : ''}
-            <div style="background:#0f172a;border-radius:10px;padding:14px;margin-bottom:14px;">
-                <div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:4px;">${o.productName}</div>
-                <div style="color:#10b981;font-size:15px;font-weight:700;margin-bottom:8px;">৳${o.price}</div>
-                <div style="color:#94a3b8;font-size:13px;margin-bottom:10px;">${o.desc||''}</div>
+    <div id="pmxUserDetailModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999999999;display:flex;align-items:${_pmxMobile?'flex-start':'center'};justify-content:center;font-family:'Hind Siliguri',sans-serif;">
+        <div style="background:#1e293b;border-radius:${_pmxMobile?'0':'20px'};padding:22px;width:100%;max-width:${_pmxMobile?'100%':'520px'};height:${_pmxMobile?'100%':'auto'};max-height:${_pmxMobile?'100%':'90vh'};overflow-y:auto;border:${_pmxMobile?'none':'1px solid #334155'};position:relative;box-sizing:border-box;">
+            <button onclick="document.getElementById('pmxUserDetailModal').remove()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:32px;width:52px;height:52px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+            ${o.img ? `<img src="${o.img}" style="width:100%;max-height:200px;object-fit:fill;border-radius:12px;margin-bottom:18px;" onerror="this.style.display='none'">` : ''}
+            <div style="background:#0f172a;border-radius:12px;padding:18px;margin-bottom:18px;">
+                <div style="color:#fff;font-size:22px;font-weight:700;margin-bottom:8px;">${o.productName}</div>
+                <div style="color:#10b981;font-size:22px;font-weight:700;margin-bottom:10px;">৳${o.price}</div>
+                <div style="color:#94a3b8;font-size:18px;margin-bottom:14px;">${o.desc||''}</div>
                 <!-- User info -->
-                <div style="background:rgba(99,102,241,0.1);border-radius:8px;padding:10px;margin-bottom:10px;border-left:3px solid #6366f1;">
+                <div style="background:rgba(99,102,241,0.1);border-radius:10px;padding:14px;margin-bottom:14px;border-left:4px solid #6366f1;">
                     ${o.extraFields && Object.keys(o.extraFields).length
                         ? Object.entries(o.extraFields).map(([k,v]) => `
-                            <div style="color:#94a3b8;font-size:12px;margin-bottom:4px;">📝 ${k}: <span style="color:#e2e8f0;font-weight:700;">${v||'-'}</span></div>`).join('')
-                        : `${o.userId ? `<div style="color:#94a3b8;font-size:12px;">🆔 আইডি/মোবাইল/লিংক: <span style="color:#e2e8f0;">${o.userId}</span></div>` : ''}
-                           ${o.userMobile ? `<div style="color:#94a3b8;font-size:12px;margin-top:3px;">📱 মোবাইল: <span style="color:#e2e8f0;">${o.userMobile}</span></div>` : ''}`
+                            <div style="color:#94a3b8;font-size:17px;margin-bottom:7px;">📝 ${k}: <span style="color:#e2e8f0;font-weight:700;">${v||'-'}</span></div>`).join('')
+                        : `${o.userId ? `<div style="color:#94a3b8;font-size:17px;">🆔 আইডি/মোবাইল/লিংক: <span style="color:#e2e8f0;">${o.userId}</span></div>` : ''}
+                           ${o.userMobile ? `<div style="color:#94a3b8;font-size:17px;margin-top:6px;">📱 মোবাইল: <span style="color:#e2e8f0;">${o.userMobile}</span></div>` : ''}`
                     }
                 </div>
                 <!-- Status -->
-                <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;">${statusLabels[o.status]||o.status}</span>
+                <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:8px 20px;border-radius:20px;font-size:18px;font-weight:700;">${statusLabels[o.status]||o.status}</span>
             </div>
             <!-- Comment section -->
-            <div style="background:#0f172a;border-radius:10px;padding:14px;">
-                <div style="color:#a78bfa;font-weight:700;margin-bottom:10px;">💬 Admin এর সাথে যোগাযোগ</div>
-                <div id="pmxUserComments" style="max-height:180px;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column-reverse;">${pmxRenderComments(comments)}</div>
-                <div style="display:flex;gap:8px;">
-                    <input id="pmxUserComment" placeholder="মেসেজ লিখুন..." style="flex:1;padding:8px;border-radius:8px;border:1px solid #374151;background:#1e293b;color:#fff;font-family:'Hind Siliguri',sans-serif;">
-                    <button onclick="pmxAddComment('${o.id}','user')" style="background:#10b981;color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;">পাঠান</button>
+            <div style="background:#0f172a;border-radius:12px;padding:18px;">
+                <div style="color:#a78bfa;font-weight:700;margin-bottom:14px;font-size:20px;">💬 Admin এর সাথে যোগাযোগ</div>
+                <div id="pmxUserComments" style="max-height:220px;overflow-y:auto;margin-bottom:16px;display:flex;flex-direction:column-reverse;">${pmxRenderComments(comments)}</div>
+                <div style="display:flex;gap:10px;">
+                    <input id="pmxUserComment" placeholder="মেসেজ লিখুন..." style="flex:1;padding:16px;border-radius:10px;border:1px solid #374151;background:#1e293b;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:18px;">
+                    <button onclick="pmxAddComment('${o.id}','user')" style="background:#10b981;color:#fff;border:none;padding:16px 24px;border-radius:10px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-size:20px;font-weight:700;">পাঠান</button>
                 </div>
             </div>
         </div>
