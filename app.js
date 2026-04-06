@@ -4228,7 +4228,7 @@ function openReturnModal(orderId) {
                         <p style="margin:0; font-size:${isMobileReturn ? '20px' : '10px'}; color:#94a3b8; font-weight:600; margin-top:4px;">অর্ডার: #${orderId}</p>
                     </div>
                 </div>
-                <button onclick="document.getElementById('returnModal').remove()" style="width:${isMobileReturn ? '60px' : '30px'}; height:${isMobileReturn ? '60px' : '30px'}; background:#f1f5f9; border:none; border-radius:50%; cursor:pointer; color:#64748b; font-size:${isMobileReturn ? '36px' : '18px'}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">&times;</button>
+                <button onclick="document.getElementById('returnModal').remove()" style="width:${isMobileReturn ? '90px' : '30px'}; height:${isMobileReturn ? '90px' : '30px'}; background:#fee2e2; border:none; border-radius:50%; cursor:pointer; color:#ef4444; font-size:${isMobileReturn ? '56px' : '18px'}; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-weight:900; line-height:1;">&times;</button>
             </div>
 
             <!-- বডি -->
@@ -4289,19 +4289,25 @@ function openReturnModal(orderId) {
                 <!-- রিফান্ড মাধ্যম -->
                 <div style="margin-bottom:${isMobileReturn ? '36px' : '20px'};">
                     <label style="display:block; margin-bottom:${isMobileReturn ? '16px' : '8px'}; font-size:${isMobileReturn ? '26px' : '13px'}; font-weight:700; color:#334155;">রিফান্ড মাধ্যম</label>
-                    <select id="refundMethod" onchange="toggleRefundFields()" style="width:100%; padding:${isMobileReturn ? '24px 20px' : '14px'}; border:2px solid #f1f5f9; border-radius:20px; background:#f8fafc; font-size:${isMobileReturn ? '24px' : '14px'}; font-weight:700;">
-                        <option value="voucher">🎁 শপিং ভাউচার</option>
-                        <option value="payment">📱 পার্সোনাল পেমেন্ট</option>
-                    </select>
+                    <div style="position:relative; width:100%;">
+                        <select id="refundMethod" onchange="toggleRefundFields()" style="width:100%; padding:${isMobileReturn ? '28px 80px 28px 24px' : '14px'}; border:2px solid #c7d2fe; border-radius:20px; background:#f8fafc; font-size:${isMobileReturn ? '26px' : '14px'}; font-weight:700; color:#1e293b; appearance:none; -webkit-appearance:none; -moz-appearance:none; cursor:pointer; outline:none;">
+                            <option value="voucher">🎁 শপিং ভাউচার</option>
+                            <option value="payment">📱 পার্সোনাল পেমেন্ট</option>
+                        </select>
+                        <div style="pointer-events:none; position:absolute; right:${isMobileReturn ? '20px' : '12px'}; top:50%; transform:translateY(-50%); font-size:${isMobileReturn ? '36px' : '18px'}; color:#6366f1; line-height:1;">▾</div>
+                    </div>
                 </div>
 
                 <!-- পেমেন্ট ফিল্ড -->
                 <div id="paymentFields" style="display:none; background:#eff6ff; padding:${isMobileReturn ? '26px' : '15px'}; border-radius:24px; border:1px solid #bfdbfe; margin-bottom:${isMobileReturn ? '26px' : '15px'};">
-                    <select id="paymentType" style="width:100%; padding:${isMobileReturn ? '22px 20px' : '10px'}; border-radius:16px; border:1.5px solid #fff; margin-bottom:${isMobileReturn ? '16px' : '10px'}; font-size:${isMobileReturn ? '22px' : '14px'}; font-weight:600;">
-                        <option value="Bkash">বিকাশ (bKash)</option>
-                        <option value="Nagad">নগদ (Nagad)</option>
-                    </select>
-                    <input type="number" id="refundNumber" placeholder="নম্বর দিন" style="width:100%; padding:${isMobileReturn ? '22px 20px' : '12px'}; border-radius:16px; border:1.5px solid #fff; box-sizing:border-box; font-size:${isMobileReturn ? '22px' : '14px'};">
+                    <div style="position:relative; width:100%; margin-bottom:${isMobileReturn ? '18px' : '10px'};">
+                        <select id="paymentType" style="width:100%; padding:${isMobileReturn ? '26px 80px 26px 22px' : '10px'}; border-radius:16px; border:2px solid #bfdbfe; background:#fff; font-size:${isMobileReturn ? '26px' : '14px'}; font-weight:700; color:#1e293b; appearance:none; -webkit-appearance:none; -moz-appearance:none; cursor:pointer; outline:none; box-sizing:border-box;">
+                            <option value="Bkash">বিকাশ (bKash)</option>
+                            <option value="Nagad">নগদ (Nagad)</option>
+                        </select>
+                        <div style="pointer-events:none; position:absolute; right:${isMobileReturn ? '20px' : '12px'}; top:50%; transform:translateY(-50%); font-size:${isMobileReturn ? '36px' : '18px'}; color:#6366f1; line-height:1;">▾</div>
+                    </div>
+                    <input type="number" id="refundNumber" placeholder="নম্বর দিন" style="width:100%; padding:${isMobileReturn ? '26px 22px' : '12px'}; border-radius:16px; border:2px solid #bfdbfe; box-sizing:border-box; font-size:${isMobileReturn ? '26px' : '14px'}; background:#fff; outline:none;">
                 </div>
             </div>
 
