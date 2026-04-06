@@ -13061,55 +13061,134 @@ function pmxOpenUserOrderDetail(orderId) {
 }
 function _pmxRenderUserDetailModal(o) {
     if (!o) return;
-    const el = document.getElementById('pmxUserDetailModal');
-    if (el) el.remove();
-    const comments = o.comments || [];
-    const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
-    const statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
-    const _pmxMobile = window.innerWidth <= 768;
-    // মোবাইলে পুরো স্ক্রিন — font/button সব বড়
-    const _mFS = _pmxMobile ? 'font-size:30px' : 'font-size:14px';
-    const _mFS2 = _pmxMobile ? '28px' : '17px';
-    const _mFS3 = _pmxMobile ? '26px' : '15px';
-    const _mPad = _pmxMobile ? '22px 20px' : '18px';
-    const _mPad2 = _pmxMobile ? '20px 28px' : '8px 20px';
-    const _mBtn = _pmxMobile ? 'padding:22px 36px;font-size:30px;border-radius:16px;' : 'padding:16px 24px;font-size:20px;border-radius:10px;';
-    const _mInp = _pmxMobile ? 'padding:22px 18px;font-size:28px;border-radius:14px;' : 'padding:16px;font-size:18px;border-radius:10px;';
-    const _mCloseSize = _pmxMobile ? '72px' : '52px';
-    const _mCloseFSize = _pmxMobile ? '42px' : '32px';
-    const _mImgH = _pmxMobile ? '260px' : '200px';
-    document.body.insertAdjacentHTML('beforeend', `
-    <div id="pmxUserDetailModal" style="position:fixed;inset:0;width:100vw;height:100vh;background:rgba(0,0,0,0.97);z-index:9999999999;display:flex;align-items:${_pmxMobile?'flex-start':'center'};justify-content:center;font-family:'Hind Siliguri',sans-serif;overflow:hidden;">
-        <div style="background:#1e293b;border-radius:${_pmxMobile?'0':'20px'};padding:${_pmxMobile?'90px 22px 40px 22px':'22px'};width:${_pmxMobile?'100vw':'100%'};max-width:${_pmxMobile?'100%':'520px'};height:${_pmxMobile?'100vh':'auto'};max-height:${_pmxMobile?'100vh':'90vh'};overflow-y:auto;border:${_pmxMobile?'none':'1px solid #334155'};position:relative;box-sizing:border-box;">
-            <button onclick="document.getElementById('pmxUserDetailModal').remove()" style="position:fixed;top:14px;right:14px;background:rgba(255,255,255,0.18);border:none;color:#fff;font-size:${_mCloseFSize};width:${_mCloseSize};height:${_mCloseSize};border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:99999999999;line-height:1;">✕</button>
-            ${o.img ? `<img src="${o.img}" style="width:100%;max-height:${_mImgH};object-fit:fill;border-radius:${_pmxMobile?'16px':'12px'};margin-bottom:${_pmxMobile?'24px':'18px'};" onerror="this.style.display='none'">` : ''}
-            <div style="background:#0f172a;border-radius:${_pmxMobile?'18px':'12px'};padding:${_mPad};margin-bottom:${_pmxMobile?'22px':'18px'};">
-                <div style="color:#fff;font-size:${_pmxMobile?'32px':'22px'};font-weight:700;margin-bottom:${_pmxMobile?'12px':'8px'};line-height:1.4;">${o.productName}</div>
-                <div style="color:#10b981;font-size:${_pmxMobile?'32px':'22px'};font-weight:700;margin-bottom:${_pmxMobile?'14px':'10px'};">৳${o.price}</div>
-                <div style="color:#94a3b8;font-size:${_mFS2};margin-bottom:${_pmxMobile?'18px':'14px'};line-height:1.6;">${o.desc||''}</div>
-                <!-- User info -->
-                <div style="background:rgba(99,102,241,0.1);border-radius:${_pmxMobile?'14px':'10px'};padding:${_pmxMobile?'18px':'14px'};margin-bottom:${_pmxMobile?'18px':'14px'};border-left:${_pmxMobile?'6px':'4px'} solid #6366f1;">
-                    ${o.extraFields && Object.keys(o.extraFields).length
-                        ? Object.entries(o.extraFields).map(([k,v]) => `
-                            <div style="color:#94a3b8;font-size:${_mFS2};margin-bottom:${_pmxMobile?'10px':'7px'};">📝 ${k}: <span style="color:#e2e8f0;font-weight:700;">${v||'-'}</span></div>`).join('')
-                        : `${o.userId ? `<div style="color:#94a3b8;font-size:${_mFS2};">🆔 আইডি/মোবাইল/লিংক: <span style="color:#e2e8f0;">${o.userId}</span></div>` : ''}
-                           ${o.userMobile ? `<div style="color:#94a3b8;font-size:${_mFS2};margin-top:${_pmxMobile?'10px':'6px'};">📱 মোবাইল: <span style="color:#e2e8f0;">${o.userMobile}</span></div>` : ''}`
-                    }
-                </div>
-                <!-- Status -->
-                <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:${_mPad2};border-radius:${_pmxMobile?'24px':'20px'};font-size:${_mFS2};font-weight:700;display:inline-block;">${statusLabels[o.status]||o.status}</span>
-            </div>
-            <!-- Comment section -->
-            <div style="background:#0f172a;border-radius:${_pmxMobile?'18px':'12px'};padding:${_mPad};">
-                <div style="color:#a78bfa;font-weight:700;margin-bottom:${_pmxMobile?'18px':'14px'};font-size:${_pmxMobile?'28px':'20px'};">💬 Admin এর সাথে যোগাযোগ</div>
-                <div id="pmxUserComments" style="max-height:${_pmxMobile?'300px':'220px'};overflow-y:auto;margin-bottom:${_pmxMobile?'20px':'16px'};display:flex;flex-direction:column-reverse;">${pmxRenderComments(comments)}</div>
-                <div style="display:flex;gap:${_pmxMobile?'12px':'10px'};">
-                    <input id="pmxUserComment" placeholder="মেসেজ লিখুন..." style="flex:1;${_mInp};border:${_pmxMobile?'2px':'1px'} solid #374151;background:#1e293b;color:#fff;font-family:'Hind Siliguri',sans-serif;">
-                    <button onclick="pmxAddComment('${o.id}','user')" style="background:#10b981;color:#fff;border:none;${_mBtn};cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-weight:700;white-space:nowrap;">পাঠান</button>
-                </div>
-            </div>
-        </div>
-    </div>`);
+    var _el = document.getElementById('pmxUserDetailModal');
+    if (_el) _el.remove();
+    var comments = o.comments || [];
+    var statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
+    var statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
+    var M = window.innerWidth <= 900; // মোবাইল?
+
+    // ── Overlay ──
+    var overlay = document.createElement('div');
+    overlay.id = 'pmxUserDetailModal';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:' + (M ? '#1e293b' : 'rgba(0,0,0,0.92)') + ';z-index:9999999999;display:flex;align-items:' + (M ? 'flex-start' : 'center') + ';justify-content:center;font-family:\'Hind Siliguri\',sans-serif;overflow:hidden;';
+
+    // ── Inner box ──
+    var box = document.createElement('div');
+    if (M) {
+        box.style.cssText = 'background:#1e293b;width:100%;height:100%;overflow-y:auto;padding:80px 18px 40px 18px;box-sizing:border-box;position:relative;';
+    } else {
+        box.style.cssText = 'background:#1e293b;border-radius:20px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;padding:22px;border:1px solid #334155;position:relative;box-sizing:border-box;';
+    }
+
+    // ── Close button ──
+    var closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    closeBtn.onclick = function() { overlay.remove(); };
+    if (M) {
+        closeBtn.style.cssText = 'position:fixed;top:12px;right:12px;background:rgba(30,41,59,0.95);border:2px solid #475569;color:#fff;font-size:36px;width:64px;height:64px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:99999999999;line-height:1;';
+    } else {
+        closeBtn.style.cssText = 'position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:18px;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:9;';
+    }
+    box.appendChild(closeBtn);
+
+    // ── Image ──
+    if (o.img) {
+        var img = document.createElement('img');
+        img.src = o.img;
+        img.onerror = function() { img.style.display = 'none'; };
+        img.style.cssText = 'width:100%;max-height:' + (M ? '280px' : '200px') + ';object-fit:fill;border-radius:' + (M ? '18px' : '12px') + ';margin-bottom:' + (M ? '24px' : '18px') + ';display:block;';
+        box.appendChild(img);
+    }
+
+    // ── Info card ──
+    var infoCard = document.createElement('div');
+    infoCard.style.cssText = 'background:#0f172a;border-radius:' + (M ? '18px' : '12px') + ';padding:' + (M ? '22px 20px' : '18px') + ';margin-bottom:' + (M ? '22px' : '18px') + ';';
+
+    var nameEl = document.createElement('div');
+    nameEl.style.cssText = 'color:#fff;font-size:' + (M ? '30px' : '22px') + ';font-weight:700;margin-bottom:' + (M ? '12px' : '8px') + ';line-height:1.4;';
+    nameEl.textContent = o.productName || '';
+    infoCard.appendChild(nameEl);
+
+    var priceEl = document.createElement('div');
+    priceEl.style.cssText = 'color:#10b981;font-size:' + (M ? '30px' : '22px') + ';font-weight:700;margin-bottom:' + (M ? '14px' : '10px') + ';';
+    priceEl.textContent = '৳' + (o.price || '');
+    infoCard.appendChild(priceEl);
+
+    if (o.desc) {
+        var descEl = document.createElement('div');
+        descEl.style.cssText = 'color:#94a3b8;font-size:' + (M ? '26px' : '15px') + ';margin-bottom:' + (M ? '18px' : '14px') + ';line-height:1.6;';
+        descEl.textContent = o.desc;
+        infoCard.appendChild(descEl);
+    }
+
+    // User fields
+    var userBox = document.createElement('div');
+    userBox.style.cssText = 'background:rgba(99,102,241,0.12);border-radius:' + (M ? '14px' : '10px') + ';padding:' + (M ? '18px' : '14px') + ';margin-bottom:' + (M ? '18px' : '14px') + ';border-left:' + (M ? '6px' : '4px') + ' solid #6366f1;';
+    if (o.extraFields && Object.keys(o.extraFields).length) {
+        Object.entries(o.extraFields).forEach(function(entry) {
+            var row = document.createElement('div');
+            row.style.cssText = 'color:#94a3b8;font-size:' + (M ? '26px' : '17px') + ';margin-bottom:' + (M ? '10px' : '7px') + ';';
+            row.innerHTML = '📝 ' + entry[0] + ': <span style="color:#e2e8f0;font-weight:700;">' + (entry[1] || '-') + '</span>';
+            userBox.appendChild(row);
+        });
+    } else {
+        if (o.userId) {
+            var r1 = document.createElement('div');
+            r1.style.cssText = 'color:#94a3b8;font-size:' + (M ? '26px' : '17px') + ';margin-bottom:' + (M ? '10px' : '6px') + ';';
+            r1.innerHTML = '🆔 আইডি/মোবাইল/লিংক: <span style="color:#e2e8f0;">' + o.userId + '</span>';
+            userBox.appendChild(r1);
+        }
+        if (o.userMobile) {
+            var r2 = document.createElement('div');
+            r2.style.cssText = 'color:#94a3b8;font-size:' + (M ? '26px' : '17px') + ';';
+            r2.innerHTML = '📱 মোবাইল: <span style="color:#e2e8f0;">' + o.userMobile + '</span>';
+            userBox.appendChild(r2);
+        }
+    }
+    infoCard.appendChild(userBox);
+
+    var statusBadge = document.createElement('span');
+    statusBadge.style.cssText = 'background:' + (statusColors[o.status] || '#374151') + ';color:#fff;padding:' + (M ? '12px 28px' : '8px 20px') + ';border-radius:' + (M ? '28px' : '20px') + ';font-size:' + (M ? '26px' : '18px') + ';font-weight:700;display:inline-block;';
+    statusBadge.textContent = statusLabels[o.status] || o.status;
+    infoCard.appendChild(statusBadge);
+    box.appendChild(infoCard);
+
+    // ── Comment section ──
+    var chatBox = document.createElement('div');
+    chatBox.style.cssText = 'background:#0f172a;border-radius:' + (M ? '18px' : '12px') + ';padding:' + (M ? '22px 20px' : '18px') + ';';
+
+    var chatTitle = document.createElement('div');
+    chatTitle.style.cssText = 'color:#a78bfa;font-weight:700;margin-bottom:' + (M ? '18px' : '14px') + ';font-size:' + (M ? '26px' : '20px') + ';';
+    chatTitle.textContent = '💬 Admin এর সাথে যোগাযোগ';
+    chatBox.appendChild(chatTitle);
+
+    var commentsDiv = document.createElement('div');
+    commentsDiv.id = 'pmxUserComments';
+    commentsDiv.style.cssText = 'max-height:' + (M ? '320px' : '220px') + ';overflow-y:auto;margin-bottom:' + (M ? '20px' : '16px') + ';display:flex;flex-direction:column-reverse;';
+    commentsDiv.innerHTML = pmxRenderComments(comments);
+    chatBox.appendChild(commentsDiv);
+
+    var inputRow = document.createElement('div');
+    inputRow.style.cssText = 'display:flex;gap:' + (M ? '12px' : '10px') + ';';
+
+    var msgInput = document.createElement('input');
+    msgInput.id = 'pmxUserComment';
+    msgInput.placeholder = 'মেসেজ লিখুন...';
+    msgInput.style.cssText = 'flex:1;padding:' + (M ? '20px 16px' : '16px') + ';border-radius:' + (M ? '14px' : '10px') + ';border:' + (M ? '2px' : '1px') + ' solid #374151;background:#1e293b;color:#fff;font-family:\'Hind Siliguri\',sans-serif;font-size:' + (M ? '26px' : '18px') + ';outline:none;';
+    inputRow.appendChild(msgInput);
+
+    var sendBtn = document.createElement('button');
+    sendBtn.textContent = 'পাঠান';
+    var _oid = o.id;
+    sendBtn.onclick = function() { pmxAddComment(_oid, 'user'); };
+    sendBtn.style.cssText = 'background:#10b981;color:#fff;border:none;padding:' + (M ? '20px 32px' : '16px 24px') + ';border-radius:' + (M ? '14px' : '10px') + ';cursor:pointer;font-family:\'Hind Siliguri\',sans-serif;font-size:' + (M ? '26px' : '20px') + ';font-weight:700;white-space:nowrap;';
+    inputRow.appendChild(sendBtn);
+    chatBox.appendChild(inputRow);
+    box.appendChild(chatBox);
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
 }
 
 // ══════════════════════════════════════════════════════════════════
