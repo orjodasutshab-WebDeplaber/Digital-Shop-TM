@@ -12912,12 +12912,12 @@ function _pmxRenderUserOrderModal(orders) {
     // Overlay
     const overlay = document.createElement('div');
     overlay.id = 'pmxUserOrderModal';
-    overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:999999999;display:flex;align-items:" + (isMob?'flex-start':'center') + ";justify-content:center;font-family:'Hind Siliguri',sans-serif;overflow:hidden;";
+    overlay.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.97);z-index:999999999;display:flex;align-items:" + (isMob?'flex-start':'center') + ";justify-content:center;font-family:'Hind Siliguri',sans-serif;overflow:hidden;";
 
     // Inner box — মোবাইলে জোর করে পুরো স্ক্রিন
     const box = document.createElement('div');
     if (isMob) {
-        box.style.cssText = "background:#1e293b;border-radius:0;padding:80px 18px 30px 18px;width:100vw;min-width:100%;min-height:100vh;height:auto;overflow-y:auto;border:none;position:relative;box-sizing:border-box;";
+        box.style.cssText = "background:#1e293b;border-radius:0;padding:100px 22px 40px 22px;width:100vw;min-width:100%;min-height:100vh;height:100vh;overflow-y:auto;border:none;position:relative;box-sizing:border-box;";
     } else {
         box.style.cssText = "background:#1e293b;border-radius:20px;padding:24px;width:90%;max-width:600px;max-height:90vh;overflow-y:auto;border:1px solid #7c3aed;position:relative;";
     }
@@ -13067,34 +13067,45 @@ function _pmxRenderUserDetailModal(o) {
     const statusColors = { pending:'#f59e0b', confirmed:'#10b981', rejected:'#ef4444', delivered:'#6366f1' };
     const statusLabels = { pending:'⏳ পেন্ডিং', confirmed:'✅ কনফার্ম', rejected:'❌ রিজেক্ট', delivered:'🚚 ডেলিভারি' };
     const _pmxMobile = window.innerWidth <= 768;
+    // মোবাইলে পুরো স্ক্রিন — font/button সব বড়
+    const _mFS = _pmxMobile ? 'font-size:30px' : 'font-size:14px';
+    const _mFS2 = _pmxMobile ? '28px' : '17px';
+    const _mFS3 = _pmxMobile ? '26px' : '15px';
+    const _mPad = _pmxMobile ? '22px 20px' : '18px';
+    const _mPad2 = _pmxMobile ? '20px 28px' : '8px 20px';
+    const _mBtn = _pmxMobile ? 'padding:22px 36px;font-size:30px;border-radius:16px;' : 'padding:16px 24px;font-size:20px;border-radius:10px;';
+    const _mInp = _pmxMobile ? 'padding:22px 18px;font-size:28px;border-radius:14px;' : 'padding:16px;font-size:18px;border-radius:10px;';
+    const _mCloseSize = _pmxMobile ? '72px' : '52px';
+    const _mCloseFSize = _pmxMobile ? '42px' : '32px';
+    const _mImgH = _pmxMobile ? '260px' : '200px';
     document.body.insertAdjacentHTML('beforeend', `
-    <div id="pmxUserDetailModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999999999;display:flex;align-items:${_pmxMobile?'flex-start':'center'};justify-content:center;font-family:'Hind Siliguri',sans-serif;">
-        <div style="background:#1e293b;border-radius:${_pmxMobile?'0':'20px'};padding:22px;width:100%;max-width:${_pmxMobile?'100%':'520px'};height:${_pmxMobile?'100%':'auto'};max-height:${_pmxMobile?'100%':'90vh'};overflow-y:auto;border:${_pmxMobile?'none':'1px solid #334155'};position:relative;box-sizing:border-box;">
-            <button onclick="document.getElementById('pmxUserDetailModal').remove()" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:32px;width:52px;height:52px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-            ${o.img ? `<img src="${o.img}" style="width:100%;max-height:200px;object-fit:fill;border-radius:12px;margin-bottom:18px;" onerror="this.style.display='none'">` : ''}
-            <div style="background:#0f172a;border-radius:12px;padding:18px;margin-bottom:18px;">
-                <div style="color:#fff;font-size:22px;font-weight:700;margin-bottom:8px;">${o.productName}</div>
-                <div style="color:#10b981;font-size:22px;font-weight:700;margin-bottom:10px;">৳${o.price}</div>
-                <div style="color:#94a3b8;font-size:18px;margin-bottom:14px;">${o.desc||''}</div>
+    <div id="pmxUserDetailModal" style="position:fixed;inset:0;width:100vw;height:100vh;background:rgba(0,0,0,0.97);z-index:9999999999;display:flex;align-items:${_pmxMobile?'flex-start':'center'};justify-content:center;font-family:'Hind Siliguri',sans-serif;overflow:hidden;">
+        <div style="background:#1e293b;border-radius:${_pmxMobile?'0':'20px'};padding:${_pmxMobile?'90px 22px 40px 22px':'22px'};width:${_pmxMobile?'100vw':'100%'};max-width:${_pmxMobile?'100%':'520px'};height:${_pmxMobile?'100vh':'auto'};max-height:${_pmxMobile?'100vh':'90vh'};overflow-y:auto;border:${_pmxMobile?'none':'1px solid #334155'};position:relative;box-sizing:border-box;">
+            <button onclick="document.getElementById('pmxUserDetailModal').remove()" style="position:fixed;top:14px;right:14px;background:rgba(255,255,255,0.18);border:none;color:#fff;font-size:${_mCloseFSize};width:${_mCloseSize};height:${_mCloseSize};border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:99999999999;line-height:1;">✕</button>
+            ${o.img ? `<img src="${o.img}" style="width:100%;max-height:${_mImgH};object-fit:fill;border-radius:${_pmxMobile?'16px':'12px'};margin-bottom:${_pmxMobile?'24px':'18px'};" onerror="this.style.display='none'">` : ''}
+            <div style="background:#0f172a;border-radius:${_pmxMobile?'18px':'12px'};padding:${_mPad};margin-bottom:${_pmxMobile?'22px':'18px'};">
+                <div style="color:#fff;font-size:${_pmxMobile?'32px':'22px'};font-weight:700;margin-bottom:${_pmxMobile?'12px':'8px'};line-height:1.4;">${o.productName}</div>
+                <div style="color:#10b981;font-size:${_pmxMobile?'32px':'22px'};font-weight:700;margin-bottom:${_pmxMobile?'14px':'10px'};">৳${o.price}</div>
+                <div style="color:#94a3b8;font-size:${_mFS2};margin-bottom:${_pmxMobile?'18px':'14px'};line-height:1.6;">${o.desc||''}</div>
                 <!-- User info -->
-                <div style="background:rgba(99,102,241,0.1);border-radius:10px;padding:14px;margin-bottom:14px;border-left:4px solid #6366f1;">
+                <div style="background:rgba(99,102,241,0.1);border-radius:${_pmxMobile?'14px':'10px'};padding:${_pmxMobile?'18px':'14px'};margin-bottom:${_pmxMobile?'18px':'14px'};border-left:${_pmxMobile?'6px':'4px'} solid #6366f1;">
                     ${o.extraFields && Object.keys(o.extraFields).length
                         ? Object.entries(o.extraFields).map(([k,v]) => `
-                            <div style="color:#94a3b8;font-size:17px;margin-bottom:7px;">📝 ${k}: <span style="color:#e2e8f0;font-weight:700;">${v||'-'}</span></div>`).join('')
-                        : `${o.userId ? `<div style="color:#94a3b8;font-size:17px;">🆔 আইডি/মোবাইল/লিংক: <span style="color:#e2e8f0;">${o.userId}</span></div>` : ''}
-                           ${o.userMobile ? `<div style="color:#94a3b8;font-size:17px;margin-top:6px;">📱 মোবাইল: <span style="color:#e2e8f0;">${o.userMobile}</span></div>` : ''}`
+                            <div style="color:#94a3b8;font-size:${_mFS2};margin-bottom:${_pmxMobile?'10px':'7px'};">📝 ${k}: <span style="color:#e2e8f0;font-weight:700;">${v||'-'}</span></div>`).join('')
+                        : `${o.userId ? `<div style="color:#94a3b8;font-size:${_mFS2};">🆔 আইডি/মোবাইল/লিংক: <span style="color:#e2e8f0;">${o.userId}</span></div>` : ''}
+                           ${o.userMobile ? `<div style="color:#94a3b8;font-size:${_mFS2};margin-top:${_pmxMobile?'10px':'6px'};">📱 মোবাইল: <span style="color:#e2e8f0;">${o.userMobile}</span></div>` : ''}`
                     }
                 </div>
                 <!-- Status -->
-                <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:8px 20px;border-radius:20px;font-size:18px;font-weight:700;">${statusLabels[o.status]||o.status}</span>
+                <span style="background:${statusColors[o.status]||'#374151'};color:#fff;padding:${_mPad2};border-radius:${_pmxMobile?'24px':'20px'};font-size:${_mFS2};font-weight:700;display:inline-block;">${statusLabels[o.status]||o.status}</span>
             </div>
             <!-- Comment section -->
-            <div style="background:#0f172a;border-radius:12px;padding:18px;">
-                <div style="color:#a78bfa;font-weight:700;margin-bottom:14px;font-size:20px;">💬 Admin এর সাথে যোগাযোগ</div>
-                <div id="pmxUserComments" style="max-height:220px;overflow-y:auto;margin-bottom:16px;display:flex;flex-direction:column-reverse;">${pmxRenderComments(comments)}</div>
-                <div style="display:flex;gap:10px;">
-                    <input id="pmxUserComment" placeholder="মেসেজ লিখুন..." style="flex:1;padding:16px;border-radius:10px;border:1px solid #374151;background:#1e293b;color:#fff;font-family:'Hind Siliguri',sans-serif;font-size:18px;">
-                    <button onclick="pmxAddComment('${o.id}','user')" style="background:#10b981;color:#fff;border:none;padding:16px 24px;border-radius:10px;cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-size:20px;font-weight:700;">পাঠান</button>
+            <div style="background:#0f172a;border-radius:${_pmxMobile?'18px':'12px'};padding:${_mPad};">
+                <div style="color:#a78bfa;font-weight:700;margin-bottom:${_pmxMobile?'18px':'14px'};font-size:${_pmxMobile?'28px':'20px'};">💬 Admin এর সাথে যোগাযোগ</div>
+                <div id="pmxUserComments" style="max-height:${_pmxMobile?'300px':'220px'};overflow-y:auto;margin-bottom:${_pmxMobile?'20px':'16px'};display:flex;flex-direction:column-reverse;">${pmxRenderComments(comments)}</div>
+                <div style="display:flex;gap:${_pmxMobile?'12px':'10px'};">
+                    <input id="pmxUserComment" placeholder="মেসেজ লিখুন..." style="flex:1;${_mInp};border:${_pmxMobile?'2px':'1px'} solid #374151;background:#1e293b;color:#fff;font-family:'Hind Siliguri',sans-serif;">
+                    <button onclick="pmxAddComment('${o.id}','user')" style="background:#10b981;color:#fff;border:none;${_mBtn};cursor:pointer;font-family:'Hind Siliguri',sans-serif;font-weight:700;white-space:nowrap;">পাঠান</button>
                 </div>
             </div>
         </div>
