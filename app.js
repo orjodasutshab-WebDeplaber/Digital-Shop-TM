@@ -3550,19 +3550,19 @@ body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri',
 /* ── TOP HEADER ── */
 .top-bar{width:100%;background:linear-gradient(135deg,#1a2744 0%,#0d1829 100%);padding:1.1em 1.25em 0.9em;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid rgba(99,102,241,0.4);position:sticky;top:0;z-index:20;box-shadow:0 4px 20px rgba(0,0,0,0.5)}
 .top-bar-logo{display:flex;flex-direction:column;gap:3px}
-.shop-name{font-size:2.2em;font-weight:800;color:#fff;letter-spacing:-0.3px}
-.shop-sub{font-size:1.2em;color:#6366f1;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
+.shop-name{font-size:1.625em;font-weight:800;color:#fff;letter-spacing:-0.3px}
+.shop-sub{font-size:0.875em;color:#6366f1;font-weight:600;letter-spacing:1.5px;text-transform:uppercase}
 .top-bar-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.order-label{font-size:1.1em;color:#64748b;letter-spacing:.5px;text-transform:uppercase}
-.order-num{font-size:1.9em;font-weight:800;color:#818cf8;letter-spacing:-0.5px}
+.order-label{font-size:0.8em;color:#64748b;letter-spacing:.5px;text-transform:uppercase}
+.order-num{font-size:1.375em;font-weight:800;color:#818cf8;letter-spacing:-0.5px}
 
 /* ── HERO STATUS BANNER ── */
 .hero-banner{width:100%;padding:1.375em 1.25em;background:${statusBg};border-bottom:2px solid ${statusColor};display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden}
 .hero-banner::before{content:'';position:absolute;right:-20px;top:-20px;width:100px;height:100px;border-radius:50%;background:${statusColor};opacity:0.06}
 .hero-banner::after{content:'';position:absolute;right:30px;bottom:-30px;width:70px;height:70px;border-radius:50%;background:${statusColor};opacity:0.04}
-.pay-label{font-size:1.2em;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:5px;font-weight:600}
-.pay-status{font-size:2.4em;font-weight:800;color:${statusColor};line-height:1}
-.status-badge{background:${statusColor};color:#fff;padding:0.8em 1.6em;border-radius:50px;font-size:1.35em;font-weight:800;white-space:nowrap;box-shadow:0 4px 15px ${statusColor}55;letter-spacing:.3px}
+.pay-label{font-size:0.875em;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:5px;font-weight:600}
+.pay-status{font-size:1.75em;font-weight:800;color:${statusColor};line-height:1}
+.status-badge{background:${statusColor};color:#fff;padding:0.625em 1.375em;border-radius:50px;font-size:1em;font-weight:800;white-space:nowrap;box-shadow:0 4px 15px ${statusColor}55;letter-spacing:.3px}
 
 /* ── PRODUCT HERO CARD ── */
 .prod-hero{width:100%;background:linear-gradient(180deg,#1a2744 0%,#111827 100%);border-bottom:1px solid #1e293b;position:relative}
@@ -3570,66 +3570,66 @@ body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri',
 .prod-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 .prod-img-placeholder{font-size:4.5em;display:flex;align-items:center;justify-content:center;height:220px;background:linear-gradient(135deg,#1e293b,#0f172a)}
 .prod-info-overlay{padding:1.125em 1.25em 1.375em;background:linear-gradient(180deg,transparent,#111827 30%)}
-.prod-cat-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(99,102,241,0.18);color:#818cf8;padding:0.5em 1.1em;border-radius:50px;font-size:1.2em;font-weight:700;margin-bottom:0.75em;border:1px solid rgba(99,102,241,0.25)}
-.prod-name{font-size:2em;font-weight:800;color:#f8fafc;line-height:1.35;margin-bottom:0.875em}
+.prod-cat-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(99,102,241,0.18);color:#818cf8;padding:0.375em 0.875em;border-radius:50px;font-size:0.875em;font-weight:700;margin-bottom:0.75em;border:1px solid rgba(99,102,241,0.25)}
+.prod-name{font-size:1.5em;font-weight:800;color:#f8fafc;line-height:1.35;margin-bottom:0.875em}
 .prod-chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.8em 1em;font-size:1.15em;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:80px;flex:1}
-.chip strong{color:#e2e8f0;font-size:1.3em;font-weight:700}
-.chip span{font-size:0.95em;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.625em 0.875em;font-size:0.9em;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:80px;flex:1}
+.chip strong{color:#e2e8f0;font-size:1.125em;font-weight:700}
+.chip span{font-size:0.75em;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
 
 /* ── SECTIONS ── */
 .page-body{padding:0 14px 110px}
 .section{background:#111827;border-radius:18px;margin-top:14px;border:1px solid #1e293b;overflow:hidden}
 .sec-head{padding:0.875em 1.125em;background:rgba(99,102,241,0.08);border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:10px}
 .sec-head-icon{width:2em;height:2em;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1em;flex-shrink:0}
-.sec-head-text{font-size:1.25em;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px}
+.sec-head-text{font-size:0.875em;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px}
 .info-row{display:flex;justify-content:space-between;align-items:center;padding:0.9375em 1.125em;border-bottom:1px solid rgba(30,41,59,0.8);gap:10px}
 .info-row:last-child{border-bottom:none}
-.ikey{font-size:1.35em;color:#64748b;flex-shrink:0;font-weight:500}
-.ival{font-size:1.35em;color:#e2e8f0;font-weight:700;text-align:right;word-break:break-word;max-width:62%}
+.ikey{font-size:1em;color:#64748b;flex-shrink:0;font-weight:500}
+.ival{font-size:1em;color:#e2e8f0;font-weight:700;text-align:right;word-break:break-word;max-width:62%}
 
 /* ── PRICE SECTION ── */
 .price-row{display:flex;justify-content:space-between;align-items:center;padding:0.9375em 1.125em;border-bottom:1px solid rgba(30,41,59,0.8)}
 .price-row:last-child{border-bottom:none}
-.plabel{font-size:1.4em;color:#94a3b8;font-weight:500}
-.pamount{font-size:1.4em;color:#e2e8f0;font-weight:700}
+.plabel{font-size:1.0625em;color:#94a3b8;font-weight:500}
+.pamount{font-size:1.0625em;color:#e2e8f0;font-weight:700}
 .price-row.disc .plabel,.price-row.disc .pamount{color:#f87171}
 .price-row.total-row{background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.1));border-top:2px solid rgba(99,102,241,0.35);padding:1.125em}
-.price-row.total-row .plabel{font-size:1.55em;font-weight:800;color:#c7d2fe}
-.price-row.total-row .pamount{font-size:2.6em;font-weight:800;color:#818cf8;letter-spacing:-1px}
+.price-row.total-row .plabel{font-size:1.1875em;font-weight:800;color:#c7d2fe}
+.price-row.total-row .pamount{font-size:2em;font-weight:800;color:#818cf8;letter-spacing:-1px}
 
 /* ── DELIVERY TRACK ── */
 .track-wrap{padding:1.125em}
-.track-title{font-size:1.2em;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:1.25em;display:flex;align-items:center;gap:8px}
+.track-title{font-size:0.875em;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:1.25em;display:flex;align-items:center;gap:8px}
 .track-steps{display:flex;justify-content:space-between;position:relative;padding:0 8px}
 .track-line{position:absolute;top:18px;left:30px;right:30px;height:3px;background:#1e293b;border-radius:2px;z-index:0}
 .track-line-fill{position:absolute;top:0;left:0;height:100%;border-radius:2px;background:linear-gradient(90deg,#10b981,#6366f1);transition:width .5s ease}
 .track-step{display:flex;flex-direction:column;align-items:center;gap:10px;z-index:1;flex:1;position:relative}
-.step-dot{width:3em;height:3em;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3em;border:2.5px solid #1e293b;background:#0d1829;transition:all .3s}
+.step-dot{width:2.25em;height:2.25em;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1em;border:2.5px solid #1e293b;background:#0d1829;transition:all .3s}
 .step-dot.done{background:#10b981;border-color:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,0.2)}
 .step-dot.active{background:linear-gradient(135deg,#6366f1,#818cf8);border-color:#818cf8;box-shadow:0 0 0 5px rgba(99,102,241,0.25),0 0 15px rgba(99,102,241,0.3)}
-.step-label{font-size:1.1em;color:#475569;text-align:center;line-height:1.4;font-weight:600}
+.step-label{font-size:0.8125em;color:#475569;text-align:center;line-height:1.4;font-weight:600}
 .step-label.done{color:#10b981}
 .step-label.active{color:#818cf8;font-weight:800}
-.rejected-box{margin-top:16px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:0.875em 1em;font-size:1.35em;color:#f87171;text-align:center;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
+.rejected-box{margin-top:16px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:12px;padding:0.875em 1em;font-size:1em;color:#f87171;text-align:center;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px}
 
 /* ── NOTE BOX ── */
 .note-box{background:rgba(234,179,8,0.06);border:1px solid rgba(234,179,8,0.2);border-radius:14px;padding:1em 1.125em;margin-top:14px;display:flex;gap:12px;align-items:flex-start}
-.note-icon{width:2.8em;height:2.8em;border-radius:10px;background:rgba(234,179,8,0.12);display:flex;align-items:center;justify-content:center;font-size:1.3em;flex-shrink:0}
-.note-text{font-size:1.3em;color:#fbbf24;line-height:1.6;font-weight:500}
+.note-icon{width:2.25em;height:2.25em;border-radius:10px;background:rgba(234,179,8,0.12);display:flex;align-items:center;justify-content:center;font-size:1em;flex-shrink:0}
+.note-text{font-size:0.9375em;color:#fbbf24;line-height:1.6;font-weight:500}
 
 /* ── FOOTER BARCODE ── */
 .receipt-footer{padding:1.25em 1.125em 0.625em;text-align:center}
 .barcode-area{display:flex;flex-direction:column;align-items:center;margin-bottom:14px;gap:5px;background:#111827;border-radius:14px;padding:16px;border:1px solid #1e293b}
 .barcode-bars{display:flex;align-items:flex-end;gap:1px;height:36px}
-.barcode-id{font-size:1.1em;color:#475569;letter-spacing:4px;margin-top:6px;font-weight:600}
-.footer-note{font-size:1.2em;color:#334155;line-height:1.8;font-weight:500}
-.footer-brand{font-size:1.4em;color:#475569;font-weight:700;margin-bottom:4px}
+.barcode-id{font-size:0.8125em;color:#475569;letter-spacing:4px;margin-top:6px;font-weight:600}
+.footer-note{font-size:0.875em;color:#334155;line-height:1.8;font-weight:500}
+.footer-brand{font-size:1em;color:#475569;font-weight:700;margin-bottom:4px}
 
 /* ── STICKY ACTION BAR ── */
 .action-bar{position:fixed;bottom:0;left:0;right:0;padding:0.75em 1em 1.5em;background:linear-gradient(180deg,transparent,#070d1a 30%,#070d1a 100%);display:flex;gap:10px;z-index:30}
-.btn-print{flex:1;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;padding:1.5em;border-radius:16px;font-size:1.5em;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 25px rgba(99,102,241,0.4);letter-spacing:.3px}
-.btn-close{width:4.5em;height:4.5em;background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:16px;font-size:1.5em;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.btn-print{flex:1;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;padding:1.125em;border-radius:16px;font-size:1.125em;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 25px rgba(99,102,241,0.4);letter-spacing:.3px}
+.btn-close{width:3.75em;height:3.75em;background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:16px;font-size:1.125em;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .btn-close:active,.btn-print:active{transform:scale(0.97)}
 
 /* ── PRINT ── */
@@ -4205,104 +4205,114 @@ function openReturnModal(orderId) {
     const order = appState.orders.find(o => String(o.id) === String(orderId));
     if (!order) return alert("অর্ডার পাওয়া যায়নি!");
 
+    const isMobileReturn = screen.width <= 768 || document.documentElement.classList.contains('is-mobile');
+
     const modalHtml = `
-    <div id="returnModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.85); display:flex; align-items:center; justify-content:center; z-index:999999999; backdrop-filter: blur(15px); font-family: 'Inter', sans-serif; padding: 15px;">
-        <div style="background:#fff; width:100%; max-width:420px; max-height: 92vh; border-radius:32px; display:flex; flex-direction:column; box-shadow:0 50px 100px -20px rgba(0,0,0,0.6); animation: modalPopUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position:relative; overflow:hidden; border: 1px solid rgba(255,255,255,0.3);">
+    <div id="returnModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15, 23, 42, 0.88); display:flex; align-items:${isMobileReturn ? 'flex-end' : 'center'}; justify-content:center; z-index:999999999; backdrop-filter: blur(15px); font-family: 'Hind Siliguri', 'Inter', sans-serif; padding: ${isMobileReturn ? '0' : '15px'};">
+        <div style="background:#fff; width:100%; max-width:${isMobileReturn ? '100%' : '420px'}; height:${isMobileReturn ? '100%' : 'auto'}; max-height:${isMobileReturn ? '100%' : '92vh'}; border-radius:${isMobileReturn ? '0' : '32px'}; display:flex; flex-direction:column; box-shadow:0 50px 100px -20px rgba(0,0,0,0.6); animation: modalPopUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); position:relative; overflow:hidden; border: ${isMobileReturn ? 'none' : '1px solid rgba(255,255,255,0.3)'};">
             
-            <div style="background: linear-gradient(90deg, #fff7ed, #ffedd5); padding: 12px 20px; border-bottom: 1px solid #fed7aa; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <i class="fa fa-info-circle" style="color: #f97316; font-size: 14px;"></i>
-                <span style="font-size: 11px; color: #9a3412; font-weight: 700;">ছবি আপলোড করতে না পারলে <a href="https://wa.me/8801822963824" target="_blank" style="color: #ea580c; text-decoration: underline; font-weight: 800;">এখানে যোগাযোগ করুন</a></span>
+            <!-- শীর্ষ সতর্কতা বার -->
+            <div style="background: linear-gradient(90deg, #fff7ed, #ffedd5); padding: ${isMobileReturn ? '16px 20px' : '12px 20px'}; border-bottom: 1px solid #fed7aa; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink:0;">
+                <i class="fa fa-info-circle" style="color: #f97316; font-size: ${isMobileReturn ? '20px' : '14px'};"></i>
+                <span style="font-size: ${isMobileReturn ? '16px' : '11px'}; color: #9a3412; font-weight: 700;">ছবি আপলোড করতে না পারলে <a href="https://wa.me/8801822963824" target="_blank" style="color: #ea580c; text-decoration: underline; font-weight: 800;">এখানে যোগাযোগ করুন</a></span>
             </div>
 
-            <div style="padding: 15px 24px; background: #fff; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="background:linear-gradient(135deg, #ef4444, #b91c1c); width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center;">
-                        <i class="fa fa-undo" style="color:#fff; font-size:13px;"></i>
+            <!-- হেডার -->
+            <div style="padding: ${isMobileReturn ? '20px 24px' : '15px 24px'}; background: #fff; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; flex-shrink:0;">
+                <div style="display:flex; align-items:center; gap:14px;">
+                    <div style="background:linear-gradient(135deg, #ef4444, #b91c1c); width:${isMobileReturn ? '52px' : '36px'}; height:${isMobileReturn ? '52px' : '36px'}; border-radius:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <i class="fa fa-undo" style="color:#fff; font-size:${isMobileReturn ? '20px' : '13px'};"></i>
                     </div>
                     <div>
-                        <h3 style="margin:0; color:#0f172a; font-size:16px; font-weight:800;">রিটার্ন পোর্টাল</h3>
-                        <p style="margin:0; font-size:10px; color:#94a3b8; font-weight:600;">অর্ডার: #${orderId}</p>
+                        <h3 style="margin:0; color:#0f172a; font-size:${isMobileReturn ? '24px' : '16px'}; font-weight:800;">রিটার্ন পোর্টাল</h3>
+                        <p style="margin:0; font-size:${isMobileReturn ? '15px' : '10px'}; color:#94a3b8; font-weight:600;">অর্ডার: #${orderId}</p>
                     </div>
                 </div>
-                <button onclick="document.getElementById('returnModal').remove()" style="width:30px; height:30px; background:#f1f5f9; border:none; border-radius:50%; cursor:pointer; color:#64748b; font-size:18px;">&times;</button>
+                <button onclick="document.getElementById('returnModal').remove()" style="width:${isMobileReturn ? '44px' : '30px'}; height:${isMobileReturn ? '44px' : '30px'}; background:#f1f5f9; border:none; border-radius:50%; cursor:pointer; color:#64748b; font-size:${isMobileReturn ? '26px' : '18px'}; display:flex; align-items:center; justify-content:center;">&times;</button>
             </div>
 
-            <div class="custom-modal-body" style="padding: 20px 24px; overflow-y: auto; flex: 1; scroll-behavior: smooth;">
+            <!-- বডি -->
+            <div class="custom-modal-body" style="padding: ${isMobileReturn ? '24px 20px' : '20px 24px'}; overflow-y: auto; flex: 1; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
                 
-                <div style="margin-bottom:20px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <label style="font-size:13px; font-weight:700; color:#334155;">প্রমাণস্বরূপ ছবি</label>
-                        <button onclick="addNewImageInput()" style="font-size:11px; color:#3b82f6; border:1px solid #3b82f6; background:#eff6ff; padding:6px 12px; border-radius:10px; cursor:pointer; font-weight:700;">
+                <!-- প্রমাণস্বরূপ ছবি -->
+                <div style="margin-bottom:${isMobileReturn ? '28px' : '20px'};">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:${isMobileReturn ? '16px' : '12px'};">
+                        <label style="font-size:${isMobileReturn ? '18px' : '13px'}; font-weight:700; color:#334155;">প্রমাণস্বরূপ ছবি</label>
+                        <button onclick="addNewImageInput()" style="font-size:${isMobileReturn ? '15px' : '11px'}; color:#3b82f6; border:1px solid #3b82f6; background:#eff6ff; padding:${isMobileReturn ? '10px 16px' : '6px 12px'}; border-radius:12px; cursor:pointer; font-weight:700;">
                             <i class="fa fa-plus-circle"></i> আরো ছবি যোগ করুন
                         </button>
                     </div>
 
                     <div id="imageInputsContainer">
-                        <div class="img-input-group" style="margin-bottom:14px; background:#f8fafc; border:2px solid #e2e8f0; border-radius:16px; padding:14px;">
+                        <div class="img-input-group" style="margin-bottom:${isMobileReturn ? '18px' : '14px'}; background:#f8fafc; border:2px solid #e2e8f0; border-radius:18px; padding:${isMobileReturn ? '18px' : '14px'};">
                             
                             <!-- ফাইল আপলোড বাটন -->
-                            <div style="margin-bottom:10px;">
-                                <label style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:10px 16px; border-radius:12px; cursor:pointer; font-size:13px; font-weight:700; text-align:center;">
+                            <div style="margin-bottom:${isMobileReturn ? '14px' : '10px'};">
+                                <label style="display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:${isMobileReturn ? '16px 20px' : '10px 16px'}; border-radius:14px; cursor:pointer; font-size:${isMobileReturn ? '17px' : '13px'}; font-weight:700; text-align:center;">
                                     <i class="fa fa-upload"></i> ফাইল থেকে ছবি আপলোড করুন
                                     <input type="file" accept="image/*" class="return-img-file" style="display:none;" onchange="uploadReturnImageFile(this)">
                                 </label>
-                                <div class="img-upload-status" style="display:none; margin-top:8px; font-size:12px; color:#6366f1; font-weight:600; text-align:center;">
+                                <div class="img-upload-status" style="display:none; margin-top:10px; font-size:${isMobileReturn ? '15px' : '12px'}; color:#6366f1; font-weight:600; text-align:center;">
                                     <i class="fa fa-spinner fa-spin"></i> আপলোড হচ্ছে...
                                 </div>
                             </div>
 
                             <!-- OR divider -->
-                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:${isMobileReturn ? '14px' : '10px'};">
                                 <div style="flex:1; height:1px; background:#e2e8f0;"></div>
-                                <span style="font-size:11px; color:#94a3b8; font-weight:600;">অথবা লিংক দিন</span>
+                                <span style="font-size:${isMobileReturn ? '15px' : '11px'}; color:#94a3b8; font-weight:600;">অথবা লিংক দিন</span>
                                 <div style="flex:1; height:1px; background:#e2e8f0;"></div>
                             </div>
 
                             <!-- লিংক input -->
                             <input type="url" class="return-image-url" placeholder="ছবির ডিরেক্ট লিংক দিন..." 
-                                style="width:100%; padding:11px 14px; border:2px solid #e2e8f0; border-radius:12px; outline:none; font-size:12px; background:#fff; box-sizing:border-box;"
+                                style="width:100%; padding:${isMobileReturn ? '16px 18px' : '11px 14px'}; border:2px solid #e2e8f0; border-radius:14px; outline:none; font-size:${isMobileReturn ? '16px' : '12px'}; background:#fff; box-sizing:border-box;"
                                 oninput="previewSingleImage(this)">
 
                             <!-- Preview -->
-                            <div class="single-preview" style="margin-top:10px; display:none;">
-                                <div style="width:80px; height:80px; border-radius:12px; overflow:hidden; border:2px solid #6366f1;">
+                            <div class="single-preview" style="margin-top:12px; display:none;">
+                                <div style="width:${isMobileReturn ? '100px' : '80px'}; height:${isMobileReturn ? '100px' : '80px'}; border-radius:14px; overflow:hidden; border:2px solid #6366f1;">
                                     <img src="" style="width:100%; height:100%; object-fit:fill;">
                                 </div>
-                                <span class="preview-ok" style="display:block; font-size:11px; color:#10b981; font-weight:700; margin-top:4px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
+                                <span class="preview-ok" style="display:block; font-size:${isMobileReturn ? '14px' : '11px'}; color:#10b981; font-weight:700; margin-top:6px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div style="margin-bottom:20px;">
-                    <label style="display:block; margin-bottom:8px; font-size:13px; font-weight:700; color:#334155;">বিস্তারিত কারণ</label>
-                    <textarea id="returnReason" placeholder="বিস্তারিত লিখুন..." style="width:100%; padding:14px; border:2px solid #f1f5f9; border-radius:20px; font-family:inherit; resize:none; height:80px; outline:none; font-size:13px; background:#f8fafc; box-sizing: border-box;"></textarea>
+                <!-- বিস্তারিত কারণ -->
+                <div style="margin-bottom:${isMobileReturn ? '28px' : '20px'};">
+                    <label style="display:block; margin-bottom:${isMobileReturn ? '12px' : '8px'}; font-size:${isMobileReturn ? '18px' : '13px'}; font-weight:700; color:#334155;">বিস্তারিত কারণ</label>
+                    <textarea id="returnReason" placeholder="বিস্তারিত লিখুন..." style="width:100%; padding:${isMobileReturn ? '18px' : '14px'}; border:2px solid #f1f5f9; border-radius:20px; font-family:inherit; resize:none; height:${isMobileReturn ? '110px' : '80px'}; outline:none; font-size:${isMobileReturn ? '17px' : '13px'}; background:#f8fafc; box-sizing: border-box;"></textarea>
                 </div>
 
-                <div style="margin-bottom:20px;">
-                    <label style="display:block; margin-bottom:8px; font-size:13px; font-weight:700; color:#334155;">রিফান্ড মাধ্যম</label>
-                    <select id="refundMethod" onchange="toggleRefundFields()" style="width:100%; padding:14px; border:2px solid #f1f5f9; border-radius:20px; background:#f8fafc; font-size:14px; font-weight:700;">
+                <!-- রিফান্ড মাধ্যম -->
+                <div style="margin-bottom:${isMobileReturn ? '28px' : '20px'};">
+                    <label style="display:block; margin-bottom:${isMobileReturn ? '12px' : '8px'}; font-size:${isMobileReturn ? '18px' : '13px'}; font-weight:700; color:#334155;">রিফান্ড মাধ্যম</label>
+                    <select id="refundMethod" onchange="toggleRefundFields()" style="width:100%; padding:${isMobileReturn ? '18px' : '14px'}; border:2px solid #f1f5f9; border-radius:20px; background:#f8fafc; font-size:${isMobileReturn ? '18px' : '14px'}; font-weight:700;">
                         <option value="voucher">🎁 শপিং ভাউচার</option>
                         <option value="payment">📱 পার্সোনাল পেমেন্ট</option>
                     </select>
                 </div>
 
-                <div id="paymentFields" style="display:none; background:#eff6ff; padding:15px; border-radius:24px; border:1px solid #bfdbfe; margin-bottom:15px;">
-                    <select id="paymentType" style="width:100%; padding:10px; border-radius:12px; border:1.5px solid #fff; margin-bottom:10px;">
+                <!-- পেমেন্ট ফিল্ড -->
+                <div id="paymentFields" style="display:none; background:#eff6ff; padding:${isMobileReturn ? '20px' : '15px'}; border-radius:24px; border:1px solid #bfdbfe; margin-bottom:${isMobileReturn ? '20px' : '15px'};">
+                    <select id="paymentType" style="width:100%; padding:${isMobileReturn ? '16px' : '10px'}; border-radius:14px; border:1.5px solid #fff; margin-bottom:12px; font-size:${isMobileReturn ? '17px' : '14px'}; font-weight:600;">
                         <option value="Bkash">বিকাশ (bKash)</option>
                         <option value="Nagad">নগদ (Nagad)</option>
                     </select>
-                    <input type="number" id="refundNumber" placeholder="নম্বর দিন" style="width:100%; padding:12px; border-radius:12px; border:1.5px solid #fff; width:100%; box-sizing:border-box;">
+                    <input type="number" id="refundNumber" placeholder="নম্বর দিন" style="width:100%; padding:${isMobileReturn ? '16px' : '12px'}; border-radius:14px; border:1.5px solid #fff; box-sizing:border-box; font-size:${isMobileReturn ? '17px' : '14px'};">
                 </div>
             </div>
 
-            <div style="padding: 18px 24px; background: #fff; border-top: 1px solid #f1f5f9;">
-                <button onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0f172a; color:#fff; border:none; padding:18px; border-radius:20px; font-weight:800; cursor:pointer; font-size:16px;">সাবমিট করুন</button>
+            <!-- সাবমিট বাটন -->
+            <div style="padding: ${isMobileReturn ? '20px 20px 32px' : '18px 24px'}; background: #fff; border-top: 1px solid #f1f5f9; flex-shrink:0;">
+                <button onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0f172a; color:#fff; border:none; padding:${isMobileReturn ? '22px' : '18px'}; border-radius:20px; font-weight:800; cursor:pointer; font-size:${isMobileReturn ? '20px' : '16px'}; font-family:'Hind Siliguri', 'Inter', sans-serif; letter-spacing:0.3px;">সাবমিট করুন</button>
             </div>
         </div>
     </div>
     <style>
-        @keyframes modalPopUp { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes modalPopUp { 0% { opacity: 0; transform: scale(0.97) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
         .custom-modal-body::-webkit-scrollbar { width: 4px; }
         .custom-modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>`;
@@ -4316,28 +4326,29 @@ window.addNewImageInput = function() {
     const div = document.createElement('div');
     div.className = 'img-input-group';
     div.style.cssText = "margin-bottom:14px; background:#f8fafc; border:2px solid #e2e8f0; border-radius:16px; padding:14px; position:relative;";
+    const isMobAdd = screen.width <= 768 || document.documentElement.classList.contains('is-mobile');
     div.innerHTML = `
-        <button onclick="this.parentElement.remove()" style="position:absolute; right:10px; top:10px; background:#fee2e2; border:none; color:#ef4444; width:24px; height:24px; border-radius:50%; cursor:pointer; z-index:1;">&times;</button>
-        <label style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:10px 16px; border-radius:12px; cursor:pointer; font-size:13px; font-weight:700; margin-bottom:10px;">
+        <button onclick="this.parentElement.remove()" style="position:absolute; right:10px; top:10px; background:#fee2e2; border:none; color:#ef4444; width:${isMobAdd?'36px':'24px'}; height:${isMobAdd?'36px':'24px'}; border-radius:50%; cursor:pointer; z-index:1; font-size:${isMobAdd?'18px':'14px'};">&times;</button>
+        <label style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:${isMobAdd?'16px 20px':'10px 16px'}; border-radius:14px; cursor:pointer; font-size:${isMobAdd?'17px':'13px'}; font-weight:700; margin-bottom:${isMobAdd?'14px':'10px'};">
             <i class="fa fa-upload"></i> ফাইল থেকে আপলোড
             <input type="file" accept="image/*" class="return-img-file" style="display:none;" onchange="uploadReturnImageFile(this)">
         </label>
-        <div class="img-upload-status" style="display:none; font-size:12px; color:#6366f1; font-weight:600; text-align:center; margin-bottom:8px;">
+        <div class="img-upload-status" style="display:none; font-size:${isMobAdd?'15px':'12px'}; color:#6366f1; font-weight:600; text-align:center; margin-bottom:${isMobAdd?'12px':'8px'};">
             <i class="fa fa-spinner fa-spin"></i> আপলোড হচ্ছে...
         </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:${isMobAdd?'14px':'10px'};">
             <div style="flex:1; height:1px; background:#e2e8f0;"></div>
-            <span style="font-size:11px; color:#94a3b8; font-weight:600;">অথবা লিংক</span>
+            <span style="font-size:${isMobAdd?'15px':'11px'}; color:#94a3b8; font-weight:600;">অথবা লিংক</span>
             <div style="flex:1; height:1px; background:#e2e8f0;"></div>
         </div>
         <input type="url" class="return-image-url" placeholder="ছবির লিংক দিন..." 
-            style="width:100%; padding:11px 14px; border:2px solid #e2e8f0; border-radius:12px; outline:none; font-size:12px; background:#fff; box-sizing:border-box;"
+            style="width:100%; padding:${isMobAdd?'16px 18px':'11px 14px'}; border:2px solid #e2e8f0; border-radius:14px; outline:none; font-size:${isMobAdd?'16px':'12px'}; background:#fff; box-sizing:border-box;"
             oninput="previewSingleImage(this)">
-        <div class="single-preview" style="margin-top:10px; display:none;">
-            <div style="width:80px; height:80px; border-radius:12px; overflow:hidden; border:2px solid #6366f1;">
+        <div class="single-preview" style="margin-top:12px; display:none;">
+            <div style="width:${isMobAdd?'100px':'80px'}; height:${isMobAdd?'100px':'80px'}; border-radius:14px; overflow:hidden; border:2px solid #6366f1;">
                 <img src="" style="width:100%; height:100%; object-fit:fill;">
             </div>
-            <span style="display:block; font-size:11px; color:#10b981; font-weight:700; margin-top:4px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
+            <span style="display:block; font-size:${isMobAdd?'14px':'11px'}; color:#10b981; font-weight:700; margin-top:6px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
         </div>
     `;
     container.appendChild(div);
