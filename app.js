@@ -3573,9 +3573,9 @@ body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri',
 .prod-cat-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(99,102,241,0.18);color:#818cf8;padding:0.375em 0.875em;border-radius:50px;font-size:1.75em;font-weight:700;margin-bottom:0.75em;border:1px solid rgba(99,102,241,0.25)}
 .prod-name{font-size:3em;font-weight:800;color:#f8fafc;line-height:1.35;margin-bottom:0.875em}
 .prod-chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.625em 0.875em;font-size:0.78em;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:80px;flex:1}
-.chip strong{color:#e2e8f0;font-size:0.99em;font-weight:700}
-.chip span{font-size:0.68em;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.8em 0.5em;font-size:1.35em;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0;flex:1;height:auto}
+.chip strong{color:#e2e8f0;font-size:1.5em;font-weight:700;display:block;line-height:1.3}
+.chip span{font-size:1.1em;color:#64748b;text-transform:uppercase;letter-spacing:.5px;display:block;line-height:1.4}
 
 /* ── SECTIONS ── */
 .page-body{padding:0 14px 180px}
