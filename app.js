@@ -1992,8 +1992,8 @@ function adminViewOrderDetails(orderId) {
                                                 background: ${c.sender === 'Admin' ? '#3b82f6' : 'white'}; 
                                                 color: ${c.sender === 'Admin' ? 'white' : '#1e293b'}; 
                                                 padding:10px 15px; border-radius:15px; max-width:80%; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
-                                        <p style="margin:0; font-size:12px;">${c.text}</p>
-                                        <small style="display:block; text-align:right; font-size:8px; opacity:0.7; margin-top:4px;">${c.time}</small>
+                                        <p style="margin:0; font-size:15px; line-height:1.5;">${c.text}</p>
+                                        <small style="display:block; text-align:right; font-size:11px; opacity:0.7; margin-top:4px;">${c.time}</small>
                                     </div>
                                 `).join('') : '<p style="text-align:center; color:#94a3b8; font-size:12px; margin-top:20px;">কোনো কথা হয়নি</p>'}
                             </div>
@@ -2267,11 +2267,11 @@ function viewUserOrderDetails(orderId) {
                                                     border-radius: ${isAdmin ? '15px 15px 15px 0' : '15px 15px 0 15px'}; 
                                                     border: 1px solid ${isAdmin ? '#e2e8f0' : '#bae6fd'};
                                                     position: relative;">
-                                            <small style="display:block; font-size:9px; font-weight:bold; margin-bottom:3px; color:${isAdmin ? '#64748b' : '#0ea5e9'};">
+                                            <small style="display:block; font-size:11px; font-weight:bold; margin-bottom:3px; color:${isAdmin ? '#64748b' : '#0ea5e9'};">
                                                 ${isAdmin ? 'Digital Shop TM (Admin)' : 'আপনি'}
                                             </small>
-                                            <p style="margin:0; font-size:13px;">${c.text}</p>
-                                            <small style="display:block; text-align:right; font-size:8px; color:#94a3b8; margin-top:4px;">${c.time}</small>
+                                            <p style="margin:0; font-size:16px; line-height:1.5;">${c.text}</p>
+                                            <small style="display:block; text-align:right; font-size:11px; color:#94a3b8; margin-top:4px;">${c.time}</small>
                                         </div>
                                     </div>
                                 `;
@@ -4850,15 +4850,15 @@ function openUserReturnChat(retId) {
                 </div>
 
                 <h4 style="margin:0 0 12px; font-size:14px; color:#38bdf8;"><i class="fa fa-comments"></i> এডমিন সাপোর্ট</h4>
-                <div id="userChatBox" style="height:220px; overflow-y:auto; background:rgba(0,0,0,0.3); border-radius:20px; padding:15px; border:1px solid #1e293b; display:flex; flex-direction:column; gap:12px; margin-bottom:10px;">
+                <div id="userChatBox" style="height:320px; overflow-y:auto; background:rgba(0,0,0,0.3); border-radius:20px; padding:15px; border:1px solid #1e293b; display:flex; flex-direction:column; gap:12px; margin-bottom:10px;">
                     ${(ret.messages || []).map(m => `
                         <div style="align-self: ${m.sender === 'user' ? 'flex-end' : 'flex-start'}; max-width: 85%;">
                             <div style="background:${m.sender === 'user' ? 'linear-gradient(135deg, #0ea5e9, #2563eb)' : '#334155'}; 
-                                        color:#fff; padding:10px 15px; border-radius:${m.sender === 'user' ? '20px 20px 5px 20px' : '20px 20px 20px 5px'}; 
-                                        font-size:13px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                                        color:#fff; padding:12px 18px; border-radius:${m.sender === 'user' ? '20px 20px 5px 20px' : '20px 20px 20px 5px'}; 
+                                        font-size:16px; line-height:1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                                 ${m.text}
                             </div>
-                            <small style="font-size:9px; color:#475569; display:block; text-align:${m.sender === 'user' ? 'right' : 'left'}; margin-top:5px;">${m.time || ''}</small>
+                            <small style="font-size:12px; color:#475569; display:block; text-align:${m.sender === 'user' ? 'right' : 'left'}; margin-top:5px;">${m.time || ''}</small>
                         </div>
                     `).join('')}
                 </div>
