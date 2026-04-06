@@ -3573,12 +3573,12 @@ body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri',
 .prod-cat-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(99,102,241,0.18);color:#818cf8;padding:0.375em 0.875em;border-radius:50px;font-size:1.75em;font-weight:700;margin-bottom:0.75em;border:1px solid rgba(99,102,241,0.25)}
 .prod-name{font-size:3em;font-weight:800;color:#f8fafc;line-height:1.35;margin-bottom:0.875em}
 .prod-chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.625em 0.875em;font-size:1.8em;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:80px;flex:1}
-.chip strong{color:#e2e8f0;font-size:2.25em;font-weight:700}
-.chip span{font-size:1.5em;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+.chip{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.44em 0.6em;font-size:0.63em;color:#94a3b8;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:56px;flex:1}
+.chip strong{color:#e2e8f0;font-size:0.79em;font-weight:700}
+.chip span{font-size:0.53em;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
 
 /* ── SECTIONS ── */
-.page-body{padding:0 14px 220px}
+.page-body{padding:0 14px 180px}
 .section{background:#111827;border-radius:18px;margin-top:14px;border:1px solid #1e293b;overflow:hidden}
 .sec-head{padding:0.875em 1.125em;background:rgba(99,102,241,0.08);border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:10px}
 .sec-head-icon{width:2em;height:2em;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1em;flex-shrink:0}
@@ -3600,7 +3600,7 @@ body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri',
 
 /* ── DELIVERY TRACK ── */
 .track-wrap{padding:1.125em}
-.track-title{font-size:1.75em;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:1.25em;display:flex;align-items:center;gap:8px}
+.track-title{font-size:0.875em;font-weight:800;color:#818cf8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:1.25em;display:flex;align-items:center;gap:8px}
 .track-steps{display:flex;justify-content:space-between;position:relative;padding:0 8px}
 .track-line{position:absolute;top:18px;left:30px;right:30px;height:3px;background:#1e293b;border-radius:2px;z-index:0}
 .track-line-fill{position:absolute;top:0;left:0;height:100%;border-radius:2px;background:linear-gradient(90deg,#10b981,#6366f1);transition:width .5s ease}
@@ -3627,9 +3627,9 @@ body{width:100%;min-height:100vh;background:#070d1a;font-family:'Hind Siliguri',
 .footer-brand{font-size:2em;color:#475569;font-weight:700;margin-bottom:4px}
 
 /* ── STICKY ACTION BAR ── */
-.action-bar{position:fixed;bottom:0;left:0;right:0;padding:1.5em 1.25em 3em;background:linear-gradient(180deg,transparent,#070d1a 30%,#070d1a 100%);display:flex;gap:14px;z-index:30}
-.btn-print{flex:1;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;padding:2.25em;border-radius:20px;font-size:2.25em;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 25px rgba(99,102,241,0.4);letter-spacing:.3px}
-.btn-close{width:7.5em;height:7.5em;background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:20px;font-size:2.25em;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.action-bar{position:fixed;bottom:0;left:0;right:0;padding:0.75em 1em 1.5em;background:linear-gradient(180deg,transparent,#070d1a 30%,#070d1a 100%);display:flex;gap:10px;z-index:30}
+.btn-print{flex:1;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;padding:1.125em;border-radius:16px;font-size:1.125em;font-weight:800;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 25px rgba(99,102,241,0.4);letter-spacing:.3px}
+.btn-close{width:3.75em;height:3.75em;background:#1e293b;color:#94a3b8;border:1px solid #334155;border-radius:16px;font-size:1.125em;font-weight:700;cursor:pointer;font-family:'Hind Siliguri',sans-serif;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .btn-close:active,.btn-print:active{transform:scale(0.97)}
 
 /* ── PRINT ── */
