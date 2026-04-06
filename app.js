@@ -4212,108 +4212,108 @@ function openReturnModal(orderId) {
         <div style="background:#fff; width:100%; max-width:${isMobileReturn ? '100%' : '420px'}; height:${isMobileReturn ? '100%' : 'auto'}; max-height:${isMobileReturn ? '100%' : '92vh'}; border-radius:${isMobileReturn ? '0' : '32px'}; display:flex; flex-direction:column; box-shadow:0 50px 100px -20px rgba(0,0,0,0.6); animation: modalPopUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); position:relative; overflow:hidden; border: ${isMobileReturn ? 'none' : '1px solid rgba(255,255,255,0.3)'};">
             
             <!-- শীর্ষ সতর্কতা বার -->
-            <div style="background: linear-gradient(90deg, #fff7ed, #ffedd5); padding: ${isMobileReturn ? '16px 20px' : '12px 20px'}; border-bottom: 1px solid #fed7aa; display: flex; align-items: center; justify-content: center; gap: 8px; flex-shrink:0;">
-                <i class="fa fa-info-circle" style="color: #f97316; font-size: ${isMobileReturn ? '20px' : '14px'};"></i>
-                <span style="font-size: ${isMobileReturn ? '16px' : '11px'}; color: #9a3412; font-weight: 700;">ছবি আপলোড করতে না পারলে <a href="https://wa.me/8801822963824" target="_blank" style="color: #ea580c; text-decoration: underline; font-weight: 800;">এখানে যোগাযোগ করুন</a></span>
+            <div style="background: linear-gradient(90deg, #fff7ed, #ffedd5); padding: ${isMobileReturn ? '24px 28px' : '12px 20px'}; border-bottom: 1px solid #fed7aa; display: flex; align-items: center; justify-content: center; gap: 10px; flex-shrink:0;">
+                <i class="fa fa-info-circle" style="color: #f97316; font-size: ${isMobileReturn ? '28px' : '14px'};"></i>
+                <span style="font-size: ${isMobileReturn ? '22px' : '11px'}; color: #9a3412; font-weight: 700; line-height:1.5;">ছবি আপলোড করতে না পারলে <a href="https://wa.me/8801822963824" target="_blank" style="color: #ea580c; text-decoration: underline; font-weight: 800;">এখানে যোগাযোগ করুন</a></span>
             </div>
 
             <!-- হেডার -->
-            <div style="padding: ${isMobileReturn ? '20px 24px' : '15px 24px'}; background: #fff; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; flex-shrink:0;">
-                <div style="display:flex; align-items:center; gap:14px;">
-                    <div style="background:linear-gradient(135deg, #ef4444, #b91c1c); width:${isMobileReturn ? '52px' : '36px'}; height:${isMobileReturn ? '52px' : '36px'}; border-radius:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                        <i class="fa fa-undo" style="color:#fff; font-size:${isMobileReturn ? '20px' : '13px'};"></i>
+            <div style="padding: ${isMobileReturn ? '28px 30px' : '15px 24px'}; background: #fff; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; flex-shrink:0;">
+                <div style="display:flex; align-items:center; gap:${isMobileReturn ? '18px' : '14px'};">
+                    <div style="background:linear-gradient(135deg, #ef4444, #b91c1c); width:${isMobileReturn ? '72px' : '36px'}; height:${isMobileReturn ? '72px' : '36px'}; border-radius:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <i class="fa fa-undo" style="color:#fff; font-size:${isMobileReturn ? '28px' : '13px'};"></i>
                     </div>
                     <div>
-                        <h3 style="margin:0; color:#0f172a; font-size:${isMobileReturn ? '24px' : '16px'}; font-weight:800;">রিটার্ন পোর্টাল</h3>
-                        <p style="margin:0; font-size:${isMobileReturn ? '15px' : '10px'}; color:#94a3b8; font-weight:600;">অর্ডার: #${orderId}</p>
+                        <h3 style="margin:0; color:#0f172a; font-size:${isMobileReturn ? '34px' : '16px'}; font-weight:800;">রিটার্ন পোর্টাল</h3>
+                        <p style="margin:0; font-size:${isMobileReturn ? '20px' : '10px'}; color:#94a3b8; font-weight:600; margin-top:4px;">অর্ডার: #${orderId}</p>
                     </div>
                 </div>
-                <button onclick="document.getElementById('returnModal').remove()" style="width:${isMobileReturn ? '44px' : '30px'}; height:${isMobileReturn ? '44px' : '30px'}; background:#f1f5f9; border:none; border-radius:50%; cursor:pointer; color:#64748b; font-size:${isMobileReturn ? '26px' : '18px'}; display:flex; align-items:center; justify-content:center;">&times;</button>
+                <button onclick="document.getElementById('returnModal').remove()" style="width:${isMobileReturn ? '60px' : '30px'}; height:${isMobileReturn ? '60px' : '30px'}; background:#f1f5f9; border:none; border-radius:50%; cursor:pointer; color:#64748b; font-size:${isMobileReturn ? '36px' : '18px'}; display:flex; align-items:center; justify-content:center; flex-shrink:0;">&times;</button>
             </div>
 
             <!-- বডি -->
-            <div class="custom-modal-body" style="padding: ${isMobileReturn ? '24px 20px' : '20px 24px'}; overflow-y: auto; flex: 1; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
+            <div class="custom-modal-body" style="padding: ${isMobileReturn ? '30px 26px' : '20px 24px'}; overflow-y: auto; flex: 1; scroll-behavior: smooth; -webkit-overflow-scrolling: touch;">
                 
                 <!-- প্রমাণস্বরূপ ছবি -->
-                <div style="margin-bottom:${isMobileReturn ? '28px' : '20px'};">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:${isMobileReturn ? '16px' : '12px'};">
-                        <label style="font-size:${isMobileReturn ? '18px' : '13px'}; font-weight:700; color:#334155;">প্রমাণস্বরূপ ছবি</label>
-                        <button onclick="addNewImageInput()" style="font-size:${isMobileReturn ? '15px' : '11px'}; color:#3b82f6; border:1px solid #3b82f6; background:#eff6ff; padding:${isMobileReturn ? '10px 16px' : '6px 12px'}; border-radius:12px; cursor:pointer; font-weight:700;">
+                <div style="margin-bottom:${isMobileReturn ? '36px' : '20px'};">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:${isMobileReturn ? '20px' : '12px'}; flex-wrap:wrap; gap:10px;">
+                        <label style="font-size:${isMobileReturn ? '26px' : '13px'}; font-weight:700; color:#334155;">প্রমাণস্বরূপ ছবি</label>
+                        <button onclick="addNewImageInput()" style="font-size:${isMobileReturn ? '20px' : '11px'}; color:#3b82f6; border:2px solid #3b82f6; background:#eff6ff; padding:${isMobileReturn ? '14px 22px' : '6px 12px'}; border-radius:14px; cursor:pointer; font-weight:700;">
                             <i class="fa fa-plus-circle"></i> আরো ছবি যোগ করুন
                         </button>
                     </div>
 
                     <div id="imageInputsContainer">
-                        <div class="img-input-group" style="margin-bottom:${isMobileReturn ? '18px' : '14px'}; background:#f8fafc; border:2px solid #e2e8f0; border-radius:18px; padding:${isMobileReturn ? '18px' : '14px'};">
+                        <div class="img-input-group" style="margin-bottom:${isMobileReturn ? '22px' : '14px'}; background:#f8fafc; border:2px solid #e2e8f0; border-radius:20px; padding:${isMobileReturn ? '24px' : '14px'};">
                             
                             <!-- ফাইল আপলোড বাটন -->
-                            <div style="margin-bottom:${isMobileReturn ? '14px' : '10px'};">
-                                <label style="display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:${isMobileReturn ? '16px 20px' : '10px 16px'}; border-radius:14px; cursor:pointer; font-size:${isMobileReturn ? '17px' : '13px'}; font-weight:700; text-align:center;">
+                            <div style="margin-bottom:${isMobileReturn ? '18px' : '10px'};">
+                                <label style="display:flex; align-items:center; justify-content:center; gap:12px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:${isMobileReturn ? '22px 24px' : '10px 16px'}; border-radius:16px; cursor:pointer; font-size:${isMobileReturn ? '22px' : '13px'}; font-weight:700; text-align:center;">
                                     <i class="fa fa-upload"></i> ফাইল থেকে ছবি আপলোড করুন
                                     <input type="file" accept="image/*" class="return-img-file" style="display:none;" onchange="uploadReturnImageFile(this)">
                                 </label>
-                                <div class="img-upload-status" style="display:none; margin-top:10px; font-size:${isMobileReturn ? '15px' : '12px'}; color:#6366f1; font-weight:600; text-align:center;">
+                                <div class="img-upload-status" style="display:none; margin-top:12px; font-size:${isMobileReturn ? '20px' : '12px'}; color:#6366f1; font-weight:600; text-align:center;">
                                     <i class="fa fa-spinner fa-spin"></i> আপলোড হচ্ছে...
                                 </div>
                             </div>
 
                             <!-- OR divider -->
-                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:${isMobileReturn ? '14px' : '10px'};">
+                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:${isMobileReturn ? '18px' : '10px'};">
                                 <div style="flex:1; height:1px; background:#e2e8f0;"></div>
-                                <span style="font-size:${isMobileReturn ? '15px' : '11px'}; color:#94a3b8; font-weight:600;">অথবা লিংক দিন</span>
+                                <span style="font-size:${isMobileReturn ? '20px' : '11px'}; color:#94a3b8; font-weight:600;">অথবা লিংক দিন</span>
                                 <div style="flex:1; height:1px; background:#e2e8f0;"></div>
                             </div>
 
                             <!-- লিংক input -->
                             <input type="url" class="return-image-url" placeholder="ছবির ডিরেক্ট লিংক দিন..." 
-                                style="width:100%; padding:${isMobileReturn ? '16px 18px' : '11px 14px'}; border:2px solid #e2e8f0; border-radius:14px; outline:none; font-size:${isMobileReturn ? '16px' : '12px'}; background:#fff; box-sizing:border-box;"
+                                style="width:100%; padding:${isMobileReturn ? '22px 22px' : '11px 14px'}; border:2px solid #e2e8f0; border-radius:16px; outline:none; font-size:${isMobileReturn ? '20px' : '12px'}; background:#fff; box-sizing:border-box;"
                                 oninput="previewSingleImage(this)">
 
                             <!-- Preview -->
-                            <div class="single-preview" style="margin-top:12px; display:none;">
-                                <div style="width:${isMobileReturn ? '100px' : '80px'}; height:${isMobileReturn ? '100px' : '80px'}; border-radius:14px; overflow:hidden; border:2px solid #6366f1;">
+                            <div class="single-preview" style="margin-top:14px; display:none;">
+                                <div style="width:${isMobileReturn ? '130px' : '80px'}; height:${isMobileReturn ? '130px' : '80px'}; border-radius:16px; overflow:hidden; border:2px solid #6366f1;">
                                     <img src="" style="width:100%; height:100%; object-fit:fill;">
                                 </div>
-                                <span class="preview-ok" style="display:block; font-size:${isMobileReturn ? '14px' : '11px'}; color:#10b981; font-weight:700; margin-top:6px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
+                                <span class="preview-ok" style="display:block; font-size:${isMobileReturn ? '18px' : '11px'}; color:#10b981; font-weight:700; margin-top:8px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- বিস্তারিত কারণ -->
-                <div style="margin-bottom:${isMobileReturn ? '28px' : '20px'};">
-                    <label style="display:block; margin-bottom:${isMobileReturn ? '12px' : '8px'}; font-size:${isMobileReturn ? '18px' : '13px'}; font-weight:700; color:#334155;">বিস্তারিত কারণ</label>
-                    <textarea id="returnReason" placeholder="বিস্তারিত লিখুন..." style="width:100%; padding:${isMobileReturn ? '18px' : '14px'}; border:2px solid #f1f5f9; border-radius:20px; font-family:inherit; resize:none; height:${isMobileReturn ? '110px' : '80px'}; outline:none; font-size:${isMobileReturn ? '17px' : '13px'}; background:#f8fafc; box-sizing: border-box;"></textarea>
+                <div style="margin-bottom:${isMobileReturn ? '36px' : '20px'};">
+                    <label style="display:block; margin-bottom:${isMobileReturn ? '16px' : '8px'}; font-size:${isMobileReturn ? '26px' : '13px'}; font-weight:700; color:#334155;">বিস্তারিত কারণ</label>
+                    <textarea id="returnReason" placeholder="বিস্তারিত লিখুন..." style="width:100%; padding:${isMobileReturn ? '24px' : '14px'}; border:2px solid #f1f5f9; border-radius:20px; font-family:inherit; resize:none; height:${isMobileReturn ? '150px' : '80px'}; outline:none; font-size:${isMobileReturn ? '22px' : '13px'}; background:#f8fafc; box-sizing: border-box; line-height:1.6;"></textarea>
                 </div>
 
                 <!-- রিফান্ড মাধ্যম -->
-                <div style="margin-bottom:${isMobileReturn ? '28px' : '20px'};">
-                    <label style="display:block; margin-bottom:${isMobileReturn ? '12px' : '8px'}; font-size:${isMobileReturn ? '18px' : '13px'}; font-weight:700; color:#334155;">রিফান্ড মাধ্যম</label>
-                    <select id="refundMethod" onchange="toggleRefundFields()" style="width:100%; padding:${isMobileReturn ? '18px' : '14px'}; border:2px solid #f1f5f9; border-radius:20px; background:#f8fafc; font-size:${isMobileReturn ? '18px' : '14px'}; font-weight:700;">
+                <div style="margin-bottom:${isMobileReturn ? '36px' : '20px'};">
+                    <label style="display:block; margin-bottom:${isMobileReturn ? '16px' : '8px'}; font-size:${isMobileReturn ? '26px' : '13px'}; font-weight:700; color:#334155;">রিফান্ড মাধ্যম</label>
+                    <select id="refundMethod" onchange="toggleRefundFields()" style="width:100%; padding:${isMobileReturn ? '24px 20px' : '14px'}; border:2px solid #f1f5f9; border-radius:20px; background:#f8fafc; font-size:${isMobileReturn ? '24px' : '14px'}; font-weight:700;">
                         <option value="voucher">🎁 শপিং ভাউচার</option>
                         <option value="payment">📱 পার্সোনাল পেমেন্ট</option>
                     </select>
                 </div>
 
                 <!-- পেমেন্ট ফিল্ড -->
-                <div id="paymentFields" style="display:none; background:#eff6ff; padding:${isMobileReturn ? '20px' : '15px'}; border-radius:24px; border:1px solid #bfdbfe; margin-bottom:${isMobileReturn ? '20px' : '15px'};">
-                    <select id="paymentType" style="width:100%; padding:${isMobileReturn ? '16px' : '10px'}; border-radius:14px; border:1.5px solid #fff; margin-bottom:12px; font-size:${isMobileReturn ? '17px' : '14px'}; font-weight:600;">
+                <div id="paymentFields" style="display:none; background:#eff6ff; padding:${isMobileReturn ? '26px' : '15px'}; border-radius:24px; border:1px solid #bfdbfe; margin-bottom:${isMobileReturn ? '26px' : '15px'};">
+                    <select id="paymentType" style="width:100%; padding:${isMobileReturn ? '22px 20px' : '10px'}; border-radius:16px; border:1.5px solid #fff; margin-bottom:${isMobileReturn ? '16px' : '10px'}; font-size:${isMobileReturn ? '22px' : '14px'}; font-weight:600;">
                         <option value="Bkash">বিকাশ (bKash)</option>
                         <option value="Nagad">নগদ (Nagad)</option>
                     </select>
-                    <input type="number" id="refundNumber" placeholder="নম্বর দিন" style="width:100%; padding:${isMobileReturn ? '16px' : '12px'}; border-radius:14px; border:1.5px solid #fff; box-sizing:border-box; font-size:${isMobileReturn ? '17px' : '14px'};">
+                    <input type="number" id="refundNumber" placeholder="নম্বর দিন" style="width:100%; padding:${isMobileReturn ? '22px 20px' : '12px'}; border-radius:16px; border:1.5px solid #fff; box-sizing:border-box; font-size:${isMobileReturn ? '22px' : '14px'};">
                 </div>
             </div>
 
             <!-- সাবমিট বাটন -->
-            <div style="padding: ${isMobileReturn ? '20px 20px 32px' : '18px 24px'}; background: #fff; border-top: 1px solid #f1f5f9; flex-shrink:0;">
-                <button onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0f172a; color:#fff; border:none; padding:${isMobileReturn ? '22px' : '18px'}; border-radius:20px; font-weight:800; cursor:pointer; font-size:${isMobileReturn ? '20px' : '16px'}; font-family:'Hind Siliguri', 'Inter', sans-serif; letter-spacing:0.3px;">সাবমিট করুন</button>
+            <div style="padding: ${isMobileReturn ? '24px 24px 40px' : '18px 24px'}; background: #fff; border-top: 1px solid #f1f5f9; flex-shrink:0;">
+                <button onclick="submitReturnRequest('${orderId}')" style="width:100%; background:#0f172a; color:#fff; border:none; padding:${isMobileReturn ? '28px' : '18px'}; border-radius:22px; font-weight:800; cursor:pointer; font-size:${isMobileReturn ? '26px' : '16px'}; font-family:'Hind Siliguri', 'Inter', sans-serif; letter-spacing:0.3px;">সাবমিট করুন</button>
             </div>
         </div>
     </div>
     <style>
         @keyframes modalPopUp { 0% { opacity: 0; transform: scale(0.97) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
-        .custom-modal-body::-webkit-scrollbar { width: 4px; }
+        .custom-modal-body::-webkit-scrollbar { width: 6px; }
         .custom-modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>`;
 
@@ -4328,27 +4328,27 @@ window.addNewImageInput = function() {
     div.style.cssText = "margin-bottom:14px; background:#f8fafc; border:2px solid #e2e8f0; border-radius:16px; padding:14px; position:relative;";
     const isMobAdd = screen.width <= 768 || document.documentElement.classList.contains('is-mobile');
     div.innerHTML = `
-        <button onclick="this.parentElement.remove()" style="position:absolute; right:10px; top:10px; background:#fee2e2; border:none; color:#ef4444; width:${isMobAdd?'36px':'24px'}; height:${isMobAdd?'36px':'24px'}; border-radius:50%; cursor:pointer; z-index:1; font-size:${isMobAdd?'18px':'14px'};">&times;</button>
-        <label style="display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:${isMobAdd?'16px 20px':'10px 16px'}; border-radius:14px; cursor:pointer; font-size:${isMobAdd?'17px':'13px'}; font-weight:700; margin-bottom:${isMobAdd?'14px':'10px'};">
+        <button onclick="this.parentElement.remove()" style="position:absolute; right:12px; top:12px; background:#fee2e2; border:none; color:#ef4444; width:${isMobAdd?'50px':'24px'}; height:${isMobAdd?'50px':'24px'}; border-radius:50%; cursor:pointer; z-index:1; font-size:${isMobAdd?'26px':'14px'}; display:flex; align-items:center; justify-content:center;">&times;</button>
+        <label style="display:flex; align-items:center; justify-content:center; gap:10px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:${isMobAdd?'22px 24px':'10px 16px'}; border-radius:16px; cursor:pointer; font-size:${isMobAdd?'22px':'13px'}; font-weight:700; margin-bottom:${isMobAdd?'18px':'10px'};">
             <i class="fa fa-upload"></i> ফাইল থেকে আপলোড
             <input type="file" accept="image/*" class="return-img-file" style="display:none;" onchange="uploadReturnImageFile(this)">
         </label>
-        <div class="img-upload-status" style="display:none; font-size:${isMobAdd?'15px':'12px'}; color:#6366f1; font-weight:600; text-align:center; margin-bottom:${isMobAdd?'12px':'8px'};">
+        <div class="img-upload-status" style="display:none; font-size:${isMobAdd?'20px':'12px'}; color:#6366f1; font-weight:600; text-align:center; margin-bottom:${isMobAdd?'16px':'8px'};">
             <i class="fa fa-spinner fa-spin"></i> আপলোড হচ্ছে...
         </div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:${isMobAdd?'14px':'10px'};">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:${isMobAdd?'18px':'10px'};">
             <div style="flex:1; height:1px; background:#e2e8f0;"></div>
-            <span style="font-size:${isMobAdd?'15px':'11px'}; color:#94a3b8; font-weight:600;">অথবা লিংক</span>
+            <span style="font-size:${isMobAdd?'20px':'11px'}; color:#94a3b8; font-weight:600;">অথবা লিংক</span>
             <div style="flex:1; height:1px; background:#e2e8f0;"></div>
         </div>
         <input type="url" class="return-image-url" placeholder="ছবির লিংক দিন..." 
-            style="width:100%; padding:${isMobAdd?'16px 18px':'11px 14px'}; border:2px solid #e2e8f0; border-radius:14px; outline:none; font-size:${isMobAdd?'16px':'12px'}; background:#fff; box-sizing:border-box;"
+            style="width:100%; padding:${isMobAdd?'22px 22px':'11px 14px'}; border:2px solid #e2e8f0; border-radius:16px; outline:none; font-size:${isMobAdd?'20px':'12px'}; background:#fff; box-sizing:border-box;"
             oninput="previewSingleImage(this)">
-        <div class="single-preview" style="margin-top:12px; display:none;">
-            <div style="width:${isMobAdd?'100px':'80px'}; height:${isMobAdd?'100px':'80px'}; border-radius:14px; overflow:hidden; border:2px solid #6366f1;">
+        <div class="single-preview" style="margin-top:14px; display:none;">
+            <div style="width:${isMobAdd?'130px':'80px'}; height:${isMobAdd?'130px':'80px'}; border-radius:16px; overflow:hidden; border:2px solid #6366f1;">
                 <img src="" style="width:100%; height:100%; object-fit:fill;">
             </div>
-            <span style="display:block; font-size:${isMobAdd?'14px':'11px'}; color:#10b981; font-weight:700; margin-top:6px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
+            <span style="display:block; font-size:${isMobAdd?'18px':'11px'}; color:#10b981; font-weight:700; margin-top:8px;"><i class="fa fa-check-circle"></i> ছবি প্রস্তুত</span>
         </div>
     `;
     container.appendChild(div);
