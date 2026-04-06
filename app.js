@@ -2169,9 +2169,15 @@ function viewUserOrderDetails(orderId) {
     const total = parseFloat(order.price);
 
     const isMobileView = window.innerWidth <= 768;
+    const _mW = isMobileView ? '100%' : '95%';
+    const _mH = isMobileView ? '100%' : '92%';
+    const _mMW = isMobileView ? '100%' : '600px';
+    const _mBR = isMobileView ? '0' : '25px';
+    const _mBD = isMobileView ? 'none' : '1px solid #3498db';
+    const _mAL = isMobileView ? 'flex-start' : 'center';
     const modalHtml = `
-        <div id="userOrderModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:${isMobileView ? 'flex-start' : 'center'}; justify-content:center; z-index:10000000; backdrop-filter: blur(8px); font-family: 'Hind Siliguri', sans-serif;">
-            <div style="background:#fff; width:${isMobileView ? '100%' : '95%'}; height:${isMobileView ? '100%' : '92%'}; max-width:${isMobileView ? '100%' : '600px'}; border-radius:${isMobileView ? '0' : '25px'}; overflow:hidden; display:flex; flex-direction:column; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border:${isMobileView ? 'none' : '1px solid #3498db'}; animation: zoomIn 0.3s ease;">
+        <div id="userOrderModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; align-items:${_mAL}; justify-content:center; z-index:10000000; backdrop-filter: blur(8px); font-family: 'Hind Siliguri', sans-serif;">
+            <div style="background:#fff; width:${_mW}; height:${_mH}; max-width:${_mMW}; border-radius:${_mBR}; overflow:hidden; display:flex; flex-direction:column; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border:${_mBD}; animation: zoomIn 0.3s ease;">
                 
                 <div style="background:#3498db; color:white; padding:20px; text-align:center; position:relative;">
                     <h3 style="margin:0; font-size:18px;">অর্ডার ডিটেইলস ও ট্র্যাকিং</h3>
