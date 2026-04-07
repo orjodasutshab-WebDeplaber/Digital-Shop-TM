@@ -59,6 +59,7 @@
         _initFirebase();
         _injectCSS();
         _buildMainUI();
+        _injectButtons();
         _bindHotkey();
         if (_currentUser) {
             _loadChatList();
@@ -2285,11 +2286,6 @@
         String(id || '').split('').forEach(c => { h = (h * 31 + c.charCodeAt(0)) & 0xffff; });
         return colors[h % colors.length];
     }
-
-    /* ══════════════════════════════════════════════════════════
-       INJECT BUTTONS (after DOM ready)
-    ══════════════════════════════════════════════════════════ */
-    _injectButtons();
 
     /* ══════════════════════════════════════════════════════════
        PUBLIC API
