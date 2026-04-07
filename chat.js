@@ -1,29 +1,51 @@
 /* ================================================================
-   DIGITAL SHOP TM — Group Chat  v1.0
-   WhatsApp-style real-time group chat using Firebase Firestore
+   DIGITAL SHOP TM — WhatsApp-Style Chat  v3.0
+   ----------------------------------------------------------------
+   ✅ ফিচার সমূহ:
+   - WhatsApp-এর মতো ডিজাইন (Dark theme)
+   - সাবজনীন (Public) গ্রুপ + কাস্টম গ্রুপ
+   - পার্সোনাল চ্যাট
+   - গ্রুপ সেটিং (এডমিন পরিবর্তন, মেম্বার যোগ/বাদ)
+   - প্রোফাইল (ছবি, বায়ো, নাম)
+   - ব্লক, ডিলিট, ক্লিয়ার চ্যাট
+   - মোবাইল + পিসি রেসপন্সিভ
    ================================================================ */
 
 (function () {
     'use strict';
 
-    /* ── Constants ─────────────────────────────────────────────── */
-    const GROUP_ID   = 'digital_shop_tm_main';
-    const GROUP_NAME = 'Digital Shop TM';
-    const MAX_MSG    = 100;   // messages to load at once
-    const TYPING_TTL = 4000;  // ms before typing indicator clears
+    /* ── Firebase Config ─────────────────────────────────────── */
+    const FB_CFG = {
+        apiKey: "AIzaSyCRJ6kN1nvr1RxKdIiBnxWVJGXm6U2kRr0",
+        authDomain: "digitalshoptm-2008.firebaseapp.com",
+        projectId: "digitalshoptm-2008",
+        storageBucket: "digitalshoptm-2008.firebasestorage.app",
+        messagingSenderId: "627378095856",
+        appId: "1:627378095856:web:b705f4f75e0512646ca435"
+    };
 
-    let _db            = null;
-    let _unsubscribe   = null;
-    let _typingTimer   = null;
-    let _isOpen        = false;
-    let _currentUser   = null;
-    let _lastMsgDate   = null;
-    let _replyTarget   = null;   // { id, senderName, text }
-    let _mediaPreview  = null;   // base64 image to send
-    let _unreadCount   = 0;
-    let _isAtBottom    = true;
+    const PUBLIC_GROUP_ID   = 'digital_shop_tm_main';
+    const PUBLIC_GROUP_NAME = 'Digital Shop TM সাবজনীন';
+    const MAX_MSG = 100;
+    const TYPING_TTL = 4000;
 
-    /* ── Wait for app to be ready, then init ───────────────────── */
+    let _db           = null;
+    let _currentUser  = null;
+    let _isMobile     = false;
+    let _activeChat   = null; // { type:'group'|'personal', id, name, avatar, isPublic }
+    let _unsubMsg     = null;
+    let _unsubTyping  = null;
+    let _typingTimer  = null;
+    let _isAtBottom   = true;
+    let _replyTarget  = null;
+    let _mediaPreview = null;
+    let _chatList     = []; // loaded chats
+    let _unreadMap    = {}; // chatId -> count
+    let _activeTab    = 'all'; // all|unread|groups
+
+    /* ══════════════════════════════════════════════════════════
+       INIT
+    ══════════════════════════════════════════════════════════ */
     window.addEventListener('load', function () {
         (window.TM_READY || Promise.resolve()).then(function () {
             setTimeout(_init, 600);
@@ -32,12 +54,18 @@
 
     function _init() {
         _currentUser = _getSessionUser();
+        _isMobile = document.documentElement.classList.contains('is-mobile') ||
+                    /Android|iPhone|iPad/i.test(navigator.userAgent);
         _initFirebase();
-        _buildUI();
+        _injectCSS();
+        _buildMainUI();
         _bindHotkey();
+        if (_currentUser) {
+            _loadChatList();
+            _ensurePublicGroup();
+        }
     }
 
-    /* ── Get current user from session ─────────────────────────── */
     function _getSessionUser() {
         try {
             const s = localStorage.getItem('TM_SESSION_USER');
@@ -45,1242 +73,2237 @@
         } catch (e) { return null; }
     }
 
-    /* ── Firebase init ─────────────────────────────────────────── */
     function _initFirebase() {
         if (typeof firebase === 'undefined') return;
         if (firebase.apps && firebase.apps.length) {
             _db = firebase.firestore();
         } else {
-            const cfg = {
-                apiKey: "AIzaSyCRJ6kN1nvr1RxKdIiBnxWVJGXm6U2kRr0",
-                authDomain: "digitalshoptm-2008.firebaseapp.com",
-                projectId: "digitalshoptm-2008",
-                storageBucket: "digitalshoptm-2008.firebasestorage.app",
-                messagingSenderId: "627378095856",
-                appId: "1:627378095856:web:b705f4f75e0512646ca435"
-            };
-            firebase.initializeApp(cfg);
+            firebase.initializeApp(FB_CFG);
             _db = firebase.firestore();
         }
-        /* ensure group doc exists */
-        _db.collection('tm_groups').doc(GROUP_ID).set({
-            name: GROUP_NAME,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       BUILD UI
-    ═══════════════════════════════════════════════════════════ */
-    function _buildUI() {
-        _injectCSS();
-        _buildOverlay();
-        _injectButtons();
+    function _ensurePublicGroup() {
+        if (!_db || !_currentUser) return;
+        _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set({
+            name: PUBLIC_GROUP_NAME,
+            isPublic: true,
+            adminId: 'system',
+            allowMemberAdd: false,
+            allowMemberMsg: true,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            members: firebase.firestore.FieldValue.arrayUnion(String(_currentUser.id))
+        }, { merge: true }).catch(()=>{});
     }
 
-    /* ── CSS ─────────────────────────────────────────────────── */
+    /* ══════════════════════════════════════════════════════════
+       CSS
+    ══════════════════════════════════════════════════════════ */
     function _injectCSS() {
+        if (document.getElementById('tmv3-style')) return;
         const s = document.createElement('style');
-        s.id = 'tm-chat-style';
+        s.id = 'tmv3-style';
         s.textContent = `
-/* ════ Chat Button ════ */
-#tmChatBtnPC {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg,#25d366 0%,#128c7e 100%);
-    border: none;
-    cursor: pointer;
-    position: relative;
-    box-shadow: 0 4px 15px rgba(37,211,102,0.4);
-    transition: opacity .2s, transform .2s;
-    flex-shrink: 0;
-}
-#tmChatBtnPC:hover { opacity:.85; transform:scale(1.08); }
-#tmChatBtnPC svg { width:22px; height:22px; fill:#fff; }
-
-/* Mobile — bottom-sheet account menu এ item হিসেবে inject */
-.tm-chat-mob-item {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    padding: 22px 28px;
-    color: #ebebf5;
-    cursor: pointer;
-    font-size: 28px;
-    font-weight: 500;
-    border-bottom: 1px solid #2c2c2e;
-    -webkit-tap-highlight-color: rgba(255,255,255,.08);
-    transition: background .15s;
-    font-family: 'Hind Siliguri', sans-serif;
-}
-.tm-chat-mob-item:active { background:#2c2c2e; }
-.tm-chat-mob-item .mob-icon-wrap {
-    width:60px; height:60px;
-    border-radius:16px;
-    background:rgba(37,211,102,.18);
-    display:flex; align-items:center; justify-content:center;
-    flex-shrink:0; font-size:26px;
+/* ══ Reset & Base ══ */
+#tmv3-root * { box-sizing:border-box; margin:0; padding:0; }
+#tmv3-root, #tmv3-overlay {
+    font-family:'Hind Siliguri',system-ui,sans-serif;
 }
 
-/* unread badge */
-.tm-chat-badge {
-    position:absolute;
-    top:-4px; right:-4px;
-    background:#ef4444;
-    color:#fff;
-    font-size:10px;
-    font-weight:700;
-    border-radius:50%;
-    width:18px; height:18px;
+/* ══ Trigger Buttons ══ */
+#tmv3-pc-btn {
     display:none;
     align-items:center; justify-content:center;
+    width:40px; height:40px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#25d366,#128c7e);
+    border:none; cursor:pointer;
+    position:relative;
+    box-shadow:0 4px 15px rgba(37,211,102,.4);
+    transition:.2s; flex-shrink:0;
+}
+#tmv3-pc-btn:hover { opacity:.85; transform:scale(1.08); }
+#tmv3-pc-btn svg { width:22px; height:22px; fill:#fff; }
+.tmv3-badge {
+    position:absolute; top:-4px; right:-4px;
+    background:#ef4444; color:#fff;
+    font-size:10px; font-weight:700;
+    border-radius:50%; width:18px; height:18px;
+    display:none; align-items:center; justify-content:center;
     border:2px solid #0f172a;
-    line-height:1;
 }
-.tm-chat-badge.show { display:flex; }
-
-/* mobile badge (text span next to label) */
-.tm-mob-badge {
-    background:#ef4444;
-    color:#fff;
-    font-size:20px;
-    font-weight:700;
-    border-radius:50px;
-    padding:2px 10px;
-    display:none;
-    margin-left:auto;
+.tmv3-badge.show { display:flex; }
+.tmv3-mob-item {
+    display:flex; align-items:center; gap:24px;
+    padding:22px 28px; color:#ebebf5; cursor:pointer;
+    font-size:28px; font-weight:500;
+    border-bottom:1px solid #2c2c2e;
+    transition:background .15s;
 }
-.tm-mob-badge.show { display:block; }
+.tmv3-mob-item:active { background:#2c2c2e; }
+.tmv3-mob-item .mob-icon { width:60px; height:60px; border-radius:16px; background:rgba(37,211,102,.18); display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; }
+.tmv3-mob-badge { background:#ef4444; color:#fff; font-size:20px; font-weight:700; border-radius:50px; padding:2px 10px; display:none; margin-left:auto; }
+.tmv3-mob-badge.show { display:block; }
 
-/* ════ Overlay / Modal ════ */
-#tmChatOverlay {
-    display:none;
-    position:fixed;
-    inset:0;
-    z-index:99999990;
-    background:rgba(0,0,0,.6);
-    backdrop-filter:blur(4px);
-    -webkit-backdrop-filter:blur(4px);
-    align-items:center;
-    justify-content:center;
-    font-family:'Hind Siliguri',sans-serif;
+/* ══ Overlay ══ */
+#tmv3-overlay {
+    display:none; position:fixed; inset:0; z-index:99999990;
+    background:rgba(0,0,0,.6); backdrop-filter:blur(4px);
+    align-items:center; justify-content:center;
 }
-#tmChatOverlay.open { display:flex; }
+#tmv3-overlay.open { display:flex; }
 
-#tmChatModal {
+/* ══ Main Window ══ */
+#tmv3-root {
     background:#111b21;
-    width:min(800px,100vw);
+    width:min(900px,100vw);
     height:min(700px,100vh);
-    border-radius:20px;
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
+    border-radius:16px;
+    display:flex; overflow:hidden;
     box-shadow:0 30px 80px rgba(0,0,0,.7);
     position:relative;
 }
-
-/* Mobile — fullscreen */
-html.is-mobile #tmChatModal {
+.is-mobile #tmv3-root {
     width:100vw !important;
-    height:100vh !important;
+    height:100dvh !important;
     border-radius:0 !important;
+    flex-direction:column;
 }
 
-/* ── Header ── */
-#tmChatHeader {
+/* ══ Left Panel ══ */
+#tmv3-left {
+    width:340px; min-width:260px; max-width:340px;
+    display:flex; flex-direction:column;
+    background:#111b21;
+    border-right:1px solid #2a3942;
+    flex-shrink:0;
+}
+.is-mobile #tmv3-left {
+    width:100%; max-width:100%;
+    height:100%; position:absolute; inset:0; z-index:2;
+    transition:transform .25s;
+}
+.is-mobile #tmv3-left.hidden { transform:translateX(-100%); }
+
+/* Left Header */
+#tmv3-left-header {
+    padding:14px 18px 10px;
+    display:flex; align-items:center; justify-content:space-between;
+    flex-shrink:0;
+}
+#tmv3-app-title { color:#e9edef; font-size:20px; font-weight:700; }
+
+.tmv3-icon-btn {
+    background:none; border:none; color:#aebac1; cursor:pointer;
+    width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; transition:.2s; flex-shrink:0;
+    position:relative;
+}
+.tmv3-icon-btn:hover { background:#2a3942; color:#e9edef; }
+.is-mobile .tmv3-icon-btn { width:56px; height:56px; font-size:26px; }
+.tmv3-header-actions { display:flex; align-items:center; gap:4px; }
+
+/* Search Bar */
+.tmv3-search-wrap {
+    padding:8px 14px;
+    flex-shrink:0;
+}
+.tmv3-search-bar {
+    background:#202c33; border-radius:10px;
+    display:flex; align-items:center; gap:10px; padding:8px 14px;
+}
+.tmv3-search-bar i { color:#8696a0; font-size:14px; }
+.tmv3-search-bar input {
+    flex:1; background:none; border:none; outline:none;
+    color:#e9edef; font-size:14px;
+    font-family:inherit;
+}
+.tmv3-search-bar input::placeholder { color:#8696a0; }
+.is-mobile .tmv3-search-bar { padding:12px 18px; }
+.is-mobile .tmv3-search-bar i { font-size:20px; }
+.is-mobile .tmv3-search-bar input { font-size:22px; }
+
+/* Filter tabs */
+.tmv3-tabs {
+    display:flex; gap:6px; padding:4px 14px 10px;
+    flex-shrink:0; overflow-x:auto; scrollbar-width:none;
+}
+.tmv3-tabs::-webkit-scrollbar { display:none; }
+.tmv3-tab {
+    background:none; border:1px solid #2a3942;
+    color:#aebac1; padding:5px 14px; border-radius:20px;
+    cursor:pointer; font-size:13px; white-space:nowrap;
+    font-family:inherit; transition:.2s;
+}
+.tmv3-tab.active { background:#202c33; color:#00a884; border-color:#00a884; }
+.tmv3-tab:hover:not(.active) { background:#1f2c34; }
+.is-mobile .tmv3-tab { font-size:20px; padding:8px 22px; }
+
+/* Chat List */
+#tmv3-chat-list {
+    flex:1; overflow-y:auto; scrollbar-width:thin;
+    scrollbar-color:#2a3942 transparent;
+}
+#tmv3-chat-list::-webkit-scrollbar { width:4px; }
+#tmv3-chat-list::-webkit-scrollbar-thumb { background:#2a3942; border-radius:4px; }
+
+.tmv3-chat-item {
+    display:flex; align-items:center; gap:14px;
+    padding:12px 18px; cursor:pointer;
+    border-bottom:1px solid rgba(42,57,66,.4);
+    transition:background .15s;
+    position:relative;
+}
+.tmv3-chat-item:hover { background:#202c33; }
+.tmv3-chat-item.active { background:#2a3942; }
+.tmv3-chat-item:active { background:#2a3942; }
+.is-mobile .tmv3-chat-item { padding:18px 24px; gap:18px; }
+
+.tmv3-avatar {
+    width:52px; height:52px; border-radius:50%;
+    background:linear-gradient(135deg,#2a3942,#1f2c34);
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; color:#aebac1; flex-shrink:0;
+    overflow:hidden; position:relative;
+}
+.tmv3-avatar img { width:100%; height:100%; object-fit:cover; }
+.tmv3-avatar.group { background:linear-gradient(135deg,#6b21a8,#4a1d96); font-size:20px; }
+.tmv3-avatar.public { background:linear-gradient(135deg,#00a884,#128c7e); }
+.is-mobile .tmv3-avatar { width:72px; height:72px; font-size:30px; }
+
+.tmv3-chat-info { flex:1; min-width:0; }
+.tmv3-chat-name { color:#e9edef; font-size:15px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tmv3-chat-preview { color:#8696a0; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+.is-mobile .tmv3-chat-name { font-size:24px; }
+.is-mobile .tmv3-chat-preview { font-size:20px; }
+
+.tmv3-chat-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+.tmv3-chat-time { color:#8696a0; font-size:11px; }
+.tmv3-unread-badge { background:#25d366; color:#111; font-size:11px; font-weight:700; min-width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; padding:0 4px; }
+.is-mobile .tmv3-chat-time { font-size:18px; }
+.is-mobile .tmv3-unread-badge { font-size:18px; min-width:30px; height:30px; }
+
+/* Bottom Nav (mobile only) */
+#tmv3-bottom-nav {
+    display:none; flex-shrink:0;
     background:#1f2c34;
-    padding:14px 18px;
-    display:flex;
-    align-items:center;
-    gap:14px;
-    border-bottom:1px solid #2a3942;
-    flex-shrink:0;
+    border-top:1px solid #2a3942;
 }
-html.is-mobile #tmChatHeader { padding:20px 24px; }
-
-#tmChatAvatar {
-    width:46px; height:46px;
-    border-radius:50%;
-    background:linear-gradient(135deg,#25d366,#128c7e);
-    display:flex; align-items:center; justify-content:center;
-    font-size:22px; color:#fff;
-    flex-shrink:0;
-}
-html.is-mobile #tmChatAvatar { width:70px; height:70px; font-size:32px; }
-
-#tmChatHeaderInfo { flex:1; min-width:0; }
-#tmChatHeaderTitle {
-    color:#e9edef;
-    font-size:16px;
-    font-weight:700;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-html.is-mobile #tmChatHeaderTitle { font-size:26px; }
-#tmChatMemberCount { color:#8696a0; font-size:12px; }
-html.is-mobile #tmChatMemberCount { font-size:20px; }
-
-#tmChatCloseBtn {
-    background:none;
-    border:none;
-    color:#8696a0;
-    font-size:22px;
-    cursor:pointer;
-    width:40px; height:40px;
-    border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
+.is-mobile #tmv3-bottom-nav { display:flex; }
+.tmv3-nav-btn {
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:14px 0; color:#aebac1; cursor:pointer;
+    font-size:10px; gap:6px; border:none; background:none; font-family:inherit;
     transition:.2s;
 }
-#tmChatCloseBtn:hover { background:#2a3942; color:#e9edef; }
-html.is-mobile #tmChatCloseBtn { width:60px; height:60px; font-size:32px; }
+.tmv3-nav-btn i { font-size:22px; }
+.tmv3-nav-btn span { font-size:16px; }
+.tmv3-nav-btn.active { color:#25d366; }
 
-/* ── Messages area ── */
-#tmChatMessages {
-    flex:1;
-    overflow-y:auto;
-    padding:16px;
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    background:#0b141a;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 5 L55 20 L55 40 L30 55 L5 40 L5 20 Z' fill='none' stroke='rgba(255,255,255,0.015)' stroke-width='1'/%3E%3C/svg%3E");
+/* ══ Right Panel ══ */
+#tmv3-right {
+    flex:1; display:flex; flex-direction:column;
+    background:#0b141a; min-width:0; position:relative;
 }
-#tmChatMessages::-webkit-scrollbar { width:5px; }
-#tmChatMessages::-webkit-scrollbar-track { background:transparent; }
-#tmChatMessages::-webkit-scrollbar-thumb { background:#2a3942; border-radius:10px; }
+.is-mobile #tmv3-right {
+    width:100%; height:100%; position:absolute; inset:0;
+    transform:translateX(100%); transition:transform .25s; z-index:3;
+}
+.is-mobile #tmv3-right.open { transform:translateX(0); }
 
-/* date divider */
-.tm-date-div {
-    display:flex; align-items:center; justify-content:center;
-    margin:10px 0;
-}
-.tm-date-div span {
-    background:#1f2c34;
+/* Right Empty State */
+#tmv3-empty-right {
+    flex:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:16px;
     color:#8696a0;
-    font-size:11px;
-    padding:4px 14px;
-    border-radius:20px;
 }
-html.is-mobile .tm-date-div span { font-size:18px; padding:6px 20px; }
+#tmv3-empty-right i { font-size:60px; opacity:.3; }
+#tmv3-empty-right p { font-size:14px; opacity:.6; text-align:center; }
 
-/* message bubble */
-.tm-msg-wrap {
-    display:flex;
-    align-items:flex-end;
-    gap:8px;
-    max-width:72%;
+/* Chat Header */
+#tmv3-chat-header {
+    background:#1f2c34; padding:12px 16px;
+    display:flex; align-items:center; gap:12px;
+    border-bottom:1px solid #2a3942; flex-shrink:0;
+    cursor:pointer;
 }
-.tm-msg-wrap.own { align-self:flex-end; flex-direction:row-reverse; }
-.tm-msg-wrap.other { align-self:flex-start; }
+.is-mobile #tmv3-chat-header { padding:18px 20px; }
 
-.tm-msg-avatar {
-    width:30px; height:30px;
-    border-radius:50%;
-    background:#2a3942;
-    display:flex; align-items:center; justify-content:center;
-    font-size:13px; color:#8696a0;
-    flex-shrink:0; align-self:flex-end;
-    overflow:hidden;
+#tmv3-back-btn {
+    display:none; background:none; border:none;
+    color:#aebac1; font-size:20px; cursor:pointer;
+    width:36px; height:36px; border-radius:50%;
+    align-items:center; justify-content:center; flex-shrink:0;
 }
-.tm-msg-avatar img { width:100%; height:100%; object-fit:cover; }
-html.is-mobile .tm-msg-avatar { width:48px; height:48px; font-size:20px; }
+.is-mobile #tmv3-back-btn { display:flex; }
 
-.tm-bubble {
-    padding:8px 12px;
-    border-radius:12px;
-    position:relative;
-    word-break:break-word;
-    max-width:100%;
+#tmv3-header-info { flex:1; min-width:0; pointer-events:none; }
+#tmv3-header-name { color:#e9edef; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#tmv3-header-sub { color:#8696a0; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.is-mobile #tmv3-header-name { font-size:26px; }
+.is-mobile #tmv3-header-sub { font-size:20px; }
+
+.tmv3-header-actions-right { display:flex; align-items:center; gap:2px; }
+
+/* 3-dot dropdown */
+.tmv3-dropdown { position:relative; }
+.tmv3-dropdown-menu {
+    position:absolute; right:0; top:calc(100% + 4px);
+    background:#233138; border-radius:10px;
+    box-shadow:0 8px 30px rgba(0,0,0,.5);
+    min-width:180px; z-index:999; overflow:hidden;
+    display:none;
+}
+.tmv3-dropdown-menu.open { display:block; }
+.tmv3-dropdown-item {
+    padding:12px 18px; color:#e9edef; font-size:14px;
+    cursor:pointer; display:flex; align-items:center; gap:10px;
+    transition:.15s; font-family:inherit;
+}
+.tmv3-dropdown-item:hover { background:#2a3942; }
+.tmv3-dropdown-item.danger { color:#ef4444; }
+.is-mobile .tmv3-dropdown-item { font-size:22px; padding:18px 26px; }
+
+/* Messages area */
+#tmv3-messages {
+    flex:1; overflow-y:auto; padding:16px;
+    display:flex; flex-direction:column; gap:4px;
+    background:#0b141a;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cpath d='M30 5 L55 20 L55 40 L30 55 L5 40 L5 20 Z' fill='none' stroke='rgba(255,255,255,0.015)' stroke-width='1'/%3E%3C/svg%3E");
+    scrollbar-width:thin; scrollbar-color:#2a3942 transparent;
+}
+#tmv3-messages::-webkit-scrollbar { width:5px; }
+#tmv3-messages::-webkit-scrollbar-thumb { background:#2a3942; border-radius:10px; }
+
+.tmv3-date-div { display:flex; align-items:center; justify-content:center; margin:10px 0; }
+.tmv3-date-div span { background:#1f2c34; color:#8696a0; font-size:11px; padding:4px 14px; border-radius:20px; }
+.is-mobile .tmv3-date-div span { font-size:18px; padding:6px 20px; }
+
+.tmv3-msg-wrap { display:flex; align-items:flex-end; gap:8px; max-width:72%; }
+.tmv3-msg-wrap.own { align-self:flex-end; flex-direction:row-reverse; }
+.tmv3-msg-wrap.other { align-self:flex-start; }
+.is-mobile .tmv3-msg-wrap { max-width:88%; }
+
+.tmv3-msg-av { width:30px; height:30px; border-radius:50%; background:#2a3942; display:flex; align-items:center; justify-content:center; font-size:12px; color:#8696a0; flex-shrink:0; overflow:hidden; }
+.tmv3-msg-av img { width:100%; height:100%; object-fit:cover; }
+.is-mobile .tmv3-msg-av { width:48px; height:48px; font-size:18px; }
+
+.tmv3-bubble {
+    padding:8px 12px; border-radius:12px;
+    position:relative; word-break:break-word; max-width:100%;
     box-shadow:0 1px 2px rgba(0,0,0,.3);
 }
-.tm-msg-wrap.own .tm-bubble {
-    background:#005c4b;
-    border-bottom-right-radius:4px;
-    color:#e9edef;
-}
-.tm-msg-wrap.other .tm-bubble {
-    background:#1f2c34;
-    border-bottom-left-radius:4px;
-    color:#e9edef;
-}
-html.is-mobile .tm-bubble { padding:12px 18px; border-radius:18px; }
+.tmv3-msg-wrap.own .tmv3-bubble { background:#005c4b; border-bottom-right-radius:4px; color:#e9edef; }
+.tmv3-msg-wrap.other .tmv3-bubble { background:#1f2c34; border-bottom-left-radius:4px; color:#e9edef; }
+.is-mobile .tmv3-bubble { padding:12px 18px; border-radius:18px; }
 
-.tm-sender-name {
-    font-size:12px;
-    font-weight:700;
-    margin-bottom:3px;
-}
-html.is-mobile .tm-sender-name { font-size:20px; }
+.tmv3-sender { font-size:12px; font-weight:700; margin-bottom:3px; }
+.is-mobile .tmv3-sender { font-size:20px; }
 
-.tm-msg-text { font-size:14px; line-height:1.5; }
-html.is-mobile .tm-msg-text { font-size:24px; }
+.tmv3-msg-text { font-size:14px; line-height:1.5; white-space:pre-wrap; }
+.is-mobile .tmv3-msg-text { font-size:24px; }
 
-.tm-msg-time {
-    font-size:11px;
-    color:rgba(233,237,239,.55);
-    text-align:right;
-    margin-top:3px;
-    display:flex; align-items:center; justify-content:flex-end; gap:4px;
-}
-html.is-mobile .tm-msg-time { font-size:18px; }
+.tmv3-msg-time { font-size:11px; color:rgba(233,237,239,.55); text-align:right; margin-top:3px; display:flex; align-items:center; justify-content:flex-end; gap:4px; }
+.is-mobile .tmv3-msg-time { font-size:18px; }
+.tmv3-tick.seen { color:#53bdeb; }
 
-/* seen ticks */
-.tm-tick { font-size:12px; }
-html.is-mobile .tm-tick { font-size:18px; }
-.tm-tick.seen { color:#53bdeb; }
+.tmv3-reply-quote { background:rgba(0,0,0,.25); border-left:3px solid #25d366; border-radius:6px; padding:5px 10px; margin-bottom:6px; font-size:12px; }
+.tmv3-reply-quote strong { color:#25d366; display:block; }
+.is-mobile .tmv3-reply-quote { font-size:20px; }
 
-/* reply quote inside bubble */
-.tm-reply-quote {
-    background:rgba(0,0,0,.25);
-    border-left:3px solid #25d366;
-    border-radius:6px;
-    padding:5px 10px;
-    margin-bottom:6px;
-    font-size:12px;
-}
-html.is-mobile .tm-reply-quote { font-size:20px; }
-.tm-reply-quote strong { color:#25d366; }
+.tmv3-msg-img { max-width:220px; border-radius:10px; cursor:pointer; display:block; }
+.is-mobile .tmv3-msg-img { max-width:380px; }
 
-/* image message */
-.tm-msg-img {
-    max-width:220px;
-    border-radius:10px;
-    cursor:pointer;
-    display:block;
-}
-html.is-mobile .tm-msg-img { max-width:380px; }
+/* Typing bar */
+#tmv3-typing { height:22px; padding:0 18px; display:flex; align-items:center; flex-shrink:0; }
+.tmv3-typing-text { color:#8696a0; font-size:12px; font-style:italic; }
+.is-mobile .tmv3-typing-text { font-size:20px; }
 
-/* swipe-to-reply (tap+hold → right-swipe) — visual hint */
-.tm-msg-wrap:active .tm-bubble { filter:brightness(1.15); }
+/* Only-admin banner */
+#tmv3-admin-banner {
+    display:none; background:#1f2c34; padding:10px 18px;
+    text-align:center; color:#8696a0; font-size:13px; flex-shrink:0;
+}
+#tmv3-admin-banner.show { display:block; }
+.is-mobile #tmv3-admin-banner { font-size:20px; }
 
-/* context menu */
-#tmContextMenu {
-    position:fixed;
-    background:#233138;
-    border-radius:12px;
-    box-shadow:0 8px 30px rgba(0,0,0,.5);
-    z-index:999999999;
-    overflow:hidden;
-    display:none;
-    min-width:160px;
+/* Input area */
+#tmv3-reply-bar {
+    display:none; background:#1f2c34; border-top:1px solid #2a3942;
+    padding:10px 18px; align-items:center; gap:12px; flex-shrink:0;
 }
-.tm-ctx-item {
-    padding:12px 18px;
-    color:#e9edef;
-    font-size:14px;
-    cursor:pointer;
-    display:flex; align-items:center; gap:10px;
-    transition:.15s;
-}
-.tm-ctx-item:hover { background:#2a3942; }
-.tm-ctx-item.danger { color:#ef4444; }
-html.is-mobile .tm-ctx-item { font-size:22px; padding:18px 26px; }
+#tmv3-reply-bar.show { display:flex; }
+#tmv3-reply-prev { flex:1; border-left:3px solid #25d366; padding-left:10px; color:#8696a0; font-size:13px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+#tmv3-reply-prev strong { color:#25d366; display:block; }
 
-/* ── Reply preview bar (above input) ── */
-#tmReplyBar {
-    display:none;
-    background:#1f2c34;
-    border-top:1px solid #2a3942;
-    padding:10px 18px;
-    align-items:center;
-    gap:12px;
-    flex-shrink:0;
+#tmv3-media-bar { display:none; background:#1f2c34; border-top:1px solid #2a3942; padding:10px 18px; align-items:center; gap:12px; flex-shrink:0; }
+#tmv3-media-bar.show { display:flex; }
+#tmv3-media-thumb { width:60px; height:60px; border-radius:10px; object-fit:cover; }
+
+#tmv3-input-area {
+    background:#1f2c34; padding:10px 14px;
+    display:flex; align-items:flex-end; gap:10px;
+    border-top:1px solid #2a3942; flex-shrink:0;
 }
-#tmReplyBar.show { display:flex; }
-#tmReplyPreview {
-    flex:1;
-    border-left:3px solid #25d366;
-    padding-left:10px;
-    color:#8696a0;
-    font-size:13px;
-    overflow:hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
+.is-mobile #tmv3-input-area { padding:16px 18px; gap:16px; }
+
+#tmv3-msg-input {
+    flex:1; background:#2a3942; border:none; border-radius:24px;
+    padding:10px 16px; color:#e9edef; font-size:14px;
+    font-family:inherit; resize:none; outline:none;
+    max-height:120px; line-height:1.5; scrollbar-width:none;
 }
-html.is-mobile #tmReplyPreview { font-size:22px; }
-#tmReplyPreview strong { color:#25d366; display:block; }
-#tmReplyClose {
-    background:none; border:none;
-    color:#8696a0; font-size:18px; cursor:pointer;
-    width:30px; height:30px;
-    border-radius:50%;
+.is-mobile #tmv3-msg-input { font-size:24px; padding:16px 22px; border-radius:36px; }
+
+.tmv3-act-btn {
+    background:none; border:none; color:#8696a0; font-size:22px;
+    cursor:pointer; width:42px; height:42px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
+    transition:.2s; flex-shrink:0;
 }
-html.is-mobile #tmReplyClose { width:50px; height:50px; font-size:28px; }
+.tmv3-act-btn:hover { background:#2a3942; color:#e9edef; }
+.is-mobile .tmv3-act-btn { width:66px; height:66px; font-size:34px; }
 
-/* ── Media preview bar ── */
-#tmMediaBar {
-    display:none;
-    background:#1f2c34;
-    border-top:1px solid #2a3942;
-    padding:10px 18px;
-    align-items:center;
-    gap:12px;
-    flex-shrink:0;
-}
-#tmMediaBar.show { display:flex; }
-#tmMediaThumb {
-    width:60px; height:60px;
-    border-radius:10px;
-    object-fit:cover;
-}
-html.is-mobile #tmMediaThumb { width:90px; height:90px; }
-#tmMediaClear {
-    background:none; border:none;
-    color:#ef4444; font-size:20px; cursor:pointer;
-    margin-left:auto;
-}
-
-/* ── Typing indicator ── */
-#tmTypingBar {
-    height:22px;
-    padding:0 18px;
-    display:flex; align-items:center;
-    flex-shrink:0;
-}
-.tm-typing-text {
-    color:#8696a0;
-    font-size:12px;
-    font-style:italic;
-}
-html.is-mobile .tm-typing-text { font-size:20px; }
-
-/* ── Input area ── */
-#tmChatInputArea {
-    background:#1f2c34;
-    padding:10px 14px;
-    display:flex;
-    align-items:flex-end;
-    gap:10px;
-    border-top:1px solid #2a3942;
-    flex-shrink:0;
-}
-html.is-mobile #tmChatInputArea { padding:16px 18px; gap:16px; }
-
-#tmMsgInput {
-    flex:1;
-    background:#2a3942;
-    border:none;
-    border-radius:24px;
-    padding:10px 16px;
-    color:#e9edef;
-    font-size:14px;
-    font-family:'Hind Siliguri',sans-serif;
-    resize:none;
-    outline:none;
-    max-height:120px;
-    line-height:1.5;
-    scrollbar-width:none;
-}
-html.is-mobile #tmMsgInput { font-size:24px; padding:16px 22px; border-radius:36px; }
-
-.tm-action-btn {
-    background:none;
-    border:none;
-    color:#8696a0;
-    font-size:22px;
-    cursor:pointer;
-    width:42px; height:42px;
-    border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    transition:.2s;
-    flex-shrink:0;
-}
-.tm-action-btn:hover { background:#2a3942; color:#e9edef; }
-html.is-mobile .tm-action-btn { width:66px; height:66px; font-size:34px; }
-
-#tmSendBtn {
-    background:linear-gradient(135deg,#25d366 0%,#128c7e 100%);
-    border:none;
-    color:#fff;
-    width:44px; height:44px;
-    border-radius:50%;
-    cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    font-size:18px;
-    transition:.2s;
-    flex-shrink:0;
+#tmv3-send-btn {
+    background:linear-gradient(135deg,#25d366,#128c7e);
+    border:none; color:#fff; width:44px; height:44px; border-radius:50%;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    font-size:18px; transition:.2s; flex-shrink:0;
     box-shadow:0 4px 15px rgba(37,211,102,.35);
 }
-#tmSendBtn:hover { opacity:.85; transform:scale(1.05); }
-html.is-mobile #tmSendBtn { width:68px; height:68px; font-size:28px; }
+#tmv3-send-btn:hover { opacity:.85; transform:scale(1.05); }
+.is-mobile #tmv3-send-btn { width:68px; height:68px; font-size:28px; }
 
-/* scroll-to-bottom fab */
-#tmScrollDownBtn {
-    position:absolute;
-    bottom:80px; right:18px;
-    background:#1f2c34;
-    border:1px solid #2a3942;
-    border-radius:50%;
-    width:40px; height:40px;
-    color:#8696a0;
-    font-size:18px;
-    cursor:pointer;
-    display:none;
-    align-items:center; justify-content:center;
-    box-shadow:0 4px 15px rgba(0,0,0,.4);
-    z-index:10;
-    transition:.2s;
+/* Scroll down btn */
+#tmv3-scroll-down {
+    position:absolute; bottom:80px; right:18px;
+    background:#1f2c34; border:1px solid #2a3942; border-radius:50%;
+    width:40px; height:40px; color:#8696a0; font-size:18px;
+    cursor:pointer; display:none; align-items:center; justify-content:center;
+    box-shadow:0 4px 15px rgba(0,0,0,.4); z-index:10; transition:.2s;
 }
-#tmScrollDownBtn.show { display:flex; }
-html.is-mobile #tmScrollDownBtn { width:64px; height:64px; font-size:28px; bottom:110px; right:24px; }
-#tmScrollDownBadge {
-    position:absolute;
-    top:-5px; right:-5px;
-    background:#25d366;
-    color:#fff;
-    font-size:10px;
-    font-weight:700;
-    border-radius:50%;
-    width:18px; height:18px;
-    display:none;
-    align-items:center; justify-content:center;
-}
-html.is-mobile #tmScrollDownBadge { width:28px; height:28px; font-size:16px; top:-8px; right:-8px; }
+#tmv3-scroll-down.show { display:flex; }
+.is-mobile #tmv3-scroll-down { width:64px; height:64px; font-size:28px; bottom:110px; }
 
-/* image lightbox */
-#tmLightbox {
+/* Context menu */
+#tmv3-ctx-menu {
+    position:fixed; background:#233138; border-radius:12px;
+    box-shadow:0 8px 30px rgba(0,0,0,.5); z-index:999999999;
+    overflow:hidden; display:none; min-width:160px;
+}
+.tmv3-ctx-item { padding:12px 18px; color:#e9edef; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:10px; transition:.15s; }
+.tmv3-ctx-item:hover { background:#2a3942; }
+.tmv3-ctx-item.danger { color:#ef4444; }
+.is-mobile .tmv3-ctx-item { font-size:22px; padding:18px 26px; }
+
+/* ══ Lightbox ══ */
+#tmv3-lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,.92); z-index:9999999999; align-items:center; justify-content:center; }
+#tmv3-lightbox.open { display:flex; }
+#tmv3-lightbox img { max-width:95vw; max-height:92vh; border-radius:8px; object-fit:contain; }
+#tmv3-lb-close { position:absolute; top:16px; right:16px; background:#1f2c34; border:none; color:#e9edef; width:44px; height:44px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+
+/* ══ Side Panel (Group Info / Profile) ══ */
+#tmv3-side-panel {
+    width:360px; background:#111b21;
+    border-left:1px solid #2a3942;
+    display:none; flex-direction:column;
+    overflow-y:auto; flex-shrink:0;
+    scrollbar-width:thin; scrollbar-color:#2a3942 transparent;
+}
+#tmv3-side-panel.open { display:flex; }
+.is-mobile #tmv3-side-panel {
+    width:100%; position:absolute; inset:0; z-index:5;
     display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.9);
-    z-index:9999999999;
-    align-items:center;
-    justify-content:center;
 }
-#tmLightbox.open { display:flex; }
-#tmLightbox img {
-    max-width:95vw;
-    max-height:92vh;
-    border-radius:8px;
-    object-fit:contain;
+.is-mobile #tmv3-side-panel.open { display:flex; }
+
+.tmv3-sp-header {
+    background:#1f2c34; padding:14px 18px;
+    display:flex; align-items:center; gap:12px;
+    border-bottom:1px solid #2a3942; flex-shrink:0;
 }
-#tmLightboxClose {
-    position:absolute;
-    top:16px; right:16px;
-    background:#1f2c34;
-    border:none;
-    color:#e9edef;
-    width:44px; height:44px;
-    border-radius:50%;
-    font-size:20px;
-    cursor:pointer;
+.tmv3-sp-title { color:#e9edef; font-size:16px; font-weight:700; flex:1; }
+.is-mobile .tmv3-sp-title { font-size:26px; }
+
+.tmv3-sp-body { padding:20px; display:flex; flex-direction:column; gap:0; }
+.tmv3-sp-avatar-wrap { display:flex; justify-content:center; margin-bottom:16px; }
+.tmv3-sp-avatar {
+    width:120px; height:120px; border-radius:50%;
+    background:linear-gradient(135deg,#2a3942,#1f2c34);
     display:flex; align-items:center; justify-content:center;
+    font-size:50px; color:#aebac1; overflow:hidden; cursor:pointer;
+    position:relative;
 }
+.tmv3-sp-avatar img { width:100%; height:100%; object-fit:cover; }
+.tmv3-sp-avatar-edit { position:absolute; bottom:0; right:0; width:36px; height:36px; background:#25d366; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; color:#fff; }
 
-/* empty state */
-#tmEmptyState {
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:14px;
-    height:100%;
-    color:#8696a0;
-}
-#tmEmptyState i { font-size:48px; opacity:.4; }
-html.is-mobile #tmEmptyState i { font-size:80px; }
-#tmEmptyState p { font-size:14px; opacity:.6; }
-html.is-mobile #tmEmptyState p { font-size:24px; }
+.tmv3-sp-name { color:#e9edef; font-size:20px; font-weight:700; text-align:center; margin-bottom:4px; }
+.tmv3-sp-sub { color:#25d366; font-size:13px; text-align:center; margin-bottom:16px; }
+.is-mobile .tmv3-sp-name { font-size:30px; }
+.is-mobile .tmv3-sp-sub { font-size:20px; }
 
-/* loading spinner */
-.tm-spinner {
-    display:flex; align-items:center; justify-content:center;
-    height:100%;
+.tmv3-sp-section { margin-bottom:0; }
+.tmv3-sp-row {
+    display:flex; align-items:center; gap:16px;
+    padding:14px 0; border-bottom:1px solid #2a3942;
+    color:#e9edef; font-size:14px; cursor:pointer;
+    transition:background .15s;
 }
-.tm-spinner i { font-size:28px; color:#25d366; animation:tm-spin 1s linear infinite; }
+.tmv3-sp-row:hover { background:rgba(42,57,66,.3); margin:0 -20px; padding:14px 20px; }
+.tmv3-sp-row i { color:#8696a0; width:20px; text-align:center; font-size:16px; flex-shrink:0; }
+.tmv3-sp-row .label { flex:1; }
+.tmv3-sp-row .value { color:#8696a0; font-size:12px; }
+.is-mobile .tmv3-sp-row { font-size:22px; padding:20px 0; }
+.is-mobile .tmv3-sp-row i { font-size:24px; }
+.is-mobile .tmv3-sp-row .value { font-size:20px; }
+
+.tmv3-sp-row.danger { color:#ef4444; }
+.tmv3-sp-row.danger i { color:#ef4444; }
+
+.tmv3-bio-box { background:#1f2c34; border-radius:10px; padding:12px 16px; margin-bottom:16px; }
+.tmv3-bio-box p { color:#e9edef; font-size:14px; line-height:1.6; }
+.is-mobile .tmv3-bio-box p { font-size:22px; }
+
+/* Toggle switch */
+.tmv3-toggle { position:relative; width:44px; height:26px; flex-shrink:0; }
+.tmv3-toggle input { display:none; }
+.tmv3-toggle-slider { position:absolute; inset:0; background:#2a3942; border-radius:26px; cursor:pointer; transition:.3s; }
+.tmv3-toggle-slider::before { content:''; position:absolute; width:20px; height:20px; left:3px; bottom:3px; background:#aebac1; border-radius:50%; transition:.3s; }
+.tmv3-toggle input:checked + .tmv3-toggle-slider { background:#25d366; }
+.tmv3-toggle input:checked + .tmv3-toggle-slider::before { transform:translateX(18px); background:#fff; }
+
+/* Member list */
+.tmv3-member-item {
+    display:flex; align-items:center; gap:14px;
+    padding:12px 0; border-bottom:1px solid rgba(42,57,66,.5);
+    cursor:pointer; transition:.15s;
+}
+.tmv3-member-item:hover { background:rgba(42,57,66,.3); margin:0 -20px; padding:12px 20px; }
+.tmv3-member-av { width:44px; height:44px; border-radius:50%; background:#2a3942; display:flex; align-items:center; justify-content:center; font-size:18px; color:#8696a0; overflow:hidden; flex-shrink:0; }
+.tmv3-member-av img { width:100%; height:100%; object-fit:cover; }
+.tmv3-member-info { flex:1; min-width:0; }
+.tmv3-member-name { color:#e9edef; font-size:14px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tmv3-member-sub { color:#8696a0; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tmv3-member-badge { background:#25d366; color:#111; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; flex-shrink:0; }
+.tmv3-member-del { background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.2s; }
+.tmv3-member-del:hover { background:rgba(239,68,68,.15); }
+.is-mobile .tmv3-member-item { padding:18px 0; }
+.is-mobile .tmv3-member-name { font-size:22px; }
+.is-mobile .tmv3-member-sub { font-size:18px; }
+
+/* ══ Modal (Add Member / Create Group / Profile Edit) ══ */
+#tmv3-modal-overlay {
+    display:none; position:fixed; inset:0; z-index:999999995;
+    background:rgba(0,0,0,.7); backdrop-filter:blur(4px);
+    align-items:center; justify-content:center;
+}
+#tmv3-modal-overlay.open { display:flex; }
+#tmv3-modal {
+    background:#111b21; border-radius:16px;
+    width:min(500px,95vw); max-height:85vh;
+    display:flex; flex-direction:column;
+    box-shadow:0 30px 80px rgba(0,0,0,.6);
+    overflow:hidden;
+}
+.tmv3-modal-head { background:#1f2c34; padding:14px 18px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #2a3942; flex-shrink:0; }
+.tmv3-modal-title { color:#e9edef; font-size:16px; font-weight:700; flex:1; }
+.tmv3-modal-body { flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:14px; }
+.tmv3-modal-footer { padding:14px 18px; border-top:1px solid #2a3942; display:flex; gap:10px; justify-content:flex-end; flex-shrink:0; }
+
+.tmv3-btn { padding:10px 22px; border-radius:8px; border:none; cursor:pointer; font-size:14px; font-weight:600; font-family:inherit; transition:.2s; }
+.tmv3-btn.primary { background:#25d366; color:#111; }
+.tmv3-btn.primary:hover { background:#1da851; }
+.tmv3-btn.secondary { background:#2a3942; color:#e9edef; }
+.tmv3-btn.secondary:hover { background:#374f5e; }
+.tmv3-btn.danger { background:#ef4444; color:#fff; }
+.tmv3-btn.danger:hover { background:#dc2626; }
+.is-mobile .tmv3-btn { font-size:22px; padding:14px 30px; }
+
+.tmv3-field { display:flex; flex-direction:column; gap:6px; }
+.tmv3-field label { color:#aebac1; font-size:13px; }
+.tmv3-field input, .tmv3-field textarea, .tmv3-field select {
+    background:#1f2c34; border:1px solid #2a3942; border-radius:8px;
+    padding:10px 14px; color:#e9edef; font-size:14px; font-family:inherit;
+    outline:none; transition:.2s;
+}
+.tmv3-field input:focus, .tmv3-field textarea:focus { border-color:#25d366; }
+.tmv3-field textarea { resize:vertical; min-height:80px; }
+.is-mobile .tmv3-field input, .is-mobile .tmv3-field textarea { font-size:22px; padding:14px 18px; }
+
+.tmv3-user-select-list { display:flex; flex-direction:column; gap:0; max-height:300px; overflow-y:auto; }
+.tmv3-user-sel-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(42,57,66,.5); cursor:pointer; transition:.15s; }
+.tmv3-user-sel-item:hover { background:rgba(42,57,66,.3); }
+.tmv3-sel-check { width:22px; height:22px; border-radius:50%; border:2px solid #2a3942; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.2s; }
+.tmv3-sel-check.checked { background:#25d366; border-color:#25d366; }
+.tmv3-sel-check.checked::after { content:'✓'; color:#111; font-size:13px; font-weight:700; }
+
+.tmv3-modal-search { background:#1f2c34; border:1px solid #2a3942; border-radius:8px; padding:10px 14px; color:#e9edef; font-size:14px; font-family:inherit; outline:none; width:100%; }
+.tmv3-modal-search::placeholder { color:#8696a0; }
+.is-mobile .tmv3-modal-search { font-size:22px; padding:14px 18px; }
+
+.tmv3-empty-msg { color:#8696a0; font-size:14px; text-align:center; padding:20px 0; }
+.is-mobile .tmv3-empty-msg { font-size:22px; }
+
+/* Avatar upload label */
+.tmv3-av-upload { display:flex; flex-direction:column; align-items:center; gap:12px; }
+.tmv3-av-preview { width:90px; height:90px; border-radius:50%; overflow:hidden; background:#1f2c34; display:flex; align-items:center; justify-content:center; font-size:36px; color:#aebac1; cursor:pointer; position:relative; }
+.tmv3-av-preview img { width:100%; height:100%; object-fit:cover; display:none; }
+.tmv3-av-upload-btn { background:#2a3942; color:#e9edef; padding:8px 20px; border-radius:8px; cursor:pointer; font-size:13px; font-family:inherit; }
+
+/* spinner */
+.tmv3-spinner { display:flex; align-items:center; justify-content:center; height:100%; }
+.tmv3-spinner i { font-size:28px; color:#25d366; animation:tm-spin 1s linear infinite; }
 @keyframes tm-spin { to { transform:rotate(360deg); } }
+
+/* toast */
+#tmv3-toast {
+    position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(100px);
+    background:#202c33; color:#e9edef; padding:10px 22px; border-radius:10px;
+    font-size:14px; z-index:9999999998; transition:.3s; pointer-events:none;
+    white-space:nowrap; box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+#tmv3-toast.show { transform:translateX(-50%) translateY(0); }
+.is-mobile #tmv3-toast { font-size:22px; padding:14px 30px; }
         `;
         document.head.appendChild(s);
     }
 
-    /* ── Build main overlay HTML ─────────────────────────────── */
-    function _buildOverlay() {
-        /* Overlay backdrop */
+    /* ══════════════════════════════════════════════════════════
+       BUILD MAIN UI
+    ══════════════════════════════════════════════════════════ */
+    function _buildMainUI() {
+        /* Overlay */
         const overlay = document.createElement('div');
-        overlay.id = 'tmChatOverlay';
+        overlay.id = 'tmv3-overlay';
         overlay.innerHTML = `
-<div id="tmChatModal">
+<div id="tmv3-root">
+
+  <!-- LEFT PANEL -->
+  <div id="tmv3-left">
     <!-- Header -->
-    <div id="tmChatHeader">
-        <div id="tmChatAvatar">💬</div>
-        <div id="tmChatHeaderInfo">
-            <div id="tmChatHeaderTitle">${GROUP_NAME}</div>
-            <div id="tmChatMemberCount">সদস্য লোড হচ্ছে...</div>
+    <div id="tmv3-left-header">
+      <span id="tmv3-app-title">Chats</span>
+      <div class="tmv3-header-actions">
+        <div class="tmv3-dropdown" id="tmv3-left-menu-wrap">
+          <button class="tmv3-icon-btn" id="tmv3-left-3dot" title="মেনু"><i class="fa fa-ellipsis-v"></i></button>
+          <div class="tmv3-dropdown-menu" id="tmv3-left-menu">
+            <div class="tmv3-dropdown-item" id="tmv3-btn-new-group"><i class="fa fa-users"></i> নতুন গ্রুপ</div>
+            <div class="tmv3-dropdown-item" id="tmv3-btn-profile"><i class="fa fa-user-circle"></i> প্রোফাইল</div>
+          </div>
         </div>
-        <button id="tmChatCloseBtn" title="বন্ধ করুন"><i class="fa fa-times"></i></button>
+      </div>
     </div>
 
-    <!-- Typing bar -->
-    <div id="tmTypingBar"></div>
+    <!-- Search -->
+    <div class="tmv3-search-wrap">
+      <div class="tmv3-search-bar">
+        <i class="fa fa-search"></i>
+        <input id="tmv3-search" placeholder="নাম, মোবাইল বা জিমেইল দিয়ে খুঁজুন..." autocomplete="off">
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tmv3-tabs">
+      <button class="tmv3-tab active" data-tab="all">All</button>
+      <button class="tmv3-tab" data-tab="unread">Unread</button>
+      <button class="tmv3-tab" data-tab="groups">Groups</button>
+    </div>
+
+    <!-- Chat List -->
+    <div id="tmv3-chat-list">
+      <div class="tmv3-spinner"><i class="fa fa-circle-notch"></i></div>
+    </div>
+
+    <!-- Bottom Nav (mobile) -->
+    <div id="tmv3-bottom-nav">
+      <button class="tmv3-nav-btn active" id="tmv3-nav-chats">
+        <i class="fa fa-comment"></i><span>Chats</span>
+      </button>
+      <button class="tmv3-nav-btn" id="tmv3-nav-updates">
+        <i class="fa fa-circle-notch"></i><span>Updates</span>
+      </button>
+      <button class="tmv3-nav-btn" id="tmv3-nav-community">
+        <i class="fa fa-users"></i><span>Community</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="tmv3-right">
+    <div id="tmv3-empty-right">
+      <i class="fa fa-lock"></i>
+      <p>Your messages are private.<br>Select a chat to start messaging.</p>
+    </div>
+
+    <!-- Chat Header (hidden until chat opens) -->
+    <div id="tmv3-chat-header" style="display:none;">
+      <button id="tmv3-back-btn"><i class="fa fa-arrow-left"></i></button>
+      <div class="tmv3-avatar" id="tmv3-hdr-av" style="width:42px;height:42px;font-size:18px;"></div>
+      <div id="tmv3-header-info">
+        <div id="tmv3-header-name"></div>
+        <div id="tmv3-header-sub"></div>
+      </div>
+      <div class="tmv3-header-actions-right">
+        <div class="tmv3-dropdown" id="tmv3-chat-menu-wrap">
+          <button class="tmv3-icon-btn" id="tmv3-chat-3dot"><i class="fa fa-ellipsis-v"></i></button>
+          <div class="tmv3-dropdown-menu" id="tmv3-chat-menu">
+            <div class="tmv3-dropdown-item" id="tmv3-btn-view-info"><i class="fa fa-info-circle"></i> বিস্তারিত দেখুন</div>
+            <div class="tmv3-dropdown-item danger" id="tmv3-btn-clear-chat"><i class="fa fa-eraser"></i> Clear Chat</div>
+            <div class="tmv3-dropdown-item danger" id="tmv3-btn-delete-chat"><i class="fa fa-trash"></i> Delete Chat</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Messages -->
-    <div id="tmChatMessages">
-        <div class="tm-spinner"><i class="fa fa-circle-notch"></i></div>
-    </div>
+    <div id="tmv3-messages" style="display:none;"></div>
 
-    <!-- Scroll-to-bottom btn -->
-    <button id="tmScrollDownBtn" onclick="window._tmChat.scrollToBottom()">
-        <i class="fa fa-chevron-down"></i>
-        <span id="tmScrollDownBadge"></span>
+    <!-- Scroll down -->
+    <button id="tmv3-scroll-down" style="display:none;" onclick="window._tmv3.scrollToBottom()">
+      <i class="fa fa-chevron-down"></i>
     </button>
 
+    <!-- Typing -->
+    <div id="tmv3-typing" style="display:none;"></div>
+
+    <!-- Admin-only banner -->
+    <div id="tmv3-admin-banner">Only <strong style="color:#25d366;">admins</strong> can send messages</div>
+
     <!-- Reply bar -->
-    <div id="tmReplyBar">
-        <div id="tmReplyPreview"></div>
-        <button id="tmReplyClose" onclick="window._tmChat.cancelReply()">
-            <i class="fa fa-times"></i>
-        </button>
+    <div id="tmv3-reply-bar">
+      <div id="tmv3-reply-prev"></div>
+      <button class="tmv3-act-btn" onclick="window._tmv3.cancelReply()"><i class="fa fa-times"></i></button>
     </div>
 
-    <!-- Media preview bar -->
-    <div id="tmMediaBar">
-        <img id="tmMediaThumb" src="" alt="preview">
-        <span style="color:#e9edef;font-size:13px;flex:1;">ছবি পাঠানো হবে</span>
-        <button id="tmMediaClear" onclick="window._tmChat.cancelMedia()">
-            <i class="fa fa-trash"></i>
-        </button>
+    <!-- Media bar -->
+    <div id="tmv3-media-bar">
+      <img id="tmv3-media-thumb" src="" alt="preview">
+      <span style="color:#e9edef;font-size:13px;flex:1;">ছবি পাঠানো হবে</span>
+      <button class="tmv3-act-btn" style="color:#ef4444;" onclick="window._tmv3.cancelMedia()"><i class="fa fa-trash"></i></button>
     </div>
 
     <!-- Input area -->
-    <div id="tmChatInputArea">
-        <label for="tmImgInput" class="tm-action-btn" title="ছবি পাঠান" style="cursor:pointer;">
-            <i class="fa fa-image"></i>
-        </label>
-        <input type="file" id="tmImgInput" accept="image/*" style="display:none;">
-
-        <textarea id="tmMsgInput" rows="1" placeholder="মেসেজ লিখুন..."></textarea>
-
-        <button id="tmSendBtn" onclick="window._tmChat.sendMessage()">
-            <i class="fa fa-paper-plane"></i>
-        </button>
+    <div id="tmv3-input-area" style="display:none;">
+      <label class="tmv3-act-btn" for="tmv3-img-input" style="cursor:pointer;" title="ছবি পাঠান">
+        <i class="fa fa-image"></i>
+      </label>
+      <input type="file" id="tmv3-img-input" accept="image/*" style="display:none;">
+      <textarea id="tmv3-msg-input" rows="1" placeholder="মেসেজ লিখুন..."></textarea>
+      <button id="tmv3-send-btn"><i class="fa fa-paper-plane"></i></button>
     </div>
+  </div>
+
+  <!-- SIDE PANEL (Group Info / User Profile) -->
+  <div id="tmv3-side-panel"></div>
+
 </div>
 
-<!-- Context menu -->
-<div id="tmContextMenu">
-    <div class="tm-ctx-item" id="tmCtxReply"><i class="fa fa-reply"></i> রিপ্লাই</div>
-    <div class="tm-ctx-item" id="tmCtxCopy"><i class="fa fa-copy"></i> কপি</div>
-    <div class="tm-ctx-item danger" id="tmCtxDelete" style="display:none"><i class="fa fa-trash"></i> মুছুন</div>
+<!-- Context Menu -->
+<div id="tmv3-ctx-menu">
+  <div class="tmv3-ctx-item" id="tmv3-ctx-reply"><i class="fa fa-reply"></i> রিপ্লাই</div>
+  <div class="tmv3-ctx-item" id="tmv3-ctx-copy"><i class="fa fa-copy"></i> কপি করুন</div>
+  <div class="tmv3-ctx-item danger" id="tmv3-ctx-delete" style="display:none"><i class="fa fa-trash"></i> মুছুন</div>
 </div>
 
 <!-- Lightbox -->
-<div id="tmLightbox" onclick="document.getElementById('tmLightbox').classList.remove('open')">
-    <img id="tmLightboxImg" src="" alt="">
-    <button id="tmLightboxClose"><i class="fa fa-times"></i></button>
+<div id="tmv3-lightbox">
+  <img id="tmv3-lb-img" src="" alt="">
+  <button id="tmv3-lb-close"><i class="fa fa-times"></i></button>
 </div>
+
+<!-- Modal overlay -->
+<div id="tmv3-modal-overlay">
+  <div id="tmv3-modal"></div>
+</div>
+
+<!-- Toast -->
+<div id="tmv3-toast"></div>
         `;
         document.body.appendChild(overlay);
 
-        /* Close on overlay backdrop click */
-        overlay.addEventListener('click', function (e) {
-            if (e.target === overlay) _closeChatModal();
+        /* Bind events */
+        _bindEvents();
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       EVENT BINDINGS
+    ══════════════════════════════════════════════════════════ */
+    function _bindEvents() {
+        /* Close overlay on backdrop */
+        document.getElementById('tmv3-overlay').addEventListener('click', function (e) {
+            if (e.target === this) _closeApp();
         });
 
-        /* Close btn */
-        document.getElementById('tmChatCloseBtn').addEventListener('click', _closeChatModal);
+        /* Back btn (mobile) */
+        document.getElementById('tmv3-back-btn').addEventListener('click', _closeActiveChat);
+
+        /* Left 3-dot menu */
+        document.getElementById('tmv3-left-3dot').addEventListener('click', function (e) {
+            e.stopPropagation();
+            document.getElementById('tmv3-left-menu').classList.toggle('open');
+        });
+
+        /* New group */
+        document.getElementById('tmv3-btn-new-group').addEventListener('click', function () {
+            document.getElementById('tmv3-left-menu').classList.remove('open');
+            _showCreateGroupModal();
+        });
+
+        /* Profile */
+        document.getElementById('tmv3-btn-profile').addEventListener('click', function () {
+            document.getElementById('tmv3-left-menu').classList.remove('open');
+            _showProfilePanel();
+        });
+
+        /* Chat 3-dot menu */
+        document.getElementById('tmv3-chat-3dot').addEventListener('click', function (e) {
+            e.stopPropagation();
+            document.getElementById('tmv3-chat-menu').classList.toggle('open');
+        });
+
+        /* View info */
+        document.getElementById('tmv3-btn-view-info').addEventListener('click', function () {
+            document.getElementById('tmv3-chat-menu').classList.remove('open');
+            if (_activeChat) _showInfoPanel(_activeChat);
+        });
+
+        /* Clear chat */
+        document.getElementById('tmv3-btn-clear-chat').addEventListener('click', function () {
+            document.getElementById('tmv3-chat-menu').classList.remove('open');
+            _clearChat();
+        });
+
+        /* Delete chat */
+        document.getElementById('tmv3-btn-delete-chat').addEventListener('click', function () {
+            document.getElementById('tmv3-chat-menu').classList.remove('open');
+            _deleteChat();
+        });
+
+        /* Chat header click → info panel */
+        document.getElementById('tmv3-chat-header').addEventListener('click', function (e) {
+            if (e.target.closest('.tmv3-icon-btn') || e.target.closest('#tmv3-back-btn')) return;
+            if (_activeChat) _showInfoPanel(_activeChat);
+        });
+
+        /* Tabs */
+        document.querySelectorAll('.tmv3-tab').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.tmv3-tab').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                _activeTab = this.dataset.tab;
+                _renderChatList();
+            });
+        });
+
+        /* Search */
+        document.getElementById('tmv3-search').addEventListener('input', function () {
+            _renderChatList(this.value);
+        });
+
+        /* Send btn */
+        document.getElementById('tmv3-send-btn').addEventListener('click', _sendMessage);
+
+        /* Textarea */
+        const ta = document.getElementById('tmv3-msg-input');
+        ta.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            _sendTyping();
+        });
+        ta.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                _sendMessage();
+            }
+        });
 
         /* Image input */
-        document.getElementById('tmImgInput').addEventListener('change', function () {
+        document.getElementById('tmv3-img-input').addEventListener('change', function () {
             if (!this.files || !this.files[0]) return;
             const reader = new FileReader();
             reader.onload = function (e) {
                 _mediaPreview = e.target.result;
-                const bar   = document.getElementById('tmMediaBar');
-                const thumb = document.getElementById('tmMediaThumb');
-                thumb.src = _mediaPreview;
-                bar.classList.add('show');
+                document.getElementById('tmv3-media-thumb').src = _mediaPreview;
+                document.getElementById('tmv3-media-bar').classList.add('show');
             };
             reader.readAsDataURL(this.files[0]);
             this.value = '';
         });
 
-        /* Textarea auto-grow & send on Enter (Shift+Enter = newline) */
-        const textarea = document.getElementById('tmMsgInput');
-        textarea.addEventListener('input', function () {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-            _sendTyping();
-        });
-        textarea.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                window._tmChat.sendMessage();
-            }
-        });
-
-        /* Messages scroll listener */
-        const msgArea = document.getElementById('tmChatMessages');
+        /* Messages scroll */
+        const msgArea = document.getElementById('tmv3-messages');
         msgArea.addEventListener('scroll', function () {
-            const isBottom = (this.scrollHeight - this.scrollTop - this.clientHeight) < 60;
-            _isAtBottom = isBottom;
-            const btn = document.getElementById('tmScrollDownBtn');
-            if (isBottom) {
-                btn.classList.remove('show');
-                _unreadCount = 0;
-                document.getElementById('tmScrollDownBadge').style.display = 'none';
-            } else {
-                btn.classList.add('show');
-            }
+            _isAtBottom = (this.scrollHeight - this.scrollTop - this.clientHeight) < 60;
+            document.getElementById('tmv3-scroll-down').classList.toggle('show', !_isAtBottom);
         });
 
-        /* Context menu hide on click outside */
-        document.addEventListener('click', function (e) {
-            const menu = document.getElementById('tmContextMenu');
-            if (!e.target.closest('#tmContextMenu')) {
-                menu.style.display = 'none';
-            }
+        /* Context menu close */
+        document.addEventListener('click', function () {
+            document.getElementById('tmv3-ctx-menu').style.display = 'none';
+            document.querySelectorAll('.tmv3-dropdown-menu').forEach(m => m.classList.remove('open'));
+        });
+
+        /* Lightbox close */
+        document.getElementById('tmv3-lightbox').addEventListener('click', function (e) {
+            if (e.target === this) this.classList.remove('open');
+        });
+        document.getElementById('tmv3-lb-close').addEventListener('click', function () {
+            document.getElementById('tmv3-lightbox').classList.remove('open');
+        });
+
+        /* Modal close on backdrop */
+        document.getElementById('tmv3-modal-overlay').addEventListener('click', function (e) {
+            if (e.target === this) _closeModal();
+        });
+
+        /* Bottom nav (mobile) */
+        ['chats', 'updates', 'community'].forEach(function (name) {
+            const btn = document.getElementById('tmv3-nav-' + name);
+            if (btn) btn.addEventListener('click', function () {
+                document.querySelectorAll('.tmv3-nav-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
         });
     }
 
-    /* ── Inject buttons into header & mobile sheet ────────────── */
-    function _injectButtons() {
-        /* ── PC: inject button next to search btn ── */
-        const searchBox = document.getElementById('headerSearchBox');
-        if (searchBox) {
-            const btn = document.createElement('button');
-            btn.id = 'tmChatBtnPC';
-            btn.title = 'গ্রুপ চ্যাট';
-            btn.innerHTML = `
-                ${_waIcon()}
-                <span class="tm-chat-badge" id="tmChatBadgePC"></span>
-            `;
-            btn.addEventListener('click', _openChatModal);
-            searchBox.parentNode.insertBefore(btn, searchBox.nextSibling);
-            /* ensure flex display */
-            const uc = searchBox.closest('.user-controls');
-            if (uc) uc.style.display = 'flex';
-        }
-
-        /* ── Mobile: inject into bottom sheet list ── */
-        _injectMobileItem();
-    }
-
-    function _injectMobileItem() {
-        /* try now, retry if sheet not yet ready */
-        const list = document.getElementById('mobileSheetList');
-        if (!list) {
-            setTimeout(_injectMobileItem, 500);
-            return;
-        }
-        /* insert before logout button (last child) */
-        const item = document.createElement('div');
-        item.className = 'tm-chat-mob-item';
-        item.id = 'tmChatMobItem';
-        item.innerHTML = `
-            <div class="mob-icon-wrap">
-                ${_waIcon(26)}
-            </div>
-            গ্রুপ চ্যাট
-            <span class="tm-mob-badge" id="tmChatBadgeMob"></span>
-        `;
-        item.addEventListener('click', function () {
-            /* close mobile account sheet first */
-            if (typeof closeMobileAccountMenu === 'function') closeMobileAccountMenu();
-            setTimeout(_openChatModal, 320);
-        });
-        list.appendChild(item);
-    }
-
-    /* ── WhatsApp SVG icon ─────────────────────────────────────── */
-    function _waIcon(size) {
-        size = size || 22;
-        return `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" fill="#fff">
-<path d="M16 2C8.268 2 2 8.268 2 16c0 2.527.676 4.9 1.857 6.945L2 30l7.258-1.832A13.93 13.93 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm0 25.6a11.548 11.548 0 01-5.896-1.614l-.42-.252-4.31 1.089 1.113-4.194-.273-.432A11.551 11.551 0 014.4 16c0-6.396 5.204-11.6 11.6-11.6S27.6 9.604 27.6 16 22.396 27.6 16 27.6zm6.368-8.67c-.35-.175-2.066-1.02-2.387-1.137-.32-.116-.553-.175-.785.175-.233.35-.9 1.137-1.103 1.37-.204.233-.407.262-.756.087-.35-.175-1.476-.544-2.812-1.737-1.04-.927-1.74-2.073-1.944-2.423-.203-.35-.022-.538.153-.712.157-.157.35-.408.524-.612.175-.204.233-.35.35-.583.116-.233.058-.437-.029-.612-.087-.175-.785-1.893-1.075-2.592-.283-.683-.57-.59-.785-.6l-.668-.012c-.233 0-.61.087-.93.437-.32.35-1.22 1.193-1.22 2.91 0 1.718 1.25 3.378 1.424 3.611.175.233 2.46 3.754 5.962 5.265.833.36 1.483.575 1.99.735.836.266 1.597.228 2.198.138.67-.1 2.066-.845 2.358-1.661.29-.816.29-1.515.204-1.661-.087-.146-.32-.233-.67-.408z"/>
-</svg>`;
-    }
-
-    /* ═══════════════════════════════════════════════════════════
-       OPEN / CLOSE
-    ═══════════════════════════════════════════════════════════ */
-    function _openChatModal() {
+    /* ══════════════════════════════════════════════════════════
+       OPEN / CLOSE APP
+    ══════════════════════════════════════════════════════════ */
+    function _openApp() {
         _currentUser = _getSessionUser();
-        if (!_currentUser) { alert('চ্যাট করতে লগইন করুন।'); return; }
-
-        document.getElementById('tmChatOverlay').classList.add('open');
-        _isOpen = true;
-        _unreadCount = 0;
-        _updateBadge(0);
-        document.getElementById('tmScrollDownBtn').classList.remove('show');
-
-        /* load member count */
-        _loadMemberCount();
-
-        /* subscribe to messages */
-        _subscribeMessages();
-
-        /* focus textarea */
-        setTimeout(function () {
-            const ta = document.getElementById('tmMsgInput');
-            if (ta) ta.focus();
-        }, 300);
+        if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
+        document.getElementById('tmv3-overlay').classList.add('open');
+        _loadChatList();
     }
 
-    function _closeChatModal() {
-        document.getElementById('tmChatOverlay').classList.remove('open');
-        _isOpen = false;
-        if (_unsubscribe) { _unsubscribe(); _unsubscribe = null; }
+    function _closeApp() {
+        document.getElementById('tmv3-overlay').classList.remove('open');
+        _unsubscribeAll();
+    }
+
+    function _unsubscribeAll() {
+        if (_unsubMsg) { _unsubMsg(); _unsubMsg = null; }
+        if (_unsubTyping) { _unsubTyping(); _unsubTyping = null; }
+        if (_typingTimer) { clearTimeout(_typingTimer); }
         _clearTypingDoc();
     }
 
-    /* ═══════════════════════════════════════════════════════════
-       FIREBASE OPERATIONS
-    ═══════════════════════════════════════════════════════════ */
-    function _loadMemberCount() {
-        if (!_db) return;
-        _db.collection('users').get().then(function (snap) {
-            const el = document.getElementById('tmChatMemberCount');
-            if (el) el.textContent = snap.size + ' জন সদস্য';
-        }).catch(function () { });
+    /* ══════════════════════════════════════════════════════════
+       CHAT LIST
+    ══════════════════════════════════════════════════════════ */
+    function _loadChatList() {
+        if (!_db || !_currentUser) return;
+        const uid = String(_currentUser.id);
+
+        /* Load groups where user is member */
+        _db.collection('tm_groups')
+            .where('members', 'array-contains', uid)
+            .onSnapshot(function (snap) {
+                const groups = snap.docs.map(doc => ({
+                    id: doc.id,
+                    type: 'group',
+                    ...doc.data()
+                }));
+
+                /* Load personal chats */
+                _db.collection('tm_personal_chats')
+                    .where('members', 'array-contains', uid)
+                    .onSnapshot(function (psnap) {
+                        const personals = psnap.docs.map(doc => ({
+                            id: doc.id,
+                            type: 'personal',
+                            ...doc.data()
+                        }));
+                        _chatList = [...groups, ...personals];
+                        _chatList.sort((a, b) => {
+                            const ta = a.lastMsgTs ? (a.lastMsgTs.toDate ? a.lastMsgTs.toDate() : new Date(a.lastMsgTs)) : new Date(0);
+                            const tb = b.lastMsgTs ? (b.lastMsgTs.toDate ? b.lastMsgTs.toDate() : new Date(b.lastMsgTs)) : new Date(0);
+                            return tb - ta;
+                        });
+                        _renderChatList();
+                    }, () => {});
+            }, () => {});
     }
 
-    function _subscribeMessages() {
-        if (!_db) {
-            document.getElementById('tmChatMessages').innerHTML = `
-                <div id="tmEmptyState">
-                    <i class="fa fa-wifi" style="color:#ef4444;"></i>
-                    <p>ইন্টারনেট সংযোগ পাওয়া যাচ্ছে না।</p>
-                </div>`;
+    function _renderChatList(query) {
+        const list = document.getElementById('tmv3-chat-list');
+        if (!list) return;
+
+        let filtered = _chatList.slice();
+
+        /* Tab filter */
+        if (_activeTab === 'unread') {
+            filtered = filtered.filter(c => (_unreadMap[c.id] || 0) > 0);
+        } else if (_activeTab === 'groups') {
+            filtered = filtered.filter(c => c.type === 'group');
+        }
+
+        /* Search filter */
+        if (query && query.trim()) {
+            const q = query.trim().toLowerCase();
+            filtered = filtered.filter(c => {
+                const name = (c.name || c.displayName || '').toLowerCase();
+                return name.includes(q);
+            });
+        }
+
+        if (!filtered.length) {
+            list.innerHTML = `<div class="tmv3-empty-msg">কোনো চ্যাট নেই</div>`;
             return;
         }
 
-        /* show spinner */
-        document.getElementById('tmChatMessages').innerHTML = `<div class="tm-spinner"><i class="fa fa-circle-notch"></i></div>`;
+        list.innerHTML = '';
+        filtered.forEach(chat => {
+            const item = document.createElement('div');
+            item.className = 'tmv3-chat-item' + (_activeChat && _activeChat.id === chat.id ? ' active' : '');
+            item.dataset.id = chat.id;
 
-        if (_unsubscribe) _unsubscribe();
+            const isGroup = chat.type === 'group';
+            const isPublic = chat.isPublic;
+            const name = chat.name || chat.displayName || 'Chat';
+            const avatar = chat.avatarData || chat.avatarUrl || '';
+            const lastMsg = chat.lastMsg || '';
+            const lastTs = chat.lastMsgTs ? _formatTime(chat.lastMsgTs.toDate ? chat.lastMsgTs.toDate() : new Date(chat.lastMsgTs)) : '';
+            const unread = _unreadMap[chat.id] || 0;
 
-        _unsubscribe = _db.collection('tm_groups')
-            .doc(GROUP_ID)
-            .collection('messages')
-            .orderBy('ts', 'asc')
-            .limitToLast(MAX_MSG)
+            let avClass = 'tmv3-avatar';
+            if (isPublic) avClass += ' public';
+            else if (isGroup) avClass += ' group';
+
+            let avContent = avatar ? `<img src="${avatar}" alt="">` : (isGroup ? '👥' : '👤');
+
+            item.innerHTML = `
+                <div class="${avClass}">${avContent}</div>
+                <div class="tmv3-chat-info">
+                    <div class="tmv3-chat-name">${_esc(name)}</div>
+                    <div class="tmv3-chat-preview">${_esc(lastMsg)}</div>
+                </div>
+                <div class="tmv3-chat-meta">
+                    <div class="tmv3-chat-time">${lastTs}</div>
+                    ${unread > 0 ? `<div class="tmv3-unread-badge">${unread > 9 ? '9+' : unread}</div>` : ''}
+                </div>
+            `;
+
+            item.addEventListener('click', function () {
+                _openChat(chat);
+            });
+            list.appendChild(item);
+        });
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       OPEN CHAT
+    ══════════════════════════════════════════════════════════ */
+    function _openChat(chat) {
+        _activeChat = chat;
+        _unsubscribeAll();
+        _isAtBottom = true;
+        _replyTarget = null;
+        _mediaPreview = null;
+
+        /* Update active in list */
+        document.querySelectorAll('.tmv3-chat-item').forEach(el => {
+            el.classList.toggle('active', el.dataset.id === chat.id);
+        });
+
+        /* Show right panel */
+        const right = document.getElementById('tmv3-right');
+        right.querySelector('#tmv3-empty-right').style.display = 'none';
+        document.getElementById('tmv3-chat-header').style.display = 'flex';
+        document.getElementById('tmv3-messages').style.display = 'flex';
+        document.getElementById('tmv3-typing').style.display = 'flex';
+        document.getElementById('tmv3-input-area').style.display = 'flex';
+
+        if (_isMobile) {
+            document.getElementById('tmv3-left').classList.add('hidden');
+            right.classList.add('open');
+        }
+
+        /* Header */
+        const isGroup = chat.type === 'group';
+        const name = chat.name || chat.displayName || 'Chat';
+        const avatar = chat.avatarData || chat.avatarUrl || '';
+        const hdrAv = document.getElementById('tmv3-hdr-av');
+        hdrAv.className = 'tmv3-avatar' + (chat.isPublic ? ' public' : isGroup ? ' group' : '');
+        hdrAv.style.cssText = 'width:42px;height:42px;font-size:18px;flex-shrink:0;';
+        hdrAv.innerHTML = avatar ? `<img src="${avatar}" alt="">` : (isGroup ? '👥' : '👤');
+        document.getElementById('tmv3-header-name').textContent = name;
+
+        if (isGroup) {
+            const members = chat.members ? chat.members.length : 0;
+            document.getElementById('tmv3-header-sub').textContent = members + ' জন সদস্য';
+        } else {
+            document.getElementById('tmv3-header-sub').textContent = 'online';
+        }
+
+        /* Reply / media bar clear */
+        document.getElementById('tmv3-reply-bar').classList.remove('show');
+        document.getElementById('tmv3-media-bar').classList.remove('show');
+
+        /* Check if user can send message */
+        _checkSendPermission(chat);
+
+        /* Subscribe messages */
+        _subscribeMessages(chat);
+
+        /* Unread clear */
+        _unreadMap[chat.id] = 0;
+        _renderChatList();
+    }
+
+    function _closeActiveChat() {
+        _activeChat = null;
+        _unsubscribeAll();
+        if (_isMobile) {
+            document.getElementById('tmv3-left').classList.remove('hidden');
+            document.getElementById('tmv3-right').classList.remove('open');
+        }
+        document.getElementById('tmv3-chat-header').style.display = 'none';
+        document.getElementById('tmv3-messages').style.display = 'none';
+        document.getElementById('tmv3-typing').style.display = 'none';
+        document.getElementById('tmv3-input-area').style.display = 'none';
+        document.getElementById('tmv3-admin-banner').classList.remove('show');
+        document.getElementById('tmv3-empty-right').style.display = 'flex';
+        _closeSidePanel();
+    }
+
+    function _checkSendPermission(chat) {
+        const banner = document.getElementById('tmv3-admin-banner');
+        const inputArea = document.getElementById('tmv3-input-area');
+        if (chat.type === 'group' && chat.allowMemberMsg === false) {
+            const uid = String(_currentUser.id);
+            const isAdmin = chat.adminId === uid;
+            if (!isAdmin) {
+                banner.classList.add('show');
+                inputArea.style.display = 'none';
+                return;
+            }
+        }
+        banner.classList.remove('show');
+        inputArea.style.display = 'flex';
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       MESSAGES
+    ══════════════════════════════════════════════════════════ */
+    function _getMessagesPath(chat) {
+        if (chat.type === 'group') {
+            return _db.collection('tm_groups').doc(chat.id).collection('messages');
+        } else {
+            return _db.collection('tm_personal_chats').doc(chat.id).collection('messages');
+        }
+    }
+
+    function _subscribeMessages(chat) {
+        if (!_db) return;
+        const area = document.getElementById('tmv3-messages');
+        area.innerHTML = '<div class="tmv3-spinner"><i class="fa fa-circle-notch"></i></div>';
+
+        _unsubMsg = _getMessagesPath(chat)
+            .orderBy('ts', 'asc').limitToLast(MAX_MSG)
             .onSnapshot(function (snap) {
-                _renderMessages(snap.docs);
-                /* listen typing separately */
-                _listenTyping();
-            }, function (err) {
-                console.error('[Chat]', err);
-                document.getElementById('tmChatMessages').innerHTML = `
-                    <div id="tmEmptyState">
-                        <i class="fa fa-exclamation-circle" style="color:#ef4444;"></i>
-                        <p>মেসেজ লোড করতে সমস্যা হচ্ছে।</p>
-                    </div>`;
+                _renderMessages(snap.docs, chat);
+                _listenTyping(chat);
+                _markSeen(snap.docs, chat);
+            }, function () {
+                area.innerHTML = '<div class="tmv3-empty-msg">মেসেজ লোড করতে সমস্যা হচ্ছে।</div>';
             });
     }
 
-    /* ── Render all messages ─────────────────────────────────── */
-    function _renderMessages(docs) {
-        const area = document.getElementById('tmChatMessages');
+    let _lastMsgDate = null;
+
+    function _renderMessages(docs, chat) {
+        const area = document.getElementById('tmv3-messages');
         if (!area) return;
+        _lastMsgDate = null;
 
         if (!docs.length) {
-            area.innerHTML = `<div id="tmEmptyState"><i class="fa fa-comments"></i><p>এখনো কোনো মেসেজ নেই। প্রথম মেসেজ পাঠান! 👋</p></div>`;
+            area.innerHTML = `<div class="tmv3-empty-msg" style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;"><i class="fa fa-comments" style="font-size:48px;opacity:.2;"></i><p>এখনো কোনো মেসেজ নেই। প্রথম মেসেজ পাঠান! 👋</p></div>`;
             return;
         }
 
-        _lastMsgDate = null;
-        const fragment = document.createDocumentFragment();
-
-        docs.forEach(function (doc) {
-            const data = doc.data();
-            const el   = _createMsgElement(doc.id, data);
-            fragment.appendChild(el);
-        });
-
+        const frag = document.createDocumentFragment();
+        docs.forEach(doc => frag.appendChild(_createMsgEl(doc.id, doc.data())));
         area.innerHTML = '';
-        area.appendChild(fragment);
+        area.appendChild(frag);
 
-        if (_isAtBottom) {
-            area.scrollTop = area.scrollHeight;
-        } else {
-            _unreadCount++;
-            const badge = document.getElementById('tmScrollDownBadge');
-            badge.textContent = _unreadCount > 9 ? '9+' : _unreadCount;
-            badge.style.display = 'flex';
-        }
-
-        /* mark own messages as seen */
-        _markSeen(docs);
+        if (_isAtBottom) area.scrollTop = area.scrollHeight;
     }
 
-    /* ── Create a single message element ────────────────────── */
-    function _createMsgElement(docId, data) {
-        const wrap = document.createDocumentFragment();
+    function _createMsgEl(docId, data) {
+        const frag = document.createDocumentFragment();
         const isOwn = _currentUser && String(data.senderId) === String(_currentUser.id);
 
-        /* date divider */
+        /* Date divider */
         if (data.ts) {
             const d = data.ts.toDate ? data.ts.toDate() : new Date(data.ts);
-            const dateStr = _formatDate(d);
-            if (dateStr !== _lastMsgDate) {
-                _lastMsgDate = dateStr;
+            const ds = _formatDate(d);
+            if (ds !== _lastMsgDate) {
+                _lastMsgDate = ds;
                 const div = document.createElement('div');
-                div.className = 'tm-date-div';
-                div.innerHTML = `<span>${dateStr}</span>`;
-                wrap.appendChild(div);
+                div.className = 'tmv3-date-div';
+                div.innerHTML = `<span>${ds}</span>`;
+                frag.appendChild(div);
             }
         }
 
-        const msgWrap = document.createElement('div');
-        msgWrap.className = 'tm-msg-wrap ' + (isOwn ? 'own' : 'other');
-        msgWrap.dataset.id = docId;
+        const wrap = document.createElement('div');
+        wrap.className = 'tmv3-msg-wrap ' + (isOwn ? 'own' : 'other');
+        wrap.dataset.id = docId;
 
-        /* avatar */
-        const avatar = document.createElement('div');
-        avatar.className = 'tm-msg-avatar';
-        if (data.senderAvatar) {
-            avatar.innerHTML = `<img src="${data.senderAvatar}" alt="">`;
-        } else {
-            avatar.innerHTML = `<i class="fa fa-user"></i>`;
-        }
+        /* Avatar */
+        const av = document.createElement('div');
+        av.className = 'tmv3-msg-av';
+        av.innerHTML = data.senderAvatar ? `<img src="${data.senderAvatar}" alt="">` : '<i class="fa fa-user"></i>';
 
-        /* bubble */
+        /* Bubble */
         const bubble = document.createElement('div');
-        bubble.className = 'tm-bubble';
+        bubble.className = 'tmv3-bubble';
 
-        /* sender name (only for others) */
         if (!isOwn) {
             const nameEl = document.createElement('div');
-            nameEl.className = 'tm-sender-name';
+            nameEl.className = 'tmv3-sender';
             nameEl.style.color = _nameColor(data.senderId);
             nameEl.textContent = data.senderName || 'User';
             bubble.appendChild(nameEl);
         }
 
-        /* reply quote */
         if (data.replyTo) {
             const q = document.createElement('div');
-            q.className = 'tm-reply-quote';
+            q.className = 'tmv3-reply-quote';
             q.innerHTML = `<strong>${_esc(data.replyTo.senderName || '')}</strong>${_esc(data.replyTo.text || '📷 ছবি')}`;
             bubble.appendChild(q);
         }
 
-        /* image or text */
         if (data.imgData) {
             const img = document.createElement('img');
-            img.className = 'tm-msg-img';
-            img.src = data.imgData;
-            img.alt = '📷';
-            img.loading = 'lazy';
-            img.addEventListener('click', function () { _openLightbox(data.imgData); });
+            img.className = 'tmv3-msg-img';
+            img.src = data.imgData; img.alt = '📷'; img.loading = 'lazy';
+            img.addEventListener('click', () => _openLightbox(data.imgData));
             bubble.appendChild(img);
         }
+
         if (data.text) {
             const txt = document.createElement('div');
-            txt.className = 'tm-msg-text';
+            txt.className = 'tmv3-msg-text';
             txt.textContent = data.text;
             bubble.appendChild(txt);
         }
 
-        /* time + ticks */
         const timeRow = document.createElement('div');
-        timeRow.className = 'tm-msg-time';
+        timeRow.className = 'tmv3-msg-time';
         const ts = data.ts ? (data.ts.toDate ? data.ts.toDate() : new Date(data.ts)) : new Date();
-        timeRow.innerHTML = _formatTime(ts);
+        timeRow.textContent = _formatTime(ts);
         if (isOwn) {
             const seen = data.seenBy && data.seenBy.length > 1;
-            timeRow.innerHTML += `<span class="tm-tick${seen ? ' seen' : ''}">✓✓</span>`;
+            const tick = document.createElement('span');
+            tick.className = 'tmv3-tick' + (seen ? ' seen' : '');
+            tick.textContent = '✓✓';
+            timeRow.appendChild(tick);
         }
         bubble.appendChild(timeRow);
 
-        /* assemble */
-        if (isOwn) {
-            msgWrap.appendChild(bubble);
-            msgWrap.appendChild(avatar);
-        } else {
-            msgWrap.appendChild(avatar);
-            msgWrap.appendChild(bubble);
-        }
+        wrap.appendChild(isOwn ? bubble : av);
+        wrap.appendChild(isOwn ? av : bubble);
+        if (!isOwn) { wrap.removeChild(wrap.children[1]); wrap.insertBefore(bubble, wrap.children[1] || null); wrap.insertBefore(av, bubble); }
 
-        /* long-press / right-click context menu */
-        _bindContextMenu(msgWrap, docId, data, isOwn);
+        /* fix order */
+        wrap.innerHTML = '';
+        if (isOwn) { wrap.appendChild(bubble); wrap.appendChild(av); }
+        else { wrap.appendChild(av); wrap.appendChild(bubble); }
 
-        wrap.appendChild(msgWrap);
-        return wrap;
+        _bindCtxMenu(wrap, docId, data, isOwn);
+        frag.appendChild(wrap);
+        return frag;
     }
 
-    /* ── Context menu binding ────────────────────────────────── */
-    function _bindContextMenu(el, docId, data, isOwn) {
+    function _bindCtxMenu(el, docId, data, isOwn) {
         let timer;
-        function showMenu(x, y) {
-            const menu     = document.getElementById('tmContextMenu');
-            const replyBtn = document.getElementById('tmCtxReply');
-            const copyBtn  = document.getElementById('tmCtxCopy');
-            const delBtn   = document.getElementById('tmCtxDelete');
-
-            replyBtn.onclick = function () {
+        function show(x, y) {
+            const menu = document.getElementById('tmv3-ctx-menu');
+            document.getElementById('tmv3-ctx-reply').onclick = function () {
                 menu.style.display = 'none';
-                _setReply(docId, data);
+                _replyTarget = { id: docId, senderName: data.senderName || 'User', text: data.text || '📷 ছবি' };
+                const prev = document.getElementById('tmv3-reply-prev');
+                prev.innerHTML = `<strong>${_esc(_replyTarget.senderName)}</strong>${_esc(_replyTarget.text)}`;
+                document.getElementById('tmv3-reply-bar').classList.add('show');
+                document.getElementById('tmv3-msg-input').focus();
             };
-            copyBtn.onclick = function () {
+            document.getElementById('tmv3-ctx-copy').onclick = function () {
                 menu.style.display = 'none';
-                if (data.text) navigator.clipboard && navigator.clipboard.writeText(data.text);
+                if (data.text) navigator.clipboard.writeText(data.text).catch(() => {});
             };
-            if (isOwn) {
-                delBtn.style.display = 'flex';
-                delBtn.onclick = function () {
-                    menu.style.display = 'none';
-                    _deleteMsg(docId);
-                };
-            } else {
-                delBtn.style.display = 'none';
-            }
-
-            menu.style.display = 'block';
-            /* position */
-            const vw = window.innerWidth, vh = window.innerHeight;
-            let left = x, top = y;
-            if (left + 200 > vw) left = vw - 210;
-            if (top + 150 > vh) top = vh - 160;
-            menu.style.left = left + 'px';
-            menu.style.top  = top + 'px';
+            const delBtn = document.getElementById('tmv3-ctx-delete');
+            delBtn.style.display = isOwn ? 'flex' : 'none';
+            delBtn.onclick = function () { menu.style.display = 'none'; _deleteMsg(docId); };
+            menu.style.cssText = `display:block;left:${Math.min(x, window.innerWidth-180)}px;top:${Math.min(y, window.innerHeight-120)}px;`;
         }
 
-        /* touch long-press */
-        el.addEventListener('touchstart', function (e) {
-            timer = setTimeout(function () {
-                const t = e.touches[0];
-                showMenu(t.clientX, t.clientY);
-            }, 500);
-        }, { passive: true });
-        el.addEventListener('touchend',  function () { clearTimeout(timer); }, { passive: true });
-        el.addEventListener('touchmove', function () { clearTimeout(timer); }, { passive: true });
-
-        /* right-click */
-        el.addEventListener('contextmenu', function (e) {
-            e.preventDefault();
-            showMenu(e.clientX, e.clientY);
-        });
+        el.addEventListener('contextmenu', function (e) { e.preventDefault(); show(e.clientX, e.clientY); });
+        el.addEventListener('touchstart', function (e) { timer = setTimeout(() => show(e.touches[0].clientX, e.touches[0].clientY), 600); }, { passive: true });
+        el.addEventListener('touchend', () => clearTimeout(timer));
+        el.addEventListener('touchmove', () => clearTimeout(timer));
     }
 
-    /* ── Send message ────────────────────────────────────────── */
-    function sendMessage() {
-        if (!_db || !_currentUser) return;
-        const ta   = document.getElementById('tmMsgInput');
-        const text = (ta.value || '').trim();
-
+    function _sendMessage() {
+        if (!_db || !_currentUser || !_activeChat) return;
+        const ta = document.getElementById('tmv3-msg-input');
+        const text = ta.value.trim();
         if (!text && !_mediaPreview) return;
 
+        /* Check permission */
+        const chat = _activeChat;
+        if (chat.type === 'group' && chat.allowMemberMsg === false) {
+            const uid = String(_currentUser.id);
+            if (chat.adminId !== uid) { _toast('শুধু এডমিন মেসেজ পাঠাতে পারবেন।'); return; }
+        }
+
         const msg = {
-            senderId:   String(_currentUser.id),
-            senderName: _currentUser.name || 'User',
-            senderAvatar: localStorage.getItem('user_profile_pic') || '',
-            text:       text,
-            ts:         firebase.firestore.FieldValue.serverTimestamp(),
-            seenBy:     [String(_currentUser.id)]
+            text: text,
+            senderId: String(_currentUser.id),
+            senderName: _currentUser.name || _currentUser.email || String(_currentUser.id),
+            senderAvatar: _currentUser.avatar || _currentUser.profileImage || '',
+            ts: firebase.firestore.FieldValue.serverTimestamp(),
+            seenBy: [String(_currentUser.id)]
         };
 
         if (_replyTarget) {
-            msg.replyTo = {
-                id:         _replyTarget.id,
-                senderName: _replyTarget.senderName,
-                text:       _replyTarget.text
-            };
+            msg.replyTo = { id: _replyTarget.id, senderName: _replyTarget.senderName, text: _replyTarget.text };
         }
+        if (_mediaPreview) msg.imgData = _mediaPreview;
 
-        if (_mediaPreview) {
-            msg.imgData = _mediaPreview;
-        }
+        const lastMsg = text || '📷 ছবি';
 
-        _db.collection('tm_groups').doc(GROUP_ID)
-           .collection('messages').add(msg)
-           .then(function () {
-               ta.value = '';
-               ta.style.height = 'auto';
-               _cancelReply();
-               _cancelMedia();
-               _clearTypingDoc();
-               /* scroll to bottom */
-               setTimeout(function () {
-                   const area = document.getElementById('tmChatMessages');
-                   if (area) area.scrollTop = area.scrollHeight;
-                   _isAtBottom = true;
-               }, 100);
-           })
-           .catch(function (err) { console.error('[Chat send]', err); });
+        _getMessagesPath(chat).add(msg).then(() => {
+            ta.value = ''; ta.style.height = 'auto';
+            _cancelReply(); _cancelMedia(); _clearTypingDoc();
+            /* update lastMsg on chat doc */
+            const ref = chat.type === 'group'
+                ? _db.collection('tm_groups').doc(chat.id)
+                : _db.collection('tm_personal_chats').doc(chat.id);
+            ref.update({ lastMsg, lastMsgTs: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
+            setTimeout(() => {
+                const area = document.getElementById('tmv3-messages');
+                if (area) { area.scrollTop = area.scrollHeight; _isAtBottom = true; }
+            }, 100);
+        }).catch(err => console.error('[send]', err));
     }
 
-    /* ── Delete message ─────────────────────────────────────── */
     function _deleteMsg(docId) {
-        if (!_db) return;
+        if (!_db || !_activeChat) return;
         if (!confirm('এই মেসেজ মুছে ফেলবেন?')) return;
-        _db.collection('tm_groups').doc(GROUP_ID)
-           .collection('messages').doc(docId).delete();
+        _getMessagesPath(_activeChat).doc(docId).delete();
     }
 
-    /* ── Mark seen ──────────────────────────────────────────── */
-    function _markSeen(docs) {
+    function _markSeen(docs, chat) {
         if (!_db || !_currentUser) return;
         const uid = String(_currentUser.id);
-        docs.forEach(function (doc) {
+        docs.forEach(doc => {
             const d = doc.data();
             if (d.senderId !== uid && (!d.seenBy || !d.seenBy.includes(uid))) {
-                doc.ref.update({
-                    seenBy: firebase.firestore.FieldValue.arrayUnion(uid)
-                }).catch(function () { });
+                doc.ref.update({ seenBy: firebase.firestore.FieldValue.arrayUnion(uid) }).catch(()=>{});
             }
         });
     }
 
-    /* ── Typing indicator ────────────────────────────────────── */
-    let _typingListenerUnsub = null;
+    function _clearChat() {
+        if (!_db || !_activeChat) return;
+        if (!confirm('এই চ্যাটের সব মেসেজ ক্লিয়ার করবেন?')) return;
+        _getMessagesPath(_activeChat).get().then(snap => {
+            const batch = _db.batch();
+            snap.docs.forEach(doc => batch.delete(doc.ref));
+            return batch.commit();
+        }).then(() => _toast('চ্যাট ক্লিয়ার হয়েছে')).catch(()=>{});
+    }
 
+    function _deleteChat() {
+        if (!_db || !_activeChat) return;
+        const chat = _activeChat;
+        if (chat.type === 'group' && chat.isPublic) { _toast('সাবজনীন গ্রুপ মুছতে পারবেন না।'); return; }
+        if (!confirm('পুরো চ্যাট ডিলিট করবেন?')) return;
+        /* remove user from members or delete personal */
+        if (chat.type === 'group') {
+            const uid = String(_currentUser.id);
+            _db.collection('tm_groups').doc(chat.id).update({
+                members: firebase.firestore.FieldValue.arrayRemove(uid)
+            }).then(() => { _closeActiveChat(); _toast('গ্রুপ থেকে বের হয়েছেন'); }).catch(()=>{});
+        } else {
+            _db.collection('tm_personal_chats').doc(chat.id).delete()
+                .then(() => { _closeActiveChat(); _toast('চ্যাট ডিলিট হয়েছে'); }).catch(()=>{});
+        }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       TYPING
+    ══════════════════════════════════════════════════════════ */
     function _sendTyping() {
-        if (!_db || !_currentUser) return;
+        if (!_db || !_currentUser || !_activeChat) return;
         clearTimeout(_typingTimer);
-        _db.collection('tm_groups').doc(GROUP_ID)
-           .collection('typing').doc(String(_currentUser.id))
-           .set({ name: _currentUser.name, ts: firebase.firestore.FieldValue.serverTimestamp() })
-           .catch(function () { });
+        const ref = _activeChat.type === 'group'
+            ? _db.collection('tm_groups').doc(_activeChat.id).collection('typing')
+            : _db.collection('tm_personal_chats').doc(_activeChat.id).collection('typing');
+        ref.doc(String(_currentUser.id)).set({
+            name: _currentUser.name || '',
+            ts: firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(()=>{});
         _typingTimer = setTimeout(_clearTypingDoc, TYPING_TTL);
     }
 
     function _clearTypingDoc() {
+        if (!_db || !_currentUser || !_activeChat) return;
+        const ref = _activeChat.type === 'group'
+            ? _db.collection('tm_groups').doc(_activeChat.id).collection('typing')
+            : _db.collection('tm_personal_chats').doc(_activeChat.id).collection('typing');
+        ref.doc(String(_currentUser.id)).delete().catch(()=>{});
+    }
+
+    function _listenTyping(chat) {
+        if (!_db || _unsubTyping) return;
+        const ref = chat.type === 'group'
+            ? _db.collection('tm_groups').doc(chat.id).collection('typing')
+            : _db.collection('tm_personal_chats').doc(chat.id).collection('typing');
+        _unsubTyping = ref.onSnapshot(snap => {
+            const bar = document.getElementById('tmv3-typing');
+            if (!bar) return;
+            const uid = String(_currentUser.id);
+            const names = snap.docs.filter(d => d.id !== uid).map(d => d.data().name);
+            bar.innerHTML = names.length ? `<span class="tmv3-typing-text">${names.length === 1 ? _esc(names[0]) + ' টাইপ করছে...' : names.length + ' জন টাইপ করছে...'}</span>` : '';
+        }, ()=>{});
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       CREATE GROUP
+    ══════════════════════════════════════════════════════════ */
+    function _showCreateGroupModal() {
+        if (!_currentUser) { _toast('লগইন করুন।'); return; }
+        const modal = document.getElementById('tmv3-modal');
+        modal.innerHTML = `
+            <div class="tmv3-modal-head">
+                <button class="tmv3-icon-btn" onclick="window._tmv3._closeModal()"><i class="fa fa-arrow-left"></i></button>
+                <span class="tmv3-modal-title">নতুন গ্রুপ তৈরি করুন</span>
+            </div>
+            <div class="tmv3-modal-body">
+                <div class="tmv3-av-upload">
+                    <label class="tmv3-sp-avatar" id="cg-av-label" for="cg-av-input" style="width:90px;height:90px;font-size:36px;cursor:pointer;">
+                        👥
+                        <img id="cg-av-img" src="" alt="" style="display:none;">
+                        <span class="tmv3-sp-avatar-edit"><i class="fa fa-camera"></i></span>
+                    </label>
+                    <input type="file" id="cg-av-input" accept="image/*" style="display:none;">
+                </div>
+                <div class="tmv3-field">
+                    <label>গ্রুপের নাম *</label>
+                    <input type="text" id="cg-name" placeholder="গ্রুপের নাম লিখুন" maxlength="100">
+                </div>
+                <div class="tmv3-field">
+                    <label>বিবরণ (ঐচ্ছিক)</label>
+                    <textarea id="cg-desc" placeholder="গ্রুপের বিবরণ..."></textarea>
+                </div>
+            </div>
+            <div class="tmv3-modal-footer">
+                <button class="tmv3-btn secondary" onclick="window._tmv3._closeModal()">বাতিল</button>
+                <button class="tmv3-btn primary" id="cg-next-btn">পরবর্তী →</button>
+            </div>
+        `;
+        document.getElementById('tmv3-modal-overlay').classList.add('open');
+
+        /* Avatar input */
+        let cgAvData = '';
+        document.getElementById('cg-av-input').addEventListener('change', function () {
+            if (!this.files || !this.files[0]) return;
+            const r = new FileReader();
+            r.onload = e => {
+                cgAvData = e.target.result;
+                const img = document.getElementById('cg-av-img');
+                img.src = cgAvData; img.style.display = 'block';
+                document.getElementById('cg-av-label').querySelector('i').style.display = 'none';
+            };
+            r.readAsDataURL(this.files[0]);
+            this.value = '';
+        });
+
+        document.getElementById('cg-next-btn').addEventListener('click', function () {
+            const name = document.getElementById('cg-name').value.trim();
+            if (!name) { _toast('গ্রুপের নাম দিন।'); return; }
+            const desc = document.getElementById('cg-desc').value.trim();
+            _createGroup(name, desc, cgAvData);
+        });
+    }
+
+    function _createGroup(name, desc, avatarData) {
         if (!_db || !_currentUser) return;
-        _db.collection('tm_groups').doc(GROUP_ID)
-           .collection('typing').doc(String(_currentUser.id))
-           .delete().catch(function () { });
-    }
-
-    function _listenTyping() {
-        if (!_db || _typingListenerUnsub) return;
-        _typingListenerUnsub = _db.collection('tm_groups').doc(GROUP_ID)
-            .collection('typing')
-            .onSnapshot(function (snap) {
-                const bar = document.getElementById('tmTypingBar');
-                if (!bar) return;
-                const uid = _currentUser ? String(_currentUser.id) : '';
-                const names = [];
-                snap.docs.forEach(function (d) {
-                    if (d.id !== uid) names.push(d.data().name);
-                });
-                if (names.length === 0) {
-                    bar.innerHTML = '';
-                } else if (names.length === 1) {
-                    bar.innerHTML = `<span class="tm-typing-text">${_esc(names[0])} টাইপ করছে...</span>`;
-                } else {
-                    bar.innerHTML = `<span class="tm-typing-text">${names.length} জন টাইপ করছে...</span>`;
-                }
-            }, function () { });
-    }
-
-    /* ── Reply helpers ─────────────────────────────────────── */
-    function _setReply(docId, data) {
-        _replyTarget = {
-            id:         docId,
-            senderName: data.senderName || 'User',
-            text:       data.text || '📷 ছবি'
+        const uid = String(_currentUser.id);
+        const groupData = {
+            name, desc,
+            avatarData: avatarData || '',
+            isPublic: false,
+            adminId: uid,
+            members: [uid],
+            allowMemberAdd: false,
+            allowMemberMsg: true,
+            createdBy: uid,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastMsg: '',
+            lastMsgTs: firebase.firestore.FieldValue.serverTimestamp()
         };
-        const bar  = document.getElementById('tmReplyBar');
-        const prev = document.getElementById('tmReplyPreview');
-        prev.innerHTML = `<strong>${_esc(_replyTarget.senderName)}</strong>${_esc(_replyTarget.text)}`;
-        bar.classList.add('show');
-        document.getElementById('tmMsgInput').focus();
+        _db.collection('tm_groups').add(groupData).then(ref => {
+            _closeModal();
+            _toast('গ্রুপ তৈরি হয়েছে! 🎉');
+            /* Open the group */
+            setTimeout(() => {
+                _openChat({ id: ref.id, type: 'group', ...groupData });
+            }, 500);
+        }).catch(() => _toast('গ্রুপ তৈরিতে সমস্যা হয়েছে।'));
     }
 
-    function cancelReply() {
-        _replyTarget = null;
-        document.getElementById('tmReplyBar').classList.remove('show');
+    /* ══════════════════════════════════════════════════════════
+       PERSONAL CHAT (search & open)
+    ══════════════════════════════════════════════════════════ */
+    function _openPersonalChat(otherUser) {
+        if (!_db || !_currentUser) return;
+        const uid = String(_currentUser.id);
+        const oid = String(otherUser.id);
+        /* create deterministic chat id */
+        const chatId = uid < oid ? uid + '_' + oid : oid + '_' + uid;
+
+        _db.collection('tm_personal_chats').doc(chatId).set({
+            members: [uid, oid],
+            memberInfo: {
+                [uid]: { name: _currentUser.name || '', avatar: _currentUser.avatar || '' },
+                [oid]: { name: otherUser.name || '', avatar: otherUser.avatar || '' }
+            },
+            type: 'personal',
+            lastMsg: '',
+            lastMsgTs: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).then(() => {
+            const displayName = otherUser.name || otherUser.email || oid;
+            _openChat({
+                id: chatId, type: 'personal',
+                name: displayName,
+                displayName,
+                avatarData: otherUser.avatar || '',
+                members: [uid, oid]
+            });
+            _closeModal();
+        }).catch(() => {});
     }
 
-    function cancelMedia() {
-        _mediaPreview = null;
-        document.getElementById('tmMediaBar').classList.remove('show');
-        document.getElementById('tmMediaThumb').src = '';
+    /* ══════════════════════════════════════════════════════════
+       INFO PANEL (Group / Personal)
+    ══════════════════════════════════════════════════════════ */
+    function _showInfoPanel(chat) {
+        const panel = document.getElementById('tmv3-side-panel');
+        panel.classList.add('open');
+
+        if (chat.type === 'group') {
+            _buildGroupInfoPanel(chat, panel);
+        } else {
+            _buildPersonalInfoPanel(chat, panel);
+        }
     }
 
-    /* ── Lightbox ─────────────────────────────────────────── */
+    function _closeSidePanel() {
+        document.getElementById('tmv3-side-panel').classList.remove('open');
+    }
+
+    function _buildGroupInfoPanel(chat, panel) {
+        const uid = String(_currentUser.id);
+        const isAdmin = chat.adminId === uid;
+        const name = chat.name || 'Group';
+        const avatar = chat.avatarData || '';
+        const members = chat.members || [];
+
+        panel.innerHTML = `
+            <div class="tmv3-sp-header">
+                <button class="tmv3-icon-btn" onclick="window._tmv3._closeSidePanel()"><i class="fa fa-times"></i></button>
+                <span class="tmv3-sp-title">Group info</span>
+                ${isAdmin ? `<button class="tmv3-icon-btn" id="sp-edit-group" title="সম্পাদনা করুন"><i class="fa fa-edit"></i></button>` : ''}
+            </div>
+            <div class="tmv3-sp-body">
+                <div class="tmv3-sp-avatar-wrap">
+                    <div class="tmv3-sp-avatar ${chat.isPublic ? 'public' : 'group'}" id="sp-av" ${isAdmin && !chat.isPublic ? 'style="cursor:pointer;"' : ''}>
+                        ${avatar ? `<img src="${avatar}" alt="">` : '👥'}
+                        ${isAdmin && !chat.isPublic ? '<span class="tmv3-sp-avatar-edit"><i class="fa fa-camera"></i></span>' : ''}
+                    </div>
+                </div>
+                <div class="tmv3-sp-name">${_esc(name)}</div>
+                <div class="tmv3-sp-sub">Group · <span style="color:#25d366;">${members.length} members</span></div>
+
+                ${chat.desc ? `<div class="tmv3-bio-box" style="margin-bottom:16px;"><p>${_esc(chat.desc)}</p></div>` : ''}
+
+                ${isAdmin ? `
+                <div class="tmv3-sp-section">
+                    <div class="tmv3-sp-row" id="sp-group-settings">
+                        <i class="fa fa-cog"></i>
+                        <span class="label">Group Settings</span>
+                        <i class="fa fa-chevron-right" style="color:#8696a0;"></i>
+                    </div>
+                </div>` : ''}
+
+                <div class="tmv3-sp-section">
+                    <div style="color:#8696a0;font-size:13px;padding:16px 0 10px;font-weight:600;">${members.length} MEMBERS</div>
+                    ${isAdmin || chat.allowMemberAdd ? `
+                    <div class="tmv3-member-item" id="sp-add-member-btn" style="cursor:pointer;">
+                        <div class="tmv3-member-av" style="background:#25d366;"><i class="fa fa-user-plus" style="color:#fff;"></i></div>
+                        <div class="tmv3-member-info"><div class="tmv3-member-name" style="color:#25d366;">Add member</div></div>
+                    </div>` : ''}
+                    <div id="sp-members-list"><div class="tmv3-spinner" style="height:60px;"><i class="fa fa-circle-notch"></i></div></div>
+                </div>
+
+                <div class="tmv3-sp-section" style="margin-top:16px;">
+                    ${!chat.isPublic ? `<div class="tmv3-sp-row danger" id="sp-leave-group"><i class="fa fa-sign-out"></i><span class="label">Exit group</span></div>` : ''}
+                    ${isAdmin && !chat.isPublic ? `<div class="tmv3-sp-row danger" id="sp-delete-group"><i class="fa fa-trash"></i><span class="label">Delete group</span></div>` : ''}
+                </div>
+            </div>
+        `;
+
+        /* Load members */
+        _loadGroupMembers(chat, isAdmin);
+
+        /* Add member btn */
+        const addBtn = panel.querySelector('#sp-add-member-btn');
+        if (addBtn) addBtn.addEventListener('click', () => _showAddMemberModal(chat));
+
+        /* Group settings (admin) */
+        const settingsBtn = panel.querySelector('#sp-group-settings');
+        if (settingsBtn) settingsBtn.addEventListener('click', () => _showGroupSettingsModal(chat));
+
+        /* Leave group */
+        const leaveBtn = panel.querySelector('#sp-leave-group');
+        if (leaveBtn) leaveBtn.addEventListener('click', () => {
+            if (!confirm('গ্রুপ থেকে বের হবেন?')) return;
+            _db.collection('tm_groups').doc(chat.id).update({
+                members: firebase.firestore.FieldValue.arrayRemove(uid)
+            }).then(() => { _closeActiveChat(); _closeSidePanel(); _toast('গ্রুপ থেকে বের হয়েছেন।'); }).catch(()=>{});
+        });
+
+        /* Delete group (admin) */
+        const delBtn = panel.querySelector('#sp-delete-group');
+        if (delBtn) delBtn.addEventListener('click', () => {
+            if (!confirm('পুরো গ্রুপ ডিলিট করবেন? এটি সকল সদস্যের কাছ থেকে মুছে যাবে।')) return;
+            _db.collection('tm_groups').doc(chat.id).delete()
+                .then(() => { _closeActiveChat(); _closeSidePanel(); _toast('গ্রুপ ডিলিট হয়েছে।'); }).catch(()=>{});
+        });
+    }
+
+    function _loadGroupMembers(chat, isAdmin) {
+        if (!_db) return;
+        const uid = String(_currentUser.id);
+        const members = chat.members || [];
+        const list = document.getElementById('sp-members-list');
+        if (!list) return;
+        list.innerHTML = '';
+
+        if (!members.length) { list.innerHTML = '<div class="tmv3-empty-msg">সদস্য নেই</div>'; return; }
+
+        /* fetch user data for each member */
+        const promises = members.map(mid => _db.collection('users').doc(String(mid)).get().catch(() => null));
+        Promise.all(promises).then(docs => {
+            list.innerHTML = '';
+            docs.forEach((doc, i) => {
+                const mid = members[i];
+                const udata = (doc && doc.exists) ? doc.data() : {};
+                const mname = udata.name || udata.email || String(mid);
+                const mavatar = udata.avatar || udata.profileImage || '';
+                const mbio = udata.bio || '';
+                const isAdminMember = String(mid) === chat.adminId;
+                const isSelf = String(mid) === uid;
+
+                const item = document.createElement('div');
+                item.className = 'tmv3-member-item';
+                item.innerHTML = `
+                    <div class="tmv3-member-av">${mavatar ? `<img src="${mavatar}" alt="">` : '<i class="fa fa-user"></i>'}</div>
+                    <div class="tmv3-member-info">
+                        <div class="tmv3-member-name">${_esc(isSelf ? 'You (' + mname + ')' : mname)}</div>
+                        <div class="tmv3-member-sub">${_esc(mbio || (udata.mobile || udata.email || String(mid)))}</div>
+                    </div>
+                    ${isAdminMember ? '<span class="tmv3-member-badge">Admin</span>' : ''}
+                    ${isAdmin && !isSelf && !chat.isPublic ? `<button class="tmv3-member-del" data-mid="${_esc(String(mid))}" title="সরিয়ে দিন"><i class="fa fa-times"></i></button>` : ''}
+                `;
+
+                /* Click to open personal chat */
+                item.querySelector('.tmv3-member-info').addEventListener('click', () => {
+                    if (!isSelf) _openPersonalChat({ id: mid, name: mname, avatar: mavatar });
+                });
+
+                /* Remove member btn */
+                const delBtn = item.querySelector('.tmv3-member-del');
+                if (delBtn) delBtn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    const mid2 = delBtn.dataset.mid;
+                    if (!confirm('এই সদস্যকে গ্রুপ থেকে বের করবেন?')) return;
+                    _db.collection('tm_groups').doc(chat.id).update({
+                        members: firebase.firestore.FieldValue.arrayRemove(mid2)
+                    }).then(() => {
+                        chat.members = chat.members.filter(m => String(m) !== mid2);
+                        _loadGroupMembers(chat, isAdmin);
+                        _toast('সদস্য সরানো হয়েছে।');
+                    }).catch(()=>{});
+                });
+
+                list.appendChild(item);
+            });
+        }).catch(() => {
+            list.innerHTML = '<div class="tmv3-empty-msg">সদস্য তালিকা লোড হচ্ছে না।</div>';
+        });
+    }
+
+    function _buildPersonalInfoPanel(chat, panel) {
+        const uid = String(_currentUser.id);
+        const otherId = (chat.members || []).find(m => String(m) !== uid);
+        const memberInfo = chat.memberInfo || {};
+        const otherInfo = otherId ? (memberInfo[String(otherId)] || {}) : {};
+        const name = chat.name || otherInfo.name || 'User';
+        const avatar = chat.avatarData || otherInfo.avatar || '';
+
+        panel.innerHTML = `
+            <div class="tmv3-sp-header">
+                <button class="tmv3-icon-btn" onclick="window._tmv3._closeSidePanel()"><i class="fa fa-times"></i></button>
+                <span class="tmv3-sp-title">Contact info</span>
+            </div>
+            <div class="tmv3-sp-body">
+                <div class="tmv3-sp-avatar-wrap">
+                    <div class="tmv3-sp-avatar">
+                        ${avatar ? `<img src="${avatar}" alt="">` : '👤'}
+                    </div>
+                </div>
+                <div class="tmv3-sp-name" id="sp-other-name">${_esc(name)}</div>
+                <div class="tmv3-sp-sub" id="sp-other-sub">Loading...</div>
+                <div id="sp-other-bio" class="tmv3-bio-box" style="display:none;"><p></p></div>
+                <div class="tmv3-sp-section">
+                    <div class="tmv3-sp-row danger" id="sp-block-user"><i class="fa fa-ban"></i><span class="label">Block</span></div>
+                    <div class="tmv3-sp-row danger" id="sp-delete-contact"><i class="fa fa-trash"></i><span class="label">Delete chat</span></div>
+                </div>
+            </div>
+        `;
+
+        /* Load other user data */
+        if (otherId && _db) {
+            _db.collection('users').doc(String(otherId)).get().then(doc => {
+                if (!doc || !doc.exists) return;
+                const d = doc.data();
+                const n = d.name || d.email || String(otherId);
+                document.getElementById('sp-other-name').textContent = n;
+                const sub = d.mobile || d.email || '';
+                document.getElementById('sp-other-sub').textContent = sub;
+                if (d.bio) {
+                    const bioBox = document.getElementById('sp-other-bio');
+                    bioBox.style.display = 'block';
+                    bioBox.querySelector('p').textContent = d.bio;
+                }
+            }).catch(()=>{});
+        }
+
+        /* Block */
+        panel.querySelector('#sp-block-user').addEventListener('click', () => {
+            if (!confirm('এই ব্যক্তিকে ব্লক করবেন?')) return;
+            _toast('ব্লক করা হয়েছে।'); // implement as needed
+            _closeSidePanel();
+        });
+
+        /* Delete chat */
+        panel.querySelector('#sp-delete-contact').addEventListener('click', () => {
+            _closeSidePanel();
+            _deleteChat();
+        });
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       GROUP SETTINGS MODAL
+    ══════════════════════════════════════════════════════════ */
+    function _showGroupSettingsModal(chat) {
+        const uid = String(_currentUser.id);
+        const modal = document.getElementById('tmv3-modal');
+        modal.innerHTML = `
+            <div class="tmv3-modal-head">
+                <button class="tmv3-icon-btn" onclick="window._tmv3._closeModal()"><i class="fa fa-arrow-left"></i></button>
+                <span class="tmv3-modal-title">Group Settings</span>
+            </div>
+            <div class="tmv3-modal-body">
+                <div class="tmv3-sp-row" style="padding:14px 0;border-bottom:1px solid #2a3942;">
+                    <i class="fa fa-user-shield" style="color:#8696a0;font-size:16px;"></i>
+                    <span class="label" style="color:#e9edef;font-size:14px;">Admin পরিবর্তন করুন</span>
+                    <button class="tmv3-btn secondary" id="gs-change-admin" style="padding:6px 14px;font-size:12px;">পরিবর্তন</button>
+                </div>
+                <div class="tmv3-sp-row" style="padding:14px 0;border-bottom:1px solid #2a3942;">
+                    <i class="fa fa-user-plus" style="color:#8696a0;font-size:16px;"></i>
+                    <div style="flex:1;">
+                        <div style="color:#e9edef;font-size:14px;">সদস্যরা মেম্বার যোগ করতে পারবে?</div>
+                        <div style="color:#8696a0;font-size:12px;">অন করলে সদস্যরাও মেম্বার যোগ করতে পারবে</div>
+                    </div>
+                    <label class="tmv3-toggle"><input type="checkbox" id="gs-allow-add" ${chat.allowMemberAdd ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                </div>
+                <div class="tmv3-sp-row" style="padding:14px 0;border-bottom:1px solid #2a3942;">
+                    <i class="fa fa-comment" style="color:#8696a0;font-size:16px;"></i>
+                    <div style="flex:1;">
+                        <div style="color:#e9edef;font-size:14px;">সদস্যরা মেসেজ পাঠাতে পারবে?</div>
+                        <div style="color:#8696a0;font-size:12px;">বন্ধ করলে শুধু এডমিন মেসেজ পাঠাতে পারবেন</div>
+                    </div>
+                    <label class="tmv3-toggle"><input type="checkbox" id="gs-allow-msg" ${chat.allowMemberMsg !== false ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                </div>
+            </div>
+            <div class="tmv3-modal-footer">
+                <button class="tmv3-btn secondary" onclick="window._tmv3._closeModal()">বাতিল</button>
+                <button class="tmv3-btn primary" id="gs-save-btn">সেভ করুন</button>
+            </div>
+        `;
+        document.getElementById('tmv3-modal-overlay').classList.add('open');
+
+        document.getElementById('gs-change-admin').addEventListener('click', () => _showChangeAdminModal(chat));
+
+        document.getElementById('gs-save-btn').addEventListener('click', () => {
+            const allowAdd = document.getElementById('gs-allow-add').checked;
+            const allowMsg = document.getElementById('gs-allow-msg').checked;
+            _db.collection('tm_groups').doc(chat.id).update({ allowMemberAdd: allowAdd, allowMemberMsg: allowMsg })
+                .then(() => {
+                    chat.allowMemberAdd = allowAdd;
+                    chat.allowMemberMsg = allowMsg;
+                    _activeChat = chat;
+                    _checkSendPermission(chat);
+                    _closeModal();
+                    _toast('সেটিং সেভ হয়েছে।');
+                }).catch(() => _toast('সেটিং সেভ করতে সমস্যা।'));
+        });
+    }
+
+    function _showChangeAdminModal(chat) {
+        const uid = String(_currentUser.id);
+        const members = (chat.members || []).filter(m => String(m) !== uid);
+        const modal = document.getElementById('tmv3-modal');
+        modal.innerHTML = `
+            <div class="tmv3-modal-head">
+                <button class="tmv3-icon-btn" onclick="window._tmv3._closeModal()"><i class="fa fa-arrow-left"></i></button>
+                <span class="tmv3-modal-title">Admin পরিবর্তন</span>
+            </div>
+            <div class="tmv3-modal-body">
+                <p style="color:#8696a0;font-size:14px;margin-bottom:12px;">নিচের সদস্যদের মধ্য থেকে নতুন Admin বেছে নিন:</p>
+                <div id="ca-list"><div class="tmv3-spinner" style="height:60px;"><i class="fa fa-circle-notch"></i></div></div>
+            </div>
+        `;
+        document.getElementById('tmv3-modal-overlay').classList.add('open');
+
+        const listEl = document.getElementById('ca-list');
+        const promises = members.map(mid => _db.collection('users').doc(String(mid)).get().catch(() => null));
+        Promise.all(promises).then(docs => {
+            listEl.innerHTML = '';
+            docs.forEach((doc, i) => {
+                const mid = members[i];
+                const udata = (doc && doc.exists) ? doc.data() : {};
+                const mname = udata.name || udata.email || String(mid);
+                const item = document.createElement('div');
+                item.className = 'tmv3-member-item';
+                item.style.cursor = 'pointer';
+                item.innerHTML = `<div class="tmv3-member-av"><i class="fa fa-user"></i></div><div class="tmv3-member-info"><div class="tmv3-member-name">${_esc(mname)}</div></div>`;
+                item.addEventListener('click', () => {
+                    if (!confirm(_esc(mname) + ' কে Admin বানাবেন?')) return;
+                    _db.collection('tm_groups').doc(chat.id).update({ adminId: String(mid) })
+                        .then(() => { chat.adminId = String(mid); _closeModal(); _toast('Admin পরিবর্তন হয়েছে।'); }).catch(()=>{});
+                });
+                listEl.appendChild(item);
+            });
+            if (!members.length) listEl.innerHTML = '<div class="tmv3-empty-msg">অন্য কোনো সদস্য নেই</div>';
+        }).catch(() => { listEl.innerHTML = '<div class="tmv3-empty-msg">লোড হচ্ছে না।</div>'; });
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       ADD MEMBER MODAL
+    ══════════════════════════════════════════════════════════ */
+    function _showAddMemberModal(chat) {
+        const modal = document.getElementById('tmv3-modal');
+        const existingMembers = chat.members || [];
+        modal.innerHTML = `
+            <div class="tmv3-modal-head">
+                <button class="tmv3-icon-btn" onclick="window._tmv3._closeModal()"><i class="fa fa-arrow-left"></i></button>
+                <span class="tmv3-modal-title">Add member</span>
+            </div>
+            <div class="tmv3-modal-body">
+                <div style="display:flex;gap:10px;margin-bottom:12px;">
+                    <input class="tmv3-modal-search" id="am-search" placeholder="নাম, মোবাইল, জিমেইল দিয়ে খুঁজুন..." autocomplete="off">
+                    <button class="tmv3-btn secondary" id="am-public-btn" style="white-space:nowrap;font-size:12px;">সকল ইউজার</button>
+                </div>
+                <div id="am-list"><div class="tmv3-empty-msg">আপনার চ্যাটে থাকা ইউজারগুলো দেখাবে...</div></div>
+                <div id="am-selected-wrap" style="display:none;margin-top:12px;border-top:1px solid #2a3942;padding-top:12px;">
+                    <div style="color:#8696a0;font-size:13px;margin-bottom:8px;">নির্বাচিত:</div>
+                    <div id="am-selected-names" style="color:#25d366;font-size:14px;"></div>
+                </div>
+            </div>
+            <div class="tmv3-modal-footer">
+                <button class="tmv3-btn secondary" onclick="window._tmv3._closeModal()">বাতিল</button>
+                <button class="tmv3-btn primary" id="am-add-btn">যোগ করুন</button>
+            </div>
+        `;
+        document.getElementById('tmv3-modal-overlay').classList.add('open');
+
+        let selected = [];
+        let currentUsers = [];
+
+        function renderList(users) {
+            const list = document.getElementById('am-list');
+            if (!users.length) { list.innerHTML = '<div class="tmv3-empty-msg">কোনো ইউজার পাওয়া যাচ্ছে না</div>'; return; }
+            list.innerHTML = '';
+            users.forEach(u => {
+                if (existingMembers.includes(String(u.id))) return; // already member
+                const item = document.createElement('div');
+                item.className = 'tmv3-user-sel-item';
+                const isSelected = selected.includes(String(u.id));
+                item.innerHTML = `
+                    <div class="tmv3-sel-check ${isSelected ? 'checked' : ''}" data-uid="${_esc(String(u.id))}"></div>
+                    <div class="tmv3-member-av">${u.avatar ? `<img src="${u.avatar}" alt="">` : '<i class="fa fa-user"></i>'}</div>
+                    <div class="tmv3-member-info"><div class="tmv3-member-name">${_esc(u.name || u.email || String(u.id))}</div><div class="tmv3-member-sub">${_esc(u.email || u.mobile || '')}</div></div>
+                `;
+                item.addEventListener('click', () => {
+                    const uid2 = String(u.id);
+                    const idx = selected.indexOf(uid2);
+                    if (idx > -1) selected.splice(idx, 1); else selected.push(uid2);
+                    renderList(currentUsers);
+                    updateSelected();
+                });
+                list.appendChild(item);
+            });
+        }
+
+        function updateSelected() {
+            const wrap = document.getElementById('am-selected-wrap');
+            const names = document.getElementById('am-selected-names');
+            if (selected.length > 0) {
+                wrap.style.display = 'block';
+                names.textContent = selected.join(', ');
+            } else {
+                wrap.style.display = 'none';
+            }
+        }
+
+        /* Load personal chat members */
+        function loadPersonalChatUsers() {
+            if (!_db || !_currentUser) return;
+            const uid = String(_currentUser.id);
+            _db.collection('tm_personal_chats').where('members', 'array-contains', uid).get()
+                .then(snap => {
+                    const otherIds = [];
+                    snap.docs.forEach(doc => {
+                        const mems = doc.data().members || [];
+                        mems.forEach(m => { if (String(m) !== uid && !otherIds.includes(String(m))) otherIds.push(String(m)); });
+                    });
+                    return Promise.all(otherIds.map(id => _db.collection('users').doc(id).get().catch(() => null)));
+                }).then(docs => {
+                    currentUsers = docs.filter(Boolean).filter(d => d.exists).map(d => ({ id: d.id, ...d.data() }));
+                    renderList(currentUsers);
+                }).catch(() => {});
+        }
+
+        /* Load all users */
+        function loadAllUsers(q) {
+            if (!_db) return;
+            _db.collection('users').limit(50).get().then(snap => {
+                const uid = String(_currentUser.id);
+                let users = snap.docs.filter(d => d.id !== uid).map(d => ({ id: d.id, ...d.data() }));
+                if (q) {
+                    const qLow = q.toLowerCase();
+                    users = users.filter(u => {
+                        const n = (u.name || '').toLowerCase();
+                        const e = (u.email || '').toLowerCase();
+                        const m = (u.mobile || '').toLowerCase();
+                        return n.includes(qLow) || e.includes(qLow) || m.includes(qLow);
+                    });
+                }
+                currentUsers = users;
+                renderList(users);
+            }).catch(() => {});
+        }
+
+        loadPersonalChatUsers();
+
+        document.getElementById('am-public-btn').addEventListener('click', () => loadAllUsers(''));
+
+        document.getElementById('am-search').addEventListener('input', function () {
+            const q = this.value.trim().toLowerCase();
+            if (q) {
+                const filtered = currentUsers.filter(u => {
+                    return (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q) || (u.mobile || '').toLowerCase().includes(q);
+                });
+                renderList(filtered);
+            } else {
+                renderList(currentUsers);
+            }
+        });
+
+        document.getElementById('am-add-btn').addEventListener('click', () => {
+            if (!selected.length) { _toast('কাউকে সিলেক্ট করুন।'); return; }
+            const updates = {};
+            selected.forEach(sid => { if (!existingMembers.includes(sid)) existingMembers.push(sid); });
+            _db.collection('tm_groups').doc(chat.id).update({
+                members: existingMembers
+            }).then(() => {
+                chat.members = existingMembers;
+                document.getElementById('tmv3-header-sub').textContent = existingMembers.length + ' জন সদস্য';
+                _closeModal();
+                _toast(selected.length + ' জন সদস্য যোগ হয়েছে।');
+                _buildGroupInfoPanel(chat, document.getElementById('tmv3-side-panel'));
+            }).catch(() => _toast('যোগ করতে সমস্যা হয়েছে।'));
+        });
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       PROFILE PANEL
+    ══════════════════════════════════════════════════════════ */
+    function _showProfilePanel() {
+        if (!_currentUser) { _toast('লগইন করুন।'); return; }
+        const panel = document.getElementById('tmv3-side-panel');
+        panel.classList.add('open');
+
+        const u = _currentUser;
+        const avatar = u.avatar || u.profileImage || '';
+        const name = u.name || '';
+        const bio = u.bio || '';
+        const email = u.email || '';
+        const mobile = u.mobile || '';
+
+        panel.innerHTML = `
+            <div class="tmv3-sp-header">
+                <button class="tmv3-icon-btn" onclick="window._tmv3._closeSidePanel()"><i class="fa fa-times"></i></button>
+                <span class="tmv3-sp-title">Profile</span>
+            </div>
+            <div class="tmv3-sp-body">
+                <div class="tmv3-sp-avatar-wrap">
+                    <div class="tmv3-sp-avatar" id="profile-av" style="cursor:pointer;">
+                        ${avatar ? `<img src="${avatar}" alt="" id="profile-av-img">` : `<span id="profile-av-icon">👤</span>`}
+                        <span class="tmv3-sp-avatar-edit"><i class="fa fa-camera"></i></span>
+                    </div>
+                    <input type="file" id="profile-av-input" accept="image/*" style="display:none;">
+                </div>
+                <div class="tmv3-sp-name">${_esc(name || 'আপনার নাম')}</div>
+                <div class="tmv3-sp-sub">${_esc(email || mobile || '')}</div>
+
+                <div class="tmv3-sp-section">
+                    <div class="tmv3-sp-row" id="pr-edit-name"><i class="fa fa-user"></i><div class="label">নাম: <span style="color:#8696a0;">${_esc(name)}</span></div><i class="fa fa-pencil" style="color:#8696a0;"></i></div>
+                    <div class="tmv3-sp-row" id="pr-edit-bio"><i class="fa fa-info-circle"></i><div class="label">Bio: <span style="color:#8696a0;">${_esc(bio || 'যোগ করুন...')}</span></div><i class="fa fa-pencil" style="color:#8696a0;"></i></div>
+                    ${email ? `<div class="tmv3-sp-row"><i class="fa fa-envelope"></i><span class="label">${_esc(email)}</span></div>` : ''}
+                    ${mobile ? `<div class="tmv3-sp-row"><i class="fa fa-phone"></i><span class="label">${_esc(mobile)}</span></div>` : ''}
+                </div>
+
+                <div style="color:#8696a0;font-size:13px;padding:16px 0 8px;font-weight:600;">গোপনীয়তা সেটিং</div>
+                <div class="tmv3-sp-row" style="padding:14px 0;border-bottom:1px solid #2a3942;">
+                    <i class="fa fa-users" style="color:#8696a0;"></i>
+                    <div style="flex:1;"><div style="color:#e9edef;font-size:14px;">গ্রুপে যোগ ব্লক</div><div style="color:#8696a0;font-size:12px;">অন করলে কেউ আপনাকে গ্রুপে যোগ করতে পারবে না</div></div>
+                    <label class="tmv3-toggle"><input type="checkbox" id="pr-block-group" ${u.blockGroupAdd ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                </div>
+                <div class="tmv3-sp-row" style="padding:14px 0;border-bottom:1px solid #2a3942;">
+                    <i class="fa fa-lock" style="color:#8696a0;"></i>
+                    <div style="flex:1;"><div style="color:#e9edef;font-size:14px;">একাউন্ট লক</div><div style="color:#8696a0;font-size:12px;">অন করলে সার্চে আপনার একাউন্ট পাওয়া যাবে না</div></div>
+                    <label class="tmv3-toggle"><input type="checkbox" id="pr-acc-lock" ${u.accountLocked ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                </div>
+                <div style="height:16px;"></div>
+                <button class="tmv3-btn primary" id="pr-save-btn" style="width:100%;">সেভ করুন</button>
+            </div>
+        `;
+
+        /* Avatar upload */
+        document.getElementById('profile-av').addEventListener('click', () => {
+            document.getElementById('profile-av-input').click();
+        });
+        document.getElementById('profile-av-input').addEventListener('change', function () {
+            if (!this.files || !this.files[0]) return;
+            const r = new FileReader();
+            r.onload = e => {
+                const src = e.target.result;
+                const avEl = document.getElementById('profile-av');
+                avEl.innerHTML = `<img src="${src}" alt="" id="profile-av-img"><span class="tmv3-sp-avatar-edit"><i class="fa fa-camera"></i></span>`;
+                _currentUser.avatar = src;
+            };
+            r.readAsDataURL(this.files[0]);
+            this.value = '';
+        });
+
+        /* Edit name */
+        document.getElementById('pr-edit-name').addEventListener('click', () => {
+            const newName = prompt('নতুন নাম লিখুন:', _currentUser.name || '');
+            if (newName === null) return;
+            _currentUser.name = newName.trim();
+            document.getElementById('pr-edit-name').querySelector('.label').innerHTML = `নাম: <span style="color:#8696a0;">${_esc(_currentUser.name)}</span>`;
+        });
+
+        /* Edit bio */
+        document.getElementById('pr-edit-bio').addEventListener('click', () => {
+            const newBio = prompt('আপনার Bio লিখুন:', _currentUser.bio || '');
+            if (newBio === null) return;
+            _currentUser.bio = newBio.trim();
+            document.getElementById('pr-edit-bio').querySelector('.label').innerHTML = `Bio: <span style="color:#8696a0;">${_esc(_currentUser.bio || 'যোগ করুন...')}</span>`;
+        });
+
+        /* Save */
+        document.getElementById('pr-save-btn').addEventListener('click', () => {
+            const blockGroup = document.getElementById('pr-block-group').checked;
+            const accLock = document.getElementById('pr-acc-lock').checked;
+            _currentUser.blockGroupAdd = blockGroup;
+            _currentUser.accountLocked = accLock;
+
+            /* Update in localStorage */
+            localStorage.setItem('TM_SESSION_USER', JSON.stringify(_currentUser));
+
+            /* Update in Firestore */
+            if (_db) {
+                _db.collection('users').doc(String(_currentUser.id)).update({
+                    name: _currentUser.name || '',
+                    bio: _currentUser.bio || '',
+                    avatar: _currentUser.avatar || '',
+                    blockGroupAdd: blockGroup,
+                    accountLocked: accLock
+                }).catch(() => {});
+            }
+            _toast('প্রোফাইল সেভ হয়েছে। ✅');
+        });
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       MODAL HELPERS
+    ══════════════════════════════════════════════════════════ */
+    function _closeModal() {
+        document.getElementById('tmv3-modal-overlay').classList.remove('open');
+        document.getElementById('tmv3-modal').innerHTML = '';
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       LIGHTBOX
+    ══════════════════════════════════════════════════════════ */
     function _openLightbox(src) {
-        document.getElementById('tmLightboxImg').src = src;
-        document.getElementById('tmLightbox').classList.add('open');
+        document.getElementById('tmv3-lb-img').src = src;
+        document.getElementById('tmv3-lightbox').classList.add('open');
     }
 
-    /* ── Hotkey: Ctrl/Cmd + Shift + C ──────────────────────── */
+    /* ══════════════════════════════════════════════════════════
+       INJECT BUTTONS (PC & Mobile)
+    ══════════════════════════════════════════════════════════ */
+    function _injectButtons() {
+        /* PC */
+        const searchBox = document.getElementById('headerSearchBox');
+        if (searchBox) {
+            const btn = document.createElement('button');
+            btn.id = 'tmv3-pc-btn';
+            btn.title = 'Chat';
+            btn.innerHTML = `${_waIcon()}<span class="tmv3-badge" id="tmv3-badge-pc"></span>`;
+            btn.addEventListener('click', _openApp);
+            searchBox.parentNode.insertBefore(btn, searchBox.nextSibling);
+            const uc = searchBox.closest('.user-controls');
+            if (uc) uc.style.display = 'flex';
+        }
+
+        /* Mobile sheet */
+        _injectMobileBtn();
+    }
+
+    function _injectMobileBtn() {
+        const list = document.getElementById('mobileSheetList');
+        if (!list) { setTimeout(_injectMobileBtn, 500); return; }
+        const item = document.createElement('div');
+        item.className = 'tmv3-mob-item';
+        item.innerHTML = `<div class="mob-icon">${_waIcon(26)}</div>Chat<span class="tmv3-mob-badge" id="tmv3-badge-mob"></span>`;
+        item.addEventListener('click', function () {
+            if (typeof closeMobileAccountMenu === 'function') closeMobileAccountMenu();
+            setTimeout(_openApp, 320);
+        });
+        list.appendChild(item);
+    }
+
+    function _waIcon(size) {
+        size = size || 22;
+        return `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" fill="#fff"><path d="M16 2C8.268 2 2 8.268 2 16c0 2.527.676 4.9 1.857 6.945L2 30l7.258-1.832A13.93 13.93 0 0016 30c7.732 0 14-6.268 14-14S23.732 2 16 2zm0 25.6a11.548 11.548 0 01-5.896-1.614l-.42-.252-4.31 1.089 1.113-4.194-.273-.432A11.551 11.551 0 014.4 16c0-6.396 5.204-11.6 11.6-11.6S27.6 9.604 27.6 16 22.396 27.6 16 27.6zm6.368-8.67c-.35-.175-2.066-1.02-2.387-1.137-.32-.116-.553-.175-.785.175-.233.35-.9 1.137-1.103 1.37-.204.233-.407.262-.756.087-.35-.175-1.476-.544-2.812-1.737-1.04-.927-1.74-2.073-1.944-2.423-.203-.35-.022-.538.153-.712.157-.157.35-.408.524-.612.175-.204.233-.35.35-.583.116-.233.058-.437-.029-.612-.087-.175-.785-1.893-1.075-2.592-.283-.683-.57-.59-.785-.6l-.668-.012c-.233 0-.61.087-.93.437-.32.35-1.22 1.193-1.22 2.91 0 1.718 1.25 3.378 1.424 3.611.175.233 2.46 3.754 5.962 5.265.833.36 1.483.575 1.99.735.836.266 1.597.228 2.198.138.67-.1 2.066-.845 2.358-1.661.29-.816.29-1.515.204-1.661-.087-.146-.32-.233-.67-.408z"/></svg>`;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       HOTKEY
+    ══════════════════════════════════════════════════════════ */
     function _bindHotkey() {
         document.addEventListener('keydown', function (e) {
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
                 e.preventDefault();
-                if (_isOpen) _closeChatModal(); else _openChatModal();
+                const ov = document.getElementById('tmv3-overlay');
+                if (ov.classList.contains('open')) _closeApp(); else _openApp();
             }
-            if (e.key === 'Escape' && _isOpen) _closeChatModal();
+            if (e.key === 'Escape') {
+                if (document.getElementById('tmv3-modal-overlay').classList.contains('open')) { _closeModal(); return; }
+                if (document.getElementById('tmv3-side-panel').classList.contains('open')) { _closeSidePanel(); return; }
+                if (document.getElementById('tmv3-overlay').classList.contains('open')) _closeApp();
+            }
         });
     }
 
-    /* ── Badge update ──────────────────────────────────────── */
-    function _updateBadge(n) {
-        const pcBadge  = document.getElementById('tmChatBadgePC');
-        const mobBadge = document.getElementById('tmChatBadgeMob');
-        if (pcBadge)  { pcBadge.textContent  = n > 9 ? '9+' : n; pcBadge.classList.toggle('show',  n > 0); }
-        if (mobBadge) { mobBadge.textContent  = n > 9 ? '9+' : n; mobBadge.classList.toggle('show', n > 0); }
+    /* ══════════════════════════════════════════════════════════
+       TOAST
+    ══════════════════════════════════════════════════════════ */
+    function _toast(msg, duration) {
+        const el = document.getElementById('tmv3-toast');
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), duration || 2500);
     }
 
-    /* scroll to bottom */
+    /* ══════════════════════════════════════════════════════════
+       HELPERS
+    ══════════════════════════════════════════════════════════ */
+    function _cancelReply() {
+        _replyTarget = null;
+        document.getElementById('tmv3-reply-bar').classList.remove('show');
+    }
+
+    function _cancelMedia() {
+        _mediaPreview = null;
+        document.getElementById('tmv3-media-bar').classList.remove('show');
+        document.getElementById('tmv3-media-thumb').src = '';
+    }
+
     function scrollToBottom() {
-        const area = document.getElementById('tmChatMessages');
-        if (area) { area.scrollTop = area.scrollHeight; _isAtBottom = true; _unreadCount = 0; }
-        document.getElementById('tmScrollDownBtn').classList.remove('show');
-        document.getElementById('tmScrollDownBadge').style.display = 'none';
+        const area = document.getElementById('tmv3-messages');
+        if (area) { area.scrollTop = area.scrollHeight; _isAtBottom = true; }
+        document.getElementById('tmv3-scroll-down').classList.remove('show');
     }
 
-    /* ── Utilities ─────────────────────────────────────────── */
     function _esc(str) {
-        return String(str || '')
-            .replace(/&/g,'&amp;')
-            .replace(/</g,'&lt;')
-            .replace(/>/g,'&gt;')
-            .replace(/"/g,'&quot;');
+        return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     function _formatTime(d) {
+        if (!d) return '';
         const h = d.getHours(), m = d.getMinutes();
         return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
     }
 
     function _formatDate(d) {
-        const now   = new Date();
+        const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const yest  = new Date(today - 86400000);
-        const day   = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const yest = new Date(today - 86400000);
+        const day = new Date(d.getFullYear(), d.getMonth(), d.getDate());
         if (+day === +today) return 'আজ';
-        if (+day === +yest)  return 'গতকাল';
+        if (+day === +yest) return 'গতকাল';
         return d.getDate() + '/' + (d.getMonth()+1) + '/' + d.getFullYear();
     }
 
-    /* deterministic color per senderId */
     function _nameColor(id) {
         const colors = ['#e91e63','#9c27b0','#3f51b5','#2196f3','#009688','#ff5722','#795548','#607d8b'];
         let h = 0;
-        String(id).split('').forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) & 0xffff; });
+        String(id || '').split('').forEach(c => { h = (h * 31 + c.charCodeAt(0)) & 0xffff; });
         return colors[h % colors.length];
     }
 
-    /* ── Public API ─────────────────────────────────────────── */
-    window._tmChat = {
-        open:          _openChatModal,
-        close:         _closeChatModal,
-        sendMessage:   sendMessage,
-        cancelReply:   cancelReply,
-        cancelMedia:   cancelMedia,
-        scrollToBottom:scrollToBottom
-    };
+    /* ══════════════════════════════════════════════════════════
+       INJECT BUTTONS (after DOM ready)
+    ══════════════════════════════════════════════════════════ */
+    _injectButtons();
 
-    /* background unread counter (when modal is closed) */
-    setInterval(function () {
-        if (_isOpen || !_db || !_currentUser) return;
-        const uid = String(_currentUser.id);
-        _db.collection('tm_groups').doc(GROUP_ID)
-           .collection('messages')
-           .orderBy('ts','desc').limit(20)
-           .get().then(function (snap) {
-               let n = 0;
-               snap.docs.forEach(function (d) {
-                   const data = d.data();
-                   if (data.senderId !== uid && (!data.seenBy || !data.seenBy.includes(uid))) n++;
-               });
-               _updateBadge(n);
-           }).catch(function () { });
-    }, 30000);
+    /* ══════════════════════════════════════════════════════════
+       PUBLIC API
+    ══════════════════════════════════════════════════════════ */
+    window._tmv3 = {
+        open: _openApp,
+        close: _closeApp,
+        sendMessage: _sendMessage,
+        cancelReply: _cancelReply,
+        cancelMedia: _cancelMedia,
+        scrollToBottom,
+        _closeModal,
+        _closeSidePanel,
+        _toast
+    };
 
 })();
