@@ -86,15 +86,42 @@
 
     function _ensurePublicGroup() {
         if (!_db || !_currentUser) return;
-        _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set({
-            name: PUBLIC_GROUP_NAME,
-            isPublic: true,
-            adminId: 'system',
-            allowMemberAdd: false,
-            allowMemberMsg: true,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            members: firebase.firestore.FieldValue.arrayUnion(String(_currentUser.id))
-        }, { merge: true }).catch(()=>{});
+        const uid = String(_currentUser.id);
+        const isMainAdmin = _currentUser.role === 'admin';
+
+        // যদি মেইন এডমিন হয়, তাহলে adminId তাকে সেট করো
+        if (isMainAdmin) {
+            _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set({
+                name: PUBLIC_GROUP_NAME,
+                isPublic: true,
+                adminId: uid,           // মেইন এডমিনকে এডমিন করা হলো
+                allowMemberAdd: false,
+                allowMemberMsg: true,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                members: firebase.firestore.FieldValue.arrayUnion(uid)
+            }, { merge: true }).catch(()=>{});
+        } else {
+            // সাধারণ ইউজার — শুধু members-এ যোগ হবে, adminId পরিবর্তন হবে না
+            _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).get().then(doc => {
+                if (doc.exists) {
+                    // গ্রুপ আছে, শুধু member যোগ করো
+                    _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
+                        members: firebase.firestore.FieldValue.arrayUnion(uid)
+                    }).catch(()=>{});
+                } else {
+                    // গ্রুপ নেই, তৈরি করো (adminId পরে মেইন এডমিন আসলে আপডেট হবে)
+                    _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set({
+                        name: PUBLIC_GROUP_NAME,
+                        isPublic: true,
+                        adminId: 'system',
+                        allowMemberAdd: false,
+                        allowMemberMsg: true,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        members: [uid]
+                    }, { merge: true }).catch(()=>{});
+                }
+            }).catch(()=>{});
+        }
     }
 
     /* ══════════════════════════════════════════════════════════
@@ -149,17 +176,36 @@
 /* ══ Overlay ══ */
 #tmv3-overlay {
     display:none; position:fixed; inset:0; z-index:99999990;
-    background:rgba(0,0,0,.6); backdrop-filter:blur(4px);
+    background:rgba(0,0,0,.65); backdrop-filter:blur(6px);
     align-items:center; justify-content:center;
+    padding:20px;
 }
 #tmv3-overlay.open { display:flex; }
+
+/* ══ Close Button (PC) ══ */
+#tmv3-close-btn {
+    display:none;
+    position:absolute;
+    top:-18px; right:-18px;
+    width:46px; height:46px;
+    border-radius:50%;
+    background:#ef4444;
+    border:3px solid #fff;
+    color:#fff; font-size:20px;
+    cursor:pointer; z-index:10;
+    align-items:center; justify-content:center;
+    box-shadow:0 4px 18px rgba(239,68,68,.5);
+    transition:.2s; flex-shrink:0;
+}
+#tmv3-close-btn:hover { background:#dc2626; transform:scale(1.1); }
+.is-mobile #tmv3-close-btn { display:none !important; }
 
 /* ══ Main Window ══ */
 #tmv3-root {
     background:#111b21;
-    width:min(900px,100vw);
-    height:min(700px,100vh);
-    border-radius:16px;
+    width:min(920px, calc(100vw - 40px));
+    height:min(680px, calc(100vh - 40px));
+    border-radius:18px;
     display:flex; overflow:hidden;
     box-shadow:0 30px 80px rgba(0,0,0,.7);
     position:relative;
@@ -680,6 +726,9 @@
         overlay.innerHTML = `
 <div id="tmv3-root">
 
+  <!-- PC Close Button -->
+  <button id="tmv3-close-btn" title="বন্ধ করুন"><i class="fa fa-times"></i></button>
+
   <!-- LEFT PANEL -->
   <div id="tmv3-left">
     <!-- Header -->
@@ -836,6 +885,13 @@
             if (e.target === this) _closeApp();
         });
 
+        /* PC Close button */
+        const closeBtn = document.getElementById('tmv3-close-btn');
+        if (closeBtn) {
+            closeBtn.style.display = 'flex';
+            closeBtn.addEventListener('click', _closeApp);
+        }
+
         /* Back btn (mobile) */
         document.getElementById('tmv3-back-btn').addEventListener('click', _closeActiveChat);
 
@@ -975,6 +1031,9 @@
         _currentUser = _getSessionUser();
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
         document.getElementById('tmv3-overlay').classList.add('open');
+        /* PC ক্রস বাটন — মোবাইলে লুকানো */
+        const closeBtn = document.getElementById('tmv3-close-btn');
+        if (closeBtn) closeBtn.style.display = _isMobile ? 'none' : 'flex';
         _loadChatList();
     }
 
@@ -1174,7 +1233,8 @@
         const inputArea = document.getElementById('tmv3-input-area');
         if (chat.type === 'group' && chat.allowMemberMsg === false) {
             const uid = String(_currentUser.id);
-            const isAdmin = chat.adminId === uid;
+            const isMainAdmin = _currentUser.role === 'admin';
+            const isAdmin = chat.adminId === uid || isMainAdmin;
             if (!isAdmin) {
                 banner.classList.add('show');
                 inputArea.style.display = 'none';
@@ -1357,7 +1417,8 @@
         const chat = _activeChat;
         if (chat.type === 'group' && chat.allowMemberMsg === false) {
             const uid = String(_currentUser.id);
-            if (chat.adminId !== uid) { _toast('শুধু এডমিন মেসেজ পাঠাতে পারবেন।'); return; }
+            const isMainAdmin = _currentUser.role === 'admin';
+            if (chat.adminId !== uid && !isMainAdmin) { _toast('শুধু এডমিন মেসেজ পাঠাতে পারবেন।'); return; }
         }
 
         const msg = {
@@ -1610,7 +1671,9 @@
 
     function _buildGroupInfoPanel(chat, panel) {
         const uid = String(_currentUser.id);
-        const isAdmin = chat.adminId === uid;
+        // সাবজনীন গ্রুপে মেইন এডমিন (role='admin') সবসময় এডমিন
+        const isMainAdmin = _currentUser.role === 'admin';
+        const isAdmin = chat.adminId === uid || isMainAdmin;
         const name = chat.name || 'Group';
         const avatar = chat.avatarData || '';
         const members = chat.members || [];
@@ -1653,7 +1716,7 @@
                 </div>
 
                 <div class="tmv3-sp-section" style="margin-top:16px;">
-                    ${!chat.isPublic ? `<div class="tmv3-sp-row danger" id="sp-leave-group"><i class="fa fa-sign-out"></i><span class="label">Exit group</span></div>` : ''}
+                    ${!chat.isPublic ? `<div class="tmv3-sp-row danger" id="sp-leave-group"><i class="fa fa-sign-out"></i><span class="label">Exit group</span></div>` : (!isMainAdmin ? `<div class="tmv3-sp-row danger" id="sp-leave-group"><i class="fa fa-sign-out"></i><span class="label">Exit group</span></div>` : '')}
                     ${isAdmin && !chat.isPublic ? `<div class="tmv3-sp-row danger" id="sp-delete-group"><i class="fa fa-trash"></i><span class="label">Delete group</span></div>` : ''}
                 </div>
             </div>
@@ -1694,11 +1757,11 @@
         const members = chat.members || [];
         const list = document.getElementById('sp-members-list');
         if (!list) return;
-        list.innerHTML = '';
+        list.innerHTML = '<div class="tmv3-spinner" style="height:60px;"><i class="fa fa-circle-notch"></i></div>';
 
         if (!members.length) { list.innerHTML = '<div class="tmv3-empty-msg">সদস্য নেই</div>'; return; }
 
-        /* fetch user data for each member */
+        /* সব member-এর user data একসাথে লোড */
         const promises = members.map(mid => _db.collection('users').doc(String(mid)).get().catch(() => null));
         Promise.all(promises).then(docs => {
             list.innerHTML = '';
@@ -1720,7 +1783,7 @@
                         <div class="tmv3-member-sub">${_esc(mbio || (udata.mobile || udata.email || String(mid)))}</div>
                     </div>
                     ${isAdminMember ? '<span class="tmv3-member-badge">Admin</span>' : ''}
-                    ${isAdmin && !isSelf && !chat.isPublic ? `<button class="tmv3-member-del" data-mid="${_esc(String(mid))}" title="সরিয়ে দিন"><i class="fa fa-times"></i></button>` : ''}
+                    ${isAdmin && !isSelf ? `<button class="tmv3-member-del" data-mid="${_esc(String(mid))}" title="সরিয়ে দিন"><i class="fa fa-times"></i></button>` : ''}
                 `;
 
                 /* Click to open personal chat */
