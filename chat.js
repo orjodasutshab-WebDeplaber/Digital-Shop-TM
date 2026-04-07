@@ -89,39 +89,48 @@
         const uid = String(_currentUser.id);
         const isMainAdmin = _currentUser.role === 'admin';
 
-        // যদি মেইন এডমিন হয়, তাহলে adminId তাকে সেট করো
-        if (isMainAdmin) {
+        // সব ইউজার সাবজনীন গ্রুপে থাকবে
+        _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).get().then(doc => {
+            if (doc.exists) {
+                // গ্রুপ আছে — user কে member এ যোগ করো
+                const data = doc.data();
+                const updates = {
+                    members: firebase.firestore.FieldValue.arrayUnion(uid)
+                };
+                // মেইন এডমিন হলে adminId আপডেট করো
+                if (isMainAdmin) {
+                    updates.adminId = uid;
+                    updates.name = PUBLIC_GROUP_NAME;
+                    updates.isPublic = true;
+                }
+                _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update(updates).catch(()=>{});
+            } else {
+                // গ্রুপ নেই — তৈরি করো
+                const groupData = {
+                    name: PUBLIC_GROUP_NAME,
+                    isPublic: true,
+                    adminId: isMainAdmin ? uid : 'system',
+                    allowMemberAdd: false,
+                    allowMemberMsg: true,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    members: [uid],
+                    lastMsg: 'Digital Shop TM সাবজনীন গ্রুপে স্বাগতম! 🎉',
+                    lastMsgTs: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set(groupData, { merge: true }).catch(()=>{});
+            }
+        }).catch(() => {
+            // Error হলেও try করো
             _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set({
                 name: PUBLIC_GROUP_NAME,
                 isPublic: true,
-                adminId: uid,           // মেইন এডমিনকে এডমিন করা হলো
+                adminId: isMainAdmin ? uid : 'system',
                 allowMemberAdd: false,
                 allowMemberMsg: true,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 members: firebase.firestore.FieldValue.arrayUnion(uid)
             }, { merge: true }).catch(()=>{});
-        } else {
-            // সাধারণ ইউজার — শুধু members-এ যোগ হবে, adminId পরিবর্তন হবে না
-            _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).get().then(doc => {
-                if (doc.exists) {
-                    // গ্রুপ আছে, শুধু member যোগ করো
-                    _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
-                        members: firebase.firestore.FieldValue.arrayUnion(uid)
-                    }).catch(()=>{});
-                } else {
-                    // গ্রুপ নেই, তৈরি করো (adminId পরে মেইন এডমিন আসলে আপডেট হবে)
-                    _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set({
-                        name: PUBLIC_GROUP_NAME,
-                        isPublic: true,
-                        adminId: 'system',
-                        allowMemberAdd: false,
-                        allowMemberMsg: true,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        members: [uid]
-                    }, { merge: true }).catch(()=>{});
-                }
-            }).catch(()=>{});
-        }
+        });
     }
 
     /* ══════════════════════════════════════════════════════════
@@ -176,36 +185,41 @@
 /* ══ Overlay ══ */
 #tmv3-overlay {
     display:none; position:fixed; inset:0; z-index:99999990;
-    background:rgba(0,0,0,.65); backdrop-filter:blur(6px);
+    background:rgba(0,0,0,.75); backdrop-filter:blur(8px);
     align-items:center; justify-content:center;
-    padding:20px;
+    padding:16px;
 }
 #tmv3-overlay.open { display:flex; }
 
 /* ══ Close Button (PC) ══ */
 #tmv3-close-btn {
     display:none;
-    position:absolute;
-    top:-18px; right:-18px;
-    width:46px; height:46px;
+    position:fixed;
+    top:12px; right:12px;
+    width:52px; height:52px;
     border-radius:50%;
-    background:#ef4444;
-    border:3px solid #fff;
-    color:#fff; font-size:20px;
-    cursor:pointer; z-index:10;
+    background:linear-gradient(135deg,#ef4444,#dc2626);
+    border:3px solid rgba(255,255,255,0.9);
+    color:#fff; font-size:22px;
+    cursor:pointer; z-index:99999999;
     align-items:center; justify-content:center;
-    box-shadow:0 4px 18px rgba(239,68,68,.5);
-    transition:.2s; flex-shrink:0;
+    box-shadow:0 6px 24px rgba(239,68,68,.6), 0 0 0 4px rgba(239,68,68,.2);
+    transition:all .2s; flex-shrink:0;
 }
-#tmv3-close-btn:hover { background:#dc2626; transform:scale(1.1); }
+#tmv3-close-btn:hover { 
+    background:linear-gradient(135deg,#dc2626,#b91c1c); 
+    transform:scale(1.1) rotate(90deg);
+    box-shadow:0 8px 30px rgba(239,68,68,.7);
+}
 .is-mobile #tmv3-close-btn { display:none !important; }
 
 /* ══ Main Window ══ */
 #tmv3-root {
     background:#111b21;
-    width:min(920px, calc(100vw - 40px));
-    height:min(680px, calc(100vh - 40px));
-    border-radius:18px;
+    width:calc(100vw - 32px);
+    height:calc(100vh - 32px);
+    max-width:1400px;
+    border-radius:16px;
     display:flex; overflow:hidden;
     box-shadow:0 30px 80px rgba(0,0,0,.7);
     position:relative;
@@ -219,7 +233,7 @@
 
 /* ══ Left Panel ══ */
 #tmv3-left {
-    width:340px; min-width:260px; max-width:340px;
+    width:380px; min-width:300px; max-width:400px;
     display:flex; flex-direction:column;
     background:#111b21;
     border-right:1px solid #2a3942;
@@ -552,7 +566,7 @@
 
 /* ══ Side Panel (Group Info / Profile) ══ */
 #tmv3-side-panel {
-    width:360px; background:#111b21;
+    width:400px; background:#111b21;
     border-left:1px solid #2a3942;
     display:none; flex-direction:column;
     overflow-y:auto; flex-shrink:0;
@@ -888,7 +902,6 @@
         /* PC Close button */
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) {
-            closeBtn.style.display = 'flex';
             closeBtn.addEventListener('click', _closeApp);
         }
 
@@ -1033,7 +1046,13 @@
         document.getElementById('tmv3-overlay').classList.add('open');
         /* PC ক্রস বাটন — মোবাইলে লুকানো */
         const closeBtn = document.getElementById('tmv3-close-btn');
-        if (closeBtn) closeBtn.style.display = _isMobile ? 'none' : 'flex';
+        if (closeBtn) {
+            if (_isMobile) {
+                closeBtn.style.display = 'none';
+            } else {
+                closeBtn.style.display = 'flex';
+            }
+        }
         _loadChatList();
     }
 
@@ -1674,6 +1693,7 @@
         // সাবজনীন গ্রুপে মেইন এডমিন (role='admin') সবসময় এডমিন
         const isMainAdmin = _currentUser.role === 'admin';
         const isAdmin = chat.adminId === uid || isMainAdmin;
+        const isPublicGroup = chat.isPublic === true;
         const name = chat.name || 'Group';
         const avatar = chat.avatarData || '';
         const members = chat.members || [];
@@ -1686,13 +1706,13 @@
             </div>
             <div class="tmv3-sp-body">
                 <div class="tmv3-sp-avatar-wrap">
-                    <div class="tmv3-sp-avatar ${chat.isPublic ? 'public' : 'group'}" id="sp-av" ${isAdmin && !chat.isPublic ? 'style="cursor:pointer;"' : ''}>
+                    <div class="tmv3-sp-avatar ${isPublicGroup ? 'public' : 'group'}" id="sp-av" ${isAdmin && !isPublicGroup ? 'style="cursor:pointer;"' : ''}>
                         ${avatar ? `<img src="${avatar}" alt="">` : '👥'}
-                        ${isAdmin && !chat.isPublic ? '<span class="tmv3-sp-avatar-edit"><i class="fa fa-camera"></i></span>' : ''}
+                        ${isAdmin && !isPublicGroup ? '<span class="tmv3-sp-avatar-edit"><i class="fa fa-camera"></i></span>' : ''}
                     </div>
                 </div>
                 <div class="tmv3-sp-name">${_esc(name)}</div>
-                <div class="tmv3-sp-sub">Group · <span style="color:#25d366;">${members.length} members</span></div>
+                <div class="tmv3-sp-sub">${isPublicGroup ? '🌐 সাবজনীন গ্রুপ · ' : 'Group · '}<span style="color:#25d366;">${members.length} members</span></div>
 
                 ${chat.desc ? `<div class="tmv3-bio-box" style="margin-bottom:16px;"><p>${_esc(chat.desc)}</p></div>` : ''}
 
@@ -1707,17 +1727,21 @@
 
                 <div class="tmv3-sp-section">
                     <div style="color:#8696a0;font-size:13px;padding:16px 0 10px;font-weight:600;">${members.length} MEMBERS</div>
-                    ${isAdmin || chat.allowMemberAdd ? `
+                    ${isAdmin ? `
                     <div class="tmv3-member-item" id="sp-add-member-btn" style="cursor:pointer;">
                         <div class="tmv3-member-av" style="background:#25d366;"><i class="fa fa-user-plus" style="color:#fff;"></i></div>
                         <div class="tmv3-member-info"><div class="tmv3-member-name" style="color:#25d366;">Add member</div></div>
-                    </div>` : ''}
+                    </div>` : (chat.allowMemberAdd ? `
+                    <div class="tmv3-member-item" id="sp-add-member-btn" style="cursor:pointer;">
+                        <div class="tmv3-member-av" style="background:#25d366;"><i class="fa fa-user-plus" style="color:#fff;"></i></div>
+                        <div class="tmv3-member-info"><div class="tmv3-member-name" style="color:#25d366;">Add member</div></div>
+                    </div>` : '')}
                     <div id="sp-members-list"><div class="tmv3-spinner" style="height:60px;"><i class="fa fa-circle-notch"></i></div></div>
                 </div>
 
                 <div class="tmv3-sp-section" style="margin-top:16px;">
-                    ${!chat.isPublic ? `<div class="tmv3-sp-row danger" id="sp-leave-group"><i class="fa fa-sign-out"></i><span class="label">Exit group</span></div>` : (!isMainAdmin ? `<div class="tmv3-sp-row danger" id="sp-leave-group"><i class="fa fa-sign-out"></i><span class="label">Exit group</span></div>` : '')}
-                    ${isAdmin && !chat.isPublic ? `<div class="tmv3-sp-row danger" id="sp-delete-group"><i class="fa fa-trash"></i><span class="label">Delete group</span></div>` : ''}
+                    ${!isPublicGroup ? `<div class="tmv3-sp-row danger" id="sp-leave-group"><i class="fa fa-sign-out-alt"></i><span class="label">Exit group</span></div>` : (!isMainAdmin ? `<div class="tmv3-sp-row danger" id="sp-leave-group"><i class="fa fa-sign-out-alt"></i><span class="label">সাবজনীন গ্রুপ ছেড়ে যান</span></div>` : '')}
+                    ${isAdmin && !isPublicGroup ? `<div class="tmv3-sp-row danger" id="sp-delete-group"><i class="fa fa-trash"></i><span class="label">Delete group</span></div>` : ''}
                 </div>
             </div>
         `;
@@ -1878,6 +1902,7 @@
     ══════════════════════════════════════════════════════════ */
     function _showGroupSettingsModal(chat) {
         const uid = String(_currentUser.id);
+        const isPublicGroup = chat.isPublic === true;
         const modal = document.getElementById('tmv3-modal');
         modal.innerHTML = `
             <div class="tmv3-modal-head">
@@ -1890,6 +1915,15 @@
                     <span class="label" style="color:#e9edef;font-size:14px;">Admin পরিবর্তন করুন</span>
                     <button class="tmv3-btn secondary" id="gs-change-admin" style="padding:6px 14px;font-size:12px;">পরিবর্তন</button>
                 </div>
+                ${isPublicGroup ? `
+                <div class="tmv3-sp-row" style="padding:14px 0;border-bottom:1px solid #2a3942;">
+                    <i class="fa fa-users" style="color:#25d366;font-size:16px;"></i>
+                    <div style="flex:1;">
+                        <div style="color:#e9edef;font-size:14px;">সকল ইউজার সিঙ্ক করুন</div>
+                        <div style="color:#8696a0;font-size:12px;">সকল registered ইউজারকে সাবজনীন গ্রুপে যোগ করুন</div>
+                    </div>
+                    <button class="tmv3-btn primary" id="gs-sync-users" style="padding:6px 14px;font-size:12px;">Sync</button>
+                </div>` : ''}
                 <div class="tmv3-sp-row" style="padding:14px 0;border-bottom:1px solid #2a3942;">
                     <i class="fa fa-user-plus" style="color:#8696a0;font-size:16px;"></i>
                     <div style="flex:1;">
@@ -1915,6 +1949,28 @@
         document.getElementById('tmv3-modal-overlay').classList.add('open');
 
         document.getElementById('gs-change-admin').addEventListener('click', () => _showChangeAdminModal(chat));
+
+        /* Sync all users to public group */
+        const syncBtn = document.getElementById('gs-sync-users');
+        if (syncBtn) {
+            syncBtn.addEventListener('click', () => {
+                syncBtn.textContent = 'Syncing...';
+                syncBtn.disabled = true;
+                _db.collection('users').get().then(snap => {
+                    const allUids = snap.docs.map(d => d.id);
+                    return _db.collection('tm_groups').doc(chat.id).update({
+                        members: allUids
+                    });
+                }).then(() => {
+                    _toast('✅ সকল ইউজার সাবজনীন গ্রুপে যোগ হয়েছে!');
+                    syncBtn.textContent = '✓ Done';
+                }).catch(() => {
+                    _toast('Sync করতে সমস্যা হয়েছে।');
+                    syncBtn.textContent = 'Sync';
+                    syncBtn.disabled = false;
+                });
+            });
+        }
 
         document.getElementById('gs-save-btn').addEventListener('click', () => {
             const allowAdd = document.getElementById('gs-allow-add').checked;
