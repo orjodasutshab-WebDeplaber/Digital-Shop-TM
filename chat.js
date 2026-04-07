@@ -112,7 +112,7 @@
 }
 
 /* ══ Trigger Buttons ══ */
-#tmv3-pc-btn {
+#tmChatBtnPC {
     display:none;
     align-items:center; justify-content:center;
     width:40px; height:40px;
@@ -123,8 +123,8 @@
     box-shadow:0 4px 15px rgba(37,211,102,.4);
     transition:.2s; flex-shrink:0;
 }
-#tmv3-pc-btn:hover { opacity:.85; transform:scale(1.08); }
-#tmv3-pc-btn svg { width:22px; height:22px; fill:#fff; }
+#tmChatBtnPC:hover { opacity:.85; transform:scale(1.08); }
+#tmChatBtnPC svg { width:22px; height:22px; fill:#fff; }
 .tmv3-badge {
     position:absolute; top:-4px; right:-4px;
     background:#ef4444; color:#fff;
@@ -2180,7 +2180,7 @@
         const searchBox = document.getElementById('headerSearchBox');
         if (searchBox) {
             const btn = document.createElement('button');
-            btn.id = 'tmv3-pc-btn';
+            btn.id = 'tmChatBtnPC';
             btn.title = 'Chat';
             btn.innerHTML = `${_waIcon()}<span class="tmv3-badge" id="tmv3-badge-pc"></span>`;
             btn.addEventListener('click', _openApp);
