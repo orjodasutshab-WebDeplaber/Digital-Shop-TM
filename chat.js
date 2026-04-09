@@ -402,6 +402,7 @@
 #tmv3-right {
     flex:1; display:flex; flex-direction:column;
     background:#0b141a; min-width:0; position:relative;
+    overflow:hidden;
 }
 .is-mobile #tmv3-right {
     width:100%; height:100%; position:absolute; inset:0;
@@ -490,7 +491,7 @@
 
 /* Messages area */
 #tmv3-messages {
-    flex:1; overflow-y:auto; padding:16px 18px;
+    flex:1; min-height:0; overflow-y:auto; padding:16px 18px;
     display:flex; flex-direction:column; gap:4px;
     background:#0b141a;
     background-image:
@@ -1169,16 +1170,17 @@
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
 
         if (!_isMobile) {
-            /* viewport=800 lock bypass:
-               screen.availWidth/Height = taskbar বাদে real pixel
-               উপরে gap নেই, দুই পাশে gap নেই, নিচে আগের মতো */
+            /* viewport=800 lock bypass */
             const W = window.screen.availWidth;
             const H = window.screen.availHeight;
 
             const ov = document.getElementById('tmv3-overlay');
             if (ov) {
-                ov.style.width  = W + 'px';
-                ov.style.height = H + 'px';
+                ov.style.width   = W + 'px';
+                ov.style.height  = H + 'px';
+                ov.style.top     = '0';
+                ov.style.left    = '0';
+                ov.style.padding = '0';
             }
 
             const root = document.getElementById('tmv3-root');
@@ -1187,35 +1189,54 @@
                 root.style.height       = H + 'px';
                 root.style.maxWidth     = 'none';
                 root.style.borderRadius = '0';
+                root.style.display      = 'flex';
+                root.style.flexDirection= 'row';
+                root.style.overflow     = 'hidden';
             }
 
             const mov = document.getElementById('tmv3-modal-overlay');
             if (mov) {
                 mov.style.width  = W + 'px';
                 mov.style.height = H + 'px';
+                mov.style.top    = '0';
+                mov.style.left   = '0';
             }
 
-            /* left panel */
+            /* left panel height */
             const lp = document.getElementById('tmv3-left');
-            if (lp) lp.style.height = H + 'px';
+            if (lp) {
+                lp.style.height   = H + 'px';
+                lp.style.overflow = 'hidden';
+            }
 
-            /* right panel — flex column */
+            /* right panel — flex column, overflow hidden
+               এতে messages scroll করবে, input সবসময় নিচে */
             const rp = document.getElementById('tmv3-right');
             if (rp) {
                 rp.style.height        = H + 'px';
                 rp.style.display       = 'flex';
                 rp.style.flexDirection = 'column';
                 rp.style.overflow      = 'hidden';
+                rp.style.flex          = '1';
+                rp.style.minWidth      = '0';
             }
 
-            /* messages flex:1 — input area সবসময় নিচে */
+            /* messages — flex:1 + min-height:0
+               এই দুটো একসাথে থাকলে scroll কাজ করে
+               এবং input area নিচে থাকে */
             const msgs = document.getElementById('tmv3-messages');
             if (msgs) {
-                msgs.style.flex      = '1';
-                msgs.style.minHeight = '0';
-                msgs.style.overflowY = 'auto';
-                msgs.style.height    = 'auto';
-                msgs.style.maxHeight = 'none';
+                msgs.style.flex       = '1';
+                msgs.style.minHeight  = '0';
+                msgs.style.overflowY  = 'auto';
+                msgs.style.height     = 'auto';
+                msgs.style.maxHeight  = 'none';
+            }
+
+            /* input area — কখনো hide হবে না */
+            const ia = document.getElementById('tmv3-input-area');
+            if (ia) {
+                ia.style.flexShrink = '0';
             }
         }
 
