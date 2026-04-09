@@ -220,8 +220,7 @@
 #tmv3-root {
     background:#0b141a;
     width:100vw; height:100vh;
-    max-width:none;
-    border-radius:0;
+    max-width:none; border-radius:0;
     display:flex; overflow:hidden;
     box-shadow:0 40px 100px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.04);
     position:relative;
@@ -1173,13 +1172,11 @@
         _currentUser = _getSessionUser();
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
 
-        /* viewport lock reset — chat fullscreen এর জন্য */
         if (!_isMobile && window._tmChatViewport) {
             window._tmChatViewport.open();
         }
 
         document.getElementById('tmv3-overlay').classList.add('open');
-
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) {
             closeBtn.style.display = _isMobile ? 'none' : 'flex';
@@ -1189,7 +1186,6 @@
 
     function _closeApp() {
         document.getElementById('tmv3-overlay').classList.remove('open');
-        /* viewport lock restore */
         if (!_isMobile && window._tmChatViewport) {
             window._tmChatViewport.close();
         }
@@ -1875,7 +1871,7 @@
                 </div>
 
                 <div class="tmv3-sp-section" style="margin-top:16px;">
-                    ${!isPublicGroup ? `<div class="tmv3-sp-row danger" id="sp-leave-group"><i class="fa fa-sign-out-alt"></i><span class="label">Exit group</span></div>` : (!isMainAdmin ? `<div class="tmv3-sp-row danger" id="sp-leave-group"><i class="fa fa-sign-out-alt"></i><span class="label">সাবজনীন গ্রুপ ছেড়ে যান</span></div>` : '')}
+                    ${!isPublicGroup ? `<div class="tmv3-sp-row danger" id="sp-leave-group"><i class="fa fa-sign-out-alt"></i><span class="label">Exit group</span></div>` : ''}
                     ${isAdmin && !isPublicGroup ? `<div class="tmv3-sp-row danger" id="sp-delete-group"><i class="fa fa-trash"></i><span class="label">Delete group</span></div>` : ''}
                 </div>
             </div>
@@ -1892,9 +1888,10 @@
         const settingsBtn = panel.querySelector('#sp-group-settings');
         if (settingsBtn) settingsBtn.addEventListener('click', () => _showGroupSettingsModal(chat));
 
-        /* Leave group */
+        /* Leave group — সাবজনীন গ্রুপ থেকে বের হওয়া যাবে না */
         const leaveBtn = panel.querySelector('#sp-leave-group');
         if (leaveBtn) leaveBtn.addEventListener('click', () => {
+            if (chat.isPublic) { _toast('সাবজনীন গ্রুপ ছেড়ে যাওয়া যাবে না।'); return; }
             if (!confirm('গ্রুপ থেকে বের হবেন?')) return;
             _db.collection('tm_groups').doc(chat.id).update({
                 members: firebase.firestore.FieldValue.arrayRemove(uid)
