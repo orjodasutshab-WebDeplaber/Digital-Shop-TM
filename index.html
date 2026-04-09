@@ -135,163 +135,157 @@
 
     <style id="tmv3-pc-fix">
     #tmv3-overlay {
-        display: none;
+        display: none !important;
         position: fixed !important;
         top: 0 !important; left: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-sizing: border-box !important;
         z-index: 99999990 !important;
-        background: rgba(0,0,0,.85);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: rgba(0,0,0,.85) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
         align-items: center !important;
         justify-content: center !important;
-        padding: 0 !important;
-        box-sizing: border-box !important;
     }
-    #tmv3-overlay.open { display: flex !important; }
-
+    #tmv3-overlay.open {
+        display: flex !important;
+    }
     #tmv3-root {
-        background: #0b141a;
         border-radius: 0 !important;
         display: flex !important;
-        overflow: hidden;
-        box-shadow: 0 40px 100px rgba(0,0,0,.8);
-        position: relative;
+        overflow: hidden !important;
+        flex-shrink: 0 !important;
     }
-    #tmv3-close-btn {
-        display: none;
-        position: fixed !important;
-        top: 14px !important; right: 14px !important;
-        z-index: 99999999 !important;
-    }
-
     #tmv3-modal-overlay {
-        display: none;
+        display: none !important;
         position: fixed !important;
         top: 0 !important; left: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
         z-index: 999999995 !important;
-        background: rgba(0,0,0,.78);
-        backdrop-filter: blur(8px);
+        background: rgba(0,0,0,.78) !important;
+        backdrop-filter: blur(8px) !important;
         align-items: center !important;
         justify-content: center !important;
-        padding: 0 !important;
         box-sizing: border-box !important;
     }
-    #tmv3-modal-overlay.open { display: flex !important; }
+    #tmv3-modal-overlay.open {
+        display: flex !important;
+    }
     #tmv3-modal {
-        background: #111b21;
-        border-radius: 18px;
-        width: 500px;
-        max-height: 85%;
-        display: flex;
-        flex-direction: column;
-        box-shadow: 0 30px 80px rgba(0,0,0,.7);
-        overflow: hidden;
-        margin: auto;
-        flex-shrink: 0;
+        width: 500px !important;
+        max-height: 85% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        background: #111b21 !important;
+        border-radius: 18px !important;
+        box-shadow: 0 30px 80px rgba(0,0,0,.7) !important;
+        overflow: hidden !important;
+        margin: auto !important;
+        flex-shrink: 0 !important;
     }
     </style>
+
     <script>
-    (function() {
-        function tmFix() {
+    (function () {
+        'use strict';
+
+        function getScaleAndSize() {
             var sw = window.screen.width;
             var sh = window.screen.height;
-            var isMob = sw < 800;
+            var vpMeta = document.querySelector('meta[name=viewport]');
+            var scale = 1;
+            if (vpMeta) {
+                var m = vpMeta.content.match(/initial-scale=([\d.]+)/);
+                if (m) scale = parseFloat(m[1]);
+            }
+            return {
+                W: Math.round(sw / scale),
+                H: Math.round(sh / scale),
+                isMob: sw < 800
+            };
+        }
 
-            var ov      = document.getElementById('tmv3-overlay');
-            var root    = document.getElementById('tmv3-root');
-            var modalOv = document.getElementById('tmv3-modal-overlay');
-            var modalEl = document.getElementById('tmv3-modal');
-            var closeBtn= document.getElementById('tmv3-close-btn');
+        function applyFix() {
+            var s = getScaleAndSize();
+            var ov   = document.getElementById('tmv3-overlay');
+            var root = document.getElementById('tmv3-root');
+            var mov  = document.getElementById('tmv3-modal-overlay');
+            var mod  = document.getElementById('tmv3-modal');
 
             if (!ov) return;
 
-            if (!isMob) {
-                // viewport meta থেকে scale বের করো
-                var vpMeta = document.querySelector('meta[name=viewport]');
-                var scale = 1;
-                if (vpMeta) {
-                    var m = vpMeta.content.match(/initial-scale=([\d.]+)/);
-                    if (m) scale = parseFloat(m[1]);
-                }
-                var W = Math.round(sw / scale);
-                var H = Math.round(sh / scale);
+            if (!s.isMob) {
+                var W = s.W, H = s.H;
 
-                // overlay = পুরো স্ক্রিন
-                ov.style.cssText += ';width:' + W + 'px!important;height:' + H + 'px!important;padding:0!important;';
-                ov.style.setProperty('width',   W + 'px', 'important');
-                ov.style.setProperty('height',  H + 'px', 'important');
-                ov.style.setProperty('padding', '0',      'important');
+                /* overlay: পুরো স্ক্রিন */
+                ov.style.setProperty('width',  W + 'px', 'important');
+                ov.style.setProperty('height', H + 'px', 'important');
 
-                // modal overlay = পুরো স্ক্রিন
-                if (modalOv) {
-                    modalOv.style.setProperty('width',   W + 'px', 'important');
-                    modalOv.style.setProperty('height',  H + 'px', 'important');
-                    modalOv.style.setProperty('padding', '20px',   'important');
-                }
-
-                // root = স্ক্রিন থেকে ছোট একটু (ক্লোজ বাটনের জায়গার জন্য নয়, পুরো নিই)
-                var RW = Math.min(W, 1350);
-                var RH = H;
+                /* root: max-width বাদ দিয়ে পুরো width */
                 if (root) {
-                    root.style.setProperty('width',         RW + 'px', 'important');
-                    root.style.setProperty('height',        RH + 'px', 'important');
-                    root.style.setProperty('max-width',     '1350px',  'important');
-                    root.style.setProperty('border-radius', '0',       'important');
+                    root.style.setProperty('width',      W + 'px', 'important');
+                    root.style.setProperty('height',     H + 'px', 'important');
+                    root.style.setProperty('max-width',  'none',   'important');
+                    root.style.setProperty('max-height', 'none',   'important');
+                    root.style.setProperty('border-radius', '0',   'important');
                 }
 
-                // modal max-width fix
-                if (modalEl) {
-                    modalEl.style.setProperty('max-width', (W - 40) + 'px', 'important');
-                    modalEl.style.setProperty('max-height', (H - 80) + 'px', 'important');
+                /* modal overlay: পুরো স্ক্রিন */
+                if (mov) {
+                    mov.style.setProperty('width',  W + 'px', 'important');
+                    mov.style.setProperty('height', H + 'px', 'important');
+                    mov.style.setProperty('padding', '20px',  'important');
                 }
 
-                // close button position fix
-                if (closeBtn) {
-                    closeBtn.style.setProperty('top',   '14px', 'important');
-                    closeBtn.style.setProperty('right', '14px', 'important');
+                /* modal box: max-width */
+                if (mod) {
+                    mod.style.setProperty('max-width',  (W - 40) + 'px', 'important');
+                    mod.style.setProperty('max-height', (H - 80) + 'px', 'important');
                 }
 
             } else {
-                // মোবাইল: JS override সরাও, CSS handle করবে
-                ['width','height','padding','border-radius','max-width','max-height'].forEach(function(p){
-                    if (ov)      ov.style.removeProperty(p);
-                    if (root)    root.style.removeProperty(p);
-                    if (modalOv) modalOv.style.removeProperty(p);
-                    if (modalEl) modalEl.style.removeProperty(p);
+                /* মোবাইল: JS override সরাও */
+                var props = ['width','height','max-width','max-height','padding','border-radius'];
+                [ov, root, mov, mod].forEach(function(el) {
+                    if (!el) return;
+                    props.forEach(function(p) { el.style.removeProperty(p); });
                 });
             }
         }
 
-        // overlay open হওয়া watch করো
-        function watchOverlay() {
+        function startWatching() {
             var ov = document.getElementById('tmv3-overlay');
             if (!ov) {
-                // chat.js এখনো লোড হয়নি — body watch করো
+                /* chat.js এখনো inject হয়নি — body watch করো */
                 new MutationObserver(function(_, obs) {
                     if (document.getElementById('tmv3-overlay')) {
                         obs.disconnect();
-                        watchOverlay();
+                        startWatching();
                     }
                 }).observe(document.body, { childList: true, subtree: true });
                 return;
             }
-            // overlay class change watch করো
+
+            /* overlay class পরিবর্তন watch */
             new MutationObserver(function(mutations) {
                 mutations.forEach(function(m) {
-                    if (m.attributeName === 'class') {
-                        if (ov.classList.contains('open')) {
-                            tmFix();
-                            // root তৈরির পরে আবার চালাও
-                            setTimeout(tmFix, 50);
-                            setTimeout(tmFix, 200);
-                        }
+                    if (m.attributeName === 'class' &&
+                        m.target.id === 'tmv3-overlay' &&
+                        m.target.classList.contains('open')) {
+                        applyFix();
+                        setTimeout(applyFix, 30);
+                        setTimeout(applyFix, 150);
                     }
                 });
             }).observe(ov, { attributes: true });
         }
 
-        window.addEventListener('load', watchOverlay);
-        window.addEventListener('resize', tmFix);
+        window.addEventListener('load', startWatching);
+        window.addEventListener('resize', applyFix);
     })();
     </script>
 
