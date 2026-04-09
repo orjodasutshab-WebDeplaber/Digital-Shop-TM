@@ -184,12 +184,13 @@
 
 /* ══ Overlay ══ */
 #tmv3-overlay {
-    display:none; position:fixed; inset:0 !important; z-index:99999990;
+    display:none; position:fixed;
+    top:0 !important; left:0 !important; right:0 !important; bottom:0 !important;
+    width:100% !important; height:100% !important;
+    z-index:99999990;
     background:rgba(0,0,0,.85); backdrop-filter:blur(12px);
     align-items:center; justify-content:center;
-    padding:20px;
-    width:100vw !important; height:100vh !important;
-    left:0 !important; top:0 !important;
+    padding:20px; box-sizing:border-box;
 }
 #tmv3-overlay.open { display:flex !important; }
 
@@ -218,10 +219,9 @@
 /* ══ Main Window ══ */
 #tmv3-root {
     background:#0b141a;
-    width:calc(100vw - 40px) !important;
-    height:calc(100vh - 40px) !important;
-    max-width:1350px !important;
-    min-width:320px !important;
+    width:calc(100% - 40px) !important;
+    height:calc(100% - 40px) !important;
+    max-width:1350px;
     border-radius:20px;
     display:flex !important; overflow:hidden;
     box-shadow:0 40px 100px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.04);
@@ -229,8 +229,8 @@
     flex-shrink:0;
 }
 .is-mobile #tmv3-root {
-    width:100vw !important;
-    height:100dvh !important;
+    width:100% !important;
+    height:100% !important;
     border-radius:0 !important;
     flex-direction:column;
 }
@@ -775,40 +775,24 @@
 
 /* ══ Modal (Add Member / Create Group / Profile Edit) ══ */
 #tmv3-modal-overlay {
-    display:none; position:fixed; inset:0 !important; z-index:999999995;
+    display:none; position:fixed;
+    top:0 !important; left:0 !important; right:0 !important; bottom:0 !important;
+    width:100% !important; height:100% !important;
+    z-index:999999995;
     background:rgba(0,0,0,.78); backdrop-filter:blur(8px);
     align-items:center; justify-content:center;
-    padding:20px;
-    width:100vw !important; height:100vh !important;
-    left:0 !important; top:0 !important;
-    box-sizing:border-box;
+    padding:20px; box-sizing:border-box;
 }
 #tmv3-modal-overlay.open { display:flex !important; }
 #tmv3-modal {
     background:#111b21; border-radius:18px;
-    width:500px; max-width:calc(100vw - 40px); max-height:calc(100vh - 80px);
+    width:500px; max-width:calc(100% - 40px); max-height:85%;
     display:flex; flex-direction:column;
     box-shadow:0 30px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(42,57,66,.5);
-    overflow:hidden; margin:auto;
+    overflow:hidden; margin:auto; flex-shrink:0;
     animation:tmModalIn .22s cubic-bezier(.34,1.56,.64,1);
-    flex-shrink:0;
 }
-@keyframes tmModalIn { from { opacity:0; transform:scale(.92) translateY(16px); } to { opacity:1; transform:none; } }
-/* Mobile bottom sheet */
-.is-mobile #tmv3-modal-overlay {
-    align-items:flex-end; justify-content:center; padding:0;
-}
-.is-mobile #tmv3-modal {
-    width:100% !important; max-width:100% !important;
-    max-height:92dvh !important; border-radius:22px 22px 0 0;
-    margin:0; animation:tmModalSlideUp .28s cubic-bezier(.34,1.2,.64,1);
-}
-.is-mobile .tmv3-modal-head { position:relative; padding:18px 22px; }
-.is-mobile .tmv3-modal-head::before {
-    content:''; position:absolute; top:8px; left:50%; transform:translateX(-50%);
-    width:40px; height:4px; background:rgba(174,186,193,.3); border-radius:4px;
-}
-@keyframes tmModalSlideUp { from { transform:translateY(100%); opacity:.5; } to { transform:none; opacity:1; } }
+@keyframes tmModalIn { from{opacity:0;transform:scale(.92) translateY(16px);}to{opacity:1;transform:none;} }
 .tmv3-modal-head { background:linear-gradient(180deg,#1a2d36,#1f2c34); padding:14px 18px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(42,57,66,.6); flex-shrink:0; }
 .tmv3-modal-title { color:#e9edef; font-size:16px; font-weight:700; flex:1; }
 .tmv3-modal-body { flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:14px; }
@@ -1191,7 +1175,33 @@
     function _openApp() {
         _currentUser = _getSessionUser();
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
-        document.getElementById('tmv3-overlay').classList.add('open');
+
+        /* ✅ viewport lock bypass — screen এর real size ব্যবহার করো */
+        const ov = document.getElementById('tmv3-overlay');
+        const sw = window.screen.width;
+        const sh = window.screen.height;
+        const isMob = sw < 800;
+        if (!isMob) {
+            /* PC: screen এর actual pixel size দিয়ে overlay সেট করো */
+            const scale = parseFloat(
+                (document.querySelector('meta[name=viewport]') || {}).content &&
+                document.querySelector('meta[name=viewport]').content.match(/initial-scale=([\d.]+)/)
+                ? document.querySelector('meta[name=viewport]').content.match(/initial-scale=([\d.]+)/)[1]
+                : 1
+            ) || 1;
+            const vpW = Math.round(sw / scale);
+            const vpH = Math.round(sh / scale);
+            ov.style.width  = vpW + 'px';
+            ov.style.height = vpH + 'px';
+            ov.style.top    = '0px';
+            ov.style.left   = '0px';
+        } else {
+            ov.style.width  = '';
+            ov.style.height = '';
+        }
+
+        ov.classList.add('open');
+
         /* PC ক্রস বাটন — মোবাইলে লুকানো */
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) {
