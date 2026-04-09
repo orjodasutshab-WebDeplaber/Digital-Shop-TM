@@ -243,7 +243,13 @@
     flex-shrink:0;
     position:relative;
 }
-/* no top accent */
+/* subtle top accent */
+#tmv3-left::before {
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:3px;
+    background:linear-gradient(90deg,#25d366,#128c7e,#075e54);
+    z-index:1;
+}
 .is-mobile #tmv3-left {
     width:100%; max-width:100%;
     height:100%; position:absolute; inset:0; z-index:2;
@@ -253,40 +259,41 @@
 
 /* Left Header */
 #tmv3-left-header {
-    padding:15px 16px 13px;
+    padding:16px 18px 12px;
     display:flex; align-items:center; justify-content:space-between;
-    background:#111b21;
-    flex-shrink:0; margin-top:0;
-    border-bottom:none;
+    background:linear-gradient(180deg,#1a2d36 0%,#111b21 100%);
+    flex-shrink:0; margin-top:3px;
+    border-bottom:1px solid rgba(42,57,66,.5);
 }
 #tmv3-app-title {
-    color:#e9edef; font-size:22px; font-weight:800;
-    letter-spacing:-.2px;
+    color:#e9edef; font-size:21px; font-weight:800;
+    letter-spacing:-.3px;
+    background:linear-gradient(135deg,#e9edef,#aebac1);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
 }
 
 .tmv3-icon-btn {
     background:none; border:none; color:#aebac1; cursor:pointer;
-    width:36px; height:36px; border-radius:50%;
+    width:38px; height:38px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    font-size:19px; transition:.2s; flex-shrink:0;
+    font-size:18px; transition:.2s; flex-shrink:0;
     position:relative;
 }
-.tmv3-icon-btn:hover { background:rgba(42,57,66,.7); color:#e9edef; }
-.is-mobile .tmv3-icon-btn { width:54px; height:54px; font-size:25px; }
-.tmv3-header-actions { display:flex; align-items:center; gap:2px; }
+.tmv3-icon-btn:hover { background:rgba(42,57,66,.7); color:#e9edef; transform:scale(1.08); }
+.is-mobile .tmv3-icon-btn { width:56px; height:56px; font-size:26px; }
+.tmv3-header-actions { display:flex; align-items:center; gap:4px; }
 
 /* Search Bar */
 .tmv3-search-wrap {
-    padding:8px 14px 6px;
+    padding:10px 12px 6px;
     flex-shrink:0;
 }
 .tmv3-search-bar {
     background:#202c33;
-    border-radius:50px;
+    border-radius:30px;
     display:flex; align-items:center; gap:10px; padding:11px 18px;
     border:none;
     transition:background .2s, box-shadow .2s;
-    min-height:46px;
 }
 .tmv3-search-bar:focus-within {
     background:#2a3942;
@@ -305,28 +312,28 @@
 
 /* Filter tabs */
 .tmv3-tabs {
-    display:flex; gap:8px; padding:8px 14px 12px;
+    display:flex; gap:8px; padding:8px 12px 10px;
     flex-shrink:0; overflow-x:auto; scrollbar-width:none;
 }
 .tmv3-tabs::-webkit-scrollbar { display:none; }
 .tmv3-tab {
-    background:transparent;
-    border:1.5px solid rgba(130,150,160,.35);
-    color:#aebac1; padding:7px 20px; border-radius:50px;
+    background:rgba(42,57,66,.4);
+    border:1.5px solid rgba(42,57,66,.6);
+    color:#aebac1; padding:7px 20px; border-radius:28px;
     cursor:pointer; font-size:13.5px; white-space:nowrap;
     font-family:inherit; transition:all .18s; font-weight:500;
-    letter-spacing:.1px;
+    letter-spacing:.2px;
 }
 .tmv3-tab.active {
-    background:#25d366;
-    color:#0b1a14; border-color:#25d366;
-    font-weight:700;
+    background:rgba(37,211,102,.18);
+    color:#25d366; border-color:rgba(37,211,102,.5);
+    font-weight:600;
 }
 .tmv3-tab:hover:not(.active) {
-    background:rgba(42,57,66,.55); color:#e9edef;
+    background:rgba(42,57,66,.65); color:#e9edef;
     border-color:rgba(42,57,66,.9);
 }
-.is-mobile .tmv3-tab { font-size:20px; padding:9px 26px; }
+.is-mobile .tmv3-tab { font-size:20px; padding:9px 24px; }
 
 /* Chat List */
 #tmv3-chat-list {
@@ -337,9 +344,9 @@
 #tmv3-chat-list::-webkit-scrollbar-thumb { background:#2a3942; border-radius:4px; }
 
 .tmv3-chat-item {
-    display:flex; align-items:center; gap:13px;
-    padding:10px 16px 10px 14px; cursor:pointer;
-    border-bottom:1px solid rgba(42,57,66,.18);
+    display:flex; align-items:center; gap:14px;
+    padding:10px 16px; cursor:pointer;
+    border-bottom:1px solid rgba(42,57,66,.25);
     transition:background .15s;
     position:relative;
 }
@@ -347,17 +354,18 @@
 .tmv3-chat-item.active { background:#2a3942; }
 .tmv3-chat-item.active::before {
     content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
-    width:3px; height:65%; background:#25d366; border-radius:0 3px 3px 0;
+    width:3px; height:60%; background:#25d366; border-radius:0 3px 3px 0;
 }
 .tmv3-chat-item:active { background:#2a3942; }
-.is-mobile .tmv3-chat-item { padding:12px 20px; gap:15px; }
+.is-mobile .tmv3-chat-item { padding:14px 20px; gap:16px; }
 
 .tmv3-avatar {
-    width:54px; height:54px; border-radius:50%;
+    width:50px; height:50px; border-radius:50%;
     background:linear-gradient(135deg,#2a3942,#1a2d36);
     display:flex; align-items:center; justify-content:center;
-    font-size:24px; color:#aebac1; flex-shrink:0;
+    font-size:22px; color:#aebac1; flex-shrink:0;
     overflow:hidden; position:relative;
+    box-shadow:0 1px 4px rgba(0,0,0,.35);
 }
 .tmv3-avatar img { width:100%; height:100%; object-fit:cover; }
 .tmv3-avatar.group { background:linear-gradient(135deg,#566b76,#374f5a); font-size:22px; }
@@ -366,29 +374,26 @@
 
 .tmv3-chat-info { flex:1; min-width:0; }
 .tmv3-chat-name {
-    color:#e9edef; font-size:16px; font-weight:400;
+    color:#e9edef; font-size:16px; font-weight:500;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    line-height:1.35;
+    line-height:1.3;
 }
-.tmv3-chat-name.has-unread { font-weight:700; }
 .tmv3-chat-preview {
     color:#8696a0; font-size:13.5px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     margin-top:2px; line-height:1.4;
 }
-.tmv3-chat-preview.has-unread { color:#e9edef; }
-.is-mobile .tmv3-chat-name { font-size:21px; }
-.is-mobile .tmv3-chat-preview { font-size:18px; }
+.is-mobile .tmv3-chat-name { font-size:22px; }
+.is-mobile .tmv3-chat-preview { font-size:19px; }
 
 .tmv3-chat-meta {
     display:flex; flex-direction:column; align-items:flex-end;
-    gap:5px; flex-shrink:0; min-width:50px;
+    gap:5px; flex-shrink:0; min-width:52px;
 }
 .tmv3-chat-time { color:#8696a0; font-size:11.5px; white-space:nowrap; }
-.tmv3-chat-time.has-unread { color:#25d366; font-weight:500; }
 .tmv3-unread-badge {
     background:#25d366;
-    color:#0b1a14; font-size:11.5px; font-weight:700;
+    color:#111; font-size:11.5px; font-weight:700;
     min-width:20px; height:20px; border-radius:10px;
     display:flex; align-items:center; justify-content:center; padding:0 5px;
     line-height:1;
@@ -1242,7 +1247,6 @@
                             /* প্রথমবার লোড — সব চ্যাটের lastMsgTs মনে রাখো, count বাড়িও না */
                             combined.forEach(chat => {
                                 const ts = chat.lastMsgTs ? (chat.lastMsgTs.toDate ? chat.lastMsgTs.toDate().getTime() : new Date(chat.lastMsgTs).getTime()) : 0;
-                                /* শুধু নতুন চ্যাটের জন্য set করো, আগে থেকে থাকলে overwrite না */
                                 if (_lastMsgTsMap[chat.id] === undefined) {
                                     _lastMsgTsMap[chat.id] = ts;
                                 }

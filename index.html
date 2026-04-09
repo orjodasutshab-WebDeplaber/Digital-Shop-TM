@@ -110,6 +110,113 @@
     <link rel="icon" type="image/x-icon" href="ko.jpeg">
     
     <link rel="stylesheet" href="do.css">
+
+    <!-- ══ Chat Panel Design Override ══ -->
+    <style>
+    /* Remove green top bar */
+    #tmv3-left::before { display:none !important; }
+
+    /* Header */
+    #tmv3-left-header {
+        padding:15px 16px 13px !important;
+        background:#111b21 !important;
+        border-bottom:none !important;
+        margin-top:0 !important;
+    }
+    #tmv3-app-title {
+        font-size:22px !important;
+        font-weight:800 !important;
+        color:#e9edef !important;
+        background:none !important;
+        -webkit-text-fill-color:#e9edef !important;
+        letter-spacing:-.2px !important;
+    }
+
+    /* Search Bar — pill shape, full rounded */
+    .tmv3-search-wrap {
+        padding:8px 14px 6px !important;
+    }
+    .tmv3-search-bar {
+        border-radius:50px !important;
+        background:#202c33 !important;
+        padding:11px 18px !important;
+        min-height:46px !important;
+        border:none !important;
+    }
+    .tmv3-search-bar:focus-within {
+        background:#2a3942 !important;
+        box-shadow:0 0 0 2px rgba(37,211,102,.25) !important;
+    }
+    .tmv3-search-bar i { font-size:16px !important; color:#8696a0 !important; }
+    .tmv3-search-bar input { font-size:15px !important; }
+
+    /* Tabs — WhatsApp pill style */
+    .tmv3-tabs {
+        gap:8px !important;
+        padding:8px 14px 12px !important;
+    }
+    .tmv3-tab {
+        border-radius:50px !important;
+        background:transparent !important;
+        border:1.5px solid rgba(130,150,160,.35) !important;
+        color:#aebac1 !important;
+        padding:7px 20px !important;
+        font-size:13.5px !important;
+        font-weight:500 !important;
+    }
+    .tmv3-tab.active {
+        background:#25d366 !important;
+        color:#0b1a14 !important;
+        border-color:#25d366 !important;
+        font-weight:700 !important;
+    }
+    .tmv3-tab:hover:not(.active) {
+        background:rgba(42,57,66,.55) !important;
+        color:#e9edef !important;
+    }
+
+    /* Chat list item */
+    .tmv3-chat-item {
+        padding:10px 16px 10px 14px !important;
+        gap:13px !important;
+        border-bottom:1px solid rgba(42,57,66,.18) !important;
+    }
+
+    /* Avatar bigger */
+    .tmv3-avatar {
+        width:54px !important;
+        height:54px !important;
+        font-size:24px !important;
+        box-shadow:none !important;
+    }
+
+    /* Name — normal weight, bold on unread */
+    .tmv3-chat-name {
+        font-size:16px !important;
+        font-weight:400 !important;
+        color:#e9edef !important;
+    }
+    .tmv3-chat-name.has-unread { font-weight:700 !important; }
+
+    /* Preview */
+    .tmv3-chat-preview { font-size:13.5px !important; color:#8696a0 !important; }
+    .tmv3-chat-preview.has-unread { color:#e9edef !important; }
+
+    /* Time */
+    .tmv3-chat-time { font-size:11.5px !important; color:#8696a0 !important; }
+    .tmv3-chat-time.has-unread { color:#25d366 !important; font-weight:500 !important; }
+
+    /* Unread badge */
+    .tmv3-unread-badge {
+        background:#25d366 !important;
+        color:#0b1a14 !important;
+        font-weight:700 !important;
+        min-width:20px !important;
+        height:20px !important;
+        border-radius:10px !important;
+        font-size:11.5px !important;
+    }
+    </style>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
