@@ -184,10 +184,12 @@
 
 /* ══ Overlay ══ */
 #tmv3-overlay {
-    display:none; position:fixed; inset:0; z-index:99999990;
+    display:none; position:fixed;
+    top:0; left:0;
     background:rgba(0,0,0,.85); backdrop-filter:blur(12px);
     align-items:center; justify-content:center;
-    padding:16px;
+    z-index:99999990;
+    padding:0; overflow:hidden;
 }
 #tmv3-overlay.open { display:flex; }
 
@@ -216,19 +218,15 @@
 /* ══ Main Window ══ */
 #tmv3-root {
     background:#0b141a;
-    width:calc(100vw - 40px);
-    height:calc(100vh - 40px);
-    max-width:1350px;
-    border-radius:20px;
+    border-radius:0;
     display:flex; overflow:hidden;
-    box-shadow:0 40px 100px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.04);
+    box-shadow:0 40px 100px rgba(0,0,0,.8);
     position:relative;
+    flex-shrink:0;
 }
 .is-mobile #tmv3-root {
-    width:100vw !important;
-    height:100dvh !important;
     border-radius:0 !important;
-    flex-direction:column;
+    flex-direction:column !important;
 }
 
 /* ══ Left Panel ══ */
@@ -771,17 +769,19 @@
 
 /* ══ Modal (Add Member / Create Group / Profile Edit) ══ */
 #tmv3-modal-overlay {
-    display:none; position:fixed; inset:0; z-index:999999995;
-    background:rgba(0,0,0,.75); backdrop-filter:blur(6px);
+    display:none; position:fixed;
+    top:0; left:0;
+    background:rgba(0,0,0,.78); backdrop-filter:blur(8px);
     align-items:center; justify-content:center;
+    z-index:999999995; padding:20px; box-sizing:border-box;
 }
 #tmv3-modal-overlay.open { display:flex; }
 #tmv3-modal {
     background:#111b21; border-radius:18px;
-    width:min(520px,95vw); max-height:85vh;
+    width:500px; max-width:100%;
     display:flex; flex-direction:column;
     box-shadow:0 30px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(42,57,66,.5);
-    overflow:hidden;
+    overflow:hidden; margin:auto; flex-shrink:0;
 }
 .tmv3-modal-head { background:linear-gradient(180deg,#1a2d36,#1f2c34); padding:14px 18px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(42,57,66,.6); flex-shrink:0; }
 .tmv3-modal-title { color:#e9edef; font-size:16px; font-weight:700; flex:1; }
@@ -1165,15 +1165,71 @@
     function _openApp() {
         _currentUser = _getSessionUser();
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
-        document.getElementById('tmv3-overlay').classList.add('open');
-        /* PC ক্রস বাটন — মোবাইলে লুকানো */
+
+        /* ── Viewport lock bypass ──
+           index.html এ width=800 lock আছে।
+           screen.width দিয়ে real pixel size বের করে
+           overlay ও root এ সেট করি।               */
+        const ov   = document.getElementById('tmv3-overlay');
+        const root = document.getElementById('tmv3-root');
+        const mov  = document.getElementById('tmv3-modal-overlay');
+
+        if (!_isMobile) {
+            const sw = window.screen.width;
+            const sh = window.screen.height;
+            /* viewport meta থেকে scale */
+            let scale = 1;
+            const vpMeta = document.querySelector('meta[name=viewport]');
+            if (vpMeta) {
+                const m = vpMeta.content.match(/initial-scale=([\d.]+)/);
+                if (m) scale = parseFloat(m[1]);
+            }
+            const W = Math.round(sw / scale);
+            const H = Math.round(sh / scale);
+
+            /* overlay: পুরো স্ক্রিন */
+            ov.style.width  = W + 'px';
+            ov.style.height = H + 'px';
+
+            /* root: পুরো স্ক্রিন */
+            root.style.width     = W + 'px';
+            root.style.height    = H + 'px';
+            root.style.maxWidth  = 'none';
+            root.style.maxHeight = 'none';
+
+            /* modal overlay */
+            if (mov) {
+                mov.style.width  = W + 'px';
+                mov.style.height = H + 'px';
+            }
+
+            /* right panel ও messages flex fix */
+            const right = document.getElementById('tmv3-right');
+            const msgs  = document.getElementById('tmv3-messages');
+            if (right) {
+                right.style.height        = H + 'px';
+                right.style.display       = 'flex';
+                right.style.flexDirection = 'column';
+                right.style.overflow      = 'hidden';
+            }
+            if (msgs) {
+                msgs.style.flex      = '1';
+                msgs.style.minHeight = '0';
+                msgs.style.overflowY = 'auto';
+            }
+        } else {
+            /* মোবাইল: JS style সরাও */
+            [ov, root, mov].forEach(el => {
+                if (el) { el.style.width = ''; el.style.height = ''; }
+            });
+        }
+
+        ov.classList.add('open');
+
+        /* PC close বাটন */
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) {
-            if (_isMobile) {
-                closeBtn.style.display = 'none';
-            } else {
-                closeBtn.style.display = 'flex';
-            }
+            closeBtn.style.display = _isMobile ? 'none' : 'flex';
         }
         _loadChatList();
     }
