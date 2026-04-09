@@ -16,114 +16,6 @@
                 if(vp) vp.content = 'width='+dw+',initial-scale='+scale.toFixed(4)+',minimum-scale='+scale.toFixed(4)+',maximum-scale='+scale.toFixed(4)+',user-scalable=no';
             }
         }
-        /* ═══════════════════════════════════════════════════
-           CHAT POPUP FULLSCREEN FIX
-           viewport width=800 lock bypass করার একমাত্র উপায়:
-           chat popup এ real screen pixel দিয়ে সব set করো
-        ═══════════════════════════════════════════════════ */
-        window.__tmChatFix = function(){
-            var ov   = document.getElementById('tmv3-overlay');
-            var root = document.getElementById('tmv3-root');
-            var mov  = document.getElementById('tmv3-modal-overlay');
-            if(!ov) return;
-
-            var sw = window.screen.availWidth;
-            var sh = window.screen.availHeight;
-            var isMob = window.screen.width < 800;
-
-            if(!isMob){
-                /* PC: viewport lock এর কারণে 1vw=8px
-                   তাই px এ সরাসরি দিতে হবে */
-                var W = sw; /* scale নেই PC তে */
-                var H = sh;
-
-                ov.style.cssText = [
-                    'position:fixed','top:0','left:0',
-                    'width:'+W+'px','height:'+H+'px',
-                    'padding:0','margin:0',
-                    'display:flex','align-items:center','justify-content:center',
-                    'background:rgba(0,0,0,.85)',
-                    'backdrop-filter:blur(12px)',
-                    'z-index:99999990','box-sizing:border-box',
-                    'overflow:hidden'
-                ].join(' !important;') + ' !important;';
-
-                if(root){
-                    root.style.cssText = [
-                        'width:'+W+'px','height:'+H+'px',
-                        'max-width:none','max-height:none',
-                        'border-radius:0',
-                        'display:flex','flex-direction:row',
-                        'overflow:hidden','flex-shrink:0',
-                        'background:#0b141a'
-                    ].join(' !important;') + ' !important;';
-                }
-
-                if(mov){
-                    mov.style.cssText = [
-                        'position:fixed','top:0','left:0',
-                        'width:'+W+'px','height:'+H+'px',
-                        'padding:20px','box-sizing:border-box',
-                        'display:flex','align-items:center','justify-content:center',
-                        'background:rgba(0,0,0,.78)',
-                        'backdrop-filter:blur(8px)',
-                        'z-index:999999995'
-                    ].join(' !important;') + ' !important;';
-                }
-
-                /* right panel */
-                var right = document.getElementById('tmv3-right');
-                var msgs  = document.getElementById('tmv3-messages');
-                var left  = document.getElementById('tmv3-left');
-                var inp   = document.getElementById('tmv3-input-area');
-
-                if(right){
-                    right.style.cssText = [
-                        'height:'+H+'px',
-                        'display:flex','flex-direction:column',
-                        'flex:1','min-height:0',
-                        'overflow:hidden',
-                        'position:relative'
-                    ].join(' !important;') + ' !important;';
-                }
-                if(left){
-                    left.style.setProperty('height', H+'px', 'important');
-                }
-                if(msgs){
-                    msgs.style.setProperty('flex',       '1',    'important');
-                    msgs.style.setProperty('min-height', '0',    'important');
-                    msgs.style.setProperty('overflow-y', 'auto', 'important');
-                    msgs.style.setProperty('height',     'auto', 'important');
-                    msgs.style.setProperty('max-height', 'none', 'important');
-                }
-                if(inp){
-                    inp.style.setProperty('flex-shrink', '0',   'important');
-                    inp.style.setProperty('position',    'relative', 'important');
-                }
-            }
-        };
-
-        /* chat overlay open হলে fix চালাও */
-        window.addEventListener('load', function(){
-            function watchChat(){
-                var ov = document.getElementById('tmv3-overlay');
-                if(!ov){
-                    setTimeout(watchChat, 300); return;
-                }
-                new MutationObserver(function(muts){
-                    muts.forEach(function(m){
-                        if(m.target.id==='tmv3-overlay' && m.attributeName==='class'){
-                            if(m.target.classList.contains('open')){
-                                window.__tmChatFix();
-                                setTimeout(window.__tmChatFix, 80);
-                                setTimeout(window.__tmChatFix, 300);
-                            }
-                        }
-                    });
-                }).observe(ov, {attributes:true});
-            }
-            watchChat();
-        });
         setScale();
         window.addEventListener('resize', setScale);
         // touch দিয়ে zoom পুরোপুরি বন্ধ
@@ -3286,4 +3178,87 @@ html.is-mobile body > div[style*="position: fixed"] > div input {
     padding: 18px !important;
 }
 </style>
+
+<script>
+/* ── CHAT FULLSCREEN FIX (PC viewport=800 bypass) ── */
+(function(){
+  function fix(){
+    var ov=document.getElementById('tmv3-overlay');
+    if(!ov||!ov.classList.contains('open'))return;
+    var W=window.screen.availWidth, H=window.screen.availHeight;
+    var isMob=window.screen.width<800;
+    if(isMob)return;
+
+    /* overlay */
+    ov.style.setProperty('width', W+'px','important');
+    ov.style.setProperty('height',H+'px','important');
+    ov.style.setProperty('top',   '0',   'important');
+    ov.style.setProperty('left',  '0',   'important');
+    ov.style.setProperty('padding','0',  'important');
+
+    /* root */
+    var r=document.getElementById('tmv3-root');
+    if(r){
+      r.style.setProperty('width',        W+'px','important');
+      r.style.setProperty('height',       H+'px','important');
+      r.style.setProperty('max-width',    'none','important');
+      r.style.setProperty('border-radius','0',   'important');
+    }
+
+    /* modal overlay */
+    var m=document.getElementById('tmv3-modal-overlay');
+    if(m){
+      m.style.setProperty('width', W+'px','important');
+      m.style.setProperty('height',H+'px','important');
+    }
+
+    /* left panel */
+    var l=document.getElementById('tmv3-left');
+    if(l) l.style.setProperty('height',H+'px','important');
+
+    /* right panel — flex column */
+    var rp=document.getElementById('tmv3-right');
+    if(rp){
+      rp.style.setProperty('height',        H+'px',  'important');
+      rp.style.setProperty('display',       'flex',  'important');
+      rp.style.setProperty('flex-direction','column','important');
+      rp.style.setProperty('overflow',      'hidden','important');
+      rp.style.setProperty('min-height',    '0',     'important');
+    }
+
+    /* messages — flex:1 scroll */
+    var ms=document.getElementById('tmv3-messages');
+    if(ms){
+      ms.style.setProperty('flex',      '1',   'important');
+      ms.style.setProperty('min-height','0',   'important');
+      ms.style.setProperty('height',    'auto','important');
+      ms.style.setProperty('max-height','none','important');
+    }
+
+    /* input area — সবসময় নিচে */
+    var ia=document.getElementById('tmv3-input-area');
+    if(ia){
+      ia.style.setProperty('flex-shrink','0','important');
+      ia.style.setProperty('width',      W - (l ? (l.offsetWidth||375) : 375) + 'px','important');
+    }
+  }
+
+  /* overlay open হওয়া watch করো */
+  function watch(){
+    var ov=document.getElementById('tmv3-overlay');
+    if(!ov){setTimeout(watch,400);return;}
+    new MutationObserver(function(ms){
+      ms.forEach(function(m){
+        if(m.target.id==='tmv3-overlay'&&m.attributeName==='class'){
+          if(m.target.classList.contains('open')){
+            fix(); setTimeout(fix,60); setTimeout(fix,250);
+          }
+        }
+      });
+    }).observe(ov,{attributes:true});
+  }
+  window.addEventListener('load',watch);
+})();
+</script>
+
 </body>
