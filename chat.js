@@ -283,24 +283,24 @@
 
 /* Search Bar */
 .tmv3-search-wrap {
-    padding:10px 14px 6px;
+    padding:12px 16px 8px;
     flex-shrink:0;
 }
 .tmv3-search-bar {
     background:#202c33;
-    border-radius:12px;
-    display:flex; align-items:center; gap:10px; padding:10px 16px;
-    border:1px solid rgba(42,57,66,.6);
+    border-radius:14px;
+    display:flex; align-items:center; gap:12px; padding:13px 18px;
+    border:1.5px solid rgba(42,57,66,.7);
     transition:border-color .2s, box-shadow .2s;
 }
 .tmv3-search-bar:focus-within {
-    border-color:rgba(37,211,102,.4);
-    box-shadow:0 0 0 2px rgba(37,211,102,.08);
+    border-color:rgba(37,211,102,.5);
+    box-shadow:0 0 0 3px rgba(37,211,102,.10);
 }
-.tmv3-search-bar i { color:#8696a0; font-size:14px; }
+.tmv3-search-bar i { color:#8696a0; font-size:16px; }
 .tmv3-search-bar input {
     flex:1; background:none; border:none; outline:none;
-    color:#e9edef; font-size:14px;
+    color:#e9edef; font-size:15px;
     font-family:inherit;
 }
 .tmv3-search-bar input::placeholder { color:#8696a0; }
@@ -310,21 +310,28 @@
 
 /* Filter tabs */
 .tmv3-tabs {
-    display:flex; gap:8px; padding:8px 14px 10px;
+    display:flex; gap:8px; padding:10px 16px 12px;
     flex-shrink:0; overflow-x:auto; scrollbar-width:none;
 }
 .tmv3-tabs::-webkit-scrollbar { display:none; }
 .tmv3-tab {
-    background:rgba(42,57,66,.3); border:1px solid rgba(42,57,66,.6);
-    color:#aebac1; padding:5px 16px; border-radius:20px;
-    cursor:pointer; font-size:13px; white-space:nowrap;
-    font-family:inherit; transition:.2s; font-weight:500;
+    background:rgba(42,57,66,.25);
+    border:1.5px solid rgba(42,57,66,.5);
+    color:#aebac1; padding:7px 20px; border-radius:24px;
+    cursor:pointer; font-size:13.5px; white-space:nowrap;
+    font-family:inherit; transition:all .2s; font-weight:600;
+    letter-spacing:.2px;
 }
 .tmv3-tab.active {
-    background:rgba(0,168,132,.15); color:#00a884; border-color:rgba(0,168,132,.4);
+    background:linear-gradient(135deg,rgba(0,168,132,.25),rgba(0,168,132,.15));
+    color:#00a884; border-color:rgba(0,168,132,.5);
     font-weight:700;
+    box-shadow:0 2px 10px rgba(0,168,132,.15);
 }
-.tmv3-tab:hover:not(.active) { background:rgba(42,57,66,.5); color:#e9edef; }
+.tmv3-tab:hover:not(.active) {
+    background:rgba(42,57,66,.5); color:#e9edef;
+    border-color:rgba(42,57,66,.8);
+}
 .is-mobile .tmv3-tab { font-size:20px; padding:8px 22px; }
 
 /* Chat List */
@@ -1171,24 +1178,16 @@
     function _openApp() {
         _currentUser = _getSessionUser();
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
-
-        if (!_isMobile && window._tmChatViewport) {
-            window._tmChatViewport.open();
-        }
-
+        if (!_isMobile && window._tmChatViewport) window._tmChatViewport.open();
         document.getElementById('tmv3-overlay').classList.add('open');
         const closeBtn = document.getElementById('tmv3-close-btn');
-        if (closeBtn) {
-            closeBtn.style.display = _isMobile ? 'none' : 'flex';
-        }
+        if (closeBtn) closeBtn.style.display = _isMobile ? 'none' : 'flex';
         _loadChatList();
     }
 
     function _closeApp() {
         document.getElementById('tmv3-overlay').classList.remove('open');
-        if (!_isMobile && window._tmChatViewport) {
-            window._tmChatViewport.close();
-        }
+        if (!_isMobile && window._tmChatViewport) window._tmChatViewport.close();
         _unsubscribeAll();
     }
 
@@ -1271,7 +1270,15 @@
 
             const isGroup = chat.type === 'group';
             const isPublic = chat.isPublic;
-            const name = chat.name || chat.displayName || 'Chat';
+            /* personal chat এ memberInfo থেকে অন্য ব্যক্তির নাম নাও */
+            let name;
+            if (!isGroup && chat.memberInfo) {
+                const uid = String(_currentUser.id);
+                const otherUid = Object.keys(chat.memberInfo).find(k => k !== uid);
+                name = otherUid ? (chat.memberInfo[otherUid].name || 'User') : (chat.name || 'Chat');
+            } else {
+                name = chat.name || chat.displayName || 'Chat';
+            }
             const avatar = chat.avatarData || chat.avatarUrl || '';
             const lastMsg = chat.lastMsg || '';
             const lastTs = chat.lastMsgTs ? _formatTime(chat.lastMsgTs.toDate ? chat.lastMsgTs.toDate() : new Date(chat.lastMsgTs)) : '';
@@ -1332,7 +1339,15 @@
 
         /* Header */
         const isGroup = chat.type === 'group';
-        const name = chat.name || chat.displayName || 'Chat';
+        /* personal chat এ অন্য ব্যক্তির নাম header এ দেখাও */
+        let name;
+        if (!isGroup && chat.memberInfo) {
+            const uid2 = String(_currentUser.id);
+            const otherUid2 = Object.keys(chat.memberInfo).find(k => k !== uid2);
+            name = otherUid2 ? (chat.memberInfo[otherUid2].name || 'User') : (chat.name || 'Chat');
+        } else {
+            name = chat.name || chat.displayName || 'Chat';
+        }
         const avatar = chat.avatarData || chat.avatarUrl || '';
         const hdrAv = document.getElementById('tmv3-hdr-av');
         hdrAv.className = 'tmv3-avatar' + (chat.isPublic ? ' public' : isGroup ? ' group' : '');
@@ -1411,9 +1426,24 @@
         const area = document.getElementById('tmv3-messages');
         area.innerHTML = '<div class="tmv3-spinner"><i class="fa fa-circle-notch"></i></div>';
 
+        let _firstLoad = true;
         _unsubMsg = _getMessagesPath(chat)
             .orderBy('ts', 'asc').limitToLast(MAX_MSG)
             .onSnapshot(function (snap) {
+                /* নতুন message এলে unread count বাড়াও (first load বাদে) */
+                if (!_firstLoad) {
+                    snap.docChanges().forEach(change => {
+                        if (change.type === 'added') {
+                            const senderId = change.doc.data().senderId;
+                            /* নিজের message এ count বাড়বে না */
+                            if (_currentUser && String(senderId) !== String(_currentUser.id)) {
+                                _unreadMap[chat.id] = (_unreadMap[chat.id] || 0) + 1;
+                                _renderChatList();
+                            }
+                        }
+                    });
+                }
+                _firstLoad = false;
                 _renderMessages(snap.docs, chat);
                 _listenTyping(chat);
                 _markSeen(snap.docs, chat);
@@ -1888,10 +1918,9 @@
         const settingsBtn = panel.querySelector('#sp-group-settings');
         if (settingsBtn) settingsBtn.addEventListener('click', () => _showGroupSettingsModal(chat));
 
-        /* Leave group — সাবজনীন গ্রুপ থেকে বের হওয়া যাবে না */
+        /* Leave group */
         const leaveBtn = panel.querySelector('#sp-leave-group');
         if (leaveBtn) leaveBtn.addEventListener('click', () => {
-            if (chat.isPublic) { _toast('সাবজনীন গ্রুপ ছেড়ে যাওয়া যাবে না।'); return; }
             if (!confirm('গ্রুপ থেকে বের হবেন?')) return;
             _db.collection('tm_groups').doc(chat.id).update({
                 members: firebase.firestore.FieldValue.arrayRemove(uid)
