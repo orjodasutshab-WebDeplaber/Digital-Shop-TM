@@ -132,6 +132,165 @@
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script>emailjs.init('DgZTRCxGcsfC2gTRf');</script>
+
+    <style id="tmv3-pc-fix">
+    /* ══ CHAT POPUP PC FIX — viewport lock bypass ══
+       viewport width=800 এ lock, তাই vw/vh কাজ করে না।
+       JS দিয়ে real screen size সেট করা হবে।            */
+    #tmv3-overlay {
+        display: none;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 99999990 !important;
+        background: rgba(0,0,0,.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 20px !important;
+        box-sizing: border-box !important;
+        /* width/height JS দিয়ে সেট হবে */
+    }
+    #tmv3-overlay.open {
+        display: flex !important;
+    }
+    #tmv3-root {
+        background: #0b141a;
+        border-radius: 20px;
+        display: flex !important;
+        overflow: hidden;
+        box-shadow: 0 40px 100px rgba(0,0,0,.8);
+        position: relative;
+        /* width/height JS দিয়ে সেট হবে */
+    }
+    #tmv3-modal-overlay {
+        display: none;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 999999995 !important;
+        background: rgba(0,0,0,.78);
+        backdrop-filter: blur(8px);
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 20px !important;
+        box-sizing: border-box !important;
+    }
+    #tmv3-modal-overlay.open {
+        display: flex !important;
+    }
+    #tmv3-modal {
+        background: #111b21;
+        border-radius: 18px;
+        width: 500px;
+        max-width: calc(100% - 40px);
+        max-height: 85%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 30px 80px rgba(0,0,0,.7);
+        overflow: hidden;
+        margin: auto;
+        flex-shrink: 0;
+    }
+    </style>
+    <script>
+    /* ══ CHAT POPUP PC FIX SCRIPT ══
+       viewport lock আছে বলে vw/vh = 800px।
+       screen.width দিয়ে real size বের করে
+       overlay ও root এ সেট করতে হবে।      */
+    (function() {
+        function tmFixChatSize() {
+            var sw = window.screen.width;
+            var sh = window.screen.height;
+            var isMobile = sw < 800;
+
+            var ov = document.getElementById('tmv3-overlay');
+            var root = document.getElementById('tmv3-root');
+            var modalOv = document.getElementById('tmv3-modal-overlay');
+
+            if (!ov) return; // chat not loaded yet
+
+            if (!isMobile) {
+                /* PC: viewport scale বের করো */
+                var vpMeta = document.querySelector('meta[name=viewport]');
+                var scale = 1;
+                if (vpMeta) {
+                    var m = vpMeta.content.match(/initial-scale=([\d.]+)/);
+                    if (m) scale = parseFloat(m[1]);
+                }
+                /* scale দিয়ে real CSS pixel size */
+                var realW = Math.round(sw / scale);
+                var realH = Math.round(sh / scale);
+
+                /* overlay */
+                ov.style.setProperty('width',  realW + 'px', 'important');
+                ov.style.setProperty('height', realH + 'px', 'important');
+
+                /* modal overlay */
+                if (modalOv) {
+                    modalOv.style.setProperty('width',  realW + 'px', 'important');
+                    modalOv.style.setProperty('height', realH + 'px', 'important');
+                }
+
+                /* root: padding 40px থেকে বাদ */
+                if (root) {
+                    root.style.setProperty('width',  (realW - 40) + 'px', 'important');
+                    root.style.setProperty('height', (realH - 40) + 'px', 'important');
+                    root.style.setProperty('max-width', '1350px', 'important');
+                }
+            } else {
+                /* Mobile: সব clear করো — CSS handle করবে */
+                ov.style.removeProperty('width');
+                ov.style.removeProperty('height');
+                if (modalOv) {
+                    modalOv.style.removeProperty('width');
+                    modalOv.style.removeProperty('height');
+                }
+                if (root) {
+                    root.style.removeProperty('width');
+                    root.style.removeProperty('height');
+                }
+            }
+        }
+
+        /* chat.js লোড হওয়ার পরে চালাও */
+        window.addEventListener('load', function() {
+            /* chat open হওয়ার সময়ও চালাতে হবে */
+            var origOpen = window._tmv3 && window._tmv3.open;
+            /* MutationObserver দিয়ে overlay দেখা */
+            var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(m) {
+                    if (m.type === 'attributes' && m.attributeName === 'class') {
+                        var el = m.target;
+                        if (el.id === 'tmv3-overlay' && el.classList.contains('open')) {
+                            tmFixChatSize();
+                        }
+                    }
+                });
+            });
+            var ov = document.getElementById('tmv3-overlay');
+            if (ov) {
+                observer.observe(ov, { attributes: true });
+                observer.observe(document.body, { childList: true, subtree: false });
+            } else {
+                /* overlay এখনো নেই — body watch করো */
+                var bodyObs = new MutationObserver(function() {
+                    var el = document.getElementById('tmv3-overlay');
+                    if (el) {
+                        observer.observe(el, { attributes: true });
+                        bodyObs.disconnect();
+                    }
+                });
+                bodyObs.observe(document.body, { childList: true, subtree: true });
+            }
+        });
+
+        /* resize হলেও fix করো */
+        window.addEventListener('resize', tmFixChatSize);
+    })();
+    </script>
+
 </head>
 
 <body class="light-theme" id="mainBody">
