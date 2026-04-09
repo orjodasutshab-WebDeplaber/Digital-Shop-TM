@@ -184,10 +184,12 @@
 
 /* ══ Overlay ══ */
 #tmv3-overlay {
-    display:none; position:fixed; inset:0; z-index:99999990;
+    display:none; position:fixed;
+    top:0; left:0;
+    z-index:99999990;
     background:rgba(0,0,0,.85); backdrop-filter:blur(12px);
-    align-items:center; justify-content:center;
-    padding:16px;
+    align-items:flex-start; justify-content:flex-start;
+    padding:0; overflow:hidden;
 }
 #tmv3-overlay.open { display:flex; }
 
@@ -216,17 +218,14 @@
 /* ══ Main Window ══ */
 #tmv3-root {
     background:#0b141a;
-    width:calc(100vw - 40px);
-    height:calc(100vh - 40px);
-    max-width:1350px;
-    border-radius:20px;
+    border-radius:0;
     display:flex; overflow:hidden;
     box-shadow:0 40px 100px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.04);
     position:relative;
 }
 .is-mobile #tmv3-root {
-    width:100vw !important;
-    height:100dvh !important;
+    width:100% !important;
+    height:100% !important;
     border-radius:0 !important;
     flex-direction:column;
 }
@@ -771,17 +770,20 @@
 
 /* ══ Modal (Add Member / Create Group / Profile Edit) ══ */
 #tmv3-modal-overlay {
-    display:none; position:fixed; inset:0; z-index:999999995;
+    display:none; position:fixed;
+    top:0; left:0;
+    z-index:999999995;
     background:rgba(0,0,0,.75); backdrop-filter:blur(6px);
     align-items:center; justify-content:center;
+    padding:20px; box-sizing:border-box;
 }
 #tmv3-modal-overlay.open { display:flex; }
 #tmv3-modal {
     background:#111b21; border-radius:18px;
-    width:min(520px,95vw); max-height:85vh;
+    width:500px; max-width:100%;
     display:flex; flex-direction:column;
     box-shadow:0 30px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(42,57,66,.5);
-    overflow:hidden;
+    overflow:hidden; margin:auto; flex-shrink:0;
 }
 .tmv3-modal-head { background:linear-gradient(180deg,#1a2d36,#1f2c34); padding:14px 18px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(42,57,66,.6); flex-shrink:0; }
 .tmv3-modal-title { color:#e9edef; font-size:16px; font-weight:700; flex:1; }
@@ -1165,7 +1167,61 @@
     function _openApp() {
         _currentUser = _getSessionUser();
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
+
+        /* ── PC fullscreen fix ──
+           viewport width=800 lock আছে তাই vw/vh কাজ করে না।
+           screen.availWidth/Height দিয়ে real pixel size নিই।  */
+        if (!_isMobile) {
+            const W = window.screen.availWidth;
+            const H = window.screen.availHeight;
+
+            const ov = document.getElementById('tmv3-overlay');
+            if (ov) {
+                ov.style.width  = W + 'px';
+                ov.style.height = H + 'px';
+            }
+
+            const root = document.getElementById('tmv3-root');
+            if (root) {
+                root.style.width     = W + 'px';
+                root.style.height    = H + 'px';
+                root.style.maxWidth  = 'none';
+                root.style.maxHeight = 'none';
+            }
+
+            const mov = document.getElementById('tmv3-modal-overlay');
+            if (mov) {
+                mov.style.width  = W + 'px';
+                mov.style.height = H + 'px';
+            }
+
+            /* left panel height */
+            const lp = document.getElementById('tmv3-left');
+            if (lp) lp.style.height = H + 'px';
+
+            /* right panel — flex column যাতে input area নিচে থাকে */
+            const rp = document.getElementById('tmv3-right');
+            if (rp) {
+                rp.style.height        = H + 'px';
+                rp.style.display       = 'flex';
+                rp.style.flexDirection = 'column';
+                rp.style.overflow      = 'hidden';
+            }
+
+            /* messages — flex:1 নিয়ে বাকি জায়গা নেবে */
+            const msgs = document.getElementById('tmv3-messages');
+            if (msgs) {
+                msgs.style.flex      = '1';
+                msgs.style.minHeight = '0';
+                msgs.style.overflowY = 'auto';
+                msgs.style.height    = 'auto';
+                msgs.style.maxHeight = 'none';
+            }
+        }
+
         document.getElementById('tmv3-overlay').classList.add('open');
+
+        /* PC close বাটন */
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) {
             closeBtn.style.display = _isMobile ? 'none' : 'flex';
@@ -1173,7 +1229,7 @@
         _loadChatList();
     }
 
-        function _closeApp() {
+    function _closeApp() {
         document.getElementById('tmv3-overlay').classList.remove('open');
         _unsubscribeAll();
     }
