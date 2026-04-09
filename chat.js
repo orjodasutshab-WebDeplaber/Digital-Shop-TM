@@ -605,6 +605,7 @@
     display:flex; align-items:flex-end; gap:10px;
     border-top:1px solid rgba(42,57,66,.6); flex-shrink:0;
     box-shadow:0 -2px 16px rgba(0,0,0,.2);
+    position:sticky; bottom:0; z-index:10;
 }
 .is-mobile #tmv3-input-area { padding:16px 18px; gap:16px; }
 
@@ -1170,7 +1171,6 @@
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
 
         if (!_isMobile) {
-            /* viewport=800 lock bypass */
             const W = window.screen.availWidth;
             const H = window.screen.availHeight;
 
@@ -1185,58 +1185,37 @@
 
             const root = document.getElementById('tmv3-root');
             if (root) {
-                root.style.width        = W + 'px';
-                root.style.height       = H + 'px';
-                root.style.maxWidth     = 'none';
-                root.style.borderRadius = '0';
-                root.style.display      = 'flex';
-                root.style.flexDirection= 'row';
-                root.style.overflow     = 'hidden';
+                root.style.width         = W + 'px';
+                root.style.height        = H + 'px';
+                root.style.maxWidth      = 'none';
+                root.style.borderRadius  = '0';
             }
 
             const mov = document.getElementById('tmv3-modal-overlay');
             if (mov) {
                 mov.style.width  = W + 'px';
                 mov.style.height = H + 'px';
-                mov.style.top    = '0';
-                mov.style.left   = '0';
             }
 
-            /* left panel height */
             const lp = document.getElementById('tmv3-left');
-            if (lp) {
-                lp.style.height   = H + 'px';
-                lp.style.overflow = 'hidden';
-            }
+            if (lp) lp.style.height = H + 'px';
 
-            /* right panel — flex column, overflow hidden
-               এতে messages scroll করবে, input সবসময় নিচে */
             const rp = document.getElementById('tmv3-right');
             if (rp) {
                 rp.style.height        = H + 'px';
                 rp.style.display       = 'flex';
                 rp.style.flexDirection = 'column';
                 rp.style.overflow      = 'hidden';
-                rp.style.flex          = '1';
-                rp.style.minWidth      = '0';
             }
 
-            /* messages — flex:1 + min-height:0
-               এই দুটো একসাথে থাকলে scroll কাজ করে
-               এবং input area নিচে থাকে */
+            /* messages flex:1 + min-height:0 = scroll কাজ করে */
             const msgs = document.getElementById('tmv3-messages');
             if (msgs) {
-                msgs.style.flex       = '1';
-                msgs.style.minHeight  = '0';
-                msgs.style.overflowY  = 'auto';
-                msgs.style.height     = 'auto';
-                msgs.style.maxHeight  = 'none';
-            }
-
-            /* input area — কখনো hide হবে না */
-            const ia = document.getElementById('tmv3-input-area');
-            if (ia) {
-                ia.style.flexShrink = '0';
+                msgs.style.flex      = '1';
+                msgs.style.minHeight = '0';
+                msgs.style.overflowY = 'auto';
+                msgs.style.height    = 'auto';
+                msgs.style.maxHeight = 'none';
             }
         }
 
