@@ -141,30 +141,47 @@
         padding: 0 !important;
         margin: 0 !important;
         border: none !important;
-        border-radius: 0 !important;
         box-sizing: border-box !important;
         z-index: 99999990 !important;
         background: rgba(0,0,0,.85) !important;
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
-        align-items: center !important;
-        justify-content: center !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
     }
-    #tmv3-overlay.open {
-        display: flex !important;
-    }
+    #tmv3-overlay.open { display: flex !important; }
+
     #tmv3-root {
         border-radius: 0 !important;
         display: flex !important;
+        flex-direction: row !important;
         overflow: hidden !important;
         flex-shrink: 0 !important;
+        max-width: none !important;
     }
+
+    /* right panel flex fix */
+    #tmv3-right {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+    }
+    #tmv3-messages {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        min-height: 0 !important;
+    }
+    #tmv3-input-area {
+        flex-shrink: 0 !important;
+    }
+
     #tmv3-modal-overlay {
         display: none !important;
         position: fixed !important;
         top: 0 !important; left: 0 !important;
         padding: 0 !important;
-        margin: 0 !important;
         z-index: 999999995 !important;
         background: rgba(0,0,0,.78) !important;
         backdrop-filter: blur(8px) !important;
@@ -172,12 +189,9 @@
         justify-content: center !important;
         box-sizing: border-box !important;
     }
-    #tmv3-modal-overlay.open {
-        display: flex !important;
-    }
+    #tmv3-modal-overlay.open { display: flex !important; }
     #tmv3-modal {
         width: 500px !important;
-        max-height: 85% !important;
         display: flex !important;
         flex-direction: column !important;
         background: #111b21 !important;
@@ -193,7 +207,7 @@
     (function () {
         'use strict';
 
-        function getScaleAndSize() {
+        function getSizes() {
             var sw = window.screen.width;
             var sh = window.screen.height;
             var vpMeta = document.querySelector('meta[name=viewport]');
@@ -210,47 +224,67 @@
         }
 
         function applyFix() {
-            var s = getScaleAndSize();
+            var s    = getSizes();
             var ov   = document.getElementById('tmv3-overlay');
             var root = document.getElementById('tmv3-root');
             var mov  = document.getElementById('tmv3-modal-overlay');
             var mod  = document.getElementById('tmv3-modal');
+            var right= document.getElementById('tmv3-right');
+            var msgs = document.getElementById('tmv3-messages');
 
             if (!ov) return;
 
             if (!s.isMob) {
                 var W = s.W, H = s.H;
 
-                /* overlay: পুরো স্ক্রিন */
+                /* overlay = পুরো স্ক্রিন */
                 ov.style.setProperty('width',  W + 'px', 'important');
                 ov.style.setProperty('height', H + 'px', 'important');
 
-                /* root: max-width বাদ দিয়ে পুরো width */
+                /* root = পুরো স্ক্রিন, flex-direction row */
                 if (root) {
-                    root.style.setProperty('width',      W + 'px', 'important');
-                    root.style.setProperty('height',     H + 'px', 'important');
-                    root.style.setProperty('max-width',  'none',   'important');
-                    root.style.setProperty('max-height', 'none',   'important');
-                    root.style.setProperty('border-radius', '0',   'important');
+                    root.style.setProperty('width',         W + 'px', 'important');
+                    root.style.setProperty('height',        H + 'px', 'important');
+                    root.style.setProperty('max-width',     'none',   'important');
+                    root.style.setProperty('max-height',    'none',   'important');
+                    root.style.setProperty('border-radius', '0',      'important');
+                    root.style.setProperty('flex-direction','row',    'important');
                 }
 
-                /* modal overlay: পুরো স্ক্রিন */
+                /* right panel: flex column, height = root height */
+                if (right) {
+                    right.style.setProperty('height',        H + 'px', 'important');
+                    right.style.setProperty('display',       'flex',   'important');
+                    right.style.setProperty('flex-direction','column', 'important');
+                    right.style.setProperty('flex',          '1',      'important');
+                    right.style.setProperty('min-height',    '0',      'important');
+                    right.style.setProperty('overflow',      'hidden', 'important');
+                }
+
+                /* messages area: flex 1 — বাকি জায়গা নেবে */
+                if (msgs) {
+                    msgs.style.setProperty('flex',       '1',    'important');
+                    msgs.style.setProperty('min-height', '0',    'important');
+                    msgs.style.setProperty('overflow-y', 'auto', 'important');
+                }
+
+                /* modal overlay */
                 if (mov) {
-                    mov.style.setProperty('width',  W + 'px', 'important');
-                    mov.style.setProperty('height', H + 'px', 'important');
-                    mov.style.setProperty('padding', '20px',  'important');
+                    mov.style.setProperty('width',   W + 'px', 'important');
+                    mov.style.setProperty('height',  H + 'px', 'important');
+                    mov.style.setProperty('padding', '20px',   'important');
                 }
 
-                /* modal box: max-width */
+                /* modal box */
                 if (mod) {
                     mod.style.setProperty('max-width',  (W - 40) + 'px', 'important');
                     mod.style.setProperty('max-height', (H - 80) + 'px', 'important');
                 }
 
             } else {
-                /* মোবাইল: JS override সরাও */
-                var props = ['width','height','max-width','max-height','padding','border-radius'];
-                [ov, root, mov, mod].forEach(function(el) {
+                var props = ['width','height','max-width','max-height','padding',
+                             'border-radius','flex','flex-direction','min-height','overflow'];
+                [ov, root, mov, mod, right, msgs].forEach(function(el) {
                     if (!el) return;
                     props.forEach(function(p) { el.style.removeProperty(p); });
                 });
@@ -260,7 +294,6 @@
         function startWatching() {
             var ov = document.getElementById('tmv3-overlay');
             if (!ov) {
-                /* chat.js এখনো inject হয়নি — body watch করো */
                 new MutationObserver(function(_, obs) {
                     if (document.getElementById('tmv3-overlay')) {
                         obs.disconnect();
@@ -269,16 +302,14 @@
                 }).observe(document.body, { childList: true, subtree: true });
                 return;
             }
-
-            /* overlay class পরিবর্তন watch */
             new MutationObserver(function(mutations) {
                 mutations.forEach(function(m) {
                     if (m.attributeName === 'class' &&
                         m.target.id === 'tmv3-overlay' &&
                         m.target.classList.contains('open')) {
                         applyFix();
-                        setTimeout(applyFix, 30);
-                        setTimeout(applyFix, 150);
+                        setTimeout(applyFix, 50);
+                        setTimeout(applyFix, 200);
                     }
                 });
             }).observe(ov, { attributes: true });
