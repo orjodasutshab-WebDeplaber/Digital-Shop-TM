@@ -41,6 +41,8 @@
     let _mediaPreview = null;
     let _chatList     = []; // loaded chats
     let _unreadMap    = {}; // chatId -> count
+    let _lastMsgTsMap = {}; // chatId -> last known lastMsgTs (ms) — for background unread tracking
+    let _chatListReady = false; // first load হয়েছে কিনা
     let _activeTab    = 'all'; // all|unread|groups
 
     /* ══════════════════════════════════════════════════════════
@@ -234,7 +236,7 @@
 
 /* ══ Left Panel ══ */
 #tmv3-left {
-    width:375px; min-width:290px; max-width:400px;
+    width:390px; min-width:300px; max-width:420px;
     display:flex; flex-direction:column;
     background:#111b21;
     border-right:1px solid rgba(42,57,66,.8);
@@ -283,56 +285,55 @@
 
 /* Search Bar */
 .tmv3-search-wrap {
-    padding:12px 16px 8px;
+    padding:10px 12px 6px;
     flex-shrink:0;
 }
 .tmv3-search-bar {
     background:#202c33;
-    border-radius:14px;
-    display:flex; align-items:center; gap:12px; padding:13px 18px;
-    border:1.5px solid rgba(42,57,66,.7);
-    transition:border-color .2s, box-shadow .2s;
+    border-radius:30px;
+    display:flex; align-items:center; gap:10px; padding:11px 18px;
+    border:none;
+    transition:background .2s, box-shadow .2s;
 }
 .tmv3-search-bar:focus-within {
-    border-color:rgba(37,211,102,.5);
-    box-shadow:0 0 0 3px rgba(37,211,102,.10);
+    background:#2a3942;
+    box-shadow:0 0 0 2px rgba(37,211,102,.25);
 }
-.tmv3-search-bar i { color:#8696a0; font-size:16px; }
+.tmv3-search-bar i { color:#8696a0; font-size:16px; flex-shrink:0; }
 .tmv3-search-bar input {
     flex:1; background:none; border:none; outline:none;
     color:#e9edef; font-size:15px;
     font-family:inherit;
 }
 .tmv3-search-bar input::placeholder { color:#8696a0; }
-.is-mobile .tmv3-search-bar { padding:12px 18px; }
-.is-mobile .tmv3-search-bar i { font-size:20px; }
+.is-mobile .tmv3-search-bar { padding:13px 20px; }
+.is-mobile .tmv3-search-bar i { font-size:22px; }
 .is-mobile .tmv3-search-bar input { font-size:22px; }
 
 /* Filter tabs */
 .tmv3-tabs {
-    display:flex; gap:8px; padding:10px 16px 12px;
+    display:flex; gap:8px; padding:8px 12px 10px;
     flex-shrink:0; overflow-x:auto; scrollbar-width:none;
 }
 .tmv3-tabs::-webkit-scrollbar { display:none; }
 .tmv3-tab {
-    background:rgba(42,57,66,.25);
-    border:1.5px solid rgba(42,57,66,.5);
-    color:#aebac1; padding:7px 20px; border-radius:24px;
+    background:rgba(42,57,66,.4);
+    border:1.5px solid rgba(42,57,66,.6);
+    color:#aebac1; padding:7px 20px; border-radius:28px;
     cursor:pointer; font-size:13.5px; white-space:nowrap;
-    font-family:inherit; transition:all .2s; font-weight:600;
+    font-family:inherit; transition:all .18s; font-weight:500;
     letter-spacing:.2px;
 }
 .tmv3-tab.active {
-    background:linear-gradient(135deg,rgba(0,168,132,.25),rgba(0,168,132,.15));
-    color:#00a884; border-color:rgba(0,168,132,.5);
-    font-weight:700;
-    box-shadow:0 2px 10px rgba(0,168,132,.15);
+    background:rgba(37,211,102,.18);
+    color:#25d366; border-color:rgba(37,211,102,.5);
+    font-weight:600;
 }
 .tmv3-tab:hover:not(.active) {
-    background:rgba(42,57,66,.5); color:#e9edef;
-    border-color:rgba(42,57,66,.8);
+    background:rgba(42,57,66,.65); color:#e9edef;
+    border-color:rgba(42,57,66,.9);
 }
-.is-mobile .tmv3-tab { font-size:20px; padding:8px 22px; }
+.is-mobile .tmv3-tab { font-size:20px; padding:9px 24px; }
 
 /* Chat List */
 #tmv3-chat-list {
@@ -344,51 +345,62 @@
 
 .tmv3-chat-item {
     display:flex; align-items:center; gap:14px;
-    padding:13px 18px; cursor:pointer;
-    border-bottom:1px solid rgba(42,57,66,.3);
+    padding:10px 16px; cursor:pointer;
+    border-bottom:1px solid rgba(42,57,66,.25);
     transition:background .15s;
     position:relative;
 }
-.tmv3-chat-item:hover { background:rgba(32,44,51,.8); }
+.tmv3-chat-item:hover { background:rgba(32,44,51,.75); }
 .tmv3-chat-item.active { background:#2a3942; }
-/* active left accent */
 .tmv3-chat-item.active::before {
     content:''; position:absolute; left:0; top:50%; transform:translateY(-50%);
     width:3px; height:60%; background:#25d366; border-radius:0 3px 3px 0;
 }
 .tmv3-chat-item:active { background:#2a3942; }
-.is-mobile .tmv3-chat-item { padding:18px 24px; gap:18px; }
+.is-mobile .tmv3-chat-item { padding:14px 20px; gap:16px; }
 
 .tmv3-avatar {
-    width:52px; height:52px; border-radius:50%;
+    width:50px; height:50px; border-radius:50%;
     background:linear-gradient(135deg,#2a3942,#1a2d36);
     display:flex; align-items:center; justify-content:center;
     font-size:22px; color:#aebac1; flex-shrink:0;
     overflow:hidden; position:relative;
-    box-shadow:0 2px 8px rgba(0,0,0,.3);
+    box-shadow:0 1px 4px rgba(0,0,0,.35);
 }
 .tmv3-avatar img { width:100%; height:100%; object-fit:cover; }
-.tmv3-avatar.group { background:linear-gradient(135deg,#6b21a8,#4a1d96); font-size:20px; }
+.tmv3-avatar.group { background:linear-gradient(135deg,#566b76,#374f5a); font-size:22px; }
 .tmv3-avatar.public { background:linear-gradient(135deg,#00a884,#075e54); }
-.is-mobile .tmv3-avatar { width:72px; height:72px; font-size:30px; }
+.is-mobile .tmv3-avatar { width:58px; height:58px; font-size:26px; }
 
 .tmv3-chat-info { flex:1; min-width:0; }
-.tmv3-chat-name { color:#e9edef; font-size:15.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tmv3-chat-preview { color:#8696a0; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:3px; }
-.is-mobile .tmv3-chat-name { font-size:24px; }
-.is-mobile .tmv3-chat-preview { font-size:20px; }
-
-.tmv3-chat-meta { display:flex; flex-direction:column; align-items:flex-end; gap:5px; flex-shrink:0; }
-.tmv3-chat-time { color:#8696a0; font-size:11.5px; }
-.tmv3-unread-badge {
-    background:linear-gradient(135deg,#25d366,#1da851);
-    color:#111; font-size:11px; font-weight:800;
-    min-width:20px; height:20px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center; padding:0 4px;
-    box-shadow:0 2px 8px rgba(37,211,102,.35);
+.tmv3-chat-name {
+    color:#e9edef; font-size:16px; font-weight:500;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    line-height:1.3;
 }
-.is-mobile .tmv3-chat-time { font-size:18px; }
-.is-mobile .tmv3-unread-badge { font-size:18px; min-width:30px; height:30px; }
+.tmv3-chat-preview {
+    color:#8696a0; font-size:13.5px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    margin-top:2px; line-height:1.4;
+}
+.is-mobile .tmv3-chat-name { font-size:22px; }
+.is-mobile .tmv3-chat-preview { font-size:19px; }
+
+.tmv3-chat-meta {
+    display:flex; flex-direction:column; align-items:flex-end;
+    gap:5px; flex-shrink:0; min-width:52px;
+}
+.tmv3-chat-time { color:#8696a0; font-size:11.5px; white-space:nowrap; }
+.tmv3-unread-badge {
+    background:#25d366;
+    color:#111; font-size:11.5px; font-weight:700;
+    min-width:20px; height:20px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center; padding:0 5px;
+    line-height:1;
+}
+.tmv3-chat-item.active .tmv3-chat-time { color:#25d366; }
+.is-mobile .tmv3-chat-time { font-size:17px; }
+.is-mobile .tmv3-unread-badge { font-size:17px; min-width:28px; height:28px; padding:0 7px; }
 
 /* Bottom Nav (mobile only) */
 #tmv3-bottom-nav {
@@ -898,7 +910,7 @@
     <div class="tmv3-search-wrap">
       <div class="tmv3-search-bar">
         <i class="fa fa-search"></i>
-        <input id="tmv3-search" placeholder="নাম, মোবাইল বা জিমেইল দিয়ে খুঁজুন..." autocomplete="off">
+        <input id="tmv3-search" placeholder="Search or start new chat" autocomplete="off">
       </div>
     </div>
 
@@ -1224,12 +1236,36 @@
                             type: 'personal',
                             ...doc.data()
                         }));
-                        _chatList = [...groups, ...personals];
-                        _chatList.sort((a, b) => {
+                        const combined = [...groups, ...personals];
+                        combined.sort((a, b) => {
                             const ta = a.lastMsgTs ? (a.lastMsgTs.toDate ? a.lastMsgTs.toDate() : new Date(a.lastMsgTs)) : new Date(0);
                             const tb = b.lastMsgTs ? (b.lastMsgTs.toDate ? b.lastMsgTs.toDate() : new Date(b.lastMsgTs)) : new Date(0);
                             return tb - ta;
                         });
+
+                        if (!_chatListReady) {
+                            /* প্রথমবার লোড — সব চ্যাটের lastMsgTs মনে রাখো, count বাড়িও না */
+                            combined.forEach(chat => {
+                                const ts = chat.lastMsgTs ? (chat.lastMsgTs.toDate ? chat.lastMsgTs.toDate().getTime() : new Date(chat.lastMsgTs).getTime()) : 0;
+                                _lastMsgTsMap[chat.id] = ts;
+                            });
+                            _chatListReady = true;
+                        } else {
+                            /* পরবর্তী আপডেট — lastMsgTs বাড়লে unread count বাড়াও */
+                            combined.forEach(chat => {
+                                const ts = chat.lastMsgTs ? (chat.lastMsgTs.toDate ? chat.lastMsgTs.toDate().getTime() : new Date(chat.lastMsgTs).getTime()) : 0;
+                                const prevTs = _lastMsgTsMap[chat.id] || 0;
+                                if (ts > prevTs) {
+                                    _lastMsgTsMap[chat.id] = ts;
+                                    /* active chat হলে count বাড়াবো না — সে নিজে দেখছে */
+                                    if (!_activeChat || _activeChat.id !== chat.id) {
+                                        _unreadMap[chat.id] = (_unreadMap[chat.id] || 0) + 1;
+                                    }
+                                }
+                            });
+                        }
+
+                        _chatList = combined;
                         _renderChatList();
                     }, () => {});
             }, () => {});
@@ -1293,12 +1329,12 @@
             item.innerHTML = `
                 <div class="${avClass}">${avContent}</div>
                 <div class="tmv3-chat-info">
-                    <div class="tmv3-chat-name">${_esc(name)}</div>
-                    <div class="tmv3-chat-preview">${_esc(lastMsg)}</div>
+                    <div class="tmv3-chat-name" style="${unread > 0 ? 'font-weight:600;color:#e9edef;' : ''}">${_esc(name)}</div>
+                    <div class="tmv3-chat-preview" style="${unread > 0 ? 'color:#e9edef;font-weight:400;' : ''}">${_esc(lastMsg)}</div>
                 </div>
                 <div class="tmv3-chat-meta">
-                    <div class="tmv3-chat-time">${lastTs}</div>
-                    ${unread > 0 ? `<div class="tmv3-unread-badge">${unread > 9 ? '9+' : unread}</div>` : ''}
+                    <div class="tmv3-chat-time" style="${unread > 0 ? 'color:#25d366;font-weight:500;' : ''}">${lastTs}</div>
+                    ${unread > 0 ? `<div class="tmv3-unread-badge">${unread > 99 ? '99+' : unread}</div>` : ''}
                 </div>
             `;
 
@@ -1430,19 +1466,6 @@
         _unsubMsg = _getMessagesPath(chat)
             .orderBy('ts', 'asc').limitToLast(MAX_MSG)
             .onSnapshot(function (snap) {
-                /* নতুন message এলে unread count বাড়াও (first load বাদে) */
-                if (!_firstLoad) {
-                    snap.docChanges().forEach(change => {
-                        if (change.type === 'added') {
-                            const senderId = change.doc.data().senderId;
-                            /* নিজের message এ count বাড়বে না */
-                            if (_currentUser && String(senderId) !== String(_currentUser.id)) {
-                                _unreadMap[chat.id] = (_unreadMap[chat.id] || 0) + 1;
-                                _renderChatList();
-                            }
-                        }
-                    });
-                }
                 _firstLoad = false;
                 _renderMessages(snap.docs, chat);
                 _listenTyping(chat);
