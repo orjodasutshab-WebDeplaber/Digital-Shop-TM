@@ -1168,10 +1168,10 @@
         _currentUser = _getSessionUser();
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
 
-        /* ── PC fullscreen fix ──
-           viewport width=800 lock আছে তাই vw/vh কাজ করে না।
-           screen.availWidth/Height দিয়ে real pixel size নিই।  */
         if (!_isMobile) {
+            /* viewport=800 lock bypass:
+               screen.availWidth/Height = taskbar বাদে real pixel
+               উপরে gap নেই, দুই পাশে gap নেই, নিচে আগের মতো */
             const W = window.screen.availWidth;
             const H = window.screen.availHeight;
 
@@ -1183,10 +1183,10 @@
 
             const root = document.getElementById('tmv3-root');
             if (root) {
-                root.style.width     = W + 'px';
-                root.style.height    = H + 'px';
-                root.style.maxWidth  = 'none';
-                root.style.maxHeight = 'none';
+                root.style.width        = W + 'px';
+                root.style.height       = H + 'px';
+                root.style.maxWidth     = 'none';
+                root.style.borderRadius = '0';
             }
 
             const mov = document.getElementById('tmv3-modal-overlay');
@@ -1195,11 +1195,11 @@
                 mov.style.height = H + 'px';
             }
 
-            /* left panel height */
+            /* left panel */
             const lp = document.getElementById('tmv3-left');
             if (lp) lp.style.height = H + 'px';
 
-            /* right panel — flex column যাতে input area নিচে থাকে */
+            /* right panel — flex column */
             const rp = document.getElementById('tmv3-right');
             if (rp) {
                 rp.style.height        = H + 'px';
@@ -1208,7 +1208,7 @@
                 rp.style.overflow      = 'hidden';
             }
 
-            /* messages — flex:1 নিয়ে বাকি জায়গা নেবে */
+            /* messages flex:1 — input area সবসময় নিচে */
             const msgs = document.getElementById('tmv3-messages');
             if (msgs) {
                 msgs.style.flex      = '1';
@@ -1221,7 +1221,6 @@
 
         document.getElementById('tmv3-overlay').classList.add('open');
 
-        /* PC close বাটন */
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) {
             closeBtn.style.display = _isMobile ? 'none' : 'flex';
