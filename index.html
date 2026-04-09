@@ -134,21 +134,30 @@
 
     /* Search Bar — pill shape, full rounded */
     .tmv3-search-wrap {
-        padding:8px 14px 6px !important;
+        padding:10px 14px 6px !important;
     }
     .tmv3-search-bar {
         border-radius:50px !important;
         background:#202c33 !important;
-        padding:11px 18px !important;
-        min-height:46px !important;
-        border:none !important;
+        padding:10px 16px !important;
+        min-height:48px !important;
+        border:1.5px solid rgba(37,211,102,.5) !important;
+        transition:border-color .2s, box-shadow .2s !important;
     }
     .tmv3-search-bar:focus-within {
-        background:#2a3942 !important;
-        box-shadow:0 0 0 2px rgba(37,211,102,.25) !important;
+        background:#202c33 !important;
+        border-color:#25d366 !important;
+        box-shadow:0 0 0 2px rgba(37,211,102,.15) !important;
     }
     .tmv3-search-bar i { font-size:16px !important; color:#8696a0 !important; }
     .tmv3-search-bar input { font-size:15px !important; }
+    #tmv3-search-clear {
+        display:none; background:none; border:none;
+        color:#8696a0; font-size:17px; cursor:pointer;
+        padding:0 2px; flex-shrink:0; line-height:1;
+    }
+    #tmv3-search-clear:hover { color:#e9edef; }
+    #tmv3-search-clear.visible { display:block !important; }
 
     /* Tabs — WhatsApp pill style */
     .tmv3-tabs {

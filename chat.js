@@ -911,6 +911,7 @@
       <div class="tmv3-search-bar">
         <i class="fa fa-search"></i>
         <input id="tmv3-search" placeholder="Search or start new chat" autocomplete="off">
+        <button id="tmv3-search-clear" title="Clear"><i class="fa fa-times"></i></button>
       </div>
     </div>
 
@@ -1114,6 +1115,22 @@
         });
 
         /* Search */
+        /* Search clear button */
+        var _clearBtn = document.getElementById('tmv3-search-clear');
+        var _searchInp = document.getElementById('tmv3-search');
+        if (_clearBtn && _searchInp) {
+            _searchInp.addEventListener('input', function () {
+                _clearBtn.classList.toggle('visible', this.value.length > 0);
+            });
+            _clearBtn.addEventListener('click', function () {
+                _searchInp.value = '';
+                _clearBtn.classList.remove('visible');
+                _searchQuery = '';
+                _renderChatList();
+                _searchInp.focus();
+            });
+        }
+
         document.getElementById('tmv3-search').addEventListener('input', function () {
             _renderChatList(this.value);
         });
