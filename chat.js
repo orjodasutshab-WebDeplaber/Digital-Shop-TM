@@ -243,7 +243,7 @@
     flex-shrink:0;
     position:relative;
 }
-/* no top accent — clean WhatsApp style */
+/* no top accent */
 .is-mobile #tmv3-left {
     width:100%; max-width:100%;
     height:100%; position:absolute; inset:0; z-index:2;
@@ -253,46 +253,44 @@
 
 /* Left Header */
 #tmv3-left-header {
-    padding:14px 18px 12px;
+    padding:15px 16px 13px;
     display:flex; align-items:center; justify-content:space-between;
     background:#111b21;
-    flex-shrink:0; margin-top:3px;
+    flex-shrink:0; margin-top:0;
     border-bottom:none;
 }
 #tmv3-app-title {
     color:#e9edef; font-size:22px; font-weight:800;
     letter-spacing:-.2px;
-    -webkit-text-fill-color:#e9edef;
 }
 
 .tmv3-icon-btn {
     background:none; border:none; color:#aebac1; cursor:pointer;
     width:36px; height:36px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    font-size:18px; transition:.2s; flex-shrink:0;
+    font-size:19px; transition:.2s; flex-shrink:0;
     position:relative;
 }
 .tmv3-icon-btn:hover { background:rgba(42,57,66,.7); color:#e9edef; }
-.is-mobile .tmv3-icon-btn { width:52px; height:52px; font-size:24px; }
+.is-mobile .tmv3-icon-btn { width:54px; height:54px; font-size:25px; }
 .tmv3-header-actions { display:flex; align-items:center; gap:2px; }
 
 /* Search Bar */
 .tmv3-search-wrap {
-    padding:10px 14px 6px;
+    padding:8px 14px 6px;
     flex-shrink:0;
-    background:#111b21;
 }
 .tmv3-search-bar {
     background:#202c33;
     border-radius:50px;
-    display:flex; align-items:center; gap:10px; padding:10px 18px;
+    display:flex; align-items:center; gap:10px; padding:11px 18px;
     border:none;
     transition:background .2s, box-shadow .2s;
-    min-height:44px;
+    min-height:46px;
 }
 .tmv3-search-bar:focus-within {
     background:#2a3942;
-    box-shadow:0 0 0 2px rgba(37,211,102,.3);
+    box-shadow:0 0 0 2px rgba(37,211,102,.25);
 }
 .tmv3-search-bar i { color:#8696a0; font-size:16px; flex-shrink:0; }
 .tmv3-search-bar input {
@@ -301,20 +299,19 @@
     font-family:inherit;
 }
 .tmv3-search-bar input::placeholder { color:#8696a0; }
-.is-mobile .tmv3-search-bar { padding:13px 20px; min-height:52px; }
+.is-mobile .tmv3-search-bar { padding:13px 20px; }
 .is-mobile .tmv3-search-bar i { font-size:22px; }
 .is-mobile .tmv3-search-bar input { font-size:22px; }
 
 /* Filter tabs */
 .tmv3-tabs {
-    display:flex; gap:8px; padding:8px 14px 10px;
+    display:flex; gap:8px; padding:8px 14px 12px;
     flex-shrink:0; overflow-x:auto; scrollbar-width:none;
-    background:#111b21;
 }
 .tmv3-tabs::-webkit-scrollbar { display:none; }
 .tmv3-tab {
-    background:rgba(42,57,66,.4);
-    border:1.5px solid rgba(42,57,66,.55);
+    background:transparent;
+    border:1.5px solid rgba(130,150,160,.35);
     color:#aebac1; padding:7px 20px; border-radius:50px;
     cursor:pointer; font-size:13.5px; white-space:nowrap;
     font-family:inherit; transition:all .18s; font-weight:500;
@@ -322,11 +319,11 @@
 }
 .tmv3-tab.active {
     background:#25d366;
-    color:#111b21; border-color:#25d366;
+    color:#0b1a14; border-color:#25d366;
     font-weight:700;
 }
 .tmv3-tab:hover:not(.active) {
-    background:rgba(42,57,66,.75); color:#e9edef;
+    background:rgba(42,57,66,.55); color:#e9edef;
     border-color:rgba(42,57,66,.9);
 }
 .is-mobile .tmv3-tab { font-size:20px; padding:9px 26px; }
@@ -340,7 +337,7 @@
 #tmv3-chat-list::-webkit-scrollbar-thumb { background:#2a3942; border-radius:4px; }
 
 .tmv3-chat-item {
-    display:flex; align-items:center; gap:12px;
+    display:flex; align-items:center; gap:13px;
     padding:10px 16px 10px 14px; cursor:pointer;
     border-bottom:1px solid rgba(42,57,66,.18);
     transition:background .15s;
@@ -353,7 +350,7 @@
     width:3px; height:65%; background:#25d366; border-radius:0 3px 3px 0;
 }
 .tmv3-chat-item:active { background:#2a3942; }
-.is-mobile .tmv3-chat-item { padding:12px 20px; gap:14px; }
+.is-mobile .tmv3-chat-item { padding:12px 20px; gap:15px; }
 
 .tmv3-avatar {
     width:54px; height:54px; border-radius:50%;
@@ -373,7 +370,7 @@
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     line-height:1.35;
 }
-.tmv3-chat-name.has-unread { font-weight:700; color:#ffffff; }
+.tmv3-chat-name.has-unread { font-weight:700; }
 .tmv3-chat-preview {
     color:#8696a0; font-size:13.5px;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
@@ -385,20 +382,20 @@
 
 .tmv3-chat-meta {
     display:flex; flex-direction:column; align-items:flex-end;
-    gap:6px; flex-shrink:0; min-width:48px;
+    gap:5px; flex-shrink:0; min-width:50px;
 }
 .tmv3-chat-time { color:#8696a0; font-size:11.5px; white-space:nowrap; }
 .tmv3-chat-time.has-unread { color:#25d366; font-weight:500; }
 .tmv3-unread-badge {
     background:#25d366;
-    color:#111; font-size:11.5px; font-weight:700;
+    color:#0b1a14; font-size:11.5px; font-weight:700;
     min-width:20px; height:20px; border-radius:10px;
     display:flex; align-items:center; justify-content:center; padding:0 5px;
     line-height:1;
 }
 .tmv3-chat-item.active .tmv3-chat-time { color:#25d366; }
-.is-mobile .tmv3-chat-time { font-size:16px; }
-.is-mobile .tmv3-unread-badge { font-size:16px; min-width:26px; height:26px; padding:0 6px; }
+.is-mobile .tmv3-chat-time { font-size:17px; }
+.is-mobile .tmv3-unread-badge { font-size:17px; min-width:28px; height:28px; padding:0 7px; }
 
 /* Bottom Nav (mobile only) */
 #tmv3-bottom-nav {
@@ -1245,8 +1242,8 @@
                             /* প্রথমবার লোড — সব চ্যাটের lastMsgTs মনে রাখো, count বাড়িও না */
                             combined.forEach(chat => {
                                 const ts = chat.lastMsgTs ? (chat.lastMsgTs.toDate ? chat.lastMsgTs.toDate().getTime() : new Date(chat.lastMsgTs).getTime()) : 0;
-                                /* শুধু প্রথমবার set করো — পরে overwrite করো না */
-                                if (!(_lastMsgTsMap[chat.id] > 0)) {
+                                /* শুধু নতুন চ্যাটের জন্য set করো, আগে থেকে থাকলে overwrite না */
+                                if (_lastMsgTsMap[chat.id] === undefined) {
                                     _lastMsgTsMap[chat.id] = ts;
                                 }
                             });
