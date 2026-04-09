@@ -10,6 +10,9 @@
         function setScale(){
             var sw = window.screen.width;
             var dw = 800; // desktop reference width
+            // chat open থাকলে scale করবো না
+            var chatOv = document.getElementById('tmv3-overlay');
+            if(chatOv && chatOv.classList.contains('open')) return;
             if(sw < dw){
                 var scale = sw / dw;
                 var vp = document.querySelector('meta[name=viewport]');
@@ -17,6 +20,17 @@
             }
         }
         setScale();
+
+        /* chat open/close এ viewport toggle */
+        window._tmChatViewport = {
+            open: function(){
+                var vp = document.querySelector('meta[name=viewport]');
+                if(vp){ vp.content = 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no'; }
+            },
+            close: function(){
+                setScale();
+            }
+        };
         window.addEventListener('resize', setScale);
         // touch দিয়ে zoom পুরোপুরি বন্ধ
         document.addEventListener('touchmove', function(e){ if(e.touches.length > 1) e.preventDefault(); }, { passive: false });

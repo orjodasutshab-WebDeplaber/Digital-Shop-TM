@@ -185,11 +185,12 @@
 /* ══ Overlay ══ */
 #tmv3-overlay {
     display:none; position:fixed;
-    top:0; left:0;
+    top:0; left:0; right:0; bottom:0;
+    width:100vw; height:100vh;
     z-index:99999990;
     background:rgba(0,0,0,.85); backdrop-filter:blur(12px);
-    align-items:flex-start; justify-content:flex-start;
-    padding:0; overflow:hidden;
+    align-items:center; justify-content:center;
+    padding:0;
 }
 #tmv3-overlay.open { display:flex; }
 
@@ -218,14 +219,16 @@
 /* ══ Main Window ══ */
 #tmv3-root {
     background:#0b141a;
+    width:100vw; height:100vh;
+    max-width:none;
     border-radius:0;
     display:flex; overflow:hidden;
     box-shadow:0 40px 100px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.04);
     position:relative;
 }
 .is-mobile #tmv3-root {
-    width:100% !important;
-    height:100% !important;
+    width:100vw !important;
+    height:100dvh !important;
     border-radius:0 !important;
     flex-direction:column;
 }
@@ -605,7 +608,7 @@
     display:flex; align-items:flex-end; gap:10px;
     border-top:1px solid rgba(42,57,66,.6); flex-shrink:0;
     box-shadow:0 -2px 16px rgba(0,0,0,.2);
-    position:sticky; bottom:0; z-index:10;
+    position:sticky; bottom:0;
 }
 .is-mobile #tmv3-input-area { padding:16px 18px; gap:16px; }
 
@@ -773,7 +776,7 @@
 /* ══ Modal (Add Member / Create Group / Profile Edit) ══ */
 #tmv3-modal-overlay {
     display:none; position:fixed;
-    top:0; left:0;
+    top:0; left:0; width:100vw; height:100vh;
     z-index:999999995;
     background:rgba(0,0,0,.75); backdrop-filter:blur(6px);
     align-items:center; justify-content:center;
@@ -782,10 +785,10 @@
 #tmv3-modal-overlay.open { display:flex; }
 #tmv3-modal {
     background:#111b21; border-radius:18px;
-    width:500px; max-width:100%;
+    width:min(500px,100%); max-height:90vh;
     display:flex; flex-direction:column;
     box-shadow:0 30px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(42,57,66,.5);
-    overflow:hidden; margin:auto; flex-shrink:0;
+    overflow:hidden; margin:auto;
 }
 .tmv3-modal-head { background:linear-gradient(180deg,#1a2d36,#1f2c34); padding:14px 18px; display:flex; align-items:center; gap:12px; border-bottom:1px solid rgba(42,57,66,.6); flex-shrink:0; }
 .tmv3-modal-title { color:#e9edef; font-size:16px; font-weight:700; flex:1; }
@@ -1170,53 +1173,9 @@
         _currentUser = _getSessionUser();
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
 
-        if (!_isMobile) {
-            const W = window.screen.availWidth;
-            const H = window.screen.availHeight;
-
-            const ov = document.getElementById('tmv3-overlay');
-            if (ov) {
-                ov.style.width   = W + 'px';
-                ov.style.height  = H + 'px';
-                ov.style.top     = '0';
-                ov.style.left    = '0';
-                ov.style.padding = '0';
-            }
-
-            const root = document.getElementById('tmv3-root');
-            if (root) {
-                root.style.width         = W + 'px';
-                root.style.height        = H + 'px';
-                root.style.maxWidth      = 'none';
-                root.style.borderRadius  = '0';
-            }
-
-            const mov = document.getElementById('tmv3-modal-overlay');
-            if (mov) {
-                mov.style.width  = W + 'px';
-                mov.style.height = H + 'px';
-            }
-
-            const lp = document.getElementById('tmv3-left');
-            if (lp) lp.style.height = H + 'px';
-
-            const rp = document.getElementById('tmv3-right');
-            if (rp) {
-                rp.style.height        = H + 'px';
-                rp.style.display       = 'flex';
-                rp.style.flexDirection = 'column';
-                rp.style.overflow      = 'hidden';
-            }
-
-            /* messages flex:1 + min-height:0 = scroll কাজ করে */
-            const msgs = document.getElementById('tmv3-messages');
-            if (msgs) {
-                msgs.style.flex      = '1';
-                msgs.style.minHeight = '0';
-                msgs.style.overflowY = 'auto';
-                msgs.style.height    = 'auto';
-                msgs.style.maxHeight = 'none';
-            }
+        /* viewport lock reset — chat fullscreen এর জন্য */
+        if (!_isMobile && window._tmChatViewport) {
+            window._tmChatViewport.open();
         }
 
         document.getElementById('tmv3-overlay').classList.add('open');
@@ -1230,6 +1189,10 @@
 
     function _closeApp() {
         document.getElementById('tmv3-overlay').classList.remove('open');
+        /* viewport lock restore */
+        if (!_isMobile && window._tmChatViewport) {
+            window._tmChatViewport.close();
+        }
         _unsubscribeAll();
     }
 
