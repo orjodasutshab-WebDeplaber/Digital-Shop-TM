@@ -186,10 +186,10 @@
 #tmv3-overlay {
     display:none; position:fixed;
     top:0; left:0;
+    z-index:99999990;
     background:rgba(0,0,0,.85); backdrop-filter:blur(12px);
     align-items:center; justify-content:center;
-    z-index:99999990;
-    padding:0; overflow:hidden;
+    padding:0; overflow:hidden; box-sizing:border-box;
 }
 #tmv3-overlay.open { display:flex; }
 
@@ -221,12 +221,13 @@
     border-radius:0;
     display:flex; overflow:hidden;
     box-shadow:0 40px 100px rgba(0,0,0,.8);
-    position:relative;
-    flex-shrink:0;
+    position:relative; flex-shrink:0;
 }
 .is-mobile #tmv3-root {
+    width:100% !important;
+    height:100% !important;
     border-radius:0 !important;
-    flex-direction:column !important;
+    flex-direction:column;
 }
 
 /* ══ Left Panel ══ */
@@ -1166,36 +1167,33 @@
         _currentUser = _getSessionUser();
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
 
-        /* ── Viewport lock bypass ──
-           index.html এ width=800 lock আছে।
-           screen.width দিয়ে real pixel size বের করে
-           overlay ও root এ সেট করি।               */
         const ov   = document.getElementById('tmv3-overlay');
         const root = document.getElementById('tmv3-root');
         const mov  = document.getElementById('tmv3-modal-overlay');
 
         if (!_isMobile) {
-            const sw = window.screen.width;
-            const sh = window.screen.height;
-            /* viewport meta থেকে scale */
+            /* viewport scale বের করো */
             let scale = 1;
             const vpMeta = document.querySelector('meta[name=viewport]');
             if (vpMeta) {
                 const m = vpMeta.content.match(/initial-scale=([\d.]+)/);
                 if (m) scale = parseFloat(m[1]);
             }
-            const W = Math.round(sw / scale);
-            const H = Math.round(sh / scale);
+            /* availWidth/availHeight = taskbar বাদে real size */
+            const W = Math.round(window.screen.availWidth  / scale);
+            const H = Math.round(window.screen.availHeight / scale);
 
-            /* overlay: পুরো স্ক্রিন */
-            ov.style.width  = W + 'px';
-            ov.style.height = H + 'px';
+            /* overlay */
+            ov.style.cssText = 'width:' + W + 'px !important; height:' + H + 'px !important; top:0 !important; left:0 !important; padding:0 !important;';
 
-            /* root: পুরো স্ক্রিন */
-            root.style.width     = W + 'px';
-            root.style.height    = H + 'px';
-            root.style.maxWidth  = 'none';
-            root.style.maxHeight = 'none';
+            /* root */
+            if (root) {
+                root.style.width     = W + 'px';
+                root.style.height    = H + 'px';
+                root.style.maxWidth  = 'none';
+                root.style.maxHeight = 'none';
+                root.style.borderRadius = '0';
+            }
 
             /* modal overlay */
             if (mov) {
@@ -1203,30 +1201,31 @@
                 mov.style.height = H + 'px';
             }
 
-            /* right panel ও messages flex fix */
+            /* right panel — flex column, messages scroll করবে */
             const right = document.getElementById('tmv3-right');
             const msgs  = document.getElementById('tmv3-messages');
+            const left  = document.getElementById('tmv3-left');
             if (right) {
-                right.style.height        = H + 'px';
-                right.style.display       = 'flex';
-                right.style.flexDirection = 'column';
-                right.style.overflow      = 'hidden';
+                right.style.cssText = 'height:' + H + 'px; display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden; position:relative;';
             }
             if (msgs) {
                 msgs.style.flex      = '1';
                 msgs.style.minHeight = '0';
                 msgs.style.overflowY = 'auto';
+                msgs.style.height    = 'auto';
+            }
+            if (left) {
+                left.style.height = H + 'px';
             }
         } else {
             /* মোবাইল: JS style সরাও */
             [ov, root, mov].forEach(el => {
-                if (el) { el.style.width = ''; el.style.height = ''; }
+                if (el) { el.style.cssText = ''; }
             });
         }
 
         ov.classList.add('open');
 
-        /* PC close বাটন */
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) {
             closeBtn.style.display = _isMobile ? 'none' : 'flex';
