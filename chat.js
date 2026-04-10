@@ -629,14 +629,19 @@
     flex:1; background:#2a3942; border:1.5px solid rgba(42,57,66,.5); border-radius:26px;
     padding:10px 18px; color:#e9edef; font-size:14.5px;
     font-family:inherit; resize:none; outline:none;
-    max-height:120px; line-height:1.55; scrollbar-width:none;
+    min-height:44px; max-height:130px;
+    line-height:1.55; scrollbar-width:none;
+    overflow-y:auto; overflow-x:hidden;
+    word-wrap:break-word; word-break:break-word;
+    white-space:pre-wrap; box-sizing:border-box;
     transition:border-color .2s, box-shadow .2s;
 }
 #tmv3-msg-input:focus {
     border-color:rgba(37,211,102,.35);
     box-shadow:0 0 0 2px rgba(37,211,102,.1);
 }
-.is-mobile #tmv3-msg-input { font-size:24px; padding:16px 22px; border-radius:36px; }
+#tmv3-msg-input::-webkit-scrollbar { display:none; }
+.is-mobile #tmv3-msg-input { font-size:24px; padding:16px 22px; border-radius:36px; min-height:56px; }
 
 .tmv3-act-btn {
     background:none; border:none; color:#8696a0; font-size:22px;
@@ -1128,6 +1133,24 @@
             });
         }
 
+        /* Search clear button */
+        (function() {
+            var _clearBtn = document.getElementById('tmv3-search-clear');
+            var _searchInp = document.getElementById('tmv3-search');
+            if (_clearBtn && _searchInp) {
+                _searchInp.addEventListener('input', function () {
+                    _clearBtn.classList.toggle('visible', this.value.length > 0);
+                });
+                _clearBtn.addEventListener('click', function () {
+                    _searchInp.value = '';
+                    _clearBtn.classList.remove('visible');
+                    _searchQuery = '';
+                    _renderChatList();
+                    _searchInp.focus();
+                });
+            }
+        })();
+
         document.getElementById('tmv3-search').addEventListener('input', function () {
             _renderChatList(this.value);
         });
@@ -1139,7 +1162,7 @@
         const ta = document.getElementById('tmv3-msg-input');
         ta.addEventListener('input', function () {
             this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            this.style.height = Math.min(this.scrollHeight, 130) + 'px';
             _sendTyping();
         });
         ta.addEventListener('keydown', function (e) {
