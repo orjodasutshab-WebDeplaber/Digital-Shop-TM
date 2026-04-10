@@ -571,18 +571,21 @@
 }
 .is-mobile .tmv3-msg-text { font-size:22px; }
 
-/* time floats to bottom-right, text wraps around it */
+/* time float right — must be before text in DOM */
 .tmv3-msg-time {
     font-size:11px; color:rgba(233,237,239,.55);
-    display:inline-flex; align-items:center; gap:3px;
-    float:right; margin-left:8px; margin-top:3px;
-    vertical-align:bottom; line-height:1;
-    position:relative; bottom:0;
+    float:right;
+    margin-left:6px;
+    margin-bottom:-2px;
+    margin-top:2px;
+    line-height:1.2;
+    white-space:nowrap;
+    display:inline-flex; align-items:flex-end; gap:3px;
 }
 .is-mobile .tmv3-msg-time { font-size:17px; }
 .tmv3-tick { font-size:12px; color:rgba(233,237,239,.55); }
 .tmv3-tick.seen { color:#53bdeb; }
-/* clearfix for float */
+/* clearfix */
 .tmv3-msg-body::after { content:''; display:table; clear:both; }
 
 .tmv3-reply-quote {
@@ -1605,8 +1608,8 @@
             bubble.appendChild(img);
         }
 
-        /* time row — float right, stays inline with text */
-        const timeRow = document.createElement('div');
+        /* time — float RIGHT, must be added BEFORE text so float works */
+        const timeRow = document.createElement('span');
         timeRow.className = 'tmv3-msg-time';
         const ts = data.ts ? (data.ts.toDate ? data.ts.toDate() : new Date(data.ts)) : new Date();
         timeRow.textContent = _formatTime(ts);
@@ -1617,7 +1620,7 @@
             tick.textContent = ' ✓✓';
             timeRow.appendChild(tick);
         }
-        body.appendChild(timeRow);
+        body.appendChild(timeRow); /* float:right must come first in DOM */
 
         if (data.text) {
             const txt = document.createElement('span');
