@@ -739,67 +739,102 @@
 }
 #tmv3-side-panel.open { display:flex; }
 .is-mobile #tmv3-side-panel {
-    width:100%; position:absolute; inset:0; z-index:5;
-    display:none;
+    width:100%; position:absolute; inset:0; z-index:5; display:none;
 }
 .is-mobile #tmv3-side-panel.open { display:flex; }
 
+/* Header */
 .tmv3-sp-header {
-    background:linear-gradient(180deg,#1a2d36 0%,#1f2c34 100%);
-    padding:14px 18px;
+    background:#1f2c34;
+    padding:14px 16px;
     display:flex; align-items:center; gap:12px;
-    border-bottom:1px solid rgba(42,57,66,.6); flex-shrink:0;
+    border-bottom:1px solid rgba(42,57,66,.5); flex-shrink:0;
 }
-.tmv3-sp-title { color:#e9edef; font-size:16px; font-weight:700; flex:1; }
+.tmv3-sp-title { color:#e9edef; font-size:16px; font-weight:600; flex:1; }
 .is-mobile .tmv3-sp-title { font-size:26px; }
 
-.tmv3-sp-body { padding:20px; display:flex; flex-direction:column; gap:0; }
-.tmv3-sp-avatar-wrap { display:flex; justify-content:center; margin-bottom:16px; }
+/* Body */
+.tmv3-sp-body { padding:0; display:flex; flex-direction:column; gap:0; }
+
+/* Avatar section — green top bg like WhatsApp */
+.tmv3-sp-avatar-wrap {
+    display:flex; justify-content:center;
+    padding:32px 20px 20px;
+    background:linear-gradient(180deg,#1a2d36 0%,#111b21 100%);
+    margin-bottom:0;
+}
 .tmv3-sp-avatar {
     width:120px; height:120px; border-radius:50%;
     background:linear-gradient(135deg,#2a3942,#1a2d36);
     display:flex; align-items:center; justify-content:center;
     font-size:50px; color:#aebac1; overflow:hidden; cursor:pointer;
     position:relative;
-    box-shadow:0 6px 24px rgba(0,0,0,.4), 0 0 0 3px rgba(37,211,102,.2);
+    box-shadow:0 4px 20px rgba(0,0,0,.5), 0 0 0 3px rgba(37,211,102,.25);
 }
 .tmv3-sp-avatar img { width:100%; height:100%; object-fit:cover; }
-.tmv3-sp-avatar-edit { position:absolute; bottom:2px; right:2px; width:34px; height:34px; background:linear-gradient(135deg,#25d366,#128c7e); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff; box-shadow:0 2px 8px rgba(0,0,0,.3); }
+.tmv3-sp-avatar-edit {
+    position:absolute; bottom:2px; right:2px;
+    width:34px; height:34px;
+    background:#25d366; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; color:#111; box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
 
-.tmv3-sp-name { color:#e9edef; font-size:20px; font-weight:700; text-align:center; margin-bottom:4px; }
-.tmv3-sp-sub { color:#25d366; font-size:13px; text-align:center; margin-bottom:16px; font-weight:500; }
-.is-mobile .tmv3-sp-name { font-size:30px; }
-.is-mobile .tmv3-sp-sub { font-size:20px; }
+/* Name & email */
+.tmv3-sp-name {
+    color:#e9edef; font-size:20px; font-weight:700;
+    text-align:center; padding:14px 20px 2px;
+}
+.tmv3-sp-sub {
+    color:#25d366; font-size:13px; text-align:center;
+    padding:0 20px 16px; font-weight:500;
+}
+.is-mobile .tmv3-sp-name { font-size:28px; }
+.is-mobile .tmv3-sp-sub { font-size:19px; }
 
-.tmv3-sp-section { margin-bottom:0; }
+/* Info rows — card style */
+.tmv3-sp-section {
+    background:#1f2c34;
+    border-radius:10px;
+    margin:8px 12px;
+    overflow:hidden;
+}
 .tmv3-sp-row {
-    display:flex; align-items:center; gap:16px;
-    padding:14px 0; border-bottom:1px solid rgba(42,57,66,.5);
+    display:flex; align-items:center; gap:14px;
+    padding:14px 16px;
+    border-bottom:1px solid rgba(42,57,66,.35);
     color:#e9edef; font-size:14px; cursor:pointer;
     transition:background .15s;
 }
-.tmv3-sp-row:hover { background:rgba(42,57,66,.3); margin:0 -20px; padding:14px 20px; }
-.tmv3-sp-row i { color:#8696a0; width:20px; text-align:center; font-size:16px; flex-shrink:0; }
-.tmv3-sp-row .label { flex:1; }
+.tmv3-sp-row:last-child { border-bottom:none; }
+.tmv3-sp-row:hover { background:rgba(42,57,66,.5); }
+.tmv3-sp-row i { color:#25d366; width:22px; text-align:center; font-size:16px; flex-shrink:0; }
+.tmv3-sp-row .label { flex:1; color:#e9edef; font-size:14px; }
 .tmv3-sp-row .value { color:#8696a0; font-size:12px; }
-.is-mobile .tmv3-sp-row { font-size:22px; padding:20px 0; }
-.is-mobile .tmv3-sp-row i { font-size:24px; }
-.is-mobile .tmv3-sp-row .value { font-size:20px; }
-
+.is-mobile .tmv3-sp-row { font-size:22px; padding:18px 16px; }
+.is-mobile .tmv3-sp-row i { font-size:22px; width:28px; }
+.is-mobile .tmv3-sp-row .value { font-size:18px; }
 .tmv3-sp-row.danger { color:#ef4444; }
 .tmv3-sp-row.danger i { color:#ef4444; }
 
-.tmv3-bio-box { background:#1f2c34; border-radius:10px; padding:12px 16px; margin-bottom:16px; border:1px solid rgba(42,57,66,.4); }
+/* Section label */
+.tmv3-sp-section-label {
+    color:#25d366; font-size:12.5px; font-weight:600;
+    padding:14px 16px 6px; letter-spacing:.3px;
+    text-transform:uppercase;
+}
+
+.tmv3-bio-box { background:#1f2c34; border-radius:10px; padding:14px 16px; margin:8px 12px; }
 .tmv3-bio-box p { color:#e9edef; font-size:14px; line-height:1.6; }
 .is-mobile .tmv3-bio-box p { font-size:22px; }
 
 /* Toggle switch */
-.tmv3-toggle { position:relative; width:44px; height:26px; flex-shrink:0; }
+.tmv3-toggle { position:relative; width:50px; height:28px; flex-shrink:0; }
 .tmv3-toggle input { display:none; }
-.tmv3-toggle-slider { position:absolute; inset:0; background:#2a3942; border-radius:26px; cursor:pointer; transition:.3s; }
-.tmv3-toggle-slider::before { content:''; position:absolute; width:20px; height:20px; left:3px; bottom:3px; background:#aebac1; border-radius:50%; transition:.3s; }
+.tmv3-toggle-slider { position:absolute; inset:0; background:#374f5a; border-radius:28px; cursor:pointer; transition:.3s; }
+.tmv3-toggle-slider::before { content:''; position:absolute; width:22px; height:22px; left:3px; bottom:3px; background:#aebac1; border-radius:50%; transition:.3s; box-shadow:0 1px 3px rgba(0,0,0,.4); }
 .tmv3-toggle input:checked + .tmv3-toggle-slider { background:#25d366; }
-.tmv3-toggle input:checked + .tmv3-toggle-slider::before { transform:translateX(18px); background:#fff; }
+.tmv3-toggle input:checked + .tmv3-toggle-slider::before { transform:translateX(22px); background:#fff; }
 
 /* Member list */
 .tmv3-member-item {
@@ -2455,19 +2490,28 @@
                     ${mobile ? `<div class="tmv3-sp-row"><i class="fa fa-phone"></i><span class="label">${_esc(mobile)}</span></div>` : ''}
                 </div>
 
-                <div style="color:#8696a0;font-size:13px;padding:16px 0 8px;font-weight:600;">গোপনীয়তা সেটিং</div>
-                <div class="tmv3-sp-row" style="padding:14px 0;border-bottom:1px solid #2a3942;">
-                    <i class="fa fa-users" style="color:#8696a0;"></i>
-                    <div style="flex:1;"><div style="color:#e9edef;font-size:14px;">গ্রুপে যোগ ব্লক</div><div style="color:#8696a0;font-size:12px;">অন করলে কেউ আপনাকে গ্রুপে যোগ করতে পারবে না</div></div>
-                    <label class="tmv3-toggle"><input type="checkbox" id="pr-block-group" ${u.blockGroupAdd ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                <div class="tmv3-sp-section-label">গোপনীয়তা সেটিং</div>
+                <div class="tmv3-sp-section">
+                    <div class="tmv3-sp-row">
+                        <i class="fa fa-users"></i>
+                        <div style="flex:1;">
+                            <div style="font-size:14px;font-weight:500;">গ্রুপে যোগ ব্লক</div>
+                            <div style="color:#8696a0;font-size:12px;margin-top:2px;">অন করলে কেউ আপনাকে গ্রুপে যোগ করতে পারবে না</div>
+                        </div>
+                        <label class="tmv3-toggle"><input type="checkbox" id="pr-block-group" ${u.blockGroupAdd ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                    </div>
+                    <div class="tmv3-sp-row">
+                        <i class="fa fa-lock"></i>
+                        <div style="flex:1;">
+                            <div style="font-size:14px;font-weight:500;">একাউন্ট লক</div>
+                            <div style="color:#8696a0;font-size:12px;margin-top:2px;">অন করলে সার্চে আপনার একাউন্ট পাওয়া যাবে না</div>
+                        </div>
+                        <label class="tmv3-toggle"><input type="checkbox" id="pr-acc-lock" ${u.accountLocked ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                    </div>
                 </div>
-                <div class="tmv3-sp-row" style="padding:14px 0;border-bottom:1px solid #2a3942;">
-                    <i class="fa fa-lock" style="color:#8696a0;"></i>
-                    <div style="flex:1;"><div style="color:#e9edef;font-size:14px;">একাউন্ট লক</div><div style="color:#8696a0;font-size:12px;">অন করলে সার্চে আপনার একাউন্ট পাওয়া যাবে না</div></div>
-                    <label class="tmv3-toggle"><input type="checkbox" id="pr-acc-lock" ${u.accountLocked ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                <div style="padding:16px 12px 20px;">
+                    <button id="pr-save-btn" style="width:100%;padding:15px;background:#25d366;color:#111;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .2s;">সেভ করুন</button>
                 </div>
-                <div style="height:16px;"></div>
-                <button class="tmv3-btn primary" id="pr-save-btn" style="width:100%;">সেভ করুন</button>
             </div>
         `;
 
