@@ -542,10 +542,11 @@
 .is-mobile .tmv3-msg-av { width:48px; height:48px; font-size:18px; }
 
 .tmv3-bubble {
-    padding:7px 10px 5px 10px;
+    padding:6px 10px 4px 10px;
     border-radius:8px;
     position:relative; word-break:break-word; max-width:100%;
     box-shadow:0 1px 2px rgba(0,0,0,.3);
+    display:inline-block;
 }
 .tmv3-msg-wrap.own .tmv3-bubble {
     background:#005c4b;
@@ -555,38 +556,30 @@
     background:#1f2c34;
     border-radius:8px 8px 8px 2px; color:#e9edef;
 }
-.is-mobile .tmv3-bubble { padding:9px 13px 6px 13px; }
+.is-mobile .tmv3-bubble { padding:8px 12px 5px 12px; }
 
-.tmv3-sender { font-size:12.5px; font-weight:700; margin-bottom:2px; }
+.tmv3-sender { font-size:12.5px; font-weight:700; margin-bottom:3px; display:block; }
 .is-mobile .tmv3-sender { font-size:20px; }
 
-/* text + time inline — WhatsApp style */
-.tmv3-msg-body {
-    display:block;
-}
+.tmv3-msg-body { display:block; }
+
 .tmv3-msg-text {
     font-size:14.5px; line-height:1.5; white-space:pre-wrap;
-    word-break:break-word;
-    display:inline;
+    word-break:break-word; display:block;
+    margin-bottom:2px;
 }
 .is-mobile .tmv3-msg-text { font-size:22px; }
 
-/* time float right — must be before text in DOM */
+/* time — bottom right, own line */
 .tmv3-msg-time {
     font-size:11px; color:rgba(233,237,239,.55);
-    float:right;
-    margin-left:6px;
-    margin-bottom:-2px;
-    margin-top:2px;
-    line-height:1.2;
+    display:flex; align-items:center; justify-content:flex-end;
+    gap:3px; line-height:1; margin-top:1px;
     white-space:nowrap;
-    display:inline-flex; align-items:flex-end; gap:3px;
 }
 .is-mobile .tmv3-msg-time { font-size:17px; }
 .tmv3-tick { font-size:12px; color:rgba(233,237,239,.55); }
 .tmv3-tick.seen { color:#53bdeb; }
-/* clearfix */
-.tmv3-msg-body::after { content:''; display:table; clear:both; }
 
 .tmv3-reply-quote {
     background:rgba(0,0,0,.3); border-left:3px solid #25d366;
@@ -1608,8 +1601,15 @@
             bubble.appendChild(img);
         }
 
-        /* time — float RIGHT, must be added BEFORE text so float works */
-        const timeRow = document.createElement('span');
+        if (data.text) {
+            const txt = document.createElement('div');
+            txt.className = 'tmv3-msg-text';
+            txt.textContent = data.text;
+            body.appendChild(txt);
+        }
+
+        /* time row — below text, aligned right */
+        const timeRow = document.createElement('div');
         timeRow.className = 'tmv3-msg-time';
         const ts = data.ts ? (data.ts.toDate ? data.ts.toDate() : new Date(data.ts)) : new Date();
         timeRow.textContent = _formatTime(ts);
@@ -1620,14 +1620,7 @@
             tick.textContent = ' ✓✓';
             timeRow.appendChild(tick);
         }
-        body.appendChild(timeRow); /* float:right must come first in DOM */
-
-        if (data.text) {
-            const txt = document.createElement('span');
-            txt.className = 'tmv3-msg-text';
-            txt.textContent = data.text;
-            body.appendChild(txt);
-        }
+        body.appendChild(timeRow);
 
         bubble.appendChild(body);
 
