@@ -542,34 +542,48 @@
 .is-mobile .tmv3-msg-av { width:48px; height:48px; font-size:18px; }
 
 .tmv3-bubble {
-    padding:9px 13px; border-radius:14px;
+    padding:7px 10px 5px 10px;
+    border-radius:8px;
     position:relative; word-break:break-word; max-width:100%;
-    box-shadow:0 2px 6px rgba(0,0,0,.25);
-    transition:box-shadow .15s;
+    box-shadow:0 1px 2px rgba(0,0,0,.3);
 }
-.tmv3-bubble:hover { box-shadow:0 4px 12px rgba(0,0,0,.35); }
 .tmv3-msg-wrap.own .tmv3-bubble {
-    background:linear-gradient(135deg,#005c4b,#00695c);
-    border-bottom-right-radius:4px; color:#e9edef;
+    background:#005c4b;
+    border-radius:8px 8px 2px 8px; color:#e9edef;
 }
 .tmv3-msg-wrap.other .tmv3-bubble {
-    background:#1f2c34; border-bottom-left-radius:4px; color:#e9edef;
-    border:1px solid rgba(42,57,66,.4);
+    background:#1f2c34;
+    border-radius:8px 8px 8px 2px; color:#e9edef;
 }
-.is-mobile .tmv3-bubble { padding:12px 18px; border-radius:18px; }
+.is-mobile .tmv3-bubble { padding:9px 13px 6px 13px; }
 
-.tmv3-sender { font-size:12.5px; font-weight:700; margin-bottom:4px; }
+.tmv3-sender { font-size:12.5px; font-weight:700; margin-bottom:2px; }
 .is-mobile .tmv3-sender { font-size:20px; }
 
-.tmv3-msg-text { font-size:14.5px; line-height:1.55; white-space:pre-wrap; }
-.is-mobile .tmv3-msg-text { font-size:24px; }
-
-.tmv3-msg-time {
-    font-size:11px; color:rgba(233,237,239,.5); text-align:right;
-    margin-top:4px; display:flex; align-items:center; justify-content:flex-end; gap:4px;
+/* text + time inline — WhatsApp style */
+.tmv3-msg-body {
+    display:block;
 }
-.is-mobile .tmv3-msg-time { font-size:18px; }
+.tmv3-msg-text {
+    font-size:14.5px; line-height:1.5; white-space:pre-wrap;
+    word-break:break-word;
+    display:inline;
+}
+.is-mobile .tmv3-msg-text { font-size:22px; }
+
+/* time floats to bottom-right, text wraps around it */
+.tmv3-msg-time {
+    font-size:11px; color:rgba(233,237,239,.55);
+    display:inline-flex; align-items:center; gap:3px;
+    float:right; margin-left:8px; margin-top:3px;
+    vertical-align:bottom; line-height:1;
+    position:relative; bottom:0;
+}
+.is-mobile .tmv3-msg-time { font-size:17px; }
+.tmv3-tick { font-size:12px; color:rgba(233,237,239,.55); }
 .tmv3-tick.seen { color:#53bdeb; }
+/* clearfix for float */
+.tmv3-msg-body::after { content:''; display:table; clear:both; }
 
 .tmv3-reply-quote {
     background:rgba(0,0,0,.3); border-left:3px solid #25d366;
@@ -1579,6 +1593,10 @@
             bubble.appendChild(q);
         }
 
+        /* body div — text + time inline like WhatsApp */
+        const body = document.createElement('div');
+        body.className = 'tmv3-msg-body';
+
         if (data.imgData) {
             const img = document.createElement('img');
             img.className = 'tmv3-msg-img';
@@ -1587,13 +1605,7 @@
             bubble.appendChild(img);
         }
 
-        if (data.text) {
-            const txt = document.createElement('div');
-            txt.className = 'tmv3-msg-text';
-            txt.textContent = data.text;
-            bubble.appendChild(txt);
-        }
-
+        /* time row — float right, stays inline with text */
         const timeRow = document.createElement('div');
         timeRow.className = 'tmv3-msg-time';
         const ts = data.ts ? (data.ts.toDate ? data.ts.toDate() : new Date(data.ts)) : new Date();
@@ -1602,10 +1614,19 @@
             const seen = data.seenBy && data.seenBy.length > 1;
             const tick = document.createElement('span');
             tick.className = 'tmv3-tick' + (seen ? ' seen' : '');
-            tick.textContent = '✓✓';
+            tick.textContent = ' ✓✓';
             timeRow.appendChild(tick);
         }
-        bubble.appendChild(timeRow);
+        body.appendChild(timeRow);
+
+        if (data.text) {
+            const txt = document.createElement('span');
+            txt.className = 'tmv3-msg-text';
+            txt.textContent = data.text;
+            body.appendChild(txt);
+        }
+
+        bubble.appendChild(body);
 
         wrap.appendChild(isOwn ? bubble : av);
         wrap.appendChild(isOwn ? av : bubble);
