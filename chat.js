@@ -277,6 +277,8 @@
     background:linear-gradient(135deg,#e9edef,#aebac1);
     -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
 }
+.is-mobile #tmv3-app-title { font-size:32px; }
+.is-mobile #tmv3-left-header { padding:20px 20px 16px; }
 
 .tmv3-icon-btn {
     background:none; border:none; color:#aebac1; cursor:pointer;
@@ -286,35 +288,105 @@
     position:relative;
 }
 .tmv3-icon-btn:hover { background:rgba(42,57,66,.7); color:#e9edef; transform:scale(1.08); }
-.is-mobile .tmv3-icon-btn { width:56px; height:56px; font-size:26px; }
+.is-mobile .tmv3-icon-btn { width:60px; height:60px; font-size:28px; }
 .tmv3-header-actions { display:flex; align-items:center; gap:4px; }
 
 /* Search Bar */
 .tmv3-search-wrap {
-    padding:10px 12px 6px;
+    padding:10px 14px 6px;
     flex-shrink:0;
+    position:relative;
 }
 .tmv3-search-bar {
     background:#202c33;
     border-radius:30px;
     display:flex; align-items:center; gap:10px; padding:11px 18px;
-    border:none;
-    transition:background .2s, box-shadow .2s;
+    border:1.5px solid transparent;
+    transition:background .2s, box-shadow .2s, border-color .2s;
 }
 .tmv3-search-bar:focus-within {
-    background:#2a3942;
-    box-shadow:0 0 0 2px rgba(37,211,102,.25);
+    background:#1a2631;
+    box-shadow:0 0 0 3px rgba(37,211,102,.2);
+    border-color:rgba(37,211,102,.35);
 }
-.tmv3-search-bar i { color:#8696a0; font-size:16px; flex-shrink:0; }
+.tmv3-search-bar i { color:#25d366; font-size:16px; flex-shrink:0; }
 .tmv3-search-bar input {
     flex:1; background:none; border:none; outline:none;
     color:#e9edef; font-size:15px;
     font-family:inherit;
 }
 .tmv3-search-bar input::placeholder { color:#8696a0; }
-.is-mobile .tmv3-search-bar { padding:13px 20px; }
-.is-mobile .tmv3-search-bar i { font-size:22px; }
-.is-mobile .tmv3-search-bar input { font-size:22px; }
+.is-mobile .tmv3-search-wrap { padding:12px 16px 8px; }
+.is-mobile .tmv3-search-bar {
+    padding:16px 22px;
+    border-radius:40px;
+    background:#1f2c34;
+    border:1.5px solid rgba(37,211,102,.2);
+    gap:14px;
+}
+.is-mobile .tmv3-search-bar:focus-within {
+    border-color:rgba(37,211,102,.5);
+    box-shadow:0 0 0 4px rgba(37,211,102,.12);
+}
+.is-mobile .tmv3-search-bar i { font-size:26px; }
+.is-mobile .tmv3-search-bar input { font-size:24px; }
+
+/* User Search Results dropdown */
+#tmv3-user-search-results {
+    display:none;
+    background:#111b21;
+    border-radius:14px;
+    margin-top:8px;
+    overflow:hidden;
+    border:1px solid rgba(37,211,102,.2);
+    box-shadow:0 8px 32px rgba(0,0,0,.5);
+    max-height:360px;
+    overflow-y:auto;
+}
+.tmv3-usr-srch-label {
+    padding:10px 16px 6px;
+    color:#25d366; font-size:12px; font-weight:700;
+    letter-spacing:.5px; text-transform:uppercase;
+    border-bottom:1px solid rgba(42,57,66,.5);
+}
+.tmv3-usr-srch-item {
+    display:flex; align-items:center; gap:12px;
+    padding:12px 16px;
+    cursor:pointer; transition:background .15s;
+    border-bottom:1px solid rgba(42,57,66,.25);
+}
+.tmv3-usr-srch-item:last-child { border-bottom:none; }
+.tmv3-usr-srch-item:hover, .tmv3-usr-srch-item:active { background:rgba(37,211,102,.08); }
+.tmv3-usr-srch-av {
+    width:44px; height:44px; border-radius:50%;
+    background:#1f2c34; display:flex; align-items:center;
+    justify-content:center; font-size:20px; flex-shrink:0;
+    overflow:hidden; border:2px solid rgba(37,211,102,.2);
+}
+.tmv3-usr-srch-av img { width:100%; height:100%; object-fit:cover; }
+.tmv3-usr-srch-info { flex:1; min-width:0; }
+.tmv3-usr-srch-name { color:#e9edef; font-size:15px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tmv3-usr-srch-sub { color:#8696a0; font-size:12px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tmv3-usr-srch-action {
+    color:#25d366; font-size:12px; font-weight:600; white-space:nowrap;
+    background:rgba(37,211,102,.1); padding:6px 12px; border-radius:20px;
+    border:1px solid rgba(37,211,102,.2); flex-shrink:0;
+}
+.tmv3-usr-search-loading {
+    padding:16px; color:#8696a0; font-size:14px; text-align:center;
+}
+/* Mobile user search results — bigger */
+.is-mobile #tmv3-user-search-results {
+    border-radius:16px; margin-top:10px;
+    max-height:420px;
+}
+.is-mobile .tmv3-usr-srch-label { font-size:16px; padding:14px 20px 8px; }
+.is-mobile .tmv3-usr-srch-item { padding:16px 20px; gap:16px; }
+.is-mobile .tmv3-usr-srch-av { width:56px; height:56px; font-size:26px; }
+.is-mobile .tmv3-usr-srch-name { font-size:22px; }
+.is-mobile .tmv3-usr-srch-sub { font-size:16px; }
+.is-mobile .tmv3-usr-srch-action { font-size:16px; padding:8px 16px; }
+.is-mobile .tmv3-usr-search-loading { font-size:20px; padding:22px; }
 
 /* Filter tabs */
 .tmv3-tabs {
@@ -338,8 +410,10 @@
 .tmv3-tab:hover:not(.active) {
     background:rgba(42,57,66,.65); color:#e9edef;
     border-color:rgba(42,57,66,.9);
+
 }
-.is-mobile .tmv3-tab { font-size:20px; padding:9px 24px; }
+.is-mobile .tmv3-tabs { padding:10px 16px 12px; gap:10px; }
+.is-mobile .tmv3-tab { font-size:22px; padding:12px 28px; border-radius:35px; border-width:2px; }
 
 /* Chat List */
 #tmv3-chat-list {
@@ -363,7 +437,7 @@
     width:3px; height:60%; background:#25d366; border-radius:0 3px 3px 0;
 }
 .tmv3-chat-item:active { background:#2a3942; }
-.is-mobile .tmv3-chat-item { padding:14px 20px; gap:16px; }
+.is-mobile .tmv3-chat-item { padding:18px 20px; gap:18px; }
 
 .tmv3-avatar {
     width:50px; height:50px; border-radius:50%;
@@ -376,7 +450,7 @@
 .tmv3-avatar img { width:100%; height:100%; object-fit:cover; }
 .tmv3-avatar.group { background:linear-gradient(135deg,#566b76,#374f5a); font-size:22px; }
 .tmv3-avatar.public { background:linear-gradient(135deg,#00a884,#075e54); }
-.is-mobile .tmv3-avatar { width:58px; height:58px; font-size:26px; }
+.is-mobile .tmv3-avatar { width:64px; height:64px; font-size:28px; }
 
 .tmv3-chat-info { flex:1; min-width:0; }
 .tmv3-chat-name {
@@ -389,8 +463,8 @@
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     margin-top:2px; line-height:1.4;
 }
-.is-mobile .tmv3-chat-name { font-size:22px; }
-.is-mobile .tmv3-chat-preview { font-size:19px; }
+.is-mobile .tmv3-chat-name { font-size:24px; font-weight:600; }
+.is-mobile .tmv3-chat-preview { font-size:20px; margin-top:4px; }
 
 .tmv3-chat-meta {
     display:flex; flex-direction:column; align-items:flex-end;
@@ -405,8 +479,8 @@
     line-height:1;
 }
 .tmv3-chat-item.active .tmv3-chat-time { color:#25d366; }
-.is-mobile .tmv3-chat-time { font-size:17px; }
-.is-mobile .tmv3-unread-badge { font-size:17px; min-width:28px; height:28px; padding:0 7px; }
+.is-mobile .tmv3-chat-time { font-size:18px; }
+.is-mobile .tmv3-unread-badge { font-size:18px; min-width:30px; height:30px; padding:0 8px; }
 
 /* Bottom Nav (mobile only) */
 #tmv3-bottom-nav {
@@ -417,12 +491,12 @@
 .is-mobile #tmv3-bottom-nav { display:flex; }
 .tmv3-nav-btn {
     flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:14px 0; color:#aebac1; cursor:pointer;
+    padding:16px 0; color:#aebac1; cursor:pointer;
     font-size:10px; gap:6px; border:none; background:none; font-family:inherit;
     transition:.2s;
 }
-.tmv3-nav-btn i { font-size:22px; }
-.tmv3-nav-btn span { font-size:16px; }
+.tmv3-nav-btn i { font-size:26px; }
+.tmv3-nav-btn span { font-size:18px; font-weight:500; }
 .tmv3-nav-btn.active { color:#25d366; }
 
 /* ══ Right Panel ══ */
@@ -467,7 +541,7 @@
     cursor:pointer;
     box-shadow:0 2px 12px rgba(0,0,0,.2);
 }
-.is-mobile #tmv3-chat-header { padding:18px 20px; }
+.is-mobile #tmv3-chat-header { padding:20px 18px; }
 
 #tmv3-back-btn {
     display:none; background:none; border:none;
@@ -482,10 +556,24 @@
 #tmv3-header-info { flex:1; min-width:0; pointer-events:none; }
 #tmv3-header-name { color:#e9edef; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 #tmv3-header-sub { color:#00a884; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; }
-.is-mobile #tmv3-header-name { font-size:26px; }
-.is-mobile #tmv3-header-sub { font-size:20px; }
+.is-mobile #tmv3-header-name { font-size:28px; }
+.is-mobile #tmv3-header-sub { font-size:21px; }
 
-.tmv3-header-actions-right { display:flex; align-items:center; gap:2px; }
+.tmv3-header-actions-right { display:flex; align-items:center; gap:4px; }
+
+/* Mobile close button (X) in chat header */
+#tmv3-chat-close-btn {
+    display:none;
+    background:linear-gradient(135deg,#ef4444,#dc2626);
+    border:2px solid rgba(255,255,255,0.9);
+    color:#fff; font-size:18px; font-weight:700;
+    width:42px; height:42px; border-radius:50%;
+    align-items:center; justify-content:center; flex-shrink:0;
+    cursor:pointer; transition:all .2s;
+    box-shadow:0 3px 12px rgba(239,68,68,.5);
+}
+#tmv3-chat-close-btn:active { transform:scale(0.9); }
+.is-mobile #tmv3-chat-close-btn { display:flex; }
 
 /* 3-dot dropdown */
 .tmv3-dropdown { position:relative; }
@@ -514,7 +602,7 @@
 }
 .tmv3-dropdown-item:hover i { color:#e9edef; }
 .tmv3-dropdown-item.danger i { color:#ef4444; }
-.is-mobile .tmv3-dropdown-item { font-size:22px; padding:18px 26px; gap:18px; }
+.is-mobile .tmv3-dropdown-item { font-size:24px; padding:20px 28px; gap:20px; }
 
 /* Messages area */
 #tmv3-messages {
@@ -569,13 +657,13 @@
     border-radius:8px 8px 8px 2px !important;
     color:#e9edef !important;
 }
-.is-mobile .tmv3-bubble { padding:10px 14px 7px 14px !important; }
+.is-mobile .tmv3-bubble { padding:12px 16px 8px 16px !important; }
 
 .tmv3-sender {
     font-size:12.5px !important; font-weight:700 !important;
     margin-bottom:3px !important; display:block !important;
 }
-.is-mobile .tmv3-sender { font-size:20px !important; }
+.is-mobile .tmv3-sender { font-size:21px !important; }
 
 .tmv3-msg-body { display:block !important; }
 
@@ -585,7 +673,7 @@
     display:block !important; margin-bottom:4px !important;
     padding:0 !important;
 }
-.is-mobile .tmv3-msg-text { font-size:22px !important; }
+.is-mobile .tmv3-msg-text { font-size:24px !important; line-height:1.5 !important; }
 
 /* time — right aligned, below text */
 .tmv3-msg-time {
@@ -596,7 +684,7 @@
     white-space:nowrap !important;
     padding:0 !important; margin-top:2px !important;
 }
-.is-mobile .tmv3-msg-time { font-size:17px !important; }
+.is-mobile .tmv3-msg-time { font-size:18px !important; }
 .tmv3-tick { font-size:12px; color:rgba(233,237,239,.55); }
 .tmv3-tick.seen { color:#53bdeb; }
 
@@ -652,7 +740,7 @@
     box-shadow:0 -2px 16px rgba(0,0,0,.2);
     position:sticky; bottom:0;
 }
-.is-mobile #tmv3-input-area { padding:16px 18px; gap:16px; }
+.is-mobile #tmv3-input-area { padding:16px 18px 22px; gap:16px; }
 
 #tmv3-msg-input {
     flex:1; background:#2a3942; border:1.5px solid rgba(42,57,66,.5); border-radius:26px;
@@ -670,7 +758,7 @@
     box-shadow:0 0 0 2px rgba(37,211,102,.1);
 }
 #tmv3-msg-input::-webkit-scrollbar { display:none; }
-.is-mobile #tmv3-msg-input { font-size:24px; padding:16px 22px; border-radius:36px; min-height:56px; }
+.is-mobile #tmv3-msg-input { font-size:25px; padding:18px 24px; border-radius:40px; min-height:60px; }
 
 .tmv3-act-btn {
     background:none; border:none; color:#8696a0; font-size:22px;
@@ -689,7 +777,7 @@
     box-shadow:0 4px 16px rgba(37,211,102,.4);
 }
 #tmv3-send-btn:hover { transform:scale(1.08); box-shadow:0 6px 22px rgba(37,211,102,.5); }
-.is-mobile #tmv3-send-btn { width:68px; height:68px; font-size:28px; }
+.is-mobile #tmv3-send-btn { width:72px; height:72px; font-size:30px; }
 
 /* Scroll down btn */
 #tmv3-scroll-down {
@@ -751,7 +839,8 @@
     border-bottom:1px solid rgba(42,57,66,.5); flex-shrink:0;
 }
 .tmv3-sp-title { color:#e9edef; font-size:16px; font-weight:600; flex:1; }
-.is-mobile .tmv3-sp-title { font-size:26px; }
+.is-mobile .tmv3-sp-title { font-size:30px; }
+.is-mobile .tmv3-sp-header { padding:20px 18px; gap:16px; }
 
 /* Body */
 .tmv3-sp-body { padding:0; display:flex; flex-direction:column; gap:0; }
@@ -789,8 +878,8 @@
     color:#25d366; font-size:13px; text-align:center;
     padding:0 20px 16px; font-weight:500;
 }
-.is-mobile .tmv3-sp-name { font-size:28px; }
-.is-mobile .tmv3-sp-sub { font-size:19px; }
+.is-mobile .tmv3-sp-name { font-size:32px; }
+.is-mobile .tmv3-sp-sub { font-size:22px; }
 
 /* Info rows — card style */
 .tmv3-sp-section {
@@ -811,9 +900,9 @@
 .tmv3-sp-row i { color:#25d366; width:22px; text-align:center; font-size:16px; flex-shrink:0; }
 .tmv3-sp-row .label { flex:1; color:#e9edef; font-size:14px; }
 .tmv3-sp-row .value { color:#8696a0; font-size:12px; }
-.is-mobile .tmv3-sp-row { font-size:22px; padding:18px 16px; }
-.is-mobile .tmv3-sp-row i { font-size:22px; width:28px; }
-.is-mobile .tmv3-sp-row .value { font-size:18px; }
+.is-mobile .tmv3-sp-row { font-size:24px; padding:20px 18px; }
+.is-mobile .tmv3-sp-row i { font-size:24px; width:30px; }
+.is-mobile .tmv3-sp-row .value { font-size:20px; }
 .tmv3-sp-row.danger { color:#ef4444; }
 .tmv3-sp-row.danger i { color:#ef4444; }
 
@@ -851,9 +940,9 @@
 .tmv3-member-badge { background:rgba(37,211,102,.15); color:#25d366; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; flex-shrink:0; border:1px solid rgba(37,211,102,.3); }
 .tmv3-member-del { background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.2s; }
 .tmv3-member-del:hover { background:rgba(239,68,68,.15); }
-.is-mobile .tmv3-member-item { padding:18px 0; }
-.is-mobile .tmv3-member-name { font-size:22px; }
-.is-mobile .tmv3-member-sub { font-size:18px; }
+.is-mobile .tmv3-member-item { padding:20px 0; gap:16px; }
+.is-mobile .tmv3-member-name { font-size:25px; font-weight:600; }
+.is-mobile .tmv3-member-sub { font-size:19px; }
 
 /* ══ Modal (Add Member / Create Group / Profile Edit) ══ */
 #tmv3-modal-overlay {
@@ -977,6 +1066,7 @@
         <input id="tmv3-search" placeholder="Search or start new chat" autocomplete="off">
         <button id="tmv3-search-clear" title="Clear"><i class="fa fa-times"></i></button>
       </div>
+      <div id="tmv3-user-search-results"></div>
     </div>
 
     <!-- Tabs -->
@@ -1031,6 +1121,7 @@
             <div class="tmv3-dropdown-item danger" id="tmv3-btn-delete-chat"><i class="fa fa-trash"></i> Delete Chat</div>
           </div>
         </div>
+        <button id="tmv3-chat-close-btn" title="বন্ধ করুন">✕</button>
       </div>
     </div>
 
@@ -1122,6 +1213,12 @@
         /* Back btn (mobile) */
         document.getElementById('tmv3-back-btn').addEventListener('click', _closeActiveChat);
 
+        /* Mobile close btn (X) next to 3dot */
+        document.getElementById('tmv3-chat-close-btn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            _closeActiveChat();
+        });
+
         /* Left 3-dot menu */
         document.getElementById('tmv3-left-3dot').addEventListener('click', function (e) {
             e.stopPropagation();
@@ -1193,6 +1290,7 @@
                 _clearBtn.classList.remove('visible');
                 _searchQuery = '';
                 _renderChatList();
+                _hideUserSearchResults();
                 _searchInp.focus();
             });
         }
@@ -1210,13 +1308,20 @@
                     _clearBtn.classList.remove('visible');
                     _searchQuery = '';
                     _renderChatList();
+                    _hideUserSearchResults();
                     _searchInp.focus();
                 });
             }
         })();
 
         document.getElementById('tmv3-search').addEventListener('input', function () {
-            _renderChatList(this.value);
+            const q = this.value.trim();
+            _renderChatList(q);
+            if (q.length >= 1) {
+                _searchUsersInMain(q);
+            } else {
+                _hideUserSearchResults();
+            }
         });
 
         /* Send btn */
@@ -1372,6 +1477,124 @@
                         _renderChatList();
                     }, () => {});
             }, () => {});
+    }
+
+
+    /* ══════════════════════════════════════════════════════════
+       USER SEARCH in main search bar
+    ══════════════════════════════════════════════════════════ */
+    var _userSearchTimer = null;
+
+    function _searchUsersInMain(q) {
+        clearTimeout(_userSearchTimer);
+        _userSearchTimer = setTimeout(function() {
+            var resultBox = document.getElementById('tmv3-user-search-results');
+            if (!resultBox) return;
+            resultBox.innerHTML = '<div class="tmv3-usr-search-loading"><i class="fa fa-spinner fa-spin"></i> খুঁজছি...</div>';
+            resultBox.style.display = 'block';
+
+            if (!_db) { resultBox.style.display = 'none'; return; }
+
+            // localStorage থেকে সব users খুঁজি
+            var allUsers = [];
+            try {
+                var usersData = localStorage.getItem('TM_USERS');
+                if (usersData) allUsers = JSON.parse(usersData);
+            } catch(e) {}
+
+            var ql = q.toLowerCase();
+            var localMatches = allUsers.filter(function(u) {
+                var name = (u.name || u.fullName || '').toLowerCase();
+                var email = (u.email || '').toLowerCase();
+                var phone = (u.phone || u.mobile || '').toLowerCase();
+                var id = String(u.id || '').toLowerCase();
+                return name.includes(ql) || email.includes(ql) || phone.includes(ql) || id.includes(ql);
+            });
+
+            // Firebase থেকেও খুঁজি
+            _db.collection('tm_users').get().then(function(snap) {
+                var fbUsers = [];
+                snap.forEach(function(doc) {
+                    var d = doc.data();
+                    var name = (d.name || d.fullName || '').toLowerCase();
+                    var email = (d.email || '').toLowerCase();
+                    var phone = (d.phone || d.mobile || '').toLowerCase();
+                    if (name.includes(ql) || email.includes(ql) || phone.includes(ql)) {
+                        fbUsers.push({ id: doc.id, name: d.name || d.fullName || doc.id, email: d.email || '', phone: d.phone || d.mobile || '', avatar: d.avatarData || d.avatar || '' });
+                    }
+                });
+
+                // merge করি (duplicate বাদ)
+                var merged = fbUsers.slice();
+                localMatches.forEach(function(lu) {
+                    var exists = merged.find(function(fu) { return String(fu.id) === String(lu.id); });
+                    if (!exists) merged.push({ id: lu.id, name: lu.name || lu.fullName || String(lu.id), email: lu.email || '', phone: lu.phone || lu.mobile || '', avatar: lu.avatarData || lu.avatar || '' });
+                });
+
+                // নিজেকে বাদ দাও
+                if (_currentUser) {
+                    var selfId = String(_currentUser.id);
+                    merged = merged.filter(function(u) { return String(u.id) !== selfId; });
+                }
+
+                // account lock করা users বাদ দাও
+                merged = merged.filter(function(u) {
+                    if (u.accountLocked === true || u.accountLocked === 'true') return false;
+                    return true;
+                });
+
+                _renderUserSearchResults(merged, resultBox);
+            }).catch(function() {
+                // Firebase fail হলে local দেখাও
+                var filtered = localMatches.filter(function(u) {
+                    if (!_currentUser) return true;
+                    return String(u.id) !== String(_currentUser.id);
+                });
+                _renderUserSearchResults(filtered.map(function(u) {
+                    return { id: u.id, name: u.name || String(u.id), email: u.email || '', avatar: u.avatarData || u.avatar || '' };
+                }), resultBox);
+            });
+        }, 350);
+    }
+
+    function _renderUserSearchResults(users, resultBox) {
+        if (!users || users.length === 0) {
+            resultBox.style.display = 'none';
+            return;
+        }
+        var html = '<div class="tmv3-usr-srch-label">👤 ইউজার পাওয়া গেছে</div>';
+        users.slice(0, 8).forEach(function(u) {
+            var av = u.avatar ? '<img src="' + u.avatar + '" alt="">' : '👤';
+            var sub = u.email || u.phone || '';
+            html += '<div class="tmv3-usr-srch-item" data-uid="' + _esc(String(u.id)) + '">' +
+                '<div class="tmv3-usr-srch-av">' + av + '</div>' +
+                '<div class="tmv3-usr-srch-info">' +
+                    '<div class="tmv3-usr-srch-name">' + _esc(u.name) + '</div>' +
+                    (sub ? '<div class="tmv3-usr-srch-sub">' + _esc(sub) + '</div>' : '') +
+                '</div>' +
+                '<div class="tmv3-usr-srch-action"><i class="fa fa-comment"></i> চ্যাট</div>' +
+            '</div>';
+        });
+        resultBox.innerHTML = html;
+        resultBox.style.display = 'block';
+
+        // click handlers
+        resultBox.querySelectorAll('.tmv3-usr-srch-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                var uid = this.dataset.uid;
+                var user = users.find(function(u) { return String(u.id) === uid; });
+                if (user) {
+                    _hideUserSearchResults();
+                    document.getElementById('tmv3-search').value = '';
+                    _openPersonalChat(user);
+                }
+            });
+        });
+    }
+
+    function _hideUserSearchResults() {
+        var box = document.getElementById('tmv3-user-search-results');
+        if (box) box.style.display = 'none';
     }
 
     function _renderChatList(query) {

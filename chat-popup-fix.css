@@ -425,103 +425,107 @@
 
     /* Modal Header */
     .tmv3-modal-head {
-        padding: 18px 22px;
-        /* Handle bar */
+        padding: 22px 24px 18px;
         position: relative;
     }
 
     .tmv3-modal-head::before {
         content: '';
         position: absolute;
-        top: 8px;
+        top: 10px;
         left: 50%;
         transform: translateX(-50%);
-        width: 40px;
-        height: 4px;
-        background: rgba(174, 186, 193, 0.3);
-        border-radius: 4px;
+        width: 44px;
+        height: 5px;
+        background: rgba(37, 211, 102, 0.3);
+        border-radius: 5px;
     }
 
     .tmv3-modal-title {
-        font-size: 24px;
-        margin-top: 6px;
+        font-size: 28px;
+        margin-top: 8px;
+        font-weight: 800;
     }
 
     /* Body */
     .tmv3-modal-body {
-        padding: 22px 20px;
-        gap: 20px;
+        padding: 24px 22px;
+        gap: 22px;
     }
 
     /* Footer */
     .tmv3-modal-footer {
-        padding: 16px 20px 28px; /* extra bottom for safe area */
-        gap: 12px;
+        padding: 18px 22px 32px;
+        gap: 14px;
     }
 
     /* Buttons */
     .tmv3-btn {
-        font-size: 22px;
-        padding: 16px 32px;
-        border-radius: 12px;
-        flex: 1; /* মোবাইলে full-width stretch */
+        font-size: 24px;
+        padding: 18px 36px;
+        border-radius: 14px;
+        flex: 1;
+        font-weight: 700;
     }
 
     /* Fields */
     .tmv3-field label {
-        font-size: 20px;
+        font-size: 22px;
+        font-weight: 600;
     }
 
     .tmv3-field input,
     .tmv3-field textarea,
     .tmv3-field select {
-        font-size: 22px;
-        padding: 15px 18px;
-        border-radius: 12px;
+        font-size: 24px;
+        padding: 18px 20px;
+        border-radius: 14px;
     }
 
     /* Modal search */
     .tmv3-modal-search {
-        font-size: 22px;
-        padding: 15px 18px;
-        border-radius: 12px;
+        font-size: 24px;
+        padding: 18px 20px;
+        border-radius: 14px;
     }
 
     /* User select list */
     .tmv3-user-select-list {
-        max-height: 320px;
+        max-height: 360px;
     }
 
     .tmv3-user-sel-item {
-        padding: 16px 18px;
-        gap: 16px;
+        padding: 18px 20px;
+        gap: 18px;
     }
 
     .tmv3-sel-check {
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
+        border-width: 2.5px;
     }
 
     .tmv3-sel-check.checked::after {
-        font-size: 17px;
+        font-size: 20px;
     }
 
     /* Empty msg */
     .tmv3-empty-msg {
-        font-size: 22px;
-        padding: 30px 0;
+        font-size: 24px;
+        padding: 36px 0;
     }
 
     /* Avatar upload */
     .tmv3-av-preview {
-        width: 110px;
-        height: 110px;
-        font-size: 46px;
+        width: 120px;
+        height: 120px;
+        font-size: 52px;
     }
 
     .tmv3-av-upload-btn {
-        font-size: 20px;
-        padding: 12px 30px;
+        font-size: 22px;
+        padding: 14px 34px;
+        border-radius: 12px;
     }
 }
 
@@ -545,83 +549,100 @@
 }
 
 .is-mobile .tmv3-modal-title {
-    font-size: 24px;
-    margin-top: 6px;
+    font-size: 28px;
+    margin-top: 8px;
+    font-weight: 800;
 }
 
 .is-mobile .tmv3-modal-head {
-    padding: 18px 22px;
+    padding: 22px 24px 18px;
     position: relative;
 }
 
 .is-mobile .tmv3-modal-head::before {
     content: '';
     position: absolute;
-    top: 8px;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 40px;
-    height: 4px;
-    background: rgba(174, 186, 193, 0.3);
-    border-radius: 4px;
+    width: 44px;
+    height: 5px;
+    background: rgba(37, 211, 102, 0.3);
+    border-radius: 5px;
 }
 
 .is-mobile .tmv3-modal-body {
-    padding: 22px 20px;
-    gap: 20px;
+    padding: 24px 22px;
+    gap: 22px;
 }
 
 .is-mobile .tmv3-modal-footer {
-    padding: 16px 20px 28px;
-    gap: 12px;
+    padding: 18px 22px 32px;
+    gap: 14px;
 }
 
 .is-mobile .tmv3-btn {
-    font-size: 22px;
-    padding: 16px 32px;
-    border-radius: 12px;
+    font-size: 24px;
+    padding: 18px 36px;
+    border-radius: 14px;
+    font-weight: 700;
 }
 
 .is-mobile .tmv3-field label {
-    font-size: 20px;
+    font-size: 22px;
+    font-weight: 600;
 }
 
 .is-mobile .tmv3-field input,
 .is-mobile .tmv3-field textarea,
 .is-mobile .tmv3-field select {
-    font-size: 22px;
-    padding: 15px 18px;
+    font-size: 24px;
+    padding: 18px 20px;
+    border-radius: 14px;
 }
 
 .is-mobile .tmv3-modal-search {
-    font-size: 22px;
-    padding: 15px 18px;
+    font-size: 24px;
+    padding: 18px 20px;
+    border-radius: 14px;
 }
 
 .is-mobile .tmv3-user-sel-item {
-    padding: 16px 18px;
+    padding: 18px 20px;
+    gap: 18px;
 }
 
 .is-mobile .tmv3-sel-check {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
+    border-width: 2.5px;
 }
 
 .is-mobile .tmv3-sel-check.checked::after {
-    font-size: 17px;
+    font-size: 20px;
 }
 
 .is-mobile .tmv3-empty-msg {
-    font-size: 22px;
+    font-size: 24px;
+    padding: 36px 0;
 }
 
 .is-mobile .tmv3-av-preview {
-    width: 110px;
-    height: 110px;
-    font-size: 46px;
+    width: 120px;
+    height: 120px;
+    font-size: 52px;
 }
 
 .is-mobile .tmv3-av-upload-btn {
-    font-size: 20px;
-    padding: 12px 30px;
+    font-size: 22px;
+    padding: 14px 34px;
+    border-radius: 12px;
+}
+
+/* User select list item name & sub text — mobile */
+.is-mobile .tmv3-user-sel-item .tmv3-usr-name {
+    font-size: 24px;
+}
+.is-mobile .tmv3-user-sel-item .tmv3-usr-sub {
+    font-size: 19px;
 }
