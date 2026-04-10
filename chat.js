@@ -440,20 +440,15 @@
         radial-gradient(ellipse 60% 40% at 50% 0%, rgba(37,211,102,.06) 0%, transparent 70%),
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M40 8 L72 26 L72 54 L40 72 L8 54 L8 26 Z' fill='none' stroke='rgba(255,255,255,0.025)' stroke-width='1'/%3E%3C/svg%3E");
 }
-#tmv3-empty-right::before {
-    content:'';
-    width:100px; height:100px; border-radius:50%;
-    background:rgba(42,57,66,.4);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow:0 0 0 16px rgba(42,57,66,.15), 0 0 0 32px rgba(42,57,66,.07);
-}
-#tmv3-empty-right i {
-    font-size:54px; color:#8696a0; opacity:.5;
-    position:absolute; /* centered via flex parent */
-}
 #tmv3-empty-right .tmv3-empty-icon-wrap {
-    position:relative; display:flex; align-items:center; justify-content:center;
-    width:100px; height:100px;
+    width:110px; height:110px; border-radius:50%;
+    background:rgba(42,57,66,.45);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 18px rgba(42,57,66,.15), 0 0 0 36px rgba(42,57,66,.07);
+    flex-shrink:0;
+}
+#tmv3-empty-right .tmv3-empty-icon-wrap i {
+    font-size:46px; color:#8696a0; opacity:.6;
 }
 #tmv3-empty-right p { font-size:14px; color:#8696a0; opacity:.7; text-align:center; line-height:1.6; }
 
@@ -944,7 +939,9 @@
   <!-- RIGHT PANEL -->
   <div id="tmv3-right">
     <div id="tmv3-empty-right">
-      <i class="fa fa-lock"></i>
+      <div class="tmv3-empty-icon-wrap">
+        <i class="fa fa-lock"></i>
+      </div>
       <p>Your messages are private.<br>Select a chat to start messaging.</p>
     </div>
 
