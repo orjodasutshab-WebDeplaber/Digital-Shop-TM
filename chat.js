@@ -194,14 +194,22 @@
 #tmv3-overlay {
     display:none; position:fixed;
     top:0; left:0; right:0; bottom:0;
-    width:100vw; height:100vh;
+    width:100%; height:100%;
     z-index:99999990;
     background:rgba(0,0,0,.85); backdrop-filter:blur(12px);
     align-items:center; justify-content:center;
     padding:0;
+    overflow:hidden;
 }
 #tmv3-overlay.open { display:flex; }
-
+/* Mobile: JS দিয়ে visualViewport অনুযায়ী সাইজ ঠিক হবে */
+.is-mobile #tmv3-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+}
 /* ══ Close Button (PC) ══ */
 #tmv3-close-btn {
     display:none;
@@ -234,10 +242,11 @@
     position:relative;
 }
 .is-mobile #tmv3-root {
-    width:100vw !important;
-    height:100dvh !important;
+    width:100% !important;
+    height:100% !important;
     border-radius:0 !important;
     flex-direction:column;
+    position:relative;
 }
 
 /* ══ Left Panel ══ */
@@ -1191,6 +1200,47 @@
         `;
         document.body.appendChild(overlay);
 
+        /* Mobile viewport fix — browser chrome থেকে সঠিক height পাওয়া */
+        if (_isMobile) {
+            function _fixMobileHeight() {
+                var ov = document.getElementById('tmv3-overlay');
+                var root = document.getElementById('tmv3-root');
+                if (!ov || !root) return;
+                
+                // Visual Viewport API ব্যবহার করি (সবচেয়ে accurate)
+                if (window.visualViewport) {
+                    var vv = window.visualViewport;
+                    ov.style.top    = vv.offsetTop + 'px';
+                    ov.style.left   = vv.offsetLeft + 'px';
+                    ov.style.width  = vv.width + 'px';
+                    ov.style.height = vv.height + 'px';
+                    root.style.width  = vv.width + 'px';
+                    root.style.height = vv.height + 'px';
+                } else {
+                    // fallback: window dimensions
+                    ov.style.top    = '0px';
+                    ov.style.left   = '0px';
+                    ov.style.width  = window.innerWidth + 'px';
+                    ov.style.height = window.innerHeight + 'px';
+                    root.style.width  = window.innerWidth + 'px';
+                    root.style.height = window.innerHeight + 'px';
+                }
+            }
+            
+            // প্রথমবার run করো
+            _fixMobileHeight();
+            
+            // resize এবং scroll এ আবার fix করো (address bar hide/show)
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', _fixMobileHeight);
+                window.visualViewport.addEventListener('scroll', _fixMobileHeight);
+            }
+            window.addEventListener('resize', _fixMobileHeight);
+            
+            // expose for _openApp to call
+            window._tmFixMobileHeight = _fixMobileHeight;
+        }
+
         /* Bind events */
         _bindEvents();
     }
@@ -1398,6 +1448,12 @@
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
         if (!_isMobile && window._tmChatViewport) window._tmChatViewport.open();
         document.getElementById('tmv3-overlay').classList.add('open');
+        // Mobile এ open হওয়ার সাথে সাথে height fix করো
+        if (_isMobile && typeof window._tmFixMobileHeight === 'function') {
+            window._tmFixMobileHeight();
+            setTimeout(window._tmFixMobileHeight, 100);
+            setTimeout(window._tmFixMobileHeight, 300);
+        }
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) closeBtn.style.display = _isMobile ? 'none' : 'flex';
         _loadChatList();
