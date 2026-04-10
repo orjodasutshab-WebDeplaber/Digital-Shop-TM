@@ -542,46 +542,50 @@
 .is-mobile .tmv3-msg-av { width:48px; height:48px; font-size:18px; }
 
 .tmv3-bubble {
-    padding:8px 12px 6px 12px;
-    border-radius:8px;
+    padding:8px 12px 6px 12px !important;
+    border-radius:8px !important;
     position:relative; word-break:break-word;
     max-width:100%; min-width:60px;
     box-shadow:0 1px 2px rgba(0,0,0,.3);
 }
 .tmv3-msg-wrap.own .tmv3-bubble {
-    background:#005c4b;
-    border-radius:8px 8px 2px 8px;
-    color:#e9edef;
+    background:#005c4b !important;
+    border-radius:8px 8px 2px 8px !important;
+    color:#e9edef !important;
 }
 .tmv3-msg-wrap.other .tmv3-bubble {
-    background:#1f2c34;
-    border-radius:8px 8px 8px 2px;
-    color:#e9edef;
+    background:#1f2c34 !important;
+    border-radius:8px 8px 8px 2px !important;
+    color:#e9edef !important;
 }
-.is-mobile .tmv3-bubble { padding:10px 14px 7px 14px; }
+.is-mobile .tmv3-bubble { padding:10px 14px 7px 14px !important; }
 
 .tmv3-sender {
-    font-size:12.5px; font-weight:700;
-    margin-bottom:3px; display:block;
+    font-size:12.5px !important; font-weight:700 !important;
+    margin-bottom:3px !important; display:block !important;
 }
-.is-mobile .tmv3-sender { font-size:20px; }
+.is-mobile .tmv3-sender { font-size:20px !important; }
 
-.tmv3-msg-body { display:block; }
+.tmv3-msg-body { display:block !important; }
 
 .tmv3-msg-text {
-    font-size:14.5px; line-height:1.5;
-    white-space:pre-wrap; word-break:break-word;
-    display:block; margin-bottom:4px;
+    font-size:14.5px !important; line-height:1.5 !important;
+    white-space:pre-wrap !important; word-break:break-word !important;
+    display:block !important; margin-bottom:4px !important;
+    padding:0 !important;
 }
-.is-mobile .tmv3-msg-text { font-size:22px; }
+.is-mobile .tmv3-msg-text { font-size:22px !important; }
 
 /* time — right aligned, below text */
 .tmv3-msg-time {
-    font-size:11px; color:rgba(233,237,239,.55);
-    display:flex; align-items:center; justify-content:flex-end;
-    gap:3px; line-height:1; white-space:nowrap;
+    font-size:11px !important; color:rgba(233,237,239,.55) !important;
+    display:flex !important; align-items:center !important;
+    justify-content:flex-end !important;
+    gap:3px !important; line-height:1 !important;
+    white-space:nowrap !important;
+    padding:0 !important; margin-top:2px !important;
 }
-.is-mobile .tmv3-msg-time { font-size:17px; }
+.is-mobile .tmv3-msg-time { font-size:17px !important; }
 .tmv3-tick { font-size:12px; color:rgba(233,237,239,.55); }
 .tmv3-tick.seen { color:#53bdeb; }
 
