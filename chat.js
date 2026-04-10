@@ -507,8 +507,8 @@
 
 /* Messages area */
 #tmv3-messages {
-    flex:1; min-height:0; overflow-y:auto; padding:16px 18px;
-    display:flex; flex-direction:column; gap:4px;
+    flex:1; min-height:0; overflow-y:auto; padding:12px 16px 12px;
+    display:flex; flex-direction:column; gap:3px;
     background:#0b141a;
     background-image:
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M40 8 L72 26 L72 54 L40 72 L8 54 L8 26 Z' fill='none' stroke='rgba(255,255,255,0.025)' stroke-width='1'/%3E%3C/svg%3E");
@@ -526,49 +526,81 @@
 }
 .is-mobile .tmv3-date-div span { font-size:18px; padding:6px 20px; }
 
-.tmv3-msg-wrap { display:flex; align-items:flex-end; gap:8px; max-width:72%; }
+.tmv3-msg-wrap {
+    display:flex; align-items:flex-end; gap:6px; max-width:70%;
+    position:relative;
+}
 .tmv3-msg-wrap.own { align-self:flex-end; flex-direction:row-reverse; }
 .tmv3-msg-wrap.other { align-self:flex-start; }
 .is-mobile .tmv3-msg-wrap { max-width:88%; }
 
 .tmv3-msg-av {
-    width:32px; height:32px; border-radius:50%;
+    width:34px; height:34px; border-radius:50%;
     background:linear-gradient(135deg,#2a3942,#1a2d36);
     display:flex; align-items:center; justify-content:center;
     font-size:13px; color:#8696a0; flex-shrink:0; overflow:hidden;
-    box-shadow:0 2px 6px rgba(0,0,0,.3);
+    align-self:flex-end; margin-bottom:2px;
 }
 .tmv3-msg-av img { width:100%; height:100%; object-fit:cover; }
-.is-mobile .tmv3-msg-av { width:48px; height:48px; font-size:18px; }
+.is-mobile .tmv3-msg-av { width:46px; height:46px; font-size:18px; }
 
+/* Bubble base */
 .tmv3-bubble {
-    padding:9px 13px; border-radius:14px;
+    padding:7px 12px 6px;
+    border-radius:10px;
     position:relative; word-break:break-word; max-width:100%;
-    box-shadow:0 2px 6px rgba(0,0,0,.25);
-    transition:box-shadow .15s;
+    box-shadow:0 1px 2px rgba(0,0,0,.3);
 }
-.tmv3-bubble:hover { box-shadow:0 4px 12px rgba(0,0,0,.35); }
-.tmv3-msg-wrap.own .tmv3-bubble {
-    background:linear-gradient(135deg,#005c4b,#00695c);
-    border-bottom-right-radius:4px; color:#e9edef;
-}
-.tmv3-msg-wrap.other .tmv3-bubble {
-    background:#1f2c34; border-bottom-left-radius:4px; color:#e9edef;
-    border:1px solid rgba(42,57,66,.4);
-}
-.is-mobile .tmv3-bubble { padding:12px 18px; border-radius:18px; }
 
-.tmv3-sender { font-size:12.5px; font-weight:700; margin-bottom:4px; }
+/* Own message — green, tail bottom-right */
+.tmv3-msg-wrap.own .tmv3-bubble {
+    background:#005c4b;
+    color:#e9edef;
+    border-radius:10px 10px 0px 10px;
+}
+.tmv3-msg-wrap.own .tmv3-bubble::after {
+    content:'';
+    position:absolute; bottom:0; right:-8px;
+    border-width:0 0 9px 9px;
+    border-style:solid;
+    border-color:transparent transparent #005c4b transparent;
+}
+
+/* Other message — dark, tail bottom-left */
+.tmv3-msg-wrap.other .tmv3-bubble {
+    background:#1f2c34;
+    color:#e9edef;
+    border-radius:0px 10px 10px 10px;
+}
+.tmv3-msg-wrap.other .tmv3-bubble::after {
+    content:'';
+    position:absolute; bottom:0; left:-8px;
+    border-width:0 9px 9px 0;
+    border-style:solid;
+    border-color:transparent #1f2c34 transparent transparent;
+}
+
+.is-mobile .tmv3-bubble { padding:10px 16px 8px; }
+
+.tmv3-sender {
+    font-size:12.5px; font-weight:700; margin-bottom:3px;
+    line-height:1.3;
+}
 .is-mobile .tmv3-sender { font-size:20px; }
 
-.tmv3-msg-text { font-size:14.5px; line-height:1.55; white-space:pre-wrap; }
-.is-mobile .tmv3-msg-text { font-size:24px; }
+.tmv3-msg-text {
+    font-size:14.5px; line-height:1.55; white-space:pre-wrap;
+    word-break:break-word;
+}
+.is-mobile .tmv3-msg-text { font-size:22px; }
 
 .tmv3-msg-time {
-    font-size:11px; color:rgba(233,237,239,.5); text-align:right;
-    margin-top:4px; display:flex; align-items:center; justify-content:flex-end; gap:4px;
+    font-size:11px; color:rgba(233,237,239,.55); text-align:right;
+    margin-top:3px; display:flex; align-items:center;
+    justify-content:flex-end; gap:4px; line-height:1;
 }
 .is-mobile .tmv3-msg-time { font-size:18px; }
+.tmv3-tick { color:rgba(233,237,239,.55); font-size:13px; }
 .tmv3-tick.seen { color:#53bdeb; }
 
 .tmv3-reply-quote {
