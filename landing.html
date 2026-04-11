@@ -2886,8 +2886,8 @@ function closePmxGuestShop(){
 
 // Firebase থেকে pmx data load করা
 function loadPmxFromFirebase(){
-    function _doLoad(){
-        if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length) return;
+    (window.FB_READY||Promise.resolve()).then(()=>{
+        if(typeof firebase==='undefined'||!firebase.firestore)return;
         const db=firebase.firestore();
         ['pmx_headers','pmx_products','pmx_holders'].forEach(col=>{
             db.collection(col).get().then(snap=>{
@@ -2901,12 +2901,7 @@ function loadPmxFromFirebase(){
             const arr=snap.docs.map(d=>d.data());
             if(arr.length){ localStorage.setItem(PKK,JSON.stringify(arr)); renderGuestProducts(); }
         }).catch(()=>{});
-    }
-    if(typeof firebase!=='undefined'&&firebase.apps&&firebase.apps.length){
-        _doLoad();
-    } else {
-        setTimeout(_doLoad, 1000);
-    }
+    });
 }
 
 // firebase-sync.js syncAll শেষ হলে সাথে সাথে re-render
@@ -2922,13 +2917,16 @@ window.addEventListener('fb-sync-done', function(){
 // firebase-sync.js এ renderProductGrid call হয় — landing এ alias করি
 window.renderProductGrid = function(){ renderGuestProducts(); };
 
-/* INIT */
-(window.TM_READY||Promise.resolve()).then(()=>{renderLB();renderSironam();
-    renderNightBoard();renderLocalBoards();
+/* INIT — Priority keys দিয়ে দ্রুত render, তারপর full hydration */
+(window.TM_PRIORITY_READY||window.TM_READY||Promise.resolve()).then(function(){
     renderGuestProducts();
+    renderPmxGuestHeaders();
+    renderLB();
+    renderSironam();
+    renderNightBoard();
+    renderLocalBoards();
     _gpCheckUrlProduct();
-    renderPmxGuestHeaders(); // localStorage থেকে প্রথমে render
-    loadPmxFromFirebase();   // Firebase থেকে fresh data নিয়ে আবার render
+    loadPmxFromFirebase();
 });
 </script>
 <script src="firebase-sync.js"></script>

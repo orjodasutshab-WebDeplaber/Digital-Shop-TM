@@ -206,6 +206,20 @@
     });
 
     /* ── 6. IndexedDB Hydration ─────────────────────────────────── */
+    // Priority keys আগে load — products/session দ্রুত পাওয়া যাবে
+    var PRIORITY_KEYS = [
+        'TM_DB_PRODUCTS_V2','TM_SESSION_USER','pmx_headers',
+        'pmx_products','pmx_holders','TM_LOCAL_BOARDS',
+        'night_boards','sironam_list','TM_LOGIN_LEADERBOARDS'
+    ];
+    window.TM_PRIORITY_READY = Promise.all(
+        PRIORITY_KEYS.map(function(k){
+            return IDB.get(k).then(function(v){
+                if(v !== null) TM_CACHE[k] = v;
+            }).catch(function(){});
+        })
+    );
+
     window.TM_READY = IDB.getAllEntries().then(function (entries) {
         var keys = Object.keys(entries);
         for (var i = 0; i < keys.length; i++) {
