@@ -57,7 +57,16 @@
     function _init() {
         _currentUser = _getSessionUser();
         _isMobile = document.documentElement.classList.contains('is-mobile') ||
-                    /Android|iPhone|iPad/i.test(navigator.userAgent);
+                    /Android|iPhone|iPad|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                    (window.innerWidth <= 768);
+
+        // ✅ is-mobile class HTML element এ যোগ করো — CSS selectors কাজ করবে
+        if (_isMobile) {
+            document.documentElement.classList.add('is-mobile');
+        } else {
+            document.documentElement.classList.remove('is-mobile');
+        }
+
         _initFirebase();
         _injectCSS();
         _buildMainUI();
@@ -288,6 +297,21 @@
 }
 .is-mobile #tmv3-app-title { font-size:32px; }
 .is-mobile #tmv3-left-header { padding:20px 20px 16px; }
+
+/* Main popup close button — mobile only */
+#tmv3-main-close-btn {
+    display: none;
+    width: 48px; height: 48px; border-radius: 50%;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border: 2.5px solid rgba(255,255,255,0.9);
+    color: #fff; font-size: 20px; font-weight: 700;
+    cursor: pointer; flex-shrink: 0;
+    align-items: center; justify-content: center;
+    box-shadow: 0 3px 14px rgba(239,68,68,.5);
+    transition: all .2s; margin-left: 4px;
+}
+#tmv3-main-close-btn:active { transform: scale(0.88); }
+.is-mobile #tmv3-main-close-btn { display: flex; }
 
 .tmv3-icon-btn {
     background:none; border:none; color:#aebac1; cursor:pointer;
@@ -1035,6 +1059,94 @@
 }
 #tmv3-toast.show { transform:translateX(-50%) translateY(0); }
 .is-mobile #tmv3-toast { font-size:22px; padding:14px 30px; }
+
+/* ══════════════════════════════════════════════════════
+   MEDIA QUERY — সব mobile এ কাজ করবে (is-mobile class ছাড়াও)
+══════════════════════════════════════════════════════ */
+@media screen and (max-width: 768px) {
+    #tmv3-overlay { position:fixed !important; top:0 !important; left:0 !important; width:100vw !important; height:100dvh !important; }
+    #tmv3-root { width:100% !important; height:100% !important; flex-direction:column !important; border-radius:0 !important; }
+    #tmv3-left { width:100% !important; max-width:100% !important; height:100% !important; position:absolute !important; inset:0 !important; z-index:2 !important; }
+    #tmv3-left.hidden { transform:translateX(-100%) !important; }
+    #tmv3-right { width:100% !important; height:100% !important; position:absolute !important; inset:0 !important; transform:translateX(100%) !important; z-index:3 !important; }
+    #tmv3-right.open { transform:translateX(0) !important; }
+    #tmv3-close-btn { display:none !important; }
+    #tmv3-main-close-btn { display:flex !important; }
+    #tmv3-chat-close-btn { display:flex !important; }
+    #tmv3-back-btn { display:flex !important; }
+    #tmv3-bottom-nav { display:flex !important; }
+
+    /* Header */
+    #tmv3-left-header { padding:18px 18px 14px !important; }
+    #tmv3-app-title { font-size:30px !important; }
+    .tmv3-icon-btn { width:56px !important; height:56px !important; font-size:26px !important; }
+
+    /* Search bar */
+    .tmv3-search-wrap { padding:12px 16px 8px !important; }
+    .tmv3-search-bar { padding:16px 22px !important; border-radius:40px !important; background:#1f2c34 !important; border:1.5px solid rgba(37,211,102,.2) !important; gap:14px !important; }
+    .tmv3-search-bar i { font-size:24px !important; color:#25d366 !important; }
+    .tmv3-search-bar input { font-size:22px !important; }
+
+    /* Tabs */
+    .tmv3-tabs { padding:10px 16px 12px !important; gap:10px !important; }
+    .tmv3-tab { font-size:20px !important; padding:12px 26px !important; border-radius:35px !important; border-width:2px !important; }
+
+    /* Chat list items */
+    .tmv3-chat-item { padding:16px 18px !important; gap:16px !important; }
+    .tmv3-avatar { width:62px !important; height:62px !important; font-size:27px !important; }
+    .tmv3-chat-name { font-size:23px !important; font-weight:600 !important; }
+    .tmv3-chat-preview { font-size:19px !important; margin-top:3px !important; }
+    .tmv3-chat-time { font-size:17px !important; }
+    .tmv3-unread-badge { font-size:17px !important; min-width:28px !important; height:28px !important; }
+
+    /* Chat header */
+    #tmv3-chat-header { padding:18px 16px !important; }
+    #tmv3-header-name { font-size:26px !important; }
+    #tmv3-header-sub { font-size:19px !important; }
+
+    /* Messages */
+    .tmv3-msg-text { font-size:22px !important; line-height:1.5 !important; }
+    .tmv3-msg-time { font-size:17px !important; }
+    .tmv3-sender { font-size:19px !important; }
+
+    /* Input area */
+    #tmv3-input-area { padding:14px 16px 20px !important; gap:14px !important; }
+    #tmv3-msg-input { font-size:23px !important; padding:16px 22px !important; border-radius:38px !important; min-height:58px !important; }
+    #tmv3-send-btn { width:70px !important; height:70px !important; font-size:28px !important; }
+
+    /* Side panel */
+    #tmv3-side-panel { width:100% !important; position:absolute !important; inset:0 !important; z-index:5 !important; }
+    .tmv3-sp-header { padding:18px 18px !important; }
+    .tmv3-sp-title { font-size:28px !important; }
+    .tmv3-sp-name { font-size:30px !important; }
+    .tmv3-sp-sub { font-size:20px !important; }
+    .tmv3-sp-row { font-size:22px !important; padding:18px 16px !important; }
+    .tmv3-sp-row i { font-size:22px !important; }
+    .tmv3-sp-row .value { font-size:18px !important; }
+    .tmv3-member-item { padding:18px 0 !important; }
+    .tmv3-member-name { font-size:23px !important; }
+    .tmv3-member-sub { font-size:18px !important; }
+
+    /* Dropdown menu */
+    .tmv3-dropdown-item { font-size:22px !important; padding:18px 24px !important; gap:18px !important; }
+
+    /* Toast */
+    #tmv3-toast { font-size:20px !important; padding:14px 28px !important; }
+
+    /* Bottom nav */
+    .tmv3-nav-btn { padding:14px 0 !important; }
+    .tmv3-nav-btn i { font-size:26px !important; }
+    .tmv3-nav-btn span { font-size:17px !important; }
+
+    /* User search results */
+    #tmv3-user-search-results { margin-top:10px !important; border-radius:16px !important; }
+    .tmv3-usr-srch-label { font-size:15px !important; padding:12px 18px 8px !important; }
+    .tmv3-usr-srch-item { padding:14px 18px !important; gap:14px !important; }
+    .tmv3-usr-srch-av { width:54px !important; height:54px !important; font-size:24px !important; }
+    .tmv3-usr-srch-name { font-size:21px !important; }
+    .tmv3-usr-srch-sub { font-size:16px !important; }
+    .tmv3-usr-srch-action { font-size:15px !important; padding:8px 14px !important; }
+}
         `;
         document.head.appendChild(s);
     }
@@ -1065,6 +1177,7 @@
             <div class="tmv3-dropdown-item" id="tmv3-btn-profile"><i class="fa fa-user-circle"></i> প্রোফাইল</div>
           </div>
         </div>
+        <button id="tmv3-main-close-btn" title="বন্ধ করুন"><i class="fa fa-times"></i></button>
       </div>
     </div>
 
@@ -1268,6 +1381,15 @@
             e.stopPropagation();
             _closeActiveChat();
         });
+
+        /* Main popup close button (mobile) */
+        var mainCloseBtn = document.getElementById('tmv3-main-close-btn');
+        if (mainCloseBtn) {
+            mainCloseBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                _closeApp();
+            });
+        }
 
         /* Left 3-dot menu */
         document.getElementById('tmv3-left-3dot').addEventListener('click', function (e) {
