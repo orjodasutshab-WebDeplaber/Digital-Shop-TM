@@ -257,9 +257,21 @@
     .g-or-div::before,.g-or-div::after{content:'';flex:1;height:1px;background:#334155;}
     </style>
     <script>
-        (window.TM_READY||Promise.resolve()).then(function(){
-            if(!localStorage.getItem('TM_SESSION_USER')) window.location.replace('landing.html');
-        });
+        (function(){
+            function checkAuth(){
+                if(!localStorage.getItem('TM_SESSION_USER')){
+                    window.location.replace('landing.html');
+                }
+            }
+            // নতুন device এ IDB খালি — max 400ms অপেক্ষা, তারপর সরাসরি চেক
+            var done = false;
+            var timer = setTimeout(function(){
+                if(!done){ done=true; checkAuth(); }
+            }, 400);
+            (window.TM_READY||Promise.resolve()).then(function(){
+                if(!done){ done=true; clearTimeout(timer); checkAuth(); }
+            });
+        })();
     </script>
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
