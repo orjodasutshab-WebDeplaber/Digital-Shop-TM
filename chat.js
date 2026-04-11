@@ -1105,7 +1105,7 @@
     }
 
     /* ── Header Buttons ── */
-    .tmv3-icon-btn { width:72px !important; height:72px !important; font-size:32px !important; }
+    .tmv3-icon-btn { width:72px !important; height:72px !important; font-size:50px !important; }
     #tmv3-left-3dot { width:72px !important; height:72px !important; font-size:32px !important; }
     #tmv3-main-close-btn {
         display:flex !important;
