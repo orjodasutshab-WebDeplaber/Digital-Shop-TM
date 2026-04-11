@@ -687,7 +687,7 @@
     font-size:12.5px !important; font-weight:700 !important;
     margin-bottom:3px !important; display:block !important;
 }
-.is-mobile .tmv3-sender { font-size:21px !important; }
+.is-mobile .tmv3-sender { font-size:63px !important; }
 
 .tmv3-msg-body { display:block !important; }
 
@@ -697,7 +697,7 @@
     display:block !important; margin-bottom:4px !important;
     padding:0 !important;
 }
-.is-mobile .tmv3-msg-text { font-size:24px !important; line-height:1.5 !important; }
+.is-mobile .tmv3-msg-text { font-size:72px !important; line-height:1.5 !important; }
 
 /* time — right aligned, below text */
 .tmv3-msg-time {
@@ -708,7 +708,7 @@
     white-space:nowrap !important;
     padding:0 !important; margin-top:2px !important;
 }
-.is-mobile .tmv3-msg-time { font-size:18px !important; }
+.is-mobile .tmv3-msg-time { font-size:54px !important; }
 .tmv3-tick { font-size:12px; color:rgba(233,237,239,.55); }
 .tmv3-tick.seen { color:#53bdeb; }
 
