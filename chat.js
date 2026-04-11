@@ -101,6 +101,29 @@
             _loadChatList();
             _ensurePublicGroup();
         }
+
+        // ✅ সেভ করা ব্যাকগ্রাউন্ড restore করো
+        try {
+            const BG_KEY = 'TM_CHAT_BG_V1';
+            const saved = JSON.parse(localStorage.getItem(BG_KEY) || 'null');
+            if (saved) {
+                // DOM ready হওয়ার পরে apply করো
+                setTimeout(() => {
+                    const area = document.getElementById('tmv3-messages');
+                    if (!area) return;
+                    if (saved.type === 'image') {
+                        area.style.backgroundImage = `url('${saved.value}')`;
+                        area.style.backgroundRepeat = 'no-repeat';
+                        area.style.backgroundSize = 'cover';
+                    } else if (saved.type === 'gradient') {
+                        area.style.backgroundImage = saved.value;
+                    } else if (saved.type === 'color') {
+                        area.style.backgroundImage = 'none';
+                        area.style.background = saved.value;
+                    }
+                }, 800);
+            }
+        } catch(e) {}
     }
 
     function _getSessionUser() {
@@ -943,6 +966,11 @@
 .is-mobile .tmv3-sp-row { font-size:39px !important; padding:20px 18px !important; }
 .is-mobile .tmv3-sp-row i { font-size:39px !important; width:30px !important; }
 .is-mobile .tmv3-sp-row .value { font-size:35px !important; }
+/* ── চ্যাট ব্যাকগ্রাউন্ড পিকার — মোবাইল ── */
+.is-mobile #pr-bg-colors div { width:58px !important; height:58px !important; }
+.is-mobile #pr-bg-upload-label { font-size:24px !important; }
+.is-mobile #pr-bg-upload-label span { padding:16px 20px !important; font-size:24px !important; border-radius:14px !important; }
+.is-mobile #pr-bg-reset { font-size:22px !important; padding:14px !important; border-radius:12px !important; }
 .tmv3-sp-row.danger { color:#ef4444; }
 .tmv3-sp-row.danger i { color:#ef4444; }
 
@@ -3067,6 +3095,22 @@
                     ${mobile ? `<div class="tmv3-sp-row"><i class="fa fa-phone"></i><span class="label">${_esc(mobile)}</span></div>` : ''}
                 </div>
 
+                <div class="tmv3-sp-section-label">চ্যাট ব্যাকগ্রাউন্ড</div>
+                <div class="tmv3-sp-section" id="pr-bg-section">
+                    <div class="tmv3-sp-row" style="flex-wrap:wrap; gap:10px; padding:14px 12px;">
+                        <div id="pr-bg-colors" style="display:flex; flex-wrap:wrap; gap:8px; width:100%;"></div>
+                        <label id="pr-bg-upload-label" style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#e9edef; font-size:13px; width:100%; margin-top:4px;">
+                            <span style="background:#2a3942; border:2px dashed #4a5568; border-radius:10px; padding:10px 16px; flex:1; text-align:center;">
+                                <i class="fa fa-image" style="color:#25d366; margin-right:6px;"></i> ছবি আপলোড করুন
+                            </span>
+                            <input type="file" id="pr-bg-file" accept="image/*" style="display:none;">
+                        </label>
+                        <button id="pr-bg-reset" style="width:100%; padding:8px; background:#2a3942; color:#8696a0; border:none; border-radius:8px; cursor:pointer; font-size:13px; font-family:inherit;">
+                            <i class="fa fa-undo"></i> ডিফল্টে ফিরুন
+                        </button>
+                    </div>
+                </div>
+
                 <div class="tmv3-sp-section-label">গোপনীয়তা সেটিং</div>
                 <div class="tmv3-sp-section">
                     <div class="tmv3-sp-row">
@@ -3124,6 +3168,152 @@
             _currentUser.bio = newBio.trim();
             document.getElementById('pr-edit-bio').querySelector('.label').innerHTML = `Bio: <span style="color:#8696a0;">${_esc(_currentUser.bio || 'যোগ করুন...')}</span>`;
         });
+
+        /* ══ চ্যাট ব্যাকগ্রাউন্ড ══ */
+        const BG_KEY = 'TM_CHAT_BG_V1';
+        const _defaultBg = { type: 'default' };
+
+        const _bgColors = [
+            { label: 'ডিফল্ট ডার্ক',  value: '#0b141a', type: 'color' },
+            { label: 'কালো',           value: '#000000', type: 'color' },
+            { label: 'গাঢ় নীল',        value: '#0a1628', type: 'color' },
+            { label: 'মধ্যরাত নীল',     value: '#0d1b2a', type: 'color' },
+            { label: 'নেভি',           value: '#1b2a4a', type: 'color' },
+            { label: 'নীল',            value: '#1a3a6e', type: 'color' },
+            { label: 'আকাশ নীল',       value: '#1e90ff', type: 'color' },
+            { label: 'সায়ান',          value: '#00bcd4', type: 'color' },
+            { label: 'সবুজ',           value: '#1a3d1a', type: 'color' },
+            { label: 'ঘাস সবুজ',       value: '#2d5a27', type: 'color' },
+            { label: 'মিন্ট',          value: '#1b4d3e', type: 'color' },
+            { label: 'টিল',            value: '#004d40', type: 'color' },
+            { label: 'ফোরেস্ট',        value: '#1b5e20', type: 'color' },
+            { label: 'লাল',            value: '#5a1a1a', type: 'color' },
+            { label: 'গাঢ় লাল',        value: '#3b0000', type: 'color' },
+            { label: 'গোলাপী',         value: '#4a1040', type: 'color' },
+            { label: 'ম্যাজেন্টা',      value: '#6a0050', type: 'color' },
+            { label: 'বেগুনি',         value: '#2d1b6e', type: 'color' },
+            { label: 'গাঢ় বেগুনি',     value: '#1a0a3d', type: 'color' },
+            { label: 'ল্যাভেন্ডার',     value: '#4a3080', type: 'color' },
+            { label: 'কমলা',           value: '#4a2000', type: 'color' },
+            { label: 'বাদামী',         value: '#3e2723', type: 'color' },
+            { label: 'ক্যারামেল',       value: '#5d4037', type: 'color' },
+            { label: 'হলুদ',           value: '#4a3a00', type: 'color' },
+            { label: 'সোনালি',         value: '#3d2e00', type: 'color' },
+            { label: 'সাদা',           value: '#f8fafc', type: 'color' },
+            { label: 'হালকা ধূসর',     value: '#e8ecef', type: 'color' },
+            { label: 'ধূসর',           value: '#607d8b', type: 'color' },
+            { label: 'গাঢ় ধূসর',       value: '#263238', type: 'color' },
+            { label: 'স্লেট',          value: '#1e2a35', type: 'color' },
+            { label: 'চারকোল',        value: '#1c2833', type: 'color' },
+            { label: 'ইন্ডিগো',        value: '#1a237e', type: 'color' },
+            { label: 'ডিপ স্কাই',      value: '#003366', type: 'color' },
+            { label: 'ওশান',          value: '#006994', type: 'color' },
+            { label: 'গ্রেডিয়েন্ট ১',   value: 'linear-gradient(135deg,#0b141a,#1a3a6e)', type: 'gradient' },
+            { label: 'গ্রেডিয়েন্ট ২',   value: 'linear-gradient(135deg,#1b0a3d,#0a2a4a)', type: 'gradient' },
+            { label: 'গ্রেডিয়েন্ট ৩',   value: 'linear-gradient(135deg,#0d3b1e,#0a1628)', type: 'gradient' },
+        ];
+
+        function _applyBg(bgData) {
+            const area = document.getElementById('tmv3-messages');
+            if (!area) return;
+            if (bgData.type === 'default') {
+                area.style.background = '';
+                area.style.backgroundImage = '';
+                area.style.backgroundRepeat = '';
+                area.style.backgroundSize = '';
+            } else if (bgData.type === 'image') {
+                area.style.background = `url('${bgData.value}') center/cover no-repeat`;
+                area.style.backgroundImage = `url('${bgData.value}')`;
+                area.style.backgroundRepeat = 'no-repeat';
+                area.style.backgroundSize = 'cover';
+            } else if (bgData.type === 'gradient') {
+                area.style.backgroundImage = bgData.value;
+                area.style.backgroundRepeat = '';
+                area.style.backgroundSize = '';
+            } else {
+                area.style.backgroundImage = 'none';
+                area.style.background = bgData.value;
+            }
+        }
+
+        // Restore saved bg on load
+        try {
+            const saved = JSON.parse(localStorage.getItem(BG_KEY) || 'null');
+            if (saved) _applyBg(saved);
+        } catch(e) {}
+
+        function _saveBg(bgData) {
+            localStorage.setItem(BG_KEY, JSON.stringify(bgData));
+            _applyBg(bgData);
+        }
+
+        // Get current selection
+        let _curBg = (() => { try { return JSON.parse(localStorage.getItem(BG_KEY) || 'null') || _defaultBg; } catch(e){ return _defaultBg; } })();
+
+        // Render color swatches
+        const colorsWrap = document.getElementById('pr-bg-colors');
+        if (colorsWrap) {
+            _bgColors.forEach((c, i) => {
+                const sw = document.createElement('div');
+                const isSelected = _curBg.value === c.value;
+                sw.title = c.label;
+                sw.style.cssText = `
+                    width:36px; height:36px; border-radius:50%; cursor:pointer; flex-shrink:0;
+                    background:${c.value}; border:3px solid ${isSelected ? '#25d366' : 'rgba(255,255,255,0.15)'};
+                    box-shadow:${isSelected ? '0 0 0 2px #25d366' : '0 2px 6px rgba(0,0,0,.4)'};
+                    transition:all .2s; position:relative;
+                `;
+                if (_isMobile) { sw.style.width = '58px'; sw.style.height = '58px'; }
+                sw.addEventListener('click', () => {
+                    colorsWrap.querySelectorAll('div').forEach(el => {
+                        el.style.border = '3px solid rgba(255,255,255,0.15)';
+                        el.style.boxShadow = '0 2px 6px rgba(0,0,0,.4)';
+                    });
+                    sw.style.border = '3px solid #25d366';
+                    sw.style.boxShadow = '0 0 0 2px #25d366';
+                    _curBg = c;
+                    _saveBg(c);
+                    _toast('ব্যাকগ্রাউন্ড পরিবর্তন হয়েছে ✅');
+                });
+                colorsWrap.appendChild(sw);
+            });
+        }
+
+        // File upload
+        const bgFile = document.getElementById('pr-bg-file');
+        if (bgFile) {
+            bgFile.addEventListener('change', function() {
+                if (!this.files || !this.files[0]) return;
+                const r = new FileReader();
+                r.onload = e => {
+                    const imgData = e.target.result;
+                    const bgData = { type: 'image', value: imgData };
+                    _curBg = bgData;
+                    _saveBg(bgData);
+                    // Update upload label
+                    const lbl = document.getElementById('pr-bg-upload-label');
+                    if (lbl) lbl.querySelector('span').innerHTML = '<i class="fa fa-check-circle" style="color:#25d366; margin-right:6px;"></i> ছবি সেট হয়েছে ✅';
+                    _toast('ব্যাকগ্রাউন্ড ছবি সেট হয়েছে ✅');
+                };
+                r.readAsDataURL(this.files[0]);
+                this.value = '';
+            });
+        }
+
+        // Reset to default
+        const resetBtn = document.getElementById('pr-bg-reset');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                localStorage.removeItem(BG_KEY);
+                _applyBg(_defaultBg);
+                colorsWrap && colorsWrap.querySelectorAll('div').forEach(el => {
+                    el.style.border = '3px solid rgba(255,255,255,0.15)';
+                    el.style.boxShadow = '0 2px 6px rgba(0,0,0,.4)';
+                });
+                _curBg = _defaultBg;
+                _toast('ব্যাকগ্রাউন্ড ডিফল্টে ফিরেছে ✅');
+            });
+        }
 
         /* Save */
         document.getElementById('pr-save-btn').addEventListener('click', () => {
