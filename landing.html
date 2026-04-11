@@ -1677,11 +1677,7 @@ const SK='TM_SESSION_USER',UK='TM_DB_USERS_V2',LBK='TM_LOGIN_LEADERBOARDS',
       LOCLK='TM_LOCAL_BOARDS',
       AID='DigitalShopOrjo',APW='Orjo@1010',APH='01822963824',MP='index.html';
 
-(function(){
-    var done=false;
-    var t=setTimeout(function(){if(!done){done=true;if(localStorage.getItem(SK))window.location.replace(MP);}},400);
-    (window.TM_READY||Promise.resolve()).then(function(){if(!done){done=true;clearTimeout(t);if(localStorage.getItem(SK))window.location.replace(MP);}});
-})();
+(window.TM_READY||Promise.resolve()).then(()=>{if(localStorage.getItem(SK))window.location.replace(MP);});
 
 function openM(id){document.getElementById(id).classList.add('open');}
 function closeM(id){document.getElementById(id).classList.remove('open');}
@@ -2888,10 +2884,10 @@ function closePmxGuestShop(){
     if(window._pmxGLTimer)clearInterval(window._pmxGLTimer);
 }
 
-// Firebase থেকে pmx data load করা
+// Firebase থেকে সরাসরি data load — FB_READY এর জন্য অপেক্ষা না করে
 function loadPmxFromFirebase(){
-    (window.FB_READY||Promise.resolve()).then(()=>{
-        if(typeof firebase==='undefined'||!firebase.firestore)return;
+    function _doLoad(){
+        if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length) return;
         const db=firebase.firestore();
         ['pmx_headers','pmx_products','pmx_holders'].forEach(col=>{
             db.collection(col).get().then(snap=>{
@@ -2900,22 +2896,44 @@ function loadPmxFromFirebase(){
                 if(col==='pmx_headers') renderPmxGuestHeaders();
             }).catch(()=>{});
         });
-        // মেইন প্রোডাক্ট লোড
         db.collection(PKK).get().then(snap=>{
             const arr=snap.docs.map(d=>d.data());
             if(arr.length){ localStorage.setItem(PKK,JSON.stringify(arr)); renderGuestProducts(); }
         }).catch(()=>{});
-    });
+        // অন্য data গুলোও Firebase থেকে নিয়ে re-render
+        const otherKeys = ['TM_DB_USERS_V2','TM_DB_NOTICES_V1','TM_LOCAL_BOARDS','night_boards','TM_LOGIN_LEADERBOARDS','sironam_list'];
+        otherKeys.forEach(col=>{
+            db.collection(col).get().then(snap=>{
+                if(!snap.empty){
+                    const arr=snap.docs.map(d=>({id:d.id,...d.data()}));
+                    localStorage.setItem(col,JSON.stringify(arr));
+                    if(col==='TM_LOGIN_LEADERBOARDS') renderLB();
+                    if(col==='sironam_list') renderSironam();
+                    if(col==='night_boards') renderNightBoard();
+                    if(col==='TM_LOCAL_BOARDS') renderLocalBoards();
+                }
+            }).catch(()=>{});
+        });
+    }
+    // Firebase তৈরি থাকলে সাথে সাথে, নইলে ১ সেকেন্ড পরে retry
+    if(typeof firebase!=='undefined'&&firebase.apps&&firebase.apps.length){
+        _doLoad();
+    } else {
+        setTimeout(function(){_doLoad();}, 800);
+        setTimeout(function(){_doLoad();}, 2000); // একবার আরো retry
+    }
 }
 
-/* INIT */
-(window.TM_READY||Promise.resolve()).then(()=>{renderLB();renderSironam();
-    renderNightBoard();renderLocalBoards();
+/* INIT — localStorage থেকে সাথে সাথে render, Firebase থেকে fresh data */
+(window.TM_READY||Promise.resolve()).then(()=>{
+    renderLB(); renderSironam();
+    renderNightBoard(); renderLocalBoards();
     renderGuestProducts();
     _gpCheckUrlProduct();
-    renderPmxGuestHeaders(); // localStorage থেকে প্রথমে render
-    loadPmxFromFirebase();   // Firebase থেকে fresh data নিয়ে আবার render
+    renderPmxGuestHeaders();
 });
+// Firebase data সাথে সাথে load শুরু — TM_READY এর জন্য অপেক্ষা না করে
+loadPmxFromFirebase();
 </script>
 <script src="firebase-sync.js"></script>
 </body>
