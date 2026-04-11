@@ -2750,21 +2750,21 @@
                     </div>
                     <button class="tmv3-btn primary" id="gs-sync-users" style="padding:6px 14px;font-size:12px;">Sync</button>
                 </div>` : ''}
-                <div class="tmv3-sp-row" style="padding:14px 0;border-bottom:1px solid #2a3942;">
-                    <i class="fa fa-user-plus" style="color:#8696a0;font-size:16px;"></i>
+                <div class="tmv3-sp-row tmv3-gs-option-row">
+                    <i class="fa fa-user-plus tmv3-gs-icon"></i>
                     <div style="flex:1;">
-                        <div style="color:#e9edef;font-size:14px;">সদস্যরা মেম্বার যোগ করতে পারবে?</div>
-                        <div style="color:#8696a0;font-size:12px;">অন করলে সদস্যরাও মেম্বার যোগ করতে পারবে</div>
+                        <div class="tmv3-gs-label">সদস্যরা মেম্বার যোগ করতে পারবে?</div>
+                        <div class="tmv3-gs-sublabel">অন করলে সদস্যরাও মেম্বার যোগ করতে পারবে</div>
                     </div>
-                    <label class="tmv3-toggle"><input type="checkbox" id="gs-allow-add" ${chat.allowMemberAdd ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                    <label class="tmv3-toggle tmv3-toggle-lg"><input type="checkbox" id="gs-allow-add" ${chat.allowMemberAdd ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
                 </div>
-                <div class="tmv3-sp-row" style="padding:14px 0;border-bottom:1px solid #2a3942;">
-                    <i class="fa fa-comment" style="color:#8696a0;font-size:16px;"></i>
+                <div class="tmv3-sp-row tmv3-gs-option-row">
+                    <i class="fa fa-comment tmv3-gs-icon"></i>
                     <div style="flex:1;">
-                        <div style="color:#e9edef;font-size:14px;">সদস্যরা মেসেজ পাঠাতে পারবে?</div>
-                        <div style="color:#8696a0;font-size:12px;">বন্ধ করলে শুধু এডমিন মেসেজ পাঠাতে পারবেন</div>
+                        <div class="tmv3-gs-label">সদস্যরা মেসেজ পাঠাতে পারবে?</div>
+                        <div class="tmv3-gs-sublabel">বন্ধ করলে শুধু এডমিন মেসেজ পাঠাতে পারবেন</div>
                     </div>
-                    <label class="tmv3-toggle"><input type="checkbox" id="gs-allow-msg" ${chat.allowMemberMsg !== false ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                    <label class="tmv3-toggle tmv3-toggle-lg"><input type="checkbox" id="gs-allow-msg" ${chat.allowMemberMsg !== false ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
                 </div>
             </div>
             <div class="tmv3-modal-footer">
