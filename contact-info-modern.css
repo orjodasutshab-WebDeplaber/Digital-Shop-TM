@@ -45,13 +45,13 @@
     background: rgba(37, 211, 102, 0.1) !important;
     border: 1.5px solid rgba(37, 211, 102, 0.25) !important;
     color: #25d366 !important;
-    width: 40px !important;
-    height: 40px !important;
+    width: 60px !important;
+    height: 60px !important;
     border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 15px !important;
+    font-size: 50px !important;
     flex-shrink: 0 !important;
     transition: all 0.22s !important;
     cursor: pointer !important;
@@ -70,7 +70,7 @@
     letter-spacing: 0.4px !important;
     font-family: 'Sora', sans-serif !important;
 }
-.is-mobile #tmv3-side-panel .tmv3-sp-title { font-size: 24px !important; }
+.is-mobile #tmv3-side-panel .tmv3-sp-title { font-size: 45px !important; }
 
 /* ══════════════════════════════════════════════════════════════
    HERO AVATAR SECTION
@@ -211,9 +211,9 @@
     letter-spacing: 0.1px !important;
 }
 
-.is-mobile #tmv3-side-panel .tmv3-sp-name  { font-size: 28px !important; }
+.is-mobile #tmv3-side-panel .tmv3-sp-name  { font-size: 47px !important; }
 .is-mobile #tmv3-side-panel .tmv3-sp-sub,
-.is-mobile #tmv3-side-panel #sp-other-sub  { font-size: 18px !important; }
+.is-mobile #tmv3-side-panel #sp-other-sub  { font-size: 37px !important; }
 
 /* ══════════════════════════════════════════════════════════════
    BIO BOX
@@ -246,7 +246,7 @@
     z-index: 1 !important;
     padding-left: 6px !important;
 }
-.is-mobile #tmv3-side-panel .tmv3-bio-box p { font-size: 20px !important; }
+.is-mobile #tmv3-side-panel .tmv3-bio-box p { font-size: 37px !important; }
 
 /* ══════════════════════════════════════════════════════════════
    SECTION CARD
@@ -284,7 +284,7 @@
     padding: 16px 20px !important;
     border-bottom: 1px solid rgba(42, 57, 66, 0.28) !important;
     color: #e9edef !important;
-    font-size: 15px !important;
+    font-size: 50px !important;
     cursor: pointer !important;
     transition: all 0.2s !important;
     position: relative !important;
@@ -315,8 +315,8 @@
 
 /* Icon box */
 #tmv3-side-panel .tmv3-sp-row i {
-    width: 40px !important;
-    height: 40px !important;
+    width: 60px !important;
+    height: 60px !important;
     border-radius: 12px !important;
     background: rgba(37, 211, 102, 0.1) !important;
     border: 1.5px solid rgba(37, 211, 102, 0.18) !important;
@@ -339,7 +339,7 @@
 #tmv3-side-panel .tmv3-sp-row .label {
     flex: 1 !important;
     color: #d1dde3 !important;
-    font-size: 15px !important;
+    font-size: 50px !important;
     font-weight: 500 !important;
     font-family: 'Sora', sans-serif !important;
 }
@@ -373,16 +373,16 @@
 /* ── Mobile rows ── */
 .is-mobile #tmv3-side-panel .tmv3-sp-row {
     padding: 18px 20px !important;
-    font-size: 20px !important;
+    font-size: 39px !important;
     gap: 18px !important;
 }
 .is-mobile #tmv3-side-panel .tmv3-sp-row i {
-    width: 48px !important;
-    height: 48px !important;
-    font-size: 20px !important;
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 39px !important;
     border-radius: 14px !important;
 }
-.is-mobile #tmv3-side-panel .tmv3-sp-row .label { font-size: 20px !important; }
+.is-mobile #tmv3-side-panel .tmv3-sp-row .label { font-size: 39px !important; }
 
 /* ══════════════════════════════════════════════════════════════
    TOGGLE SWITCH
@@ -465,9 +465,15 @@
 .is-mobile #tmv3-side-panel.open { display: flex !important; }
 .is-mobile #tmv3-side-panel .tmv3-sp-header { padding: 20px 22px !important; }
 .is-mobile #tmv3-side-panel .tmv3-sp-avatar {
-    width: 160px !important;
-    height: 160px !important;
-    font-size: 68px !important;
+    width: 175px !important;
+    height: 175px !important;
+    font-size: 75px !important;
 }
 .is-mobile #tmv3-side-panel .tmv3-sp-avatar-wrap { padding: 48px 20px 36px !important; }
 .is-mobile #tmv3-side-panel .tmv3-sp-section { margin: 10px 18px !important; border-radius: 18px !important; }
+.is-mobile #tmv3-side-panel .tmv3-sp-section-label { font-size: 33px !important; }
+.is-mobile #tmv3-side-panel .tmv3-member-item { padding: 18px 20px !important; gap: 16px !important; }
+.is-mobile #tmv3-side-panel .tmv3-member-av { width: 75px !important; height: 75px !important; font-size: 33px !important; }
+.is-mobile #tmv3-side-panel .tmv3-member-name { font-size: 40px !important; font-weight: 600 !important; }
+.is-mobile #tmv3-side-panel .tmv3-member-sub { font-size: 34px !important; }
+.is-mobile #tmv3-side-panel .tmv3-member-badge { font-size: 26px !important; padding: 6px 16px !important; }
