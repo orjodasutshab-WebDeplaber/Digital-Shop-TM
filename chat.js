@@ -102,6 +102,29 @@
             _ensurePublicGroup();
         }
 
+        // ✅ ১৫ দিনের পুরনো message Firestore থেকে auto-delete
+        if (_db) {
+            setTimeout(() => {
+                try {
+                    const cutoff = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
+                    const cutoffTs = firebase.firestore.Timestamp.fromDate(cutoff);
+                    // group messages
+                    _db.collectionGroup('messages')
+                        .where('expireAt', '<', cutoffTs)
+                        .limit(200)
+                        .get()
+                        .then(snap => {
+                            if (snap.empty) return;
+                            const batch = _db.batch();
+                            snap.docs.forEach(doc => batch.delete(doc.ref));
+                            return batch.commit();
+                        })
+                        .then(() => console.log('[TM] ✅ Expired messages cleaned'))
+                        .catch(e => console.warn('[TM] expire clean err:', e.message));
+                } catch(e) {}
+            }, 5000); // 5s পরে চালাও — main load এ বাধা না দিতে
+        }
+
         // ✅ সেভ করা ব্যাকগ্রাউন্ড restore করো
         setTimeout(() => {
             try {
@@ -2219,11 +2242,12 @@
             bubble.appendChild(q);
         }
 
-        if (data.imgData) {
+        if (data.imgData || data.imgUrl) {
             const img = document.createElement('img');
             img.className = 'tmv3-msg-img';
-            img.src = data.imgData; img.alt = '📷'; img.loading = 'lazy';
-            img.addEventListener('click', () => _openLightbox(data.imgData));
+            const src = data.imgUrl || data.imgData; // ✅ link আগে, fallback base64
+            img.src = src; img.alt = '📷'; img.loading = 'lazy';
+            img.addEventListener('click', () => _openLightbox(src));
             bubble.appendChild(img);
         }
 
@@ -2304,26 +2328,65 @@
             if (chat.adminId !== uid && !isMainAdmin) { _toast('শুধু এডমিন মেসেজ পাঠাতে পারবেন।'); return; }
         }
 
+        /* ছবি থাকলে আগে ImgBB তে আপলোড করো, তারপর link হিসেবে সেন্ড */
+        if (_mediaPreview) {
+            const sendBtn = document.getElementById('tmv3-send-btn');
+            if (sendBtn) { sendBtn.disabled = true; sendBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>'; }
+            _toast('ছবি আপলোড হচ্ছে...');
+
+            // base64 থেকে raw part নাও
+            const base64 = _mediaPreview.includes(',') ? _mediaPreview.split(',')[1] : _mediaPreview;
+            const fd = new FormData();
+            fd.append('image', base64);
+
+            fetch('https://api.imgbb.com/1/upload?key=5be9029fcab9d8ab514eeeb3563af84d', {
+                method: 'POST', body: fd
+            })
+            .then(r => r.json())
+            .then(json => {
+                if (!json.success) throw new Error('ImgBB upload failed');
+                const imgUrl = json.data.display_url || json.data.url;
+                _doSendMessage(text, imgUrl); // link হিসেবে পাঠাও
+            })
+            .catch(() => {
+                _toast('❌ ছবি আপলোড ব্যর্থ! আবার চেষ্টা করুন।');
+                if (sendBtn) { sendBtn.disabled = false; sendBtn.innerHTML = '<i class="fa fa-paper-plane"></i>'; }
+            });
+            return;
+        }
+
+        _doSendMessage(text, null);
+    }
+
+    function _doSendMessage(text, imgUrl) {
+        const chat = _activeChat;
+        const ta = document.getElementById('tmv3-msg-input');
+        const sendBtn = document.getElementById('tmv3-send-btn');
+
+        const now = new Date();
+        const expireAt = new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000); // ১৫ দিন পরে
+
         const msg = {
             text: text,
             senderId: String(_currentUser.id),
             senderName: _currentUser.name || _currentUser.email || String(_currentUser.id),
             senderAvatar: _currentUser.avatar || _currentUser.profileImage || '',
             ts: firebase.firestore.FieldValue.serverTimestamp(),
-            seenBy: [String(_currentUser.id)]
+            seenBy: [String(_currentUser.id)],
+            expireAt: firebase.firestore.Timestamp.fromDate(expireAt) // ✅ auto-delete এর জন্য
         };
 
         if (_replyTarget) {
             msg.replyTo = { id: _replyTarget.id, senderName: _replyTarget.senderName, text: _replyTarget.text };
         }
-        if (_mediaPreview) msg.imgData = _mediaPreview;
+        if (imgUrl) msg.imgUrl = imgUrl; // ✅ base64 নয়, link
 
         const lastMsg = text || '📷 ছবি';
 
         _getMessagesPath(chat).add(msg).then(() => {
             ta.value = ''; ta.style.height = 'auto';
             _cancelReply(); _cancelMedia(); _clearTypingDoc();
-            /* update lastMsg on chat doc */
+            if (sendBtn) { sendBtn.disabled = false; sendBtn.innerHTML = '<i class="fa fa-paper-plane"></i>'; }
             const ref = chat.type === 'group'
                 ? _db.collection('tm_groups').doc(chat.id)
                 : _db.collection('tm_personal_chats').doc(chat.id);
@@ -2332,7 +2395,10 @@
                 const area = document.getElementById('tmv3-messages');
                 if (area) { area.scrollTop = area.scrollHeight; _isAtBottom = true; }
             }, 100);
-        }).catch(err => console.error('[send]', err));
+        }).catch(err => {
+            console.error('[send]', err);
+            if (sendBtn) { sendBtn.disabled = false; sendBtn.innerHTML = '<i class="fa fa-paper-plane"></i>'; }
+        });
     }
 
     function _deleteMsg(docId) {
