@@ -865,6 +865,7 @@
 .tmv3-sp-title { color:#e9edef; font-size:16px; font-weight:600; flex:1; }
 .is-mobile .tmv3-sp-title { font-size:45px; }
 .is-mobile .tmv3-sp-header { padding:20px 18px; gap:16px; }
+.is-mobile .tmv3-sp-avatar { width:155px; height:155px; font-size:75px; }
 
 /* Body */
 .tmv3-sp-body { padding:0; display:flex; flex-direction:column; gap:0; }
@@ -965,8 +966,12 @@
 .tmv3-member-del { background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.2s; }
 .tmv3-member-del:hover { background:rgba(239,68,68,.15); }
 .is-mobile .tmv3-member-item { padding:20px 0; gap:16px; }
+.is-mobile .tmv3-member-av { width:75px; height:75px; font-size:33px; }
 .is-mobile .tmv3-member-name { font-size:40px; font-weight:600; }
 .is-mobile .tmv3-member-sub { font-size:34px; }
+.is-mobile .tmv3-member-badge { font-size:26px; padding:6px 16px; }
+.is-mobile .tmv3-sp-section-label { font-size:33px; }
+.is-mobile .tmv3-sp-row .label { font-size:39px; }
 
 /* ══ Modal (Add Member / Create Group / Profile Edit) ══ */
 #tmv3-modal-overlay {
