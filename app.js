@@ -10642,7 +10642,7 @@ function showNoticeBoardPopup() {
 
             <!-- বিস্তারিত text -->
             ${n.detail ? `<div style="background:#f8fafc; border-left:4px solid #3b82f6; border-radius:0 10px 10px 0; padding:12px 16px; margin-bottom:18px;">
-                <p style="color:#334155; font-size:13px; line-height:1.8; margin:0; white-space:pre-wrap;">${n.detail}</p>
+                <p id="nbDetailText" style="color:#334155; font-size:21px; line-height:1.8; margin:0; white-space:pre-wrap;">${n.detail}</p>
             </div>` : ''}
         `;
     }
@@ -10670,11 +10670,11 @@ function showNoticeBoardPopup() {
             <div style="background:#1e293b; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
                 <div style="display:flex; align-items:center; gap:10px;">
                     <div style="width:8px; height:8px; background:#22c55e; border-radius:50%; box-shadow:0 0 6px #22c55e;"></div>
-                    <span style="color:#f1f5f9; font-size:13px; font-weight:700; letter-spacing:0.5px;">Digital Shop TM — নোটিশ</span>
+                    <span id="nbHeaderTitle" style="color:#f1f5f9; font-size:13px; font-weight:700; letter-spacing:0.5px;">Digital Shop TM — নোটিশ</span>
                 </div>
                 <div style="display:flex; align-items:center; gap:8px;">
                     ${notices.length > 1 ? `<span id="nbCounter" style="color:#94a3b8; font-size:11px; font-weight:600;">১/${notices.length}</span>` : ''}
-                    <button onclick="closeNoticeBoardPopup()" style="background:rgba(255,255,255,0.1); border:none; color:#94a3b8; width:28px; height:28px; border-radius:8px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; line-height:1;">✕</button>
+                    <button onclick="closeNoticeBoardPopup()" id="nbCloseBtn" style="background:rgba(255,255,255,0.1); border:none; color:#94a3b8; width:28px; height:28px; border-radius:8px; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; line-height:1;">✕</button>
                 </div>
             </div>
 
@@ -10684,18 +10684,75 @@ function showNoticeBoardPopup() {
             </div>
 
             <!-- Footer buttons -->
-            <div style="padding:14px 20px; border-top:1px solid #f1f5f9; display:flex; gap:10px; justify-content:flex-end; flex-shrink:0; background:#fff;">
+            <div id="nbFooter" style="padding:14px 20px; border-top:1px solid #f1f5f9; display:flex; gap:10px; justify-content:flex-end; flex-shrink:0; background:#fff;">
                 ${notices.length > 1 ? `
                 <button id="nbPrev" onclick="nbNavigate(-1)" style="background:#f1f5f9; color:#64748b; border:none; padding:9px 16px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600; display:none;">‹ আগের</button>
                 <button id="nbNext" onclick="nbNavigate(1)" style="background:#3b82f6; color:#fff; border:none; padding:9px 16px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600;">পরের ›</button>
                 ` : ''}
-                <button onclick="closeNoticeBoardPopup()" style="background:#0f172a; color:#fff; border:none; padding:9px 20px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:700;">ঠিক আছে</button>
+                <button onclick="closeNoticeBoardPopup()" id="nbOkBtn" style="background:#0f172a; color:#fff; border:none; padding:9px 20px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:700;">ঠিক আছে</button>
             </div>
         </div>
     `;
     document.body.appendChild(popup);
 
-    // Next/Prev navigation
+    // ── মোবাইলে বাটন ও ক্রস বড় করা (+15px) ──
+    (function applyMobileNoticeSize() {
+        const isMobile = document.documentElement.classList.contains('is-mobile') ||
+            /Android|iPhone|iPad|webOS/i.test(navigator.userAgent) ||
+            window.innerWidth <= 900;
+        if (!isMobile) return;
+
+        // ক্রস বাটন — 16px → 31px, size 28px → 56px
+        const closeBtn = document.getElementById('nbCloseBtn');
+        if (closeBtn) {
+            closeBtn.style.fontSize = '31px';
+            closeBtn.style.width = '56px';
+            closeBtn.style.height = '56px';
+            closeBtn.style.borderRadius = '12px';
+        }
+
+        // header title
+        const headerTitle = document.getElementById('nbHeaderTitle');
+        if (headerTitle) { headerTitle.style.fontSize = '24px'; }
+
+        // counter
+        const counter = document.getElementById('nbCounter');
+        if (counter) { counter.style.fontSize = '22px'; }
+
+        // footer padding বড়
+        const footer = document.getElementById('nbFooter');
+        if (footer) {
+            footer.style.padding = '18px 20px 28px';
+            footer.style.gap = '14px';
+        }
+
+        // বিস্তারিত text — ইতিমধ্যে 21px, মোবাইলে আরো: 26px
+        const detailText = document.getElementById('nbDetailText');
+        if (detailText) {
+            detailText.style.fontSize = '26px';
+            detailText.style.lineHeight = '1.9';
+        }
+
+        // "পরের" বাটন — 13px → 28px
+        const nextBtn = document.getElementById('nbNext');
+        if (nextBtn) {
+            nextBtn.style.cssText += '; font-size:28px !important; padding:18px 30px !important; border-radius:14px !important; min-height:66px !important; font-weight:700 !important;';
+        }
+
+        // "আগের" বাটন
+        const prevBtn = document.getElementById('nbPrev');
+        if (prevBtn) {
+            prevBtn.style.cssText += '; font-size:28px !important; padding:18px 30px !important; border-radius:14px !important; min-height:66px !important; font-weight:700 !important;';
+        }
+
+        // "ঠিক আছে" বাটন — 13px → 28px
+        const okBtn = document.getElementById('nbOkBtn');
+        if (okBtn) {
+            okBtn.style.cssText += '; font-size:28px !important; padding:18px 36px !important; border-radius:14px !important; min-height:66px !important; font-weight:800 !important;';
+        }
+    })();
+
+    // Next/Prev navigate এও মোবাইল size apply করো
     window.nbNavigate = function(dir) {
         currentIdx += dir;
         if (currentIdx < 0) currentIdx = 0;
@@ -10707,6 +10764,14 @@ function showNoticeBoardPopup() {
         const next = document.getElementById('nbNext');
         if (prev) prev.style.display = currentIdx > 0 ? 'block' : 'none';
         if (next) next.style.display = currentIdx < notices.length-1 ? 'block' : 'none';
+
+        // মোবাইলে detail text বড় রাখো
+        const isMobile = document.documentElement.classList.contains('is-mobile') ||
+            /Android|iPhone|iPad|webOS/i.test(navigator.userAgent) || window.innerWidth <= 900;
+        if (isMobile) {
+            const dt = document.getElementById('nbDetailText');
+            if (dt) { dt.style.fontSize = '26px'; dt.style.lineHeight = '1.9'; }
+        }
     };
 }
 
