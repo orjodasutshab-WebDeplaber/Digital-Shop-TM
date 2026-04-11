@@ -257,34 +257,37 @@
         -webkit-text-fill-color: #e9edef !important;
         letter-spacing: -0.2px !important;
     }
-    .tmv3-icon-btn {
-        width: 54px !important; height: 54px !important; font-size: 24px !important;
-        color: #aebac1 !important;
-    }
+    /* 3-dot বাটন দ্বিগুণ বড় */
+    .tmv3-icon-btn { width: 72px !important; height: 72px !important; font-size: 32px !important; color: #aebac1 !important; }
+    #tmv3-left-3dot { width: 72px !important; height: 72px !important; font-size: 32px !important; }
+    /* close বাটন ও 3-dot এর মাঝে খালি জায়গা */
+    .tmv3-header-actions { gap: 20px !important; }
     #tmv3-main-close-btn {
-        width: 54px !important; height: 54px !important; font-size: 22px !important;
-        border-width: 2px !important;
+        width: 72px !important; height: 72px !important; font-size: 28px !important;
+        border-width: 2.5px !important;
         background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+        box-shadow: 0 3px 14px rgba(239,68,68,.5) !important;
     }
-    .tmv3-search-wrap { padding: 6px 14px 8px !important; }
+    /* Search bar বড়, গোলাকার, ভেতরে কোনো extra বক্স নেই */
+    .tmv3-search-wrap { padding: 12px 16px 10px !important; }
     .tmv3-search-bar {
         background: #202c33 !important;
         border: none !important;
-        border-radius: 12px !important;
-        padding: 15px 18px !important;
-        gap: 14px !important;
+        border-radius: 100px !important;
+        padding: 22px 26px !important;
+        gap: 16px !important;
         box-shadow: none !important;
-        min-height: unset !important;
+        min-height: 88px !important;
     }
     .tmv3-search-bar:focus-within {
         background: #202c33 !important;
         border-color: transparent !important;
         box-shadow: none !important;
     }
-    .tmv3-search-bar i { font-size: 22px !important; color: #8696a0 !important; }
-    .tmv3-search-bar input { font-size: 24px !important; }
-    .tmv3-search-bar input::placeholder { font-size: 24px !important; color: #8696a0 !important; }
-    #tmv3-search-clear { width: 38px !important; height: 38px !important; font-size: 20px !important; }
+    .tmv3-search-bar i { font-size: 30px !important; color: #8696a0 !important; }
+    .tmv3-search-bar input { font-size: 28px !important; }
+    .tmv3-search-bar input::placeholder { font-size: 28px !important; color: #8696a0 !important; }
+    #tmv3-search-clear { display: none !important; }
     .tmv3-tabs { padding: 8px 14px 10px !important; gap: 8px !important; }
     .tmv3-tab {
         font-size: 20px !important; padding: 11px 26px !important;

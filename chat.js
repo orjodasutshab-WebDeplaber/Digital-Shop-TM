@@ -1115,36 +1115,38 @@
     }
 
     /* ── Header Buttons ── */
-    .tmv3-icon-btn { width:56px !important; height:56px !important; font-size:26px !important; }
+    .tmv3-icon-btn { width:72px !important; height:72px !important; font-size:32px !important; }
+    #tmv3-left-3dot { width:72px !important; height:72px !important; font-size:32px !important; }
     #tmv3-main-close-btn {
         display:flex !important;
-        width:58px !important; height:58px !important; font-size:24px !important;
-        border-width:2px !important; border-radius:50% !important;
-        box-shadow:none !important;
+        width:72px !important; height:72px !important; font-size:28px !important;
+        border-width:2.5px !important; border-radius:50% !important;
+        box-shadow:0 3px 14px rgba(239,68,68,.5) !important;
     }
+    #tmv3-header-actions, .tmv3-header-actions { gap:20px !important; }
     #tmv3-back-btn { display:flex !important; width:72px !important; height:72px !important; font-size:32px !important; }
     #tmv3-chat-close-btn { display:flex !important; width:68px !important; height:68px !important; font-size:28px !important; }
 
-    /* ── Search Bar — WhatsApp style ── */
-    .tmv3-search-wrap { padding:10px 16px 8px !important; }
+    /* ── Search Bar — বড়, ভেতরে কোনো বক্স নেই ── */
+    .tmv3-search-wrap { padding:14px 16px 10px !important; }
     .tmv3-search-bar {
-        padding:16px 20px !important;
-        border-radius:12px !important;
+        padding:22px 26px !important;
+        border-radius:100px !important;
         background:#202c33 !important;
         border:none !important;
         box-shadow:none !important;
-        gap:14px !important;
-        min-height:60px !important;
+        gap:16px !important;
+        min-height:90px !important;
     }
     .tmv3-search-bar:focus-within {
         border-color:transparent !important;
         background:#202c33 !important;
         box-shadow:none !important;
     }
-    .tmv3-search-bar i { font-size:24px !important; color:#8696a0 !important; }
-    .tmv3-search-bar input { font-size:24px !important; color:#e9edef !important; }
-    .tmv3-search-bar input::placeholder { font-size:24px !important; color:#8696a0 !important; }
-    #tmv3-search-clear { width:40px !important; height:40px !important; font-size:22px !important; }
+    .tmv3-search-bar i { font-size:30px !important; color:#8696a0 !important; }
+    .tmv3-search-bar input { font-size:28px !important; color:#e9edef !important; }
+    .tmv3-search-bar input::placeholder { font-size:28px !important; color:#8696a0 !important; }
+    #tmv3-search-clear { display:none !important; }
 
     /* ── Filter Tabs — WhatsApp style ── */
     .tmv3-tabs { padding:8px 16px 12px !important; gap:10px !important; }
@@ -1298,7 +1300,7 @@
     <!-- Header -->
     <div id="tmv3-left-header">
       <span id="tmv3-app-title">Chats</span>
-      <div class="tmv3-header-actions">
+      <div class="tmv3-header-actions" style="gap:14px;">
         <div class="tmv3-dropdown" id="tmv3-left-menu-wrap">
           <button class="tmv3-icon-btn" id="tmv3-left-3dot" title="মেনু"><i class="fa fa-ellipsis-v"></i></button>
           <div class="tmv3-dropdown-menu" id="tmv3-left-menu">
@@ -1315,7 +1317,6 @@
       <div class="tmv3-search-bar">
         <i class="fa fa-search"></i>
         <input id="tmv3-search" placeholder="Search or start new chat" autocomplete="off">
-        <button id="tmv3-search-clear" title="Clear"><i class="fa fa-times"></i></button>
       </div>
       <div id="tmv3-user-search-results"></div>
     </div>
