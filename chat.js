@@ -1114,7 +1114,7 @@
         box-shadow:0 3px 14px rgba(239,68,68,.5) !important;
     }
     #tmv3-header-actions, .tmv3-header-actions { gap:20px !important; }
-    #tmv3-back-btn { display:flex !important; width:72px !important; height:72px !important; font-size:32px !important; }
+    #tmv3-back-btn { display:flex !important; width:72px !important; height:72px !important; font-size:47px !important; }
     #tmv3-chat-close-btn { display:none !important; }
 
     /* ── Search Bar — বড়, ভেতরে কোনো বক্স নেই ── */
@@ -1172,8 +1172,8 @@
     /* ── Chat Header ── */
     #tmv3-chat-header { padding:20px 18px !important; gap:16px !important; min-height:94px !important; }
     #tmv3-hdr-av { width:68px !important; height:68px !important; font-size:30px !important; flex-shrink:0 !important; }
-    #tmv3-header-name { font-size:30px !important; font-weight:800 !important; }
-    #tmv3-header-sub { font-size:22px !important; }
+    #tmv3-header-name { font-size:45px !important; font-weight:800 !important; }
+    #tmv3-header-sub { font-size:37px !important; }
 
     /* ── Dropdown ── */
     .tmv3-dropdown-menu { min-width:260px !important; border-radius:16px !important; }
