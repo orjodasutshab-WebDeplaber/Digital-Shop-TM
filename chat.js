@@ -943,6 +943,15 @@
 .is-mobile .tmv3-bio-box p { font-size:37px; }
 
 /* Toggle switch */
+.tmv3-pr-row-title { font-size:14px; font-weight:500; }
+.tmv3-pr-row-desc { color:#8696a0; font-size:12px; margin-top:2px; }
+.tmv3-toggle-lg { width:50px; height:28px; }
+.is-mobile .tmv3-pr-row-title { font-size:29px !important; font-weight:600 !important; }
+.is-mobile .tmv3-pr-row-desc { font-size:27px !important; margin-top:6px !important; }
+.is-mobile .tmv3-toggle-lg { width:90px !important; height:50px !important; }
+.is-mobile .tmv3-toggle-lg .tmv3-toggle-slider::before { width:40px !important; height:40px !important; left:4px !important; bottom:4px !important; }
+.is-mobile .tmv3-toggle-lg input:checked + .tmv3-toggle-slider::before { transform:translateX(40px) !important; }
+
 .tmv3-toggle { position:relative; width:50px; height:28px; flex-shrink:0; }
 .tmv3-toggle input { display:none; }
 .tmv3-toggle-slider { position:absolute; inset:0; background:#374f5a; border-radius:28px; cursor:pointer; transition:.3s; }
@@ -3048,18 +3057,18 @@
                     <div class="tmv3-sp-row">
                         <i class="fa fa-users"></i>
                         <div style="flex:1;">
-                            <div style="font-size:14px;font-weight:500;">গ্রুপে যোগ ব্লক</div>
-                            <div style="color:#8696a0;font-size:12px;margin-top:2px;">অন করলে কেউ আপনাকে গ্রুপে যোগ করতে পারবে না</div>
+                            <div class="tmv3-pr-row-title">গ্রুপে যোগ ব্লক</div>
+                            <div class="tmv3-pr-row-desc">অন করলে কেউ আপনাকে গ্রুপে যোগ করতে পারবে না</div>
                         </div>
-                        <label class="tmv3-toggle"><input type="checkbox" id="pr-block-group" ${u.blockGroupAdd ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                        <label class="tmv3-toggle tmv3-toggle-lg"><input type="checkbox" id="pr-block-group" ${u.blockGroupAdd ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
                     </div>
                     <div class="tmv3-sp-row">
                         <i class="fa fa-lock"></i>
                         <div style="flex:1;">
-                            <div style="font-size:14px;font-weight:500;">একাউন্ট লক</div>
-                            <div style="color:#8696a0;font-size:12px;margin-top:2px;">অন করলে সার্চে আপনার একাউন্ট পাওয়া যাবে না</div>
+                            <div class="tmv3-pr-row-title">একাউন্ট লক</div>
+                            <div class="tmv3-pr-row-desc">অন করলে সার্চে আপনার একাউন্ট পাওয়া যাবে না</div>
                         </div>
-                        <label class="tmv3-toggle"><input type="checkbox" id="pr-acc-lock" ${u.accountLocked ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
+                        <label class="tmv3-toggle tmv3-toggle-lg"><input type="checkbox" id="pr-acc-lock" ${u.accountLocked ? 'checked' : ''}><span class="tmv3-toggle-slider"></span></label>
                     </div>
                 </div>
                 <div style="padding:16px 12px 20px;">
