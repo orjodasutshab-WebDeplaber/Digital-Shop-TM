@@ -3312,9 +3312,9 @@
             bgFile.addEventListener('change', function() {
                 if (!this.files || !this.files[0]) return;
                 const file = this.files[0];
-                // ফাইল সাইজ চেক (max 5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    _toast('❌ ছবি ৫MB এর বেশি হবে না!'); return;
+                // ফাইল সাইজ চেক (max 500MB)
+                if (file.size > 500 * 1024 * 1024) {
+                    _toast('❌ ছবি ৫০০MB এর বেশি হবে না!'); return;
                 }
                 const r = new FileReader();
                 r.onload = e => {
