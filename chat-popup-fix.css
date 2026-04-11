@@ -240,6 +240,63 @@
     .tmv3-av-upload-btn { font-size: 24px !important; padding: 16px 38px !important; border-radius: 14px !important; }
     .tmv3-usr-name { font-size: 26px !important; }
     .tmv3-usr-sub { font-size: 20px !important; }
+
+    /* ══ WhatsApp-style chat list header & search overrides ══ */
+    #tmv3-left-header {
+        padding: 20px 20px 14px !important;
+        background: #111b21 !important;
+        border-bottom: none !important;
+        min-height: unset !important;
+        align-items: center !important;
+    }
+    #tmv3-app-title {
+        font-size: 38px !important;
+        font-weight: 900 !important;
+        color: #e9edef !important;
+        background: none !important;
+        -webkit-text-fill-color: #e9edef !important;
+        letter-spacing: -0.2px !important;
+    }
+    .tmv3-icon-btn {
+        width: 54px !important; height: 54px !important; font-size: 24px !important;
+        color: #aebac1 !important;
+    }
+    #tmv3-main-close-btn {
+        width: 54px !important; height: 54px !important; font-size: 22px !important;
+        border-width: 2px !important;
+        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    }
+    .tmv3-search-wrap { padding: 6px 14px 8px !important; }
+    .tmv3-search-bar {
+        background: #202c33 !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 15px 18px !important;
+        gap: 14px !important;
+        box-shadow: none !important;
+        min-height: unset !important;
+    }
+    .tmv3-search-bar:focus-within {
+        background: #202c33 !important;
+        border-color: transparent !important;
+        box-shadow: none !important;
+    }
+    .tmv3-search-bar i { font-size: 22px !important; color: #8696a0 !important; }
+    .tmv3-search-bar input { font-size: 24px !important; }
+    .tmv3-search-bar input::placeholder { font-size: 24px !important; color: #8696a0 !important; }
+    #tmv3-search-clear { width: 38px !important; height: 38px !important; font-size: 20px !important; }
+    .tmv3-tabs { padding: 8px 14px 10px !important; gap: 8px !important; }
+    .tmv3-tab {
+        font-size: 20px !important; padding: 11px 26px !important;
+        border-radius: 50px !important; border-width: 1.5px !important;
+        font-weight: 600 !important; min-height: unset !important;
+    }
+    .tmv3-chat-item { padding: 16px 18px !important; gap: 16px !important; min-height: unset !important; }
+    .tmv3-avatar { width: 80px !important; height: 80px !important; font-size: 34px !important; }
+    .tmv3-chat-name { font-size: 26px !important; font-weight: 600 !important; }
+    .tmv3-chat-preview { font-size: 22px !important; }
+    .tmv3-chat-time { font-size: 20px !important; }
+    .tmv3-unread-badge { font-size: 18px !important; min-width: 30px !important; height: 30px !important; }
 }
 
 /* .is-mobile class based — same rules */

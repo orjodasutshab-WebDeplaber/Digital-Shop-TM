@@ -364,17 +364,19 @@
 .tmv3-search-bar input::placeholder { color:#8696a0; }
 .is-mobile .tmv3-search-wrap { padding:12px 16px 8px; }
 .is-mobile .tmv3-search-bar {
-    padding:16px 22px;
-    border-radius:40px;
-    background:#1f2c34;
-    border:1.5px solid rgba(37,211,102,.2);
+    padding:16px 20px;
+    border-radius:12px;
+    background:#202c33;
+    border:none;
+    box-shadow:none;
     gap:14px;
 }
 .is-mobile .tmv3-search-bar:focus-within {
-    border-color:rgba(37,211,102,.5);
-    box-shadow:0 0 0 4px rgba(37,211,102,.12);
+    border-color:transparent;
+    background:#202c33;
+    box-shadow:none;
 }
-.is-mobile .tmv3-search-bar i { font-size:26px; }
+.is-mobile .tmv3-search-bar i { font-size:22px; color:#8696a0; }
 .is-mobile .tmv3-search-bar input { font-size:24px; }
 
 /* User Search Results dropdown */
@@ -1095,58 +1097,61 @@
 
     /* ── LEFT HEADER ── */
     #tmv3-left-header {
-        padding:28px 24px 20px !important;
+        padding:20px 20px 16px !important;
         background:#111b21 !important;
         border-bottom:none !important;
-        min-height:110px !important;
+        min-height:80px !important;
+        align-items:center !important;
     }
     #tmv3-left::before { display:none !important; }
     #tmv3-app-title {
-        font-size:60px !important; font-weight:900 !important;
-        background:linear-gradient(135deg,#e9edef,#aebac1) !important;
-        -webkit-background-clip:text !important;
-        -webkit-text-fill-color:transparent !important;
-        background-clip:text !important;
-        letter-spacing:-0.5px !important;
+        font-size:42px !important; font-weight:900 !important;
+        background:none !important;
+        -webkit-background-clip:unset !important;
+        -webkit-text-fill-color:#e9edef !important;
+        background-clip:unset !important;
+        color:#e9edef !important;
+        letter-spacing:-0.3px !important;
     }
 
     /* ── Header Buttons ── */
-    .tmv3-icon-btn { width:72px !important; height:72px !important; font-size:32px !important; }
+    .tmv3-icon-btn { width:56px !important; height:56px !important; font-size:26px !important; }
     #tmv3-main-close-btn {
         display:flex !important;
-        width:72px !important; height:72px !important; font-size:28px !important;
-        border-width:3px !important; border-radius:50% !important;
+        width:58px !important; height:58px !important; font-size:24px !important;
+        border-width:2px !important; border-radius:50% !important;
+        box-shadow:none !important;
     }
     #tmv3-back-btn { display:flex !important; width:72px !important; height:72px !important; font-size:32px !important; }
     #tmv3-chat-close-btn { display:flex !important; width:68px !important; height:68px !important; font-size:28px !important; }
 
-    /* ── Search Bar — big rounded pill ── */
-    .tmv3-search-wrap { padding:16px 18px 12px !important; }
+    /* ── Search Bar — WhatsApp style ── */
+    .tmv3-search-wrap { padding:10px 16px 8px !important; }
     .tmv3-search-bar {
-        padding:24px 30px !important;
-        border-radius:100px !important;
+        padding:16px 20px !important;
+        border-radius:12px !important;
         background:#202c33 !important;
-        border:2px solid rgba(37,211,102,.2) !important;
-        box-shadow:0 2px 12px rgba(0,0,0,.2) !important;
-        gap:18px !important;
-        min-height:100px !important;
+        border:none !important;
+        box-shadow:none !important;
+        gap:14px !important;
+        min-height:60px !important;
     }
     .tmv3-search-bar:focus-within {
-        border-color:rgba(37,211,102,.55) !important;
-        background:#1f2c34 !important;
-        box-shadow:0 0 0 5px rgba(37,211,102,.12) !important;
+        border-color:transparent !important;
+        background:#202c33 !important;
+        box-shadow:none !important;
     }
-    .tmv3-search-bar i { font-size:34px !important; color:#25d366 !important; }
-    .tmv3-search-bar input { font-size:30px !important; color:#e9edef !important; }
-    .tmv3-search-bar input::placeholder { font-size:30px !important; color:#8696a0 !important; }
-    #tmv3-search-clear { width:52px !important; height:52px !important; font-size:26px !important; }
+    .tmv3-search-bar i { font-size:24px !important; color:#8696a0 !important; }
+    .tmv3-search-bar input { font-size:24px !important; color:#e9edef !important; }
+    .tmv3-search-bar input::placeholder { font-size:24px !important; color:#8696a0 !important; }
+    #tmv3-search-clear { width:40px !important; height:40px !important; font-size:22px !important; }
 
-    /* ── Filter Tabs — 90px pill ── */
-    .tmv3-tabs { padding:14px 18px 16px !important; gap:12px !important; }
+    /* ── Filter Tabs — WhatsApp style ── */
+    .tmv3-tabs { padding:8px 16px 12px !important; gap:10px !important; }
     .tmv3-tab {
-        font-size:28px !important; padding:18px 42px !important;
-        border-radius:90px !important; border-width:2px !important;
-        font-weight:700 !important; min-height:90px !important;
+        font-size:22px !important; padding:12px 28px !important;
+        border-radius:50px !important; border-width:1.5px !important;
+        font-weight:600 !important; min-height:unset !important;
         display:flex !important; align-items:center !important;
     }
 
