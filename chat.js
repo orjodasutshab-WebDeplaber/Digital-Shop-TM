@@ -67,6 +67,21 @@
             document.documentElement.classList.remove('is-mobile');
         }
 
+        // ✅ Visual Viewport API — কীবোর্ড উঠলে modal সঠিক উচ্চতায় থাকবে
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', function () {
+                document.documentElement.style.setProperty(
+                    '--vvh', window.visualViewport.height + 'px'
+                );
+                // modal overlay কে visual viewport এর মধ্যে রাখা
+                var overlay = document.getElementById('tmv3-modal-overlay');
+                if (overlay && overlay.classList.contains('open')) {
+                    overlay.style.height = window.visualViewport.height + 'px';
+                    overlay.style.top = window.visualViewport.offsetTop + 'px';
+                }
+            });
+        }
+
         // ✅ window resize এ re-check করো
         window.addEventListener('resize', function() {
             var nowMobile = /Android|iPhone|iPad|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 900;
@@ -3138,7 +3153,11 @@
        MODAL HELPERS
     ══════════════════════════════════════════════════════════ */
     function _closeModal() {
-        document.getElementById('tmv3-modal-overlay').classList.remove('open');
+        var overlay = document.getElementById('tmv3-modal-overlay');
+        overlay.classList.remove('open');
+        // viewport reset
+        overlay.style.height = '';
+        overlay.style.top = '';
         document.getElementById('tmv3-modal').innerHTML = '';
     }
 
