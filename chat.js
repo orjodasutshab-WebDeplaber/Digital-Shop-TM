@@ -1114,7 +1114,7 @@
         box-shadow:0 3px 14px rgba(239,68,68,.5) !important;
     }
     #tmv3-header-actions, .tmv3-header-actions { gap:20px !important; }
-    #tmv3-back-btn { display:flex !important; width:72px !important; height:72px !important; font-size:47px !important; }
+    #tmv3-back-btn { display:flex !important; width:72px !important; height:72px !important; font-size:59px !important; }
     #tmv3-chat-close-btn { display:none !important; }
 
     /* ── Search Bar — বড়, ভেতরে কোনো বক্স নেই ── */
@@ -1172,8 +1172,8 @@
     /* ── Chat Header ── */
     #tmv3-chat-header { padding:20px 18px !important; gap:16px !important; min-height:94px !important; }
     #tmv3-hdr-av { width:68px !important; height:68px !important; font-size:30px !important; flex-shrink:0 !important; }
-    #tmv3-header-name { font-size:45px !important; font-weight:800 !important; }
-    #tmv3-header-sub { font-size:37px !important; }
+    #tmv3-header-name { font-size:30px !important; font-weight:800 !important; }
+    #tmv3-header-sub { font-size:22px !important; }
 
     /* ── Dropdown ── */
     .tmv3-dropdown-menu { min-width:260px !important; border-radius:16px !important; }
@@ -1218,21 +1218,21 @@
 
     /* ── Side Panel ── */
     .tmv3-sp-header { padding:24px 20px !important; gap:16px !important; min-height:88px !important; }
-    .tmv3-sp-title { font-size:30px !important; font-weight:800 !important; }
-    .tmv3-sp-avatar { width:140px !important; height:140px !important; font-size:60px !important; }
-    .tmv3-sp-name { font-size:32px !important; font-weight:800 !important; padding:18px 22px 4px !important; }
-    .tmv3-sp-sub { font-size:22px !important; padding:0 22px 20px !important; }
+    .tmv3-sp-title { font-size:45px !important; font-weight:800 !important; }
+    .tmv3-sp-avatar { width:140px !important; height:140px !important; font-size:75px !important; }
+    .tmv3-sp-name { font-size:47px !important; font-weight:800 !important; padding:18px 22px 4px !important; }
+    .tmv3-sp-sub { font-size:37px !important; padding:0 22px 20px !important; }
     .tmv3-sp-section { margin:10px 14px !important; border-radius:14px !important; }
-    .tmv3-sp-section-label { font-size:18px !important; padding:14px 18px 8px !important; }
-    .tmv3-sp-row { font-size:24px !important; padding:20px 20px !important; gap:18px !important; }
-    .tmv3-sp-row i { font-size:24px !important; width:30px !important; }
-    .tmv3-sp-row .label { font-size:24px !important; }
-    .tmv3-sp-row .value { font-size:19px !important; }
-    .tmv3-bio-box p { font-size:22px !important; }
+    .tmv3-sp-section-label { font-size:33px !important; padding:14px 18px 8px !important; }
+    .tmv3-sp-row { font-size:39px !important; padding:20px 20px !important; gap:18px !important; }
+    .tmv3-sp-row i { font-size:39px !important; width:30px !important; }
+    .tmv3-sp-row .label { font-size:39px !important; }
+    .tmv3-sp-row .value { font-size:34px !important; }
+    .tmv3-bio-box p { font-size:37px !important; }
     .tmv3-member-item { padding:18px 0 !important; gap:16px !important; }
-    .tmv3-member-av { width:60px !important; height:60px !important; font-size:26px !important; }
-    .tmv3-member-name { font-size:24px !important; font-weight:600 !important; }
-    .tmv3-member-sub { font-size:19px !important; }
+    .tmv3-member-av { width:60px !important; height:60px !important; font-size:41px !important; }
+    .tmv3-member-name { font-size:39px !important; font-weight:600 !important; }
+    .tmv3-member-sub { font-size:34px !important; }
     .tmv3-member-badge { font-size:16px !important; padding:5px 14px !important; }
 
     /* ── User Search Results ── */
