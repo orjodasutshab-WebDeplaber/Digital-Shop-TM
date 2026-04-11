@@ -1896,6 +1896,13 @@
         if (query && query.trim()) {
             const q = query.trim().toLowerCase();
             filtered = filtered.filter(c => {
+                // personal chat — memberInfo থেকে অন্য ব্যক্তির নাম নাও
+                if (c.type === 'personal' && c.memberInfo && _currentUser) {
+                    const uid = String(_currentUser.id);
+                    const otherUid = Object.keys(c.memberInfo).find(k => k !== uid);
+                    const otherName = otherUid ? (c.memberInfo[otherUid].name || '').toLowerCase() : '';
+                    if (otherName && otherName.includes(q)) return true;
+                }
                 const name = (c.name || c.displayName || '').toLowerCase();
                 return name.includes(q);
             });
@@ -2831,9 +2838,13 @@
                 <span class="tmv3-modal-title">Add member</span>
             </div>
             <div class="tmv3-modal-body">
-                <div style="display:flex;gap:10px;margin-bottom:12px;">
-                    <input class="tmv3-modal-search" id="am-search" placeholder="নাম, মোবাইল, জিমেইল দিয়ে খুঁজুন..." autocomplete="off">
-                    <button class="tmv3-btn secondary" id="am-public-btn" style="white-space:nowrap;font-size:12px;">সকল ইউজার</button>
+                <div class="tmv3-am-search-wrap">
+                    <span class="tmv3-am-search-icon"><i class="fa fa-search"></i></span>
+                    <input class="tmv3-am-search-input" id="am-search" placeholder="নাম, মোবাইল বা ইমেইল দিয়ে খুঁজুন..." autocomplete="off">
+                    <button class="tmv3-am-clear-btn" id="am-clear-btn" style="display:none;" title="মুছুন">✕</button>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin:8px 0 10px;">
+                    <button class="tmv3-btn secondary" id="am-public-btn" style="white-space:nowrap;font-size:12px;padding:8px 16px;">সকল ইউজার দেখুন</button>
                 </div>
                 <div id="am-list"><div class="tmv3-empty-msg">আপনার চ্যাটে থাকা ইউজারগুলো দেখাবে...</div></div>
                 <div id="am-selected-wrap" style="display:none;margin-top:12px;border-top:1px solid #2a3942;padding-top:12px;">
@@ -2929,16 +2940,51 @@
 
         document.getElementById('am-public-btn').addEventListener('click', () => loadAllUsers(''));
 
-        document.getElementById('am-search').addEventListener('input', function () {
+        /* Search input with clear button logic */
+        const amSearchEl = document.getElementById('am-search');
+        const amClearBtn = document.getElementById('am-clear-btn');
+
+        amSearchEl.addEventListener('input', function () {
             const q = this.value.trim().toLowerCase();
+            amClearBtn.style.display = q ? 'flex' : 'none';
             if (q) {
+                /* প্রথমে currentUsers এ search, তারপর Firebase এ */
                 const filtered = currentUsers.filter(u => {
-                    return (u.name || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q) || (u.mobile || '').toLowerCase().includes(q);
+                    return (u.name || '').toLowerCase().includes(q) ||
+                           (u.email || '').toLowerCase().includes(q) ||
+                           (u.mobile || '').toLowerCase().includes(q);
                 });
-                renderList(filtered);
+                if (filtered.length > 0) {
+                    renderList(filtered);
+                } else {
+                    /* Firebase এ search করো — personal accounts ও আসবে */
+                    if (_db && _currentUser) {
+                        _db.collection('users').limit(100).get().then(snap => {
+                            const uid = String(_currentUser.id);
+                            let fbUsers = snap.docs.filter(d => d.id !== uid).map(d => ({ id: d.id, ...d.data() }));
+                            fbUsers = fbUsers.filter(u => {
+                                const n = (u.name || '').toLowerCase();
+                                const e = (u.email || '').toLowerCase();
+                                const m = (u.mobile || '').toLowerCase();
+                                return n.includes(q) || e.includes(q) || m.includes(q);
+                            });
+                            currentUsers = fbUsers;
+                            renderList(fbUsers);
+                        }).catch(() => renderList([]));
+                    } else {
+                        renderList([]);
+                    }
+                }
             } else {
                 renderList(currentUsers);
             }
+        });
+
+        amClearBtn.addEventListener('click', function() {
+            amSearchEl.value = '';
+            amClearBtn.style.display = 'none';
+            renderList(currentUsers);
+            amSearchEl.focus();
         });
 
         document.getElementById('am-add-btn').addEventListener('click', () => {
