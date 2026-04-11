@@ -45,13 +45,13 @@
     background: rgba(37, 211, 102, 0.1) !important;
     border: 1.5px solid rgba(37, 211, 102, 0.25) !important;
     color: #25d366 !important;
-    width: 60px !important;
-    height: 60px !important;
+    width: 40px !important;
+    height: 40px !important;
     border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 50px !important;
+    font-size: 15px !important;
     flex-shrink: 0 !important;
     transition: all 0.22s !important;
     cursor: pointer !important;
@@ -284,7 +284,7 @@
     padding: 16px 20px !important;
     border-bottom: 1px solid rgba(42, 57, 66, 0.28) !important;
     color: #e9edef !important;
-    font-size: 50px !important;
+    font-size: 15px !important;
     cursor: pointer !important;
     transition: all 0.2s !important;
     position: relative !important;
@@ -315,8 +315,8 @@
 
 /* Icon box */
 #tmv3-side-panel .tmv3-sp-row i {
-    width: 60px !important;
-    height: 60px !important;
+    width: 40px !important;
+    height: 40px !important;
     border-radius: 12px !important;
     background: rgba(37, 211, 102, 0.1) !important;
     border: 1.5px solid rgba(37, 211, 102, 0.18) !important;
@@ -339,7 +339,7 @@
 #tmv3-side-panel .tmv3-sp-row .label {
     flex: 1 !important;
     color: #d1dde3 !important;
-    font-size: 50px !important;
+    font-size: 15px !important;
     font-weight: 500 !important;
     font-family: 'Sora', sans-serif !important;
 }
@@ -464,6 +464,11 @@
 }
 .is-mobile #tmv3-side-panel.open { display: flex !important; }
 .is-mobile #tmv3-side-panel .tmv3-sp-header { padding: 20px 22px !important; }
+.is-mobile #tmv3-side-panel .tmv3-sp-header .tmv3-icon-btn {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 50px !important;
+}
 .is-mobile #tmv3-side-panel .tmv3-sp-avatar {
     width: 175px !important;
     height: 175px !important;
