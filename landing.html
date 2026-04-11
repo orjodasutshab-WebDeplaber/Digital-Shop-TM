@@ -1667,6 +1667,52 @@ body.is-mobile #sirFull input[type="text"] { font-size: 28px !important; padding
 body.is-mobile #sirProductLabel > div > span:nth-child(2) { font-size: 34px !important; }
 body.is-mobile #sirProductLabel > div > span:nth-child(3) { font-size: 24px !important; }
 body.is-mobile #sirProductLabel { padding: 18px 16px 14px !important; }
+
+/* ── Skeleton Loading ── */
+@keyframes shimmer {
+    0%   { background-position: -600px 0; }
+    100% { background-position: 600px 0; }
+}
+.tm-skeleton {
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 600px 100%;
+    animation: shimmer 1.4s infinite linear;
+    border-radius: 10px;
+}
+body.dark-theme .tm-skeleton, body:not(.light-theme) .tm-skeleton {
+    background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+    background-size: 600px 100%;
+    animation: shimmer 1.4s infinite linear;
+}
+.tm-skel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 0;
+}
+body.is-mobile .tm-skel-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 0 14px;
+}
+.tm-skel-card {
+    border-radius: 14px;
+    overflow: hidden;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+body.dark-theme .tm-skel-card, body:not(.light-theme) .tm-skel-card {
+    background: #1e293b;
+    border-color: #334155;
+}
+.tm-skel-img  { height: 160px; width: 100%; }
+.tm-skel-line { height: 14px; margin: 10px 12px 6px; border-radius: 6px; }
+.tm-skel-line.short { width: 55%; }
+.tm-skel-line.price { width: 40%; height: 18px; margin-top: 8px; }
+.tm-skel-line.btn   { height: 34px; margin: 10px 12px 12px; border-radius: 8px; }
+.tm-skel-lb { display:flex; gap:12px; padding:4px 0; overflow:hidden; }
+.tm-skel-lb-item { flex:0 0 120px; height:56px; border-radius:12px; }
+body.is-mobile .tm-skel-lb-item { flex:0 0 90px; height:48px; }
 </style>
 
 <div id="toast"></div>
@@ -2904,7 +2950,42 @@ function loadPmxFromFirebase(){
     });
 }
 
-// firebase-sync.js syncAll শেষ হলে সাথে সাথে re-render
+/* ── Skeleton helpers ── */
+function _skelCard(){
+    return `<div class="tm-skel-card">
+        <div class="tm-skeleton tm-skel-img"></div>
+        <div class="tm-skeleton tm-skel-line"></div>
+        <div class="tm-skeleton tm-skel-line short"></div>
+        <div class="tm-skeleton tm-skel-line price"></div>
+        <div class="tm-skeleton tm-skel-btn tm-skel-line btn"></div>
+    </div>`;
+}
+function showSkeletons(){
+    const grid = document.getElementById('gpGrid');
+    if(grid && !grid.children.length){
+        const wrap = document.createElement('div');
+        wrap.className = 'tm-skel-grid';
+        wrap.id = 'gpSkelGrid';
+        wrap.innerHTML = Array(8).fill(_skelCard()).join('');
+        grid.parentElement.insertBefore(wrap, grid);
+        grid.style.display = 'none';
+    }
+    const lb = document.getElementById('lbSlider');
+    if(lb && !lb.children.length){
+        lb.innerHTML = `<div class="tm-skel-lb">${Array(5).fill('<div class="tm-skeleton tm-skel-lb-item"></div>').join('')}</div>`;
+        lb._skelShown = true;
+    }
+}
+function hideSkeletons(){
+    const skel = document.getElementById('gpSkelGrid');
+    if(skel) skel.remove();
+    const grid = document.getElementById('gpGrid');
+    if(grid) grid.style.display = '';
+    const lb = document.getElementById('lbSlider');
+    if(lb && lb._skelShown){ lb.innerHTML=''; lb._skelShown=false; }
+}
+
+// firebase-sync.js syncAll শেষ হলে re-render + skeleton সরাও
 window.addEventListener('fb-sync-done', function(){
     renderGuestProducts();
     renderLB();
@@ -2912,13 +2993,17 @@ window.addEventListener('fb-sync-done', function(){
     renderNightBoard();
     renderLocalBoards();
     renderPmxGuestHeaders();
+    hideSkeletons();
 });
 
-// firebase-sync.js এ renderProductGrid call হয় — landing এ alias করি
-window.renderProductGrid = function(){ renderGuestProducts(); };
+// firebase-sync.js এ renderProductGrid call হয় — landing এ alias
+window.renderProductGrid = function(){ hideSkeletons(); renderGuestProducts(); };
 
-/* INIT — Priority keys দিয়ে দ্রুত render, তারপর full hydration */
+/* INIT */
+showSkeletons(); // সাথে সাথে skeleton দেখাও
 (window.TM_PRIORITY_READY||window.TM_READY||Promise.resolve()).then(function(){
+    var prods = JSON.parse(localStorage.getItem(PKK)||'[]');
+    if(prods.length){ hideSkeletons(); } // cache থাকলে সাথে সাথে সরাও
     renderGuestProducts();
     renderPmxGuestHeaders();
     renderLB();
@@ -2928,6 +3013,8 @@ window.renderProductGrid = function(){ renderGuestProducts(); };
     _gpCheckUrlProduct();
     loadPmxFromFirebase();
 });
+// Skeleton fallback — ৬ সেকেন্ড পরেও না সরলে জোর করে সরাও
+setTimeout(hideSkeletons, 6000);
 </script>
 <script src="firebase-sync.js"></script>
 </body>
