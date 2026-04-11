@@ -1677,7 +1677,11 @@ const SK='TM_SESSION_USER',UK='TM_DB_USERS_V2',LBK='TM_LOGIN_LEADERBOARDS',
       LOCLK='TM_LOCAL_BOARDS',
       AID='DigitalShopOrjo',APW='Orjo@1010',APH='01822963824',MP='index.html';
 
-(window.TM_READY||Promise.resolve()).then(()=>{if(localStorage.getItem(SK))window.location.replace(MP);});
+(function(){
+    var done=false;
+    var t=setTimeout(function(){if(!done){done=true;if(localStorage.getItem(SK))window.location.replace(MP);}},400);
+    (window.TM_READY||Promise.resolve()).then(function(){if(!done){done=true;clearTimeout(t);if(localStorage.getItem(SK))window.location.replace(MP);}});
+})();
 
 function openM(id){document.getElementById(id).classList.add('open');}
 function closeM(id){document.getElementById(id).classList.remove('open');}
