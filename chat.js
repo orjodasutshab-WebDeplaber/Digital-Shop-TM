@@ -117,21 +117,20 @@
                     area.style.backgroundImage = 'none';
                     area.style.backgroundColor = meta.value;
                 } else if (meta.type === 'image') {
-                    // ছবি IndexedDB থেকে
+                    // ছবি IndexedDB থেকে ArrayBuffer → ObjectURL
                     if (window._TMDB) {
                         window._TMDB.get(BG_IMG_KEY).then(val => {
                             if (!val) return;
                             const a = document.getElementById('tmv3-messages');
                             if (!a) return;
-                            a.style.backgroundImage = `url('${val}')`;
+                            const mime = meta.mime || 'image/jpeg';
+                            const blob = new Blob([val], { type: mime });
+                            const objUrl = URL.createObjectURL(blob);
+                            a.style.backgroundImage = `url('${objUrl}')`;
                             a.style.backgroundRepeat = 'no-repeat';
                             a.style.backgroundSize = 'cover';
                             a.style.backgroundPosition = 'center';
                         }).catch(()=>{});
-                    } else {
-                        // fallback
-                        const fb = localStorage.getItem(BG_IMG_KEY + '_fb');
-                        if (fb) { area.style.backgroundImage=`url('${fb}')`; area.style.backgroundSize='cover'; }
                     }
                 }
             } catch(e) {}
@@ -3265,7 +3264,13 @@
             if (meta) {
                 _applyBgMeta(meta);
                 if (meta.type === 'image' && window._TMDB) {
-                    window._TMDB.get(BG_IMG_KEY).then(val => { if (val) _applyBgImage(val); }).catch(()=>{});
+                    window._TMDB.get(BG_IMG_KEY).then(val => {
+                        if (!val) return;
+                        const mime = meta.mime || 'image/jpeg';
+                        const blob = new Blob([val], { type: mime });
+                        const objUrl = URL.createObjectURL(blob);
+                        _applyBgImage(objUrl);
+                    }).catch(()=>{});
                 }
             }
         } catch(e) {}
@@ -3306,7 +3311,7 @@
             });
         }
 
-        /* ── ছবি আপলোড → সরাসরি IndexedDB ── */
+        /* ── ছবি আপলোড → ArrayBuffer হিসেবে IDB তে, ObjectURL দিয়ে display ── */
         const bgFile = document.getElementById('pr-bg-file');
         if (bgFile) {
             bgFile.addEventListener('change', function() {
@@ -3316,28 +3321,40 @@
                 if (file.size > 500 * 1024 * 1024) {
                     _toast('❌ ছবি ৫০০MB এর বেশি হবে না!'); return;
                 }
-                const r = new FileReader();
-                r.onload = e => {
-                    const dataUrl = e.target.result;
-                    const meta = { type: 'image', value: 'idb' };
-                    // meta localStorage এ (ছোট), ছবি IDB তে সরাসরি (বড়)
+
+                const lbl = document.getElementById('pr-bg-upload-label');
+                if (lbl) lbl.querySelector('span').innerHTML = '<i class="fa fa-spinner fa-spin" style="color:#25d366;margin-right:6px;"></i> লোড হচ্ছে...';
+
+                // ✅ ArrayBuffer — base64 conversion নেই, RAM spike নেই
+                file.arrayBuffer().then(buffer => {
+                    const meta = { type: 'image', value: 'idb', mime: file.type };
                     localStorage.setItem(BG_META_KEY, JSON.stringify(meta));
+
                     if (window._TMDB) {
-                        window._TMDB.set(BG_IMG_KEY, dataUrl).then(() => {
-                            _applyBgImage(dataUrl);
+                        // IDB তে ArrayBuffer সেভ করো
+                        return window._TMDB.set(BG_IMG_KEY, buffer).then(() => {
+                            // display এর জন্য ObjectURL — RAM এ পুরো ছবি ওঠে না
+                            const blob = new Blob([buffer], { type: file.type });
+                            const objUrl = URL.createObjectURL(blob);
+                            _applyBgImage(objUrl);
                             _curMeta = meta;
-                            const lbl = document.getElementById('pr-bg-upload-label');
                             if (lbl) lbl.querySelector('span').innerHTML = '<i class="fa fa-check-circle" style="color:#25d366;margin-right:6px;"></i> ছবি সেট হয়েছে ✅';
                             _toast('ব্যাকগ্রাউন্ড ছবি সেট হয়েছে ✅');
-                        }).catch(() => _toast('❌ ছবি সেভ করতে সমস্যা!'));
+                        });
                     } else {
-                        // fallback: localStorage এ রাখো
-                        localStorage.setItem(BG_IMG_KEY + '_fb', dataUrl);
-                        _applyBgImage(dataUrl);
+                        // fallback — _TMDB না থাকলে ObjectURL দিয়ে শুধু display
+                        const blob = new Blob([buffer], { type: file.type });
+                        const objUrl = URL.createObjectURL(blob);
+                        _applyBgImage(objUrl);
+                        _curMeta = meta;
+                        if (lbl) lbl.querySelector('span').innerHTML = '<i class="fa fa-check-circle" style="color:#25d366;margin-right:6px;"></i> ছবি সেট হয়েছে ✅';
                         _toast('ব্যাকগ্রাউন্ড ছবি সেট হয়েছে ✅');
                     }
-                };
-                r.readAsDataURL(file);
+                }).catch(() => {
+                    if (lbl) lbl.querySelector('span').innerHTML = '<i class="fa fa-image" style="color:#25d366;margin-right:6px;"></i> ছবি আপলোড করুন';
+                    _toast('❌ ছবি লোড করতে সমস্যা!');
+                });
+
                 this.value = '';
             });
         }
