@@ -595,19 +595,8 @@
 
 .tmv3-header-actions-right { display:flex; align-items:center; gap:4px; }
 
-/* Mobile close button (X) in chat header */
-#tmv3-chat-close-btn {
-    display:none;
-    background:linear-gradient(135deg,#ef4444,#dc2626);
-    border:2px solid rgba(255,255,255,0.9);
-    color:#fff; font-size:18px; font-weight:700;
-    width:42px; height:42px; border-radius:50%;
-    align-items:center; justify-content:center; flex-shrink:0;
-    cursor:pointer; transition:all .2s;
-    box-shadow:0 3px 12px rgba(239,68,68,.5);
-}
-#tmv3-chat-close-btn:active { transform:scale(0.9); }
-.is-mobile #tmv3-chat-close-btn { display:flex; }
+/* Mobile close button (X) in chat header — HIDDEN */
+#tmv3-chat-close-btn { display:none !important; }
 
 /* 3-dot dropdown */
 .tmv3-dropdown { position:relative; }
@@ -644,7 +633,9 @@
     display:flex; flex-direction:column; gap:4px;
     background:#0b141a;
     background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M40 8 L72 26 L72 54 L40 72 L8 54 L8 26 Z' fill='none' stroke='rgba(255,255,255,0.025)' stroke-width='1'/%3E%3C/svg%3E");
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cdefs%3E%3Cstyle%3E.c%7Bfill:none;stroke:rgba(255,255,255,0.03);stroke-width:1%7D%3C/style%3E%3C/defs%3E%3C!-- flower/bloom shape --%3E%3Ccircle cx='60' cy='60' r='18' class='c'/%3E%3Ccircle cx='60' cy='60' r='10' class='c'/%3E%3Cline x1='60' y1='38' x2='60' y2='82' class='c'/%3E%3Cline x1='38' y1='60' x2='82' y2='60' class='c'/%3E%3Cline x1='45' y1='45' x2='75' y2='75' class='c'/%3E%3Cline x1='75' y1='45' x2='45' y2='75' class='c'/%3E%3C!-- leaf shape --%3E%3Cellipse cx='160' cy='60' rx='14' ry='22' transform='rotate(-30 160 60)' class='c'/%3E%3Cellipse cx='160' cy='60' rx='6' ry='14' transform='rotate(-30 160 60)' class='c'/%3E%3C!-- star --%3E%3Cpolygon points='280,44 284,56 296,56 287,64 290,76 280,68 270,76 273,64 264,56 276,56' class='c'/%3E%3C!-- diamond --%3E%3Crect x='348' y='46' width='18' height='18' transform='rotate(45 357 55)' class='c'/%3E%3C!-- flower 2 --%3E%3Ccircle cx='60' cy='160' r='16' class='c'/%3E%3Ccircle cx='60' cy='160' r='8' class='c'/%3E%3Cline x1='60' y1='140' x2='60' y2='180' class='c'/%3E%3Cline x1='40' y1='160' x2='80' y2='160' class='c'/%3E%3C!-- peace symbol --%3E%3Ccircle cx='180' cy='160' r='20' class='c'/%3E%3Cline x1='180' y1='140' x2='180' y2='180' class='c'/%3E%3Cline x1='166' y1='170' x2='180' y2='160' class='c'/%3E%3Cline x1='194' y1='170' x2='180' y2='160' class='c'/%3E%3C!-- butterfly --%3E%3Cellipse cx='295' cy='155' rx='20' ry='12' transform='rotate(-20 295 155)' class='c'/%3E%3Cellipse cx='315' cy='165' rx='18' ry='10' transform='rotate(20 315 165)' class='c'/%3E%3Cline x1='305' y1='155' x2='305' y2='175' class='c'/%3E%3C!-- heart --%3E%3Cpath d='M370 150 Q370 140 380 140 Q390 140 390 150 Q390 165 370 175 Q350 165 350 150 Q350 140 360 140 Q370 140 370 150Z' class='c'/%3E%3C!-- sun --%3E%3Ccircle cx='60' cy='270' r='14' class='c'/%3E%3Cline x1='60' y1='250' x2='60' y2='244' class='c'/%3E%3Cline x1='60' y1='290' x2='60' y2='296' class='c'/%3E%3Cline x1='40' y1='270' x2='34' y2='270' class='c'/%3E%3Cline x1='80' y1='270' x2='86' y2='270' class='c'/%3E%3Cline x1='46' y1='256' x2='42' y2='252' class='c'/%3E%3Cline x1='74' y1='284' x2='78' y2='288' class='c'/%3E%3Cline x1='74' y1='256' x2='78' y2='252' class='c'/%3E%3Cline x1='46' y1='284' x2='42' y2='288' class='c'/%3E%3C!-- musical note --%3E%3Cpath d='M170 255 L190 248 L190 262 Q190 270 183 270 Q176 270 176 263 Q176 256 183 256 L183 248' class='c'/%3E%3C!-- camera --%3E%3Crect x='268' y='255' width='36' height='26' rx='4' class='c'/%3E%3Ccircle cx='286' cy='268' r='8' class='c'/%3E%3Ccircle cx='286' cy='268' r='4' class='c'/%3E%3Crect x='271' y='250' width='10' height='6' rx='2' class='c'/%3E%3C!-- location pin --%3E%3Cpath d='M360 248 Q378 248 378 262 Q378 276 360 290 Q342 276 342 262 Q342 248 360 248Z' class='c'/%3E%3Ccircle cx='360' cy='262' r='6' class='c'/%3E%3C!-- clock --%3E%3Ccircle cx='60' cy='370' r='18' class='c'/%3E%3Cline x1='60' y1='356' x2='60' y2='370' class='c'/%3E%3Cline x1='60' y1='370' x2='70' y2='375' class='c'/%3E%3C!-- envelope --%3E%3Crect x='148' y='355' width='40' height='28' rx='3' class='c'/%3E%3Cpolyline points='148,358 168,372 188,358' class='c'/%3E%3C!-- trophy --%3E%3Cpath d='M275 355 L275 375 Q275 382 285 382 Q295 382 295 375 L295 355 Z' class='c'/%3E%3Cline x1='280' y1='382' x2='280' y2='390' class='c'/%3E%3Cline x1='290' y1='382' x2='290' y2='390' class='c'/%3E%3Cline x1='275' y1='390' x2='295' y2='390' class='c'/%3E%3Cpath d='M275 358 Q265 358 265 368 Q265 375 275 375' class='c'/%3E%3Cpath d='M295 358 Q305 358 305 368 Q305 375 295 375' class='c'/%3E%3C!-- wifi --%3E%3Cpath d='M340 390 Q360 365 380 390' class='c'/%3E%3Cpath d='M347 383 Q360 372 373 383' class='c'/%3E%3Ccircle cx='360' cy='390' r='3' class='c'/%3E%3C/svg%3E");
+    background-repeat:repeat;
+    background-size:400px 400px;
     scrollbar-width:thin; scrollbar-color:#2a3942 transparent;
 }
 #tmv3-messages::-webkit-scrollbar { width:5px; }
@@ -1190,16 +1181,17 @@
     .tmv3-dropdown-item { font-size:28px !important; padding:22px 28px !important; gap:20px !important; }
     .tmv3-dropdown-item i { font-size:26px !important; }
 
-    /* ── Messages ── */
-    #tmv3-messages { padding:16px 14px !important; gap:5px !important; }
-    .tmv3-msg-wrap { max-width:87% !important; }
-    .tmv3-msg-av { width:50px !important; height:50px !important; font-size:22px !important; }
-    .tmv3-bubble { padding:14px 18px 9px !important; border-radius:14px !important; }
-    .tmv3-msg-text { font-size:28px !important; line-height:1.55 !important; }
-    .tmv3-msg-time { font-size:20px !important; margin-top:5px !important; }
-    .tmv3-sender { font-size:22px !important; margin-bottom:4px !important; font-weight:700 !important; }
-    .tmv3-date-div span { font-size:20px !important; padding:7px 20px !important; }
-    .tmv3-reply-quote { font-size:20px !important; }
+    /* ── Messages — WhatsApp style দ্বিগুণ বড় ── */
+    #tmv3-messages { padding:20px 14px !important; gap:6px !important; }
+    .tmv3-msg-wrap { max-width:82% !important; }
+    .tmv3-msg-av { width:64px !important; height:64px !important; font-size:28px !important; }
+    .tmv3-bubble { padding:20px 26px 14px !important; border-radius:18px !important; }
+    .tmv3-msg-text { font-size:34px !important; line-height:1.55 !important; }
+    .tmv3-msg-time { font-size:26px !important; margin-top:7px !important; }
+    .tmv3-sender { font-size:28px !important; margin-bottom:6px !important; font-weight:700 !important; }
+    .tmv3-date-div span { font-size:26px !important; padding:10px 28px !important; }
+    .tmv3-reply-quote { font-size:26px !important; }
+    .tmv3-tick { font-size:22px !important; }
 
     /* ── Input Area ── */
     #tmv3-input-area { padding:14px 16px 24px !important; gap:14px !important; }
