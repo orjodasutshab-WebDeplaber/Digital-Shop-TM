@@ -334,7 +334,7 @@
     position:relative;
 }
 .tmv3-icon-btn:hover { background:rgba(42,57,66,.7); color:#e9edef; transform:scale(1.08); }
-.is-mobile .tmv3-icon-btn { width:60px; height:60px; font-size:28px; }
+.is-mobile .tmv3-icon-btn { width:60px; height:60px; font-size:50px; }
 .tmv3-header-actions { display:flex; align-items:center; gap:4px; }
 
 /* Search Bar */
@@ -863,7 +863,7 @@
     border-bottom:1px solid rgba(42,57,66,.5); flex-shrink:0;
 }
 .tmv3-sp-title { color:#e9edef; font-size:16px; font-weight:600; flex:1; }
-.is-mobile .tmv3-sp-title { font-size:30px; }
+.is-mobile .tmv3-sp-title { font-size:45px; }
 .is-mobile .tmv3-sp-header { padding:20px 18px; gap:16px; }
 
 /* Body */
@@ -902,8 +902,8 @@
     color:#25d366; font-size:13px; text-align:center;
     padding:0 20px 16px; font-weight:500;
 }
-.is-mobile .tmv3-sp-name { font-size:32px; }
-.is-mobile .tmv3-sp-sub { font-size:22px; }
+.is-mobile .tmv3-sp-name { font-size:47px; }
+.is-mobile .tmv3-sp-sub { font-size:37px; }
 
 /* Info rows — card style */
 .tmv3-sp-section {
@@ -924,9 +924,9 @@
 .tmv3-sp-row i { color:#25d366; width:22px; text-align:center; font-size:16px; flex-shrink:0; }
 .tmv3-sp-row .label { flex:1; color:#e9edef; font-size:14px; }
 .tmv3-sp-row .value { color:#8696a0; font-size:12px; }
-.is-mobile .tmv3-sp-row { font-size:24px; padding:20px 18px; }
-.is-mobile .tmv3-sp-row i { font-size:24px; width:30px; }
-.is-mobile .tmv3-sp-row .value { font-size:20px; }
+.is-mobile .tmv3-sp-row { font-size:39px; padding:20px 18px; }
+.is-mobile .tmv3-sp-row i { font-size:39px; width:30px; }
+.is-mobile .tmv3-sp-row .value { font-size:35px; }
 .tmv3-sp-row.danger { color:#ef4444; }
 .tmv3-sp-row.danger i { color:#ef4444; }
 
@@ -939,7 +939,7 @@
 
 .tmv3-bio-box { background:#1f2c34; border-radius:10px; padding:14px 16px; margin:8px 12px; }
 .tmv3-bio-box p { color:#e9edef; font-size:14px; line-height:1.6; }
-.is-mobile .tmv3-bio-box p { font-size:22px; }
+.is-mobile .tmv3-bio-box p { font-size:37px; }
 
 /* Toggle switch */
 .tmv3-toggle { position:relative; width:50px; height:28px; flex-shrink:0; }
@@ -965,8 +965,8 @@
 .tmv3-member-del { background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:.2s; }
 .tmv3-member-del:hover { background:rgba(239,68,68,.15); }
 .is-mobile .tmv3-member-item { padding:20px 0; gap:16px; }
-.is-mobile .tmv3-member-name { font-size:25px; font-weight:600; }
-.is-mobile .tmv3-member-sub { font-size:19px; }
+.is-mobile .tmv3-member-name { font-size:40px; font-weight:600; }
+.is-mobile .tmv3-member-sub { font-size:34px; }
 
 /* ══ Modal (Add Member / Create Group / Profile Edit) ══ */
 #tmv3-modal-overlay {
