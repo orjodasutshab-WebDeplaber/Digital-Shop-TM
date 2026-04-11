@@ -1093,186 +1093,183 @@
     #tmv3-close-btn { display:none !important; }
     #tmv3-bottom-nav { display:none !important; }
 
-    /* ── LEFT HEADER — WhatsApp style "WhatsApp" title ── */
+    /* ── LEFT HEADER ── */
     #tmv3-left-header {
-        padding:20px 22px 16px !important;
+        padding:28px 24px 20px !important;
         background:#111b21 !important;
         border-bottom:none !important;
-        min-height:72px !important;
-        display:flex !important; align-items:center !important; justify-content:space-between !important;
+        min-height:110px !important;
     }
     #tmv3-left::before { display:none !important; }
     #tmv3-app-title {
-        font-size:36px !important; font-weight:800 !important;
-        color:#e9edef !important;
-        background:none !important;
-        -webkit-text-fill-color:#e9edef !important;
-        letter-spacing:-0.3px !important;
+        font-size:60px !important; font-weight:900 !important;
+        background:linear-gradient(135deg,#e9edef,#aebac1) !important;
+        -webkit-background-clip:text !important;
+        -webkit-text-fill-color:transparent !important;
+        background-clip:text !important;
+        letter-spacing:-0.5px !important;
     }
 
-    /* ── Header action buttons ── */
-    .tmv3-icon-btn { width:52px !important; height:52px !important; font-size:26px !important; }
+    /* ── Header Buttons ── */
+    .tmv3-icon-btn { width:72px !important; height:72px !important; font-size:32px !important; }
     #tmv3-main-close-btn {
         display:flex !important;
-        width:52px !important; height:52px !important; font-size:22px !important;
-        border-width:2.5px !important; border-radius:50% !important;
+        width:72px !important; height:72px !important; font-size:28px !important;
+        border-width:3px !important; border-radius:50% !important;
     }
-    #tmv3-back-btn { display:flex !important; width:52px !important; height:52px !important; font-size:26px !important; }
-    #tmv3-chat-close-btn { display:flex !important; width:50px !important; height:50px !important; font-size:22px !important; }
+    #tmv3-back-btn { display:flex !important; width:72px !important; height:72px !important; font-size:32px !important; }
+    #tmv3-chat-close-btn { display:flex !important; width:68px !important; height:68px !important; font-size:28px !important; }
 
-    /* ── Search Bar — exact WhatsApp pill ── */
-    .tmv3-search-wrap { padding:10px 16px 8px !important; }
+    /* ── Search Bar — big rounded pill ── */
+    .tmv3-search-wrap { padding:16px 18px 12px !important; }
     .tmv3-search-bar {
-        padding:16px 22px !important;
-        border-radius:50px !important;
+        padding:24px 30px !important;
+        border-radius:100px !important;
         background:#202c33 !important;
-        border:none !important;
-        box-shadow:none !important;
-        gap:14px !important;
-        min-height:60px !important;
+        border:2px solid rgba(37,211,102,.2) !important;
+        box-shadow:0 2px 12px rgba(0,0,0,.2) !important;
+        gap:18px !important;
+        min-height:100px !important;
     }
     .tmv3-search-bar:focus-within {
-        border:none !important;
-        background:#202c33 !important;
-        box-shadow:none !important;
+        border-color:rgba(37,211,102,.55) !important;
+        background:#1f2c34 !important;
+        box-shadow:0 0 0 5px rgba(37,211,102,.12) !important;
     }
-    .tmv3-search-bar i { font-size:24px !important; color:#8696a0 !important; }
-    .tmv3-search-bar input { font-size:22px !important; color:#e9edef !important; }
-    .tmv3-search-bar input::placeholder { font-size:22px !important; color:#8696a0 !important; }
-    #tmv3-search-clear { width:40px !important; height:40px !important; font-size:20px !important; }
+    .tmv3-search-bar i { font-size:34px !important; color:#25d366 !important; }
+    .tmv3-search-bar input { font-size:30px !important; color:#e9edef !important; }
+    .tmv3-search-bar input::placeholder { font-size:30px !important; color:#8696a0 !important; }
+    #tmv3-search-clear { width:52px !important; height:52px !important; font-size:26px !important; }
 
-    /* ── Filter Tabs ── */
-    .tmv3-tabs { padding:10px 16px 12px !important; gap:10px !important; }
+    /* ── Filter Tabs — 90px pill ── */
+    .tmv3-tabs { padding:14px 18px 16px !important; gap:12px !important; }
     .tmv3-tab {
-        font-size:19px !important; padding:11px 26px !important;
-        border-radius:40px !important; border-width:1.5px !important;
-        font-weight:600 !important;
+        font-size:28px !important; padding:18px 42px !important;
+        border-radius:90px !important; border-width:2px !important;
+        font-weight:700 !important; min-height:90px !important;
+        display:flex !important; align-items:center !important;
     }
 
-    /* ── Chat List — WhatsApp exact spacing ── */
+    /* ── Chat List ── */
     #tmv3-chat-list { padding:0 !important; }
     .tmv3-chat-item {
-        padding:14px 18px !important; gap:16px !important;
-        min-height:88px !important;
-        border-bottom:none !important;
+        padding:20px 22px !important; gap:20px !important;
+        min-height:110px !important;
+        border-bottom:1px solid rgba(42,57,66,.15) !important;
     }
     .tmv3-chat-item:hover, .tmv3-chat-item:active { background:rgba(42,57,66,.4) !important; }
     .tmv3-avatar {
-        width:64px !important; height:64px !important;
-        font-size:28px !important; flex-shrink:0 !important;
+        width:100px !important; height:100px !important;
+        font-size:42px !important; flex-shrink:0 !important;
         border-radius:50% !important;
-        box-shadow:none !important;
     }
-    .tmv3-chat-name { font-size:22px !important; font-weight:600 !important; line-height:1.35 !important; }
-    .tmv3-chat-preview { font-size:18px !important; margin-top:3px !important; line-height:1.4 !important; color:#8696a0 !important; }
-    .tmv3-chat-time { font-size:17px !important; font-weight:400 !important; color:#8696a0 !important; }
-    .tmv3-chat-meta { gap:6px !important; min-width:54px !important; align-items:flex-end !important; }
+    .tmv3-chat-name { font-size:30px !important; font-weight:700 !important; line-height:1.3 !important; }
+    .tmv3-chat-preview { font-size:26px !important; margin-top:5px !important; line-height:1.4 !important; color:#8696a0 !important; }
+    .tmv3-chat-time { font-size:24px !important; font-weight:400 !important; color:#8696a0 !important; }
+    .tmv3-chat-meta { gap:8px !important; min-width:64px !important; align-items:flex-end !important; }
     .tmv3-unread-badge {
-        font-size:16px !important; min-width:28px !important; height:28px !important;
-        padding:0 8px !important; border-radius:14px !important; font-weight:700 !important;
-        background:#25d366 !important; color:#111 !important;
+        font-size:22px !important; min-width:36px !important; height:36px !important;
+        padding:0 10px !important; border-radius:18px !important; font-weight:700 !important;
     }
-    .tmv3-chat-info { flex:1 !important; min-width:0 !important; }
 
     /* ── Chat Header ── */
-    #tmv3-chat-header { padding:14px 16px !important; gap:14px !important; min-height:76px !important; background:#202c33 !important; }
-    #tmv3-hdr-av { width:52px !important; height:52px !important; font-size:22px !important; flex-shrink:0 !important; }
-    #tmv3-header-name { font-size:22px !important; font-weight:700 !important; }
-    #tmv3-header-sub { font-size:17px !important; }
+    #tmv3-chat-header { padding:20px 18px !important; gap:16px !important; min-height:94px !important; }
+    #tmv3-hdr-av { width:68px !important; height:68px !important; font-size:30px !important; flex-shrink:0 !important; }
+    #tmv3-header-name { font-size:30px !important; font-weight:800 !important; }
+    #tmv3-header-sub { font-size:22px !important; }
 
     /* ── Dropdown ── */
-    .tmv3-dropdown-menu { min-width:240px !important; border-radius:12px !important; }
-    .tmv3-dropdown-item { font-size:22px !important; padding:18px 24px !important; gap:18px !important; }
-    .tmv3-dropdown-item i { font-size:22px !important; }
+    .tmv3-dropdown-menu { min-width:260px !important; border-radius:16px !important; }
+    .tmv3-dropdown-item { font-size:28px !important; padding:22px 28px !important; gap:20px !important; }
+    .tmv3-dropdown-item i { font-size:26px !important; }
 
     /* ── Messages ── */
-    #tmv3-messages { padding:14px 12px !important; gap:4px !important; }
-    .tmv3-msg-wrap { max-width:85% !important; }
-    .tmv3-msg-av { width:44px !important; height:44px !important; font-size:18px !important; }
-    .tmv3-bubble { padding:10px 14px 7px !important; border-radius:10px !important; }
-    .tmv3-msg-text { font-size:22px !important; line-height:1.55 !important; }
-    .tmv3-msg-time { font-size:16px !important; margin-top:4px !important; }
-    .tmv3-sender { font-size:17px !important; margin-bottom:3px !important; font-weight:700 !important; }
-    .tmv3-date-div span { font-size:17px !important; padding:6px 18px !important; }
-    .tmv3-reply-quote { font-size:18px !important; }
+    #tmv3-messages { padding:16px 14px !important; gap:5px !important; }
+    .tmv3-msg-wrap { max-width:87% !important; }
+    .tmv3-msg-av { width:50px !important; height:50px !important; font-size:22px !important; }
+    .tmv3-bubble { padding:14px 18px 9px !important; border-radius:14px !important; }
+    .tmv3-msg-text { font-size:28px !important; line-height:1.55 !important; }
+    .tmv3-msg-time { font-size:20px !important; margin-top:5px !important; }
+    .tmv3-sender { font-size:22px !important; margin-bottom:4px !important; font-weight:700 !important; }
+    .tmv3-date-div span { font-size:20px !important; padding:7px 20px !important; }
+    .tmv3-reply-quote { font-size:20px !important; }
 
     /* ── Input Area ── */
-    #tmv3-input-area { padding:12px 14px 20px !important; gap:12px !important; background:#202c33 !important; }
-    .tmv3-act-btn { width:56px !important; height:56px !important; font-size:28px !important; }
+    #tmv3-input-area { padding:14px 16px 24px !important; gap:14px !important; }
+    .tmv3-act-btn { width:66px !important; height:66px !important; font-size:32px !important; }
     #tmv3-msg-input {
-        font-size:22px !important; padding:16px 22px !important;
-        border-radius:30px !important; min-height:56px !important; line-height:1.4 !important;
-        background:#2a3942 !important;
+        font-size:28px !important; padding:22px 28px !important;
+        border-radius:99px !important; min-height:72px !important; line-height:1.4 !important;
     }
-    #tmv3-send-btn { width:64px !important; height:64px !important; font-size:26px !important; border-radius:50% !important; flex-shrink:0 !important; }
+    #tmv3-send-btn { width:110px !important; height:110px !important; font-size:44px !important; border-radius:50% !important; flex-shrink:0 !important; }
 
     /* ── Scroll down ── */
-    #tmv3-scroll-down { width:56px !important; height:56px !important; font-size:24px !important; bottom:90px !important; }
+    #tmv3-scroll-down { width:64px !important; height:64px !important; font-size:28px !important; bottom:110px !important; }
 
     /* ── Toast ── */
-    #tmv3-toast { font-size:20px !important; padding:14px 28px !important; border-radius:14px !important; }
+    #tmv3-toast { font-size:24px !important; padding:16px 32px !important; border-radius:16px !important; }
 
     /* ── Typing ── */
-    .tmv3-typing-text { font-size:18px !important; }
-    #tmv3-typing { height:26px !important; padding:0 16px !important; }
-    #tmv3-admin-banner { font-size:18px !important; padding:12px 18px !important; }
+    .tmv3-typing-text { font-size:22px !important; }
+    #tmv3-typing { height:30px !important; padding:0 18px !important; }
+    #tmv3-admin-banner { font-size:22px !important; padding:14px 20px !important; }
 
     /* ── Reply bar ── */
-    #tmv3-reply-bar { padding:12px 16px !important; gap:12px !important; }
-    #tmv3-reply-prev { font-size:18px !important; }
+    #tmv3-reply-bar { padding:14px 18px !important; gap:14px !important; }
+    #tmv3-reply-prev { font-size:22px !important; }
 
     /* ── Side Panel ── */
-    .tmv3-sp-header { padding:20px 18px !important; gap:14px !important; min-height:76px !important; }
-    .tmv3-sp-title { font-size:24px !important; font-weight:700 !important; }
-    .tmv3-sp-avatar { width:120px !important; height:120px !important; font-size:50px !important; }
-    .tmv3-sp-name { font-size:26px !important; font-weight:700 !important; padding:16px 18px 3px !important; }
-    .tmv3-sp-sub { font-size:18px !important; padding:0 18px 16px !important; }
-    .tmv3-sp-section { margin:8px 12px !important; border-radius:12px !important; }
-    .tmv3-sp-section-label { font-size:16px !important; padding:12px 16px 6px !important; }
-    .tmv3-sp-row { font-size:20px !important; padding:16px 18px !important; gap:16px !important; }
-    .tmv3-sp-row i { font-size:20px !important; width:26px !important; }
-    .tmv3-sp-row .label { font-size:20px !important; }
-    .tmv3-sp-row .value { font-size:16px !important; }
-    .tmv3-bio-box p { font-size:18px !important; }
-    .tmv3-member-item { padding:14px 0 !important; gap:14px !important; }
-    .tmv3-member-av { width:52px !important; height:52px !important; font-size:22px !important; }
-    .tmv3-member-name { font-size:20px !important; font-weight:600 !important; }
-    .tmv3-member-sub { font-size:16px !important; }
-    .tmv3-member-badge { font-size:14px !important; padding:4px 12px !important; }
+    .tmv3-sp-header { padding:24px 20px !important; gap:16px !important; min-height:88px !important; }
+    .tmv3-sp-title { font-size:30px !important; font-weight:800 !important; }
+    .tmv3-sp-avatar { width:140px !important; height:140px !important; font-size:60px !important; }
+    .tmv3-sp-name { font-size:32px !important; font-weight:800 !important; padding:18px 22px 4px !important; }
+    .tmv3-sp-sub { font-size:22px !important; padding:0 22px 20px !important; }
+    .tmv3-sp-section { margin:10px 14px !important; border-radius:14px !important; }
+    .tmv3-sp-section-label { font-size:18px !important; padding:14px 18px 8px !important; }
+    .tmv3-sp-row { font-size:24px !important; padding:20px 20px !important; gap:18px !important; }
+    .tmv3-sp-row i { font-size:24px !important; width:30px !important; }
+    .tmv3-sp-row .label { font-size:24px !important; }
+    .tmv3-sp-row .value { font-size:19px !important; }
+    .tmv3-bio-box p { font-size:22px !important; }
+    .tmv3-member-item { padding:18px 0 !important; gap:16px !important; }
+    .tmv3-member-av { width:60px !important; height:60px !important; font-size:26px !important; }
+    .tmv3-member-name { font-size:24px !important; font-weight:600 !important; }
+    .tmv3-member-sub { font-size:19px !important; }
+    .tmv3-member-badge { font-size:16px !important; padding:5px 14px !important; }
 
     /* ── User Search Results ── */
-    #tmv3-user-search-results { margin-top:8px !important; border-radius:16px !important; max-height:400px !important; }
-    .tmv3-usr-srch-label { font-size:16px !important; padding:14px 18px 8px !important; }
-    .tmv3-usr-srch-item { padding:14px 18px !important; gap:14px !important; }
-    .tmv3-usr-srch-av { width:52px !important; height:52px !important; font-size:24px !important; }
-    .tmv3-usr-srch-name { font-size:20px !important; font-weight:600 !important; }
-    .tmv3-usr-srch-sub { font-size:15px !important; }
-    .tmv3-usr-srch-action { font-size:15px !important; padding:8px 14px !important; }
-    .tmv3-usr-search-loading { font-size:18px !important; padding:18px !important; }
+    #tmv3-user-search-results { margin-top:10px !important; border-radius:20px !important; max-height:460px !important; }
+    .tmv3-usr-srch-label { font-size:18px !important; padding:16px 22px 10px !important; }
+    .tmv3-usr-srch-item { padding:18px 22px !important; gap:16px !important; }
+    .tmv3-usr-srch-av { width:60px !important; height:60px !important; font-size:26px !important; }
+    .tmv3-usr-srch-name { font-size:24px !important; font-weight:700 !important; }
+    .tmv3-usr-srch-sub { font-size:18px !important; }
+    .tmv3-usr-srch-action { font-size:17px !important; padding:10px 18px !important; }
+    .tmv3-usr-search-loading { font-size:20px !important; padding:22px !important; }
 
     /* ── Modal ── */
     #tmv3-modal-overlay { align-items:flex-end !important; padding:0 !important; }
-    #tmv3-modal { width:100% !important; max-width:100% !important; max-height:92dvh !important; border-radius:22px 22px 0 0 !important; margin:0 !important; }
-    .tmv3-modal-title { font-size:22px !important; font-weight:700 !important; }
-    .tmv3-modal-head { padding:20px 22px 16px !important; position:relative !important; }
+    #tmv3-modal { width:100% !important; max-width:100% !important; max-height:93dvh !important; border-radius:26px 26px 0 0 !important; margin:0 !important; }
+    .tmv3-modal-title { font-size:30px !important; font-weight:800 !important; }
+    .tmv3-modal-head { padding:24px 24px 18px !important; position:relative !important; }
     .tmv3-modal-head::before {
-        content:'' !important; position:absolute !important; top:10px !important; left:50% !important;
-        transform:translateX(-50%) !important; width:44px !important; height:5px !important;
-        background:rgba(37,211,102,.3) !important; border-radius:5px !important;
+        content:'' !important; position:absolute !important; top:11px !important; left:50% !important;
+        transform:translateX(-50%) !important; width:48px !important; height:5px !important;
+        background:rgba(37,211,102,.35) !important; border-radius:5px !important;
     }
-    .tmv3-modal-body { padding:20px 18px !important; gap:18px !important; }
-    .tmv3-modal-footer { padding:16px 18px 30px !important; gap:12px !important; }
-    .tmv3-btn { font-size:20px !important; padding:15px 30px !important; border-radius:12px !important; font-weight:600 !important; }
-    .tmv3-field label { font-size:18px !important; font-weight:600 !important; }
-    .tmv3-field input, .tmv3-field textarea, .tmv3-field select { font-size:20px !important; padding:14px 18px !important; border-radius:12px !important; }
-    .tmv3-modal-search { font-size:20px !important; padding:14px 18px !important; border-radius:12px !important; }
-    .tmv3-user-sel-item { padding:14px 18px !important; gap:14px !important; }
-    .tmv3-sel-check { width:32px !important; height:32px !important; }
-    .tmv3-sel-check.checked::after { font-size:17px !important; }
-    .tmv3-empty-msg { font-size:20px !important; padding:28px 0 !important; }
-    .tmv3-av-preview { width:100px !important; height:100px !important; font-size:44px !important; }
-    .tmv3-av-upload-btn { font-size:18px !important; padding:12px 30px !important; border-radius:10px !important; }
-    .tmv3-ctx-item { font-size:19px !important; padding:16px 22px !important; }
+    .tmv3-modal-body { padding:24px 22px !important; gap:22px !important; }
+    .tmv3-modal-footer { padding:18px 22px 34px !important; gap:14px !important; }
+    .tmv3-btn { font-size:26px !important; padding:20px 38px !important; border-radius:14px !important; font-weight:700 !important; flex:1 !important; }
+    .tmv3-field label { font-size:22px !important; font-weight:600 !important; }
+    .tmv3-field input, .tmv3-field textarea, .tmv3-field select { font-size:24px !important; padding:18px 20px !important; border-radius:14px !important; }
+    .tmv3-modal-search { font-size:24px !important; padding:18px 20px !important; border-radius:14px !important; }
+    .tmv3-user-sel-item { padding:18px 20px !important; gap:18px !important; }
+    .tmv3-sel-check { width:38px !important; height:38px !important; }
+    .tmv3-sel-check.checked::after { font-size:20px !important; }
+    .tmv3-empty-msg { font-size:24px !important; padding:36px 0 !important; }
+    .tmv3-av-preview { width:120px !important; height:120px !important; font-size:52px !important; }
+    .tmv3-av-upload-btn { font-size:22px !important; padding:14px 34px !important; border-radius:12px !important; }
+    .tmv3-ctx-item { font-size:22px !important; padding:18px 24px !important; }
 }
         `;
         document.head.appendChild(s);
