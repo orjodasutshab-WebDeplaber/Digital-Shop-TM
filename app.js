@@ -6673,12 +6673,16 @@ function findUserForReset() {
         String(u.id)===query ||
         String(u.mobile)===query ||
         String(u.phone)===query ||
-        (u.email && u.email.toLowerCase()===query.toLowerCase())
+        (u.email && u.email.toLowerCase()===query.toLowerCase()) ||
+        (u.googleId && String(u.googleId)===query) ||
+        (u.uid && String(u.uid)===query)
     );
     if (!user) { _showResetMsg('step1Msg','❌ এই তথ্য দিয়ে কোনো একাউন্ট পাওয়া যায়নি!','error'); return; }
     if (!user.email) { _showResetMsg('step1Msg','❌ এই একাউন্টে ইমেইল নেই! Admin এর সাথে যোগাযোগ করুন।','error'); return; }
     // ইউজার card দেখাও
+    // Google account হলে id দিয়ে track করো, নইলে mobile/phone/id
     _otpState.userMobile = String(user.mobile||user.phone||user.id);
+    _otpState.userId = String(user.id); // ✅ Google user এর জন্য id সংরক্ষণ
     const nameEl  = document.getElementById('resetUserName');
     const emailEl = document.getElementById('resetUserEmail');
     const card    = document.getElementById('resetUserCard');
@@ -6695,8 +6699,12 @@ function findUserForReset() {
 
 async function sendOtpForReset() {
     const mobile = _otpState.userMobile;
+    const userId = _otpState.userId; // ✅ Google user এর id
     const user = (appState.users||[]).find(u=>
-        String(u.mobile)===mobile||String(u.phone)===mobile||String(u.id)===mobile
+        String(u.mobile)===mobile ||
+        String(u.phone)===mobile ||
+        String(u.id)===mobile ||
+        (userId && String(u.id)===userId)  // ✅ Google account match
     );
     if(!user){ _showResetMsg('step1Msg','❌ এই মোবাইল নম্বরে কোনো একাউন্ট পাওয়া যায়নি!','error'); return; }
     _otpState.userMobile = mobile;
@@ -6733,7 +6741,14 @@ async function verifyOtpAndReset() {
     if(!otpInput||otpInput.length!==6){ _showResetMsg('step2Msg','❌ ৬ ডিজিটের OTP দিন!','error'); return; }
     if(!newPass||newPass.length<4){ _showResetMsg('step2Msg','❌ পাসওয়ার্ড কমপক্ষে ৪ অক্ষর!','error'); return; }
     const mobile=_otpState.userMobile;
-    const userIdx=(appState.users||[]).findIndex(u=>String(u.mobile)===mobile||String(u.phone)===mobile);
+    const userId=_otpState.userId; // ✅ Google user এর id
+    // ✅ mobile, phone, id — যেকোনো একটি মিললেই হবে (Google account সহ)
+    const userIdx=(appState.users||[]).findIndex(u=>
+        String(u.mobile)===mobile ||
+        String(u.phone)===mobile ||
+        String(u.id)===mobile ||
+        (userId && String(u.id)===userId)
+    );
     if(userIdx===-1){ _showResetMsg('step2Msg','❌ ইউজার পাওয়া যায়নি!','error'); return; }
     if(_otpState.method==='email'){
         if(!_otpState.code){ _showResetMsg('step2Msg','❌ OTP মেয়াদ শেষ! পুনরায় পাঠান।','error'); return; }
@@ -10698,61 +10713,27 @@ function showNoticeBoardPopup() {
     // ── মোবাইলে বাটন ও ক্রস বড় করা (+15px) ──
     (function applyMobileNoticeSize() {
         const isMobile = document.documentElement.classList.contains('is-mobile') ||
-            /Android|iPhone|iPad|webOS/i.test(navigator.userAgent) ||
-            window.innerWidth <= 900;
+            /Android|iPhone|iPad|webOS/i.test(navigator.userAgent) || window.innerWidth <= 900;
         if (!isMobile) return;
-
-        // ক্রস বাটন — 16px → 31px, size 28px → 56px
         const closeBtn = document.getElementById('nbCloseBtn');
-        if (closeBtn) {
-            closeBtn.style.fontSize = '31px';
-            closeBtn.style.width = '56px';
-            closeBtn.style.height = '56px';
-            closeBtn.style.borderRadius = '12px';
-        }
-
-        // header title
+        if (closeBtn) { closeBtn.style.fontSize='31px'; closeBtn.style.width='56px'; closeBtn.style.height='56px'; closeBtn.style.borderRadius='12px'; }
         const headerTitle = document.getElementById('nbHeaderTitle');
-        if (headerTitle) { headerTitle.style.fontSize = '24px'; }
-
-        // counter
+        if (headerTitle) { headerTitle.style.fontSize='24px'; }
         const counter = document.getElementById('nbCounter');
-        if (counter) { counter.style.fontSize = '22px'; }
-
-        // footer padding বড়
+        if (counter) { counter.style.fontSize='22px'; }
         const footer = document.getElementById('nbFooter');
-        if (footer) {
-            footer.style.padding = '18px 20px 28px';
-            footer.style.gap = '14px';
-        }
-
-        // বিস্তারিত text — ইতিমধ্যে 21px, মোবাইলে আরো: 26px
-        const detailText = document.getElementById('nbDetailText');
-        if (detailText) {
-            detailText.style.fontSize = '26px';
-            detailText.style.lineHeight = '1.9';
-        }
-
-        // "পরের" বাটন — 13px → 28px
-        const nextBtn = document.getElementById('nbNext');
-        if (nextBtn) {
-            nextBtn.style.cssText += '; font-size:28px !important; padding:18px 30px !important; border-radius:14px !important; min-height:66px !important; font-weight:700 !important;';
-        }
-
-        // "আগের" বাটন
-        const prevBtn = document.getElementById('nbPrev');
-        if (prevBtn) {
-            prevBtn.style.cssText += '; font-size:28px !important; padding:18px 30px !important; border-radius:14px !important; min-height:66px !important; font-weight:700 !important;';
-        }
-
-        // "ঠিক আছে" বাটন — 13px → 28px
+        if (footer) { footer.style.padding='18px 20px 28px'; footer.style.gap='14px'; }
+        const dt = document.getElementById('nbDetailText');
+        if (dt) { dt.style.fontSize='26px'; dt.style.lineHeight='1.9'; }
+        ['nbNext','nbPrev'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) { btn.style.fontSize='28px'; btn.style.padding='18px 30px'; btn.style.borderRadius='14px'; btn.style.minHeight='66px'; btn.style.fontWeight='700'; }
+        });
         const okBtn = document.getElementById('nbOkBtn');
-        if (okBtn) {
-            okBtn.style.cssText += '; font-size:28px !important; padding:18px 36px !important; border-radius:14px !important; min-height:66px !important; font-weight:800 !important;';
-        }
+        if (okBtn) { okBtn.style.fontSize='28px'; okBtn.style.padding='18px 36px'; okBtn.style.borderRadius='14px'; okBtn.style.minHeight='66px'; okBtn.style.fontWeight='800'; }
     })();
 
-    // Next/Prev navigate এও মোবাইল size apply করো
+    // Next/Prev navigation
     window.nbNavigate = function(dir) {
         currentIdx += dir;
         if (currentIdx < 0) currentIdx = 0;
@@ -10764,13 +10745,12 @@ function showNoticeBoardPopup() {
         const next = document.getElementById('nbNext');
         if (prev) prev.style.display = currentIdx > 0 ? 'block' : 'none';
         if (next) next.style.display = currentIdx < notices.length-1 ? 'block' : 'none';
-
         // মোবাইলে detail text বড় রাখো
         const isMobile = document.documentElement.classList.contains('is-mobile') ||
             /Android|iPhone|iPad|webOS/i.test(navigator.userAgent) || window.innerWidth <= 900;
         if (isMobile) {
             const dt = document.getElementById('nbDetailText');
-            if (dt) { dt.style.fontSize = '26px'; dt.style.lineHeight = '1.9'; }
+            if (dt) { dt.style.fontSize='26px'; dt.style.lineHeight='1.9'; }
         }
     };
 }
