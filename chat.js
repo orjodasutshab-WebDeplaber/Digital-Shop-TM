@@ -534,7 +534,6 @@
     background:#1a2d36;
     border-top:1px solid rgba(42,57,66,.6);
 }
-.is-mobile #tmv3-bottom-nav { display:flex; }
 .tmv3-nav-btn {
     flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
     padding:16px 0; color:#aebac1; cursor:pointer;
@@ -1080,127 +1079,138 @@
     /* ── Layout ── */
     #tmv3-overlay { position:fixed !important; top:0 !important; left:0 !important; width:100vw !important; height:100dvh !important; }
     #tmv3-root { width:100% !important; height:100% !important; flex-direction:column !important; border-radius:0 !important; }
-    #tmv3-left { width:100% !important; max-width:100% !important; height:100% !important; position:absolute !important; inset:0 !important; z-index:2 !important; transition:transform .28s cubic-bezier(.4,0,.2,1) !important; }
+    #tmv3-left { width:100% !important; max-width:100% !important; height:100% !important; position:absolute !important; inset:0 !important; z-index:2 !important; }
     #tmv3-left.hidden { transform:translateX(-100%) !important; }
-    #tmv3-right { width:100% !important; height:100% !important; position:absolute !important; inset:0 !important; transform:translateX(100%) !important; transition:transform .28s cubic-bezier(.4,0,.2,1) !important; z-index:3 !important; }
+    #tmv3-right { width:100% !important; height:100% !important; position:absolute !important; inset:0 !important; transform:translateX(100%) !important; z-index:3 !important; }
     #tmv3-right.open { transform:translateX(0) !important; }
     #tmv3-side-panel { width:100% !important; position:absolute !important; inset:0 !important; z-index:5 !important; }
     #tmv3-close-btn { display:none !important; }
-    #tmv3-back-btn { display:flex !important; width:52px !important; height:52px !important; font-size:24px !important; }
-    #tmv3-bottom-nav { display:flex !important; }
-    #tmv3-main-close-btn { display:flex !important; }
-    #tmv3-chat-close-btn { display:flex !important; }
+    #tmv3-bottom-nav { display:none !important; }
+
+    /* ── Buttons ── */
+    #tmv3-back-btn { display:flex !important; width:58px !important; height:58px !important; font-size:28px !important; }
+    #tmv3-main-close-btn { display:flex !important; width:56px !important; height:56px !important; font-size:24px !important; border-width:3px !important; }
+    #tmv3-chat-close-btn { display:flex !important; width:56px !important; height:56px !important; font-size:24px !important; border-width:3px !important; }
 
     /* ── Left Header ── */
-    #tmv3-left-header { padding:20px 18px 16px !important; }
-    #tmv3-app-title { font-size:34px !important; font-weight:900 !important; }
-    .tmv3-icon-btn { width:56px !important; height:56px !important; font-size:26px !important; }
-    #tmv3-main-close-btn { width:52px !important; height:52px !important; font-size:22px !important; }
+    #tmv3-left-header { padding:24px 20px 18px !important; }
+    #tmv3-app-title { font-size:40px !important; font-weight:900 !important; letter-spacing:-0.5px !important; }
+    .tmv3-icon-btn { width:58px !important; height:58px !important; font-size:28px !important; }
 
-    /* ── Search Bar — WhatsApp style big pill ── */
-    .tmv3-search-wrap { padding:14px 16px 10px !important; }
+    /* ── Search Bar — WhatsApp big pill ── */
+    .tmv3-search-wrap { padding:16px 18px 12px !important; }
     .tmv3-search-bar {
-        padding:18px 24px !important;
-        border-radius:50px !important;
-        background:#1f2c34 !important;
-        border:2px solid rgba(37,211,102,.25) !important;
+        padding:20px 26px !important;
+        border-radius:60px !important;
+        background:#202c33 !important;
+        border:2px solid rgba(37,211,102,.2) !important;
         gap:16px !important;
-        box-shadow:0 2px 12px rgba(0,0,0,.25) !important;
+        box-shadow:0 2px 16px rgba(0,0,0,.3) !important;
     }
     .tmv3-search-bar:focus-within {
-        border-color:rgba(37,211,102,.55) !important;
-        box-shadow:0 0 0 4px rgba(37,211,102,.12) !important;
+        border-color:rgba(37,211,102,.6) !important;
+        background:#1f2c34 !important;
+        box-shadow:0 0 0 5px rgba(37,211,102,.12) !important;
     }
-    .tmv3-search-bar i { font-size:26px !important; color:#25d366 !important; }
-    .tmv3-search-bar input { font-size:24px !important; font-weight:400 !important; }
-    .tmv3-search-bar input::placeholder { font-size:24px !important; }
+    .tmv3-search-bar i { font-size:28px !important; color:#25d366 !important; }
+    .tmv3-search-bar input { font-size:26px !important; }
+    .tmv3-search-bar input::placeholder { font-size:26px !important; color:#8696a0 !important; }
 
     /* ── Filter Tabs ── */
-    .tmv3-tabs { padding:12px 16px 14px !important; gap:12px !important; overflow-x:auto !important; }
-    .tmv3-tab { font-size:22px !important; padding:13px 30px !important; border-radius:40px !important; border-width:2px !important; font-weight:600 !important; }
+    .tmv3-tabs { padding:14px 18px 16px !important; gap:12px !important; }
+    .tmv3-tab { font-size:24px !important; padding:14px 34px !important; border-radius:50px !important; border-width:2px !important; font-weight:700 !important; }
 
-    /* ── Chat List Items — WhatsApp style big ── */
-    #tmv3-chat-list { padding:4px 0 !important; }
-    .tmv3-chat-item { padding:18px 20px !important; gap:18px !important; min-height:88px !important; }
-    .tmv3-avatar { width:68px !important; height:68px !important; font-size:30px !important; flex-shrink:0 !important; }
-    .tmv3-chat-name { font-size:26px !important; font-weight:700 !important; line-height:1.3 !important; }
-    .tmv3-chat-preview { font-size:21px !important; margin-top:4px !important; line-height:1.4 !important; }
-    .tmv3-chat-time { font-size:19px !important; font-weight:500 !important; }
-    .tmv3-unread-badge { font-size:18px !important; min-width:32px !important; height:32px !important; padding:0 9px !important; border-radius:16px !important; }
-    .tmv3-chat-meta { gap:7px !important; }
+    /* ── Chat List ── */
+    #tmv3-chat-list { padding:6px 0 !important; }
+    .tmv3-chat-item { padding:20px 22px !important; gap:20px !important; min-height:96px !important; }
+    .tmv3-avatar { width:74px !important; height:74px !important; font-size:32px !important; flex-shrink:0 !important; border-radius:50% !important; }
+    .tmv3-chat-name { font-size:28px !important; font-weight:700 !important; line-height:1.3 !important; }
+    .tmv3-chat-preview { font-size:22px !important; margin-top:5px !important; line-height:1.4 !important; }
+    .tmv3-chat-time { font-size:20px !important; font-weight:500 !important; }
+    .tmv3-unread-badge { font-size:19px !important; min-width:34px !important; height:34px !important; padding:0 10px !important; border-radius:17px !important; }
+    .tmv3-chat-meta { gap:8px !important; }
 
     /* ── Chat Header ── */
-    #tmv3-chat-header { padding:20px 18px !important; gap:16px !important; min-height:80px !important; }
-    #tmv3-hdr-av { width:54px !important; height:54px !important; font-size:24px !important; flex-shrink:0 !important; }
-    #tmv3-header-name { font-size:28px !important; font-weight:700 !important; }
-    #tmv3-header-sub { font-size:20px !important; }
-    #tmv3-chat-close-btn { width:50px !important; height:50px !important; font-size:22px !important; }
+    #tmv3-chat-header { padding:20px 18px !important; gap:16px !important; min-height:84px !important; }
+    #tmv3-hdr-av { width:58px !important; height:58px !important; font-size:26px !important; flex-shrink:0 !important; }
+    #tmv3-header-name { font-size:30px !important; font-weight:800 !important; }
+    #tmv3-header-sub { font-size:21px !important; }
 
-    /* ── Dropdown Menu ── */
-    .tmv3-dropdown-menu { min-width:240px !important; border-radius:14px !important; }
-    .tmv3-dropdown-item { font-size:24px !important; padding:20px 26px !important; gap:18px !important; }
-    .tmv3-dropdown-item i { font-size:24px !important; }
+    /* ── Dropdown ── */
+    .tmv3-dropdown-menu { min-width:260px !important; border-radius:16px !important; }
+    .tmv3-dropdown-item { font-size:26px !important; padding:22px 28px !important; gap:20px !important; }
+    .tmv3-dropdown-item i { font-size:26px !important; }
 
     /* ── Messages ── */
-    .tmv3-bubble { padding:13px 16px 8px 16px !important; border-radius:18px !important; max-width:82% !important; }
-    .tmv3-msg-text { font-size:23px !important; line-height:1.55 !important; }
-    .tmv3-msg-time { font-size:18px !important; margin-top:4px !important; }
-    .tmv3-sender { font-size:20px !important; margin-bottom:4px !important; font-weight:700 !important; }
-    .tmv3-date-divider { font-size:18px !important; padding:6px 18px !important; }
-    .tmv3-reply-preview { font-size:19px !important; padding:8px 12px !important; }
+    .tmv3-bubble { padding:14px 18px 9px !important; border-radius:20px !important; max-width:84% !important; }
+    .tmv3-msg-text { font-size:24px !important; line-height:1.6 !important; }
+    .tmv3-msg-time { font-size:19px !important; margin-top:5px !important; }
+    .tmv3-sender { font-size:21px !important; margin-bottom:4px !important; font-weight:700 !important; }
 
     /* ── Input Area ── */
-    #tmv3-input-area { padding:16px 18px 24px !important; gap:14px !important; background:#111b21 !important; }
-    #tmv3-img-btn { width:52px !important; height:52px !important; font-size:26px !important; }
-    #tmv3-msg-input { 
-        font-size:24px !important; 
-        padding:18px 24px !important; 
-        border-radius:42px !important; 
-        min-height:60px !important;
-        line-height:1.4 !important;
-    }
-    #tmv3-send-btn { width:72px !important; height:72px !important; font-size:30px !important; border-radius:50% !important; }
-
-    /* ── Bottom Nav ── */
-    #tmv3-bottom-nav { padding:0 !important; min-height:72px !important; }
-    .tmv3-nav-btn { padding:14px 0 !important; gap:5px !important; }
-    .tmv3-nav-btn i { font-size:28px !important; }
-    .tmv3-nav-btn span { font-size:18px !important; font-weight:600 !important; }
+    #tmv3-input-area { padding:16px 18px 26px !important; gap:14px !important; }
+    #tmv3-img-btn { width:56px !important; height:56px !important; font-size:28px !important; }
+    #tmv3-msg-input { font-size:25px !important; padding:20px 26px !important; border-radius:50px !important; min-height:64px !important; line-height:1.4 !important; }
+    #tmv3-send-btn { width:76px !important; height:76px !important; font-size:32px !important; border-radius:50% !important; flex-shrink:0 !important; }
 
     /* ── Side Panel ── */
-    .tmv3-sp-header { padding:20px 20px !important; gap:16px !important; }
-    .tmv3-sp-title { font-size:30px !important; font-weight:800 !important; }
-    .tmv3-sp-avatar { width:130px !important; height:130px !important; font-size:56px !important; }
-    .tmv3-sp-name { font-size:32px !important; font-weight:800 !important; padding:16px 20px 4px !important; }
-    .tmv3-sp-sub { font-size:21px !important; padding:0 20px 18px !important; }
-    .tmv3-sp-section { margin:10px 14px !important; border-radius:14px !important; }
-    .tmv3-sp-section-label { font-size:18px !important; padding:14px 18px 8px !important; }
-    .tmv3-sp-row { font-size:23px !important; padding:20px 18px !important; gap:16px !important; }
-    .tmv3-sp-row i { font-size:24px !important; width:30px !important; }
-    .tmv3-sp-row .label { font-size:23px !important; }
-    .tmv3-sp-row .value { font-size:19px !important; }
-    .tmv3-member-item { padding:18px 0 !important; gap:18px !important; }
-    .tmv3-member-avatar { width:58px !important; height:58px !important; font-size:24px !important; }
-    .tmv3-member-name { font-size:24px !important; font-weight:700 !important; }
-    .tmv3-member-sub { font-size:19px !important; }
-    .tmv3-member-badge { font-size:16px !important; padding:4px 12px !important; }
-
-    /* ── Toast ── */
-    #tmv3-toast { font-size:21px !important; padding:14px 30px !important; border-radius:14px !important; }
+    .tmv3-sp-header { padding:22px 20px !important; gap:16px !important; }
+    .tmv3-sp-title { font-size:32px !important; font-weight:800 !important; }
+    .tmv3-sp-avatar { width:140px !important; height:140px !important; font-size:60px !important; }
+    .tmv3-sp-name { font-size:34px !important; font-weight:800 !important; padding:18px 22px 4px !important; }
+    .tmv3-sp-sub { font-size:22px !important; padding:0 22px 20px !important; }
+    .tmv3-sp-section { margin:10px 14px !important; border-radius:16px !important; }
+    .tmv3-sp-section-label { font-size:19px !important; padding:14px 18px 8px !important; }
+    .tmv3-sp-row { font-size:24px !important; padding:20px 20px !important; gap:18px !important; }
+    .tmv3-sp-row i { font-size:26px !important; width:32px !important; }
+    .tmv3-sp-row .label { font-size:24px !important; }
+    .tmv3-sp-row .value { font-size:20px !important; }
+    .tmv3-member-item { padding:20px 0 !important; gap:18px !important; }
+    .tmv3-member-avatar { width:62px !important; height:62px !important; font-size:26px !important; }
+    .tmv3-member-name { font-size:26px !important; font-weight:700 !important; }
+    .tmv3-member-sub { font-size:20px !important; }
+    .tmv3-member-badge { font-size:17px !important; padding:5px 14px !important; }
 
     /* ── User Search Results ── */
-    #tmv3-user-search-results { margin-top:12px !important; border-radius:18px !important; }
-    .tmv3-usr-srch-label { font-size:18px !important; padding:14px 20px 8px !important; }
-    .tmv3-usr-srch-item { padding:16px 20px !important; gap:16px !important; }
-    .tmv3-usr-srch-av { width:58px !important; height:58px !important; font-size:26px !important; }
-    .tmv3-usr-srch-name { font-size:23px !important; font-weight:700 !important; }
-    .tmv3-usr-srch-sub { font-size:17px !important; }
-    .tmv3-usr-srch-action { font-size:17px !important; padding:9px 16px !important; }
+    #tmv3-user-search-results { margin-top:12px !important; border-radius:20px !important; }
+    .tmv3-usr-srch-label { font-size:19px !important; padding:16px 22px 10px !important; }
+    .tmv3-usr-srch-item { padding:18px 22px !important; gap:18px !important; }
+    .tmv3-usr-srch-av { width:62px !important; height:62px !important; font-size:28px !important; }
+    .tmv3-usr-srch-name { font-size:25px !important; font-weight:700 !important; }
+    .tmv3-usr-srch-sub { font-size:19px !important; }
+    .tmv3-usr-srch-action { font-size:18px !important; padding:10px 18px !important; }
 
-    /* ── Empty state ── */
-    .tmv3-empty-msg { font-size:22px !important; padding:32px 0 !important; }
-    #tmv3-empty-right .tmv3-lock-icon { font-size:64px !important; }
-    #tmv3-empty-right p { font-size:22px !important; }
+    /* ── Toast ── */
+    #tmv3-toast { font-size:22px !important; padding:16px 32px !important; border-radius:16px !important; }
+
+    /* ── Empty states ── */
+    .tmv3-empty-msg { font-size:24px !important; padding:36px 0 !important; }
+
+    /* ── WhatsApp style: no border between chat items, just padding ── */
+    .tmv3-chat-item { border-bottom:none !important; }
+    .tmv3-chat-item:hover { background:rgba(42,57,66,.5) !important; }
+
+    /* ── Left panel — cleaner header ── */
+    #tmv3-left::before { height:4px !important; }
+    #tmv3-left-header { 
+        background:linear-gradient(180deg,#1a2d36 0%,#111b21 100%) !important; 
+        border-bottom:1px solid rgba(42,57,66,.4) !important;
+    }
+
+    /* ── Search bar clear button bigger ── */
+    #tmv3-search-clear { width:42px !important; height:42px !important; font-size:22px !important; }
+
+    /* ── Modal popup bigger on mobile ── */
+    .tmv3-modal-title { font-size:28px !important; }
+    .tmv3-modal-head { padding:22px 24px !important; }
+    .tmv3-field label { font-size:22px !important; font-weight:600 !important; }
+    .tmv3-field input, .tmv3-field textarea, .tmv3-field select { font-size:24px !important; padding:18px 20px !important; }
+    .tmv3-modal-search { font-size:24px !important; padding:18px 20px !important; }
+    .tmv3-btn { font-size:24px !important; padding:18px 36px !important; }
+    .tmv3-user-sel-item { padding:18px 20px !important; gap:18px !important; }
+    .tmv3-sel-check { width:36px !important; height:36px !important; }
+    .tmv3-sel-check.checked::after { font-size:20px !important; }
+    .tmv3-modal-footer { padding:18px 22px 32px !important; }
 }
         `;
         document.head.appendChild(s);
@@ -1258,18 +1268,6 @@
       <div class="tmv3-spinner"><i class="fa fa-circle-notch"></i></div>
     </div>
 
-    <!-- Bottom Nav (mobile) -->
-    <div id="tmv3-bottom-nav">
-      <button class="tmv3-nav-btn active" id="tmv3-nav-chats">
-        <i class="fa fa-comment"></i><span>Chats</span>
-      </button>
-      <button class="tmv3-nav-btn" id="tmv3-nav-updates">
-        <i class="fa fa-circle-notch"></i><span>Updates</span>
-      </button>
-      <button class="tmv3-nav-btn" id="tmv3-nav-community">
-        <i class="fa fa-users"></i><span>Community</span>
-      </button>
-    </div>
   </div>
 
   <!-- RIGHT PANEL -->
@@ -1607,14 +1605,6 @@
             if (e.target === this) _closeModal();
         });
 
-        /* Bottom nav (mobile) */
-        ['chats', 'updates', 'community'].forEach(function (name) {
-            const btn = document.getElementById('tmv3-nav-' + name);
-            if (btn) btn.addEventListener('click', function () {
-                document.querySelectorAll('.tmv3-nav-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
     }
 
     /* ══════════════════════════════════════════════════════════
