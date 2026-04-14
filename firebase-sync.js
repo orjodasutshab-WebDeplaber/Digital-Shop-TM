@@ -85,6 +85,14 @@ window.pushToCloud = async function(lsKey) {
   if (!db) return;
   const col = KEY_MAP[lsKey];
   if (!col) return;
+
+  // ⛔ products key এ pushToCloud block করা হয়েছে
+  // কারণ: pushToCloud পুরো array batch.set() করে — delete করলেও ফিরে আসে
+  // Products এখন adminDeleteProduct/addProduct/editProduct থেকে direct .delete()/.set() দিয়ে manage হয়
+  if (lsKey === 'TM_DB_PRODUCTS_V2') {
+    console.log('[FB] pushToCloud: products blocked — use direct Firestore ops');
+    return;
+  }
   // _TM_CACHE কে priority দিই — idb-shim এখানে data রাখে
   const raw = (window._TM_CACHE && window._TM_CACHE[lsKey]) || localStorage.getItem(lsKey);
   if (!raw) { console.warn('[FB] pushToCloud: no data for', lsKey); return; }

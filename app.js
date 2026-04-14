@@ -1271,8 +1271,27 @@ function adminSaveProduct() {
 
     // ডাটাবেসে পণ্য যুক্ত করা
     appState.products.unshift(newProd);
-    saveData(DB_KEYS.PRODUCTS, appState.products);
-    
+
+    // Local save (pushToCloud ছাড়া — conflict এড়াতে)
+    const _addStr = JSON.stringify(appState.products);
+    if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.PRODUCTS] = _addStr;
+    if (window._TMDB && typeof window._TMDB.set === 'function') {
+        window._TMDB.set(DB_KEYS.PRODUCTS, _addStr).catch(()=>{});
+    }
+    if (localStorage._fbOrigSet) localStorage._fbOrigSet(DB_KEYS.PRODUCTS, _addStr);
+
+    // Firestore এ সরাসরি নতুন product document লেখা
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore()
+                .collection('products')
+                .doc(String(newProd.id))
+                .set(newProd)
+                .then(() => console.log('[FB] ✅ New product saved to Firestore:', newProd.id))
+                .catch(e => console.warn('[FB] ❌ Product add Firestore error:', e.message));
+        }
+    } catch(e) { console.warn('[FB] product add error:', e.message); }
+
     alert("✅ সফলভাবে পাবলিশ হয়েছে!");
     
     // --- মেইন সাইট আপডেট (ফিল্টার লজিক) ---
@@ -2529,9 +2548,39 @@ function adminResetPass(userId) {
 
 function adminDeleteProduct(id) {
     if(confirm("আপনি কি এই পণ্যটি ডিলিট করতে চান?")) {
+        // ১. Local state থেকে সরান
         appState.products = appState.products.filter(p => p.id !== id);
-        saveData(DB_KEYS.PRODUCTS, appState.products);
+
+        // ২. localStorage/IDB তে save — pushToCloud ডাকা হচ্ছে না
+        //    (pushToCloud ডাকলে পুরো array আবার Firebase এ লিখত এবং conflict হত)
+        const _str = JSON.stringify(appState.products);
+        if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.PRODUCTS] = _str;
+        if (window._TMDB && typeof window._TMDB.set === 'function') {
+            window._TMDB.set(DB_KEYS.PRODUCTS, _str).catch(()=>{});
+        }
+        // idb-shim এর origSet দিয়েও save করি
+        if (localStorage._fbOrigSet) {
+            localStorage._fbOrigSet(DB_KEYS.PRODUCTS, _str);
+        }
+
+        // ৩. UI আপডেট
         renderProductGrid(appState.products);
+        if (typeof renderAdminProducts === 'function') renderAdminProducts();
+
+        // ৪. Firestore থেকে সরাসরি document delete — এটাই মূল fix
+        //    onSnapshot conflict এড়াতে pushToCloud এর পরিবর্তে সরাসরি .delete()
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore) {
+                firebase.firestore()
+                    .collection('products')
+                    .doc(String(id))
+                    .delete()
+                    .then(() => console.log('[FB] ✅ Product deleted from Firestore:', id))
+                    .catch(e => console.warn('[FB] ❌ Product Firestore delete error:', e.message));
+            }
+        } catch(e) {
+            console.warn('[FB] adminDeleteProduct error:', e.message);
+        }
     }
 }
 
@@ -3259,12 +3308,29 @@ window.saveProductEdit = function(productId) {
     };
     product.images = finalImages;
 
-    // ডাটাবেস আপডেট
-    if(typeof saveData === 'function') {
-        saveData(DB_KEYS.PRODUCTS, appState.products);
-    } else {
-        localStorage.setItem('products', JSON.stringify(appState.products));
+    // ডাটাবেস আপডেট — Local save (pushToCloud ছাড়া)
+    const _editStr = JSON.stringify(appState.products);
+    if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.PRODUCTS] = _editStr;
+    if (window._TMDB && typeof window._TMDB.set === 'function') {
+        window._TMDB.set(DB_KEYS.PRODUCTS, _editStr).catch(()=>{});
     }
+    if (localStorage._fbOrigSet) {
+        localStorage._fbOrigSet(DB_KEYS.PRODUCTS, _editStr);
+    } else {
+        localStorage.setItem('products', _editStr);
+    }
+
+    // Firestore এ সরাসরি updated product লেখা
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore()
+                .collection('products')
+                .doc(String(product.id))
+                .set(product)
+                .then(() => console.log('[FB] ✅ Product updated in Firestore:', product.id))
+                .catch(e => console.warn('[FB] ❌ Product edit Firestore error:', e.message));
+        }
+    } catch(e) { console.warn('[FB] product edit error:', e.message); }
     
     // রি-রেন্ডার
     if(typeof renderProductGrid === 'function') renderProductGrid(appState.products);
