@@ -475,6 +475,23 @@ function startListeners() {
     });
   });
 
+  // ── Sironam (স্পেশাল শিরোনাম) real-time listener ────────────
+  db.collection('sironam').onSnapshot(snap => {
+    _pulling = true;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('sironam_list', arr);
+    _pulling = false;
+    console.log('[FB] ↻ Sironam list updated:', arr.length);
+    // sironamData variable update
+    if (typeof window._reloadSironamData === 'function') {
+      window._reloadSironamData();
+    }
+    // UI refresh
+    if (typeof window.displaySironamOnPortal === 'function') {
+      window.displaySironamOnPortal();
+    }
+  });
+
   console.log('[FB] Listeners started');
 }
 

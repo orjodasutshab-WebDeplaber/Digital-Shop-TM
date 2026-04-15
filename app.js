@@ -9895,6 +9895,7 @@ let sironamData = [];
 function _reloadSironamData() {
     sironamData = JSON.parse(localStorage.getItem('sironam_list')) || [];
 }
+window._reloadSironamData = _reloadSironamData;
 
 // অ্যাডমিন প্যানেল থেকে শিরোনাম কন্ট্রোল ওপেন করা
 function openSironamControl() {
@@ -10039,6 +10040,8 @@ function deleteSironam(id) {
 
 function displaySironamOnPortal() {
     _reloadSironamData(); // ✅ hydration শেষে fresh data নেওয়া
+    // global expose (firebase-sync real-time listener এর জন্য)
+    window.displaySironamOnPortal = displaySironamOnPortal;
     const container = document.getElementById('sironam-portal-display');
     if (!container) return;
 
