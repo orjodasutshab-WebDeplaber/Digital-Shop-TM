@@ -89,7 +89,8 @@ window.pushToCloud = async function(lsKey) {
   // ⛔ এই key গুলোতে pushToCloud block — direct .delete()/.set() দিয়ে manage হয়
   // batch.set() করলে delete করা item ফিরে আসত
   const _blocked = ['TM_DB_PRODUCTS_V2','TM_DB_ORDERS_V2','TM_DB_ADS_V2',
-                    'TM_LOCAL_BOARDS','TM_LOGIN_LEADERBOARDS','TM_SUB_ADMINS'];
+                    'TM_LOCAL_BOARDS','TM_LOGIN_LEADERBOARDS','TM_SUB_ADMINS',
+                    'pmx_headers','pmx_products','pmx_holders','sironam_list'];
   if (_blocked.includes(lsKey)) {
     console.log('[FB] pushToCloud blocked for:', lsKey);
     return;

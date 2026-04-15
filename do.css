@@ -1540,8 +1540,9 @@ body, html {
 
 /* বেলি বোড কন্টেইনারের সাইজ নির্ধারণ */
 .beli-board {
-    width: 730px;  /* আপনার চাহিদামতো Width */
-    height: 340px; /* আপনার চাহিদামতো Height */
+    width: min(730px, 45vw);
+    min-width: 280px;
+    height: 340px;
     background: #1e293b;
     border-radius: 12px;
     overflow: hidden;
@@ -1549,7 +1550,22 @@ body, html {
     justify-content: center;
     align-items: center;
     border: 1px dashed #4b5563;
-    flex-shrink: 0; /* সাইজ যেন ছোট হয়ে না যায় */
+    flex-shrink: 1;
+}
+
+@media (max-width: 700px) {
+    .beli-board {
+        width: 90vw;
+        height: 200px;
+        min-width: 0;
+    }
+}
+
+@media (min-width: 701px) and (max-width: 1100px) {
+    .beli-board {
+        width: min(580px, 44vw);
+        height: 280px;
+    }
 }
 
 .beli-board img {

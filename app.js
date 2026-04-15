@@ -9962,49 +9962,56 @@ function renderAdminSironamList() {
 
 // শিরোনাম এবং তার আওতাধীন সকল পণ্য স্থায়ীভাবে ডিলিট করা
 function deleteSironam(id) {
-    // ১. নিশ্চিত হওয়ার জন্য কনফার্মেশন
     if (!confirm("সাবধান! এই শিরোনামটি ডিলিট করলে এর ভেতরের সব পণ্য চিরতরে মুছে যাবে। আপনি কি নিশ্চিত?")) {
         return;
     }
 
-    // ২. শিরোনাম ডিলিট করা (sironamData থেকে)
+    // ১. sironamData local থেকে সরানো (pushToCloud ছাড়া)
     if (typeof sironamData !== 'undefined') {
         sironamData = sironamData.filter(item => String(item.id) !== String(id));
-        localStorage.setItem('sironam_list', JSON.stringify(sironamData));
+        const str = JSON.stringify(sironamData);
+        if (window._TM_CACHE) window._TM_CACHE['sironam_list'] = str;
+        if (window._TMDB) window._TMDB.set('sironam_list', str).catch(()=>{});
     }
 
-    // ৩. ঐ শিরোনামের সকল পণ্য ডিলিট করা (আপনার সিস্টেমের লজিক অনুযায়ী)
+    // ২. ঐ শিরোনামের সকল পণ্য local থেকে সরানো (pushToCloud ছাড়া)
+    let deletedProductIds = [];
     if (typeof appState !== 'undefined' && appState.products) {
-        
-        // আপনার দেওয়া লজিক অনুযায়ী ফিল্টার: sironamTag এর সাথে শিরোনামের ID ম্যাচ করানো হচ্ছে
+        deletedProductIds = appState.products
+            .filter(p => String(p.sironamTag) === String(id))
+            .map(p => p.id);
         appState.products = appState.products.filter(p => String(p.sironamTag) !== String(id));
-        
-        // আপনার সিস্টেমের saveData ফাংশন ব্যবহার করে ডাটাবেজ আপডেট
-        saveData(DB_KEYS.PRODUCTS, appState.products);
-        
-        console.log("✅ Digital Shop TM: ওই শিরোনামের সকল পণ্য ডাটাবেজ থেকে মুছে ফেলা হয়েছে!");
+        const str = JSON.stringify(appState.products);
+        if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.PRODUCTS] = str;
+        if (window._TMDB) window._TMDB.set(DB_KEYS.PRODUCTS, str).catch(()=>{});
     }
 
-    // ৪. ইন্টারফেস এবং পোর্টাল রিফ্রেশ করা
+    // ৩. Firestore থেকে sironam doc + products সরাসরি delete
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            const db = firebase.firestore();
+            db.collection('sironam').doc(String(id)).delete()
+                .then(() => console.log('[FB] ✅ Sironam deleted:', id))
+                .catch(e => console.warn('[FB] sironam delete error:', e.message));
+            deletedProductIds.forEach(pid => {
+                db.collection('products').doc(String(pid)).delete()
+                    .catch(e => console.warn('[FB] product delete error:', pid, e.message));
+            });
+        }
+    } catch(e) {
+        console.warn('[FB] deleteSironam error:', e.message);
+    }
+
+    // ৪. UI রিফ্রেশ
     const adminList = document.getElementById('adminSironamList');
-    if (adminList) {
-        adminList.innerHTML = renderAdminSironamList();
-    }
-    
-    if (typeof displaySironamOnPortal === 'function') {
-        displaySironamOnPortal();
-    }
-
-    // ৫. মেইন গ্রিড আপডেট করা (যাতে পণ্যগুলো সাথে সাথে চলে যায়)
+    if (adminList) adminList.innerHTML = renderAdminSironamList();
+    if (typeof displaySironamOnPortal === 'function') displaySironamOnPortal();
     if (typeof renderProductGrid === 'function') {
-        // মেইন শপে শুধুমাত্র জেনারেল পণ্য দেখানোর জন্য ফিল্টার করা
         const mainOnly = appState.products.filter(p => !p.sironamTag || p.sironamTag === "" || p.sironamTag === "main");
         renderProductGrid(mainOnly);
     }
 
-    alert("শিরোনাম এবং এর ভেতরের সকল পণ্য সফলভাবে ডিলিট হয়েছে।");
-    
-    // সম্পূর্ণ নিশ্চিত হতে একবার রিলোড দেওয়া ভালো
+    alert("শিরোনাম এবং এর ভেতরের সকল পণ্য সফলভাবে ডিলিট হয়েছে।");
     location.reload();
 }
 
@@ -13330,13 +13337,15 @@ window.addEventListener('load', function() {
     const db = pmxDb();
     if (db) {
         ['pmx_headers','pmx_products','pmx_holders'].forEach(col => {
-            db.collection(col).get().then(snap => {
+            db.collection(col).onSnapshot(snap => {
                 const arr = snap.docs.map(d => d.data());
-                if (arr.length) {
-                    localStorage.setItem(col, JSON.stringify(arr));
-                    if (col === 'pmx_headers') pmxRefreshDisplay();
-                }
-            }).catch(()=>{});
+                // localStorage/IDB direct update — pushToCloud ডাকা হবে না
+                const str = JSON.stringify(arr);
+                if (window._TM_CACHE) window._TM_CACHE[col] = str;
+                if (window._TMDB) window._TMDB.set(col, str).catch(()=>{});
+                if (col === 'pmx_headers') pmxRefreshDisplay();
+                if (col === 'pmx_products' || col === 'pmx_holders') pmxRefreshDisplay();
+            });
         });
         // pmx_orders আলাদাভাবে — deleted list দিয়ে filter
         db.collection('pmx_orders').get().then(snap => {
