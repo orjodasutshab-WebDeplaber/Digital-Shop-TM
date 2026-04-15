@@ -7418,8 +7418,8 @@ function renderUserCards() {
             <div class="card-right" style="background:${theme.right};">
                 <h5 class="card-title" style="color:#ffffff;">${card.name}</h5>
                 <div class="card-details" style="color:${theme.text};">
-                    <span><i class="fa fa-shopping-bag" style="color:${theme.accent};"></i> মিন: ৳${card.min || 0}</span>
-                    <span><i class="fa fa-arrow-up" style="color:${theme.accent};"></i> ম্যাক্স: ৳${card.max || 'N/A'}</span>
+                    <span><i class="fa fa-shopping-bag" style="color:${theme.accent};"></i> মিন: ৳${card.minAmount || card.min || 0}</span>
+                    <span><i class="fa fa-arrow-up" style="color:${theme.accent};"></i> ম্যাক্স: ৳${card.maxAmount || card.max || 'N/A'}</span>
                 </div>
                 
                 <div class="promo-box" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.3);">
@@ -9932,18 +9932,40 @@ function openSironamControl() {
 
 // শিরোনাম পাবলিশ করা
 function publishSironam() {
-    const name = document.getElementById('sironamName').value;
-    const img = document.getElementById('sironamImgUrl').value;
+    const name = document.getElementById('sironamName').value.trim();
+    const img = document.getElementById('sironamImgUrl').value.trim();
 
     if (!name || !img) return alert("নাম এবং ছবি দুটুই দিন!");
 
-    sironamData.push({ id: Date.now(), name, img });
-    localStorage.setItem('sironam_list', JSON.stringify(sironamData));
-    
+    const newItem = { id: Date.now(), name, img };
+    sironamData.push(newItem);
+    const str = JSON.stringify(sironamData);
+
+    // ১. localStorage (idb-shim) এ সেভ
+    localStorage.setItem('sironam_list', str);
+
+    // ২. IDB cache সরাসরি আপডেট (idb-shim bypass)
+    if (window._TM_CACHE) window._TM_CACHE['sironam_list'] = str;
+    if (window._TMDB) window._TMDB.set('sironam_list', str).catch(() => {});
+
+    // ৩. Firebase Firestore এ সরাসরি push (deleteSironam এর মতো approach)
+    try {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            firebase.firestore()
+                .collection('sironam')
+                .doc(String(newItem.id))
+                .set(newItem)
+                .then(() => console.log('[FB] ✅ Sironam published:', newItem.id))
+                .catch(e => console.warn('[FB] sironam publish error:', e.message));
+        }
+    } catch(e) {
+        console.warn('[FB] publishSironam firebase error:', e.message);
+    }
+
     document.getElementById('adminSironamList').innerHTML = renderAdminSironamList();
     document.getElementById('sironamName').value = '';
     document.getElementById('sironamImgUrl').value = '';
-    
+
     displaySironamOnPortal(); // পোর্টালে আপডেট করা
 }
 
@@ -10433,7 +10455,7 @@ function publishDeliAd(id) {
 }
 
 function renderDeliAds(id) {
-    return deliAds.filter(a => a.sironamId === id).map(a => `
+    return deliAds.filter(a => String(a.sironamId) === String(id)).map(a => `
         <div style="display:flex; justify-content:space-between; background:#1f2937; padding:8px; margin-bottom:5px; border-radius:5px;">
             <img src="${a.img}" style="width:40px; height:25px; object-fit:fill;">
             <button onclick="deleteDeliAd(${a.id}, '${id}')" style="background:#ef4444; color:white; border:none; padding:2px 8px; border-radius:4px; cursor:pointer;">ডিলিট</button>
