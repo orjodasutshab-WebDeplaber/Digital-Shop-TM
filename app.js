@@ -1271,27 +1271,16 @@ function adminSaveProduct() {
 
     // ডাটাবেসে পণ্য যুক্ত করা
     appState.products.unshift(newProd);
-
-    // Local save (pushToCloud ছাড়া — conflict এড়াতে)
-    const _addStr = JSON.stringify(appState.products);
-    if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.PRODUCTS] = _addStr;
-    if (window._TMDB && typeof window._TMDB.set === 'function') {
-        window._TMDB.set(DB_KEYS.PRODUCTS, _addStr).catch(()=>{});
-    }
-    if (localStorage._fbOrigSet) localStorage._fbOrigSet(DB_KEYS.PRODUCTS, _addStr);
-
-    // Firestore এ সরাসরি নতুন product document লেখা
+    const _as = JSON.stringify(appState.products);
+    if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.PRODUCTS] = _as;
+    if (window._TMDB) window._TMDB.set(DB_KEYS.PRODUCTS, _as).catch(()=>{});
+    if (localStorage._fbOrigSet) localStorage._fbOrigSet(DB_KEYS.PRODUCTS, _as);
     try {
-        if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firebase.firestore()
-                .collection('products')
-                .doc(String(newProd.id))
-                .set(newProd)
-                .then(() => console.log('[FB] ✅ New product saved to Firestore:', newProd.id))
-                .catch(e => console.warn('[FB] ❌ Product add Firestore error:', e.message));
-        }
-    } catch(e) { console.warn('[FB] product add error:', e.message); }
-
+        if (typeof firebase !== 'undefined' && firebase.firestore)
+            firebase.firestore().collection('products').doc(String(newProd.id)).set(newProd)
+                .then(()=>console.log('[FB] ✅ Product added:',newProd.id))
+                .catch(e=>console.warn('[FB] product add err:',e.message));
+    } catch(e) {}
     alert("✅ সফলভাবে পাবলিশ হয়েছে!");
     
     // --- মেইন সাইট আপডেট (ফিল্টার লজিক) ---
@@ -2548,39 +2537,19 @@ function adminResetPass(userId) {
 
 function adminDeleteProduct(id) {
     if(confirm("আপনি কি এই পণ্যটি ডিলিট করতে চান?")) {
-        // ১. Local state থেকে সরান
         appState.products = appState.products.filter(p => p.id !== id);
-
-        // ২. localStorage/IDB তে save — pushToCloud ডাকা হচ্ছে না
-        //    (pushToCloud ডাকলে পুরো array আবার Firebase এ লিখত এবং conflict হত)
-        const _str = JSON.stringify(appState.products);
-        if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.PRODUCTS] = _str;
-        if (window._TMDB && typeof window._TMDB.set === 'function') {
-            window._TMDB.set(DB_KEYS.PRODUCTS, _str).catch(()=>{});
-        }
-        // idb-shim এর origSet দিয়েও save করি
-        if (localStorage._fbOrigSet) {
-            localStorage._fbOrigSet(DB_KEYS.PRODUCTS, _str);
-        }
-
-        // ৩. UI আপডেট
+        const _s = JSON.stringify(appState.products);
+        if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.PRODUCTS] = _s;
+        if (window._TMDB) window._TMDB.set(DB_KEYS.PRODUCTS, _s).catch(()=>{});
+        if (localStorage._fbOrigSet) localStorage._fbOrigSet(DB_KEYS.PRODUCTS, _s);
         renderProductGrid(appState.products);
         if (typeof renderAdminProducts === 'function') renderAdminProducts();
-
-        // ৪. Firestore থেকে সরাসরি document delete — এটাই মূল fix
-        //    onSnapshot conflict এড়াতে pushToCloud এর পরিবর্তে সরাসরি .delete()
         try {
-            if (typeof firebase !== 'undefined' && firebase.firestore) {
-                firebase.firestore()
-                    .collection('products')
-                    .doc(String(id))
-                    .delete()
-                    .then(() => console.log('[FB] ✅ Product deleted from Firestore:', id))
-                    .catch(e => console.warn('[FB] ❌ Product Firestore delete error:', e.message));
-            }
-        } catch(e) {
-            console.warn('[FB] adminDeleteProduct error:', e.message);
-        }
+            if (typeof firebase !== 'undefined' && firebase.firestore)
+                firebase.firestore().collection('products').doc(String(id)).delete()
+                    .then(()=>console.log('[FB] ✅ Product deleted:',id))
+                    .catch(e=>console.warn('[FB] product delete err:',e.message));
+        } catch(e) {}
     }
 }
 
@@ -2998,17 +2967,19 @@ document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclic
 // অর্ডার ডিলিট করার জন্য নতুন ফাংশন
 function cancelUserOrder(orderId) {
     if (confirm("আপনি কি নিশ্চিত যে আপনি এই অর্ডারটি চিরতরে ডিলিট করতে চান?")) {
-        // ডাটাবেজ থেকে ফিল্টার করে ডিলিট করা
-        appState.orders = appState.orders.filter(function(o) {
-            return o.id !== orderId;
-        });
-        
-        // লোকাল স্টোরেজে সেভ করা
-        saveData(DB_KEYS.ORDERS, appState.orders);
-        
-        // ভিউ আপডেট করা (আবার ট্র্যাকিং ওপেন করে রিফ্রেশ করা)
+        appState.orders = appState.orders.filter(function(o) { return o.id !== orderId; });
+        const _os = JSON.stringify(appState.orders);
+        if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.ORDERS] = _os;
+        if (window._TMDB) window._TMDB.set(DB_KEYS.ORDERS, _os).catch(()=>{});
+        if (localStorage._fbOrigSet) localStorage._fbOrigSet(DB_KEYS.ORDERS, _os);
+        else localStorage.setItem(DB_KEYS.ORDERS, _os);
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore)
+                firebase.firestore().collection('orders').doc(String(orderId)).delete()
+                    .then(()=>console.log('[FB] ✅ Order deleted:',orderId))
+                    .catch(e=>console.warn('[FB] order delete err:',e.message));
+        } catch(e) {}
         openOrderTracking();
-        
         alert("অর্ডারটি সফলভাবে ডিলিট করা হয়েছে।");
     }
 }
@@ -3308,29 +3279,18 @@ window.saveProductEdit = function(productId) {
     };
     product.images = finalImages;
 
-    // ডাটাবেস আপডেট — Local save (pushToCloud ছাড়া)
-    const _editStr = JSON.stringify(appState.products);
-    if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.PRODUCTS] = _editStr;
-    if (window._TMDB && typeof window._TMDB.set === 'function') {
-        window._TMDB.set(DB_KEYS.PRODUCTS, _editStr).catch(()=>{});
-    }
-    if (localStorage._fbOrigSet) {
-        localStorage._fbOrigSet(DB_KEYS.PRODUCTS, _editStr);
-    } else {
-        localStorage.setItem('products', _editStr);
-    }
-
-    // Firestore এ সরাসরি updated product লেখা
+    // ডাটাবেস আপডেট
+    const _es = JSON.stringify(appState.products);
+    if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.PRODUCTS] = _es;
+    if (window._TMDB) window._TMDB.set(DB_KEYS.PRODUCTS, _es).catch(()=>{});
+    if (localStorage._fbOrigSet) localStorage._fbOrigSet(DB_KEYS.PRODUCTS, _es);
+    else localStorage.setItem('products', _es);
     try {
-        if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firebase.firestore()
-                .collection('products')
-                .doc(String(product.id))
-                .set(product)
-                .then(() => console.log('[FB] ✅ Product updated in Firestore:', product.id))
-                .catch(e => console.warn('[FB] ❌ Product edit Firestore error:', e.message));
-        }
-    } catch(e) { console.warn('[FB] product edit error:', e.message); }
+        if (typeof firebase !== 'undefined' && firebase.firestore)
+            firebase.firestore().collection('products').doc(String(product.id)).set(product)
+                .then(()=>console.log('[FB] ✅ Product updated:',product.id))
+                .catch(e=>console.warn('[FB] product edit err:',e.message));
+    } catch(e) {}
     
     // রি-রেন্ডার
     if(typeof renderProductGrid === 'function') renderProductGrid(appState.products);
@@ -3441,11 +3401,23 @@ function masterPublishAd() {
 // ৩. বিজ্ঞাপন ডিলিট করার ফাংশন
 function masterDeleteAd(id) {
     if(confirm("আপনি কি এটি ডিলিট করতে চান?")) {
+        // ১. Local থেকে সরান
         let ads = JSON.parse(localStorage.getItem(DB_KEYS.ADS)) || [];
         ads = ads.filter(a => a.id !== id);
-        if(typeof window.pushToCloud==='function') window.pushToCloud('TM_DB_ADS_V2');
-        localStorage.setItem(DB_KEYS.ADS, JSON.stringify(ads));
+        const _adStr = JSON.stringify(ads);
+        if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.ADS] = _adStr;
+        if (window._TMDB) window._TMDB.set(DB_KEYS.ADS, _adStr).catch(()=>{});
+        if (localStorage._fbOrigSet) localStorage._fbOrigSet(DB_KEYS.ADS, _adStr);
+        else localStorage.setItem(DB_KEYS.ADS, _adStr);
+        if (window.appState) window.appState.ads = ads;
         renderAdminAds(document.getElementById('adminMainContainer'));
+        // ২. Firestore থেকে সরাসরি delete
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore)
+                firebase.firestore().collection('ads').doc(String(id)).delete()
+                    .then(()=>console.log('[FB] ✅ Ad deleted:',id))
+                    .catch(e=>console.warn('[FB] ad delete err:',e.message));
+        } catch(e) {}
     }
 }
 /**
@@ -10891,9 +10863,21 @@ function publishLocalBoard() {
 function deleteLocalBoard(idx) {
     if(!confirm('ডিলিট করবেন?'))return;
     const items=JSON.parse(localStorage.getItem(LOCAL_K))||[];
+    const item = items[idx];
     items.splice(idx,1);
-    localStorage.setItem(LOCAL_K,JSON.stringify(items));
+    const _lbStr = JSON.stringify(items);
+    if (window._TM_CACHE) window._TM_CACHE[LOCAL_K] = _lbStr;
+    if (window._TMDB) window._TMDB.set(LOCAL_K, _lbStr).catch(()=>{});
+    if (localStorage._fbOrigSet) localStorage._fbOrigSet(LOCAL_K, _lbStr);
+    else localStorage.setItem(LOCAL_K, _lbStr);
     showToast('🗑️ ডিলিট হয়েছে');
+    // Firestore থেকে সরাসরি delete (item.id দিয়ে)
+    try {
+        if (item && item.id && typeof firebase !== 'undefined' && firebase.firestore)
+            firebase.firestore().collection('local_boards').doc(String(item.id)).delete()
+                .then(()=>console.log('[FB] ✅ LocalBoard deleted:',item.id))
+                .catch(e=>console.warn('[FB] localboard delete err:',e.message));
+    } catch(e) {}
     const c=document.getElementById('adminMainContainer');
     if(c) renderAdminLocalBoard(c);
 }
@@ -10954,9 +10938,21 @@ function publishLoginLB() {
 function deleteLoginLB(idx) {
     if(!confirm('ডিলিট করবেন?'))return;
     const items=JSON.parse(localStorage.getItem(LB_KEY))||[];
+    const item = items[idx];
     items.splice(idx,1);
-    localStorage.setItem(LB_KEY,JSON.stringify(items));
+    const _llbStr = JSON.stringify(items);
+    if (window._TM_CACHE) window._TM_CACHE[LB_KEY] = _llbStr;
+    if (window._TMDB) window._TMDB.set(LB_KEY, _llbStr).catch(()=>{});
+    if (localStorage._fbOrigSet) localStorage._fbOrigSet(LB_KEY, _llbStr);
+    else localStorage.setItem(LB_KEY, _llbStr);
     showToast('🗑️ ডিলিট হয়েছে');
+    // Firestore থেকে সরাসরি delete (item.id দিয়ে)
+    try {
+        if (item && item.id && typeof firebase !== 'undefined' && firebase.firestore)
+            firebase.firestore().collection('leaderboards').doc(String(item.id)).delete()
+                .then(()=>console.log('[FB] ✅ LeaderBoard deleted:',item.id))
+                .catch(e=>console.warn('[FB] leaderboard delete err:',e.message));
+    } catch(e) {}
     const c=document.getElementById('adminMainContainer');
     if(c) renderAdminLoginLeaderboard(c);
 }
@@ -11102,13 +11098,37 @@ function deleteSubAdmin(idx) {
     const list = getSubAdmins();
     const sa = list[idx];
 
-    // users DB থেকেও সরাই
+    // ১. users DB থেকে Local এ সরাই
     const users = JSON.parse(localStorage.getItem(DB_KEYS.USERS)) || [];
     const uIdx = users.findIndex(u => u.id === sa.id);
-    if (uIdx !== -1) { users.splice(uIdx, 1); localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)); }
+    if (uIdx !== -1) {
+        users.splice(uIdx, 1);
+        const _uStr = JSON.stringify(users);
+        if (window._TM_CACHE) window._TM_CACHE[DB_KEYS.USERS] = _uStr;
+        if (window._TMDB) window._TMDB.set(DB_KEYS.USERS, _uStr).catch(()=>{});
+        if (localStorage._fbOrigSet) localStorage._fbOrigSet(DB_KEYS.USERS, _uStr);
+        else localStorage.setItem(DB_KEYS.USERS, _uStr);
+        // Firestore users collection থেকেও delete
+        try {
+            if (sa.id && typeof firebase !== 'undefined' && firebase.firestore)
+                firebase.firestore().collection('users').doc(String(sa.id)).delete()
+                    .then(()=>console.log('[FB] ✅ SubAdmin user deleted:',sa.id))
+                    .catch(e=>console.warn('[FB] subadmin user delete err:',e.message));
+        } catch(e) {}
+    }
 
+    // ২. sub_admins list থেকে সরাই
     list.splice(idx, 1);
     saveSubAdmins(list);
+
+    // ৩. Firestore sub_admins collection থেকে delete
+    try {
+        if (sa.id && typeof firebase !== 'undefined' && firebase.firestore)
+            firebase.firestore().collection('sub_admins').doc(String(sa.id)).delete()
+                .then(()=>console.log('[FB] ✅ SubAdmin deleted from sub_admins:',sa.id))
+                .catch(e=>console.warn('[FB] sub_admins delete err:',e.message));
+    } catch(e) {}
+
     showToast('🗑️ সহকারী এডমিন ডিলিট হয়েছে');
     const c = document.getElementById('adminMainContainer');
     if (c) renderSubAdminManager(c);
