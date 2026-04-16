@@ -2426,3 +2426,408 @@ html.is-mobile .search-wrapper i {
     scrollbar-width: thin !important;
     scrollbar-color: #6366f1 #2c2c2e !important;
 }
+
+
+/* ================================================================
+   PC RESPONSIVE FIXES — Digital Shop TM
+   সব breakpoint: 1280px, 1100px, 960px, 768px, 600px
+   ================================================================ */
+
+/* ── 1. HEADER ─────────────────────────────────────────────── */
+
+/* 1280px: header padding কমানো */
+@media (max-width: 1280px) {
+    .site-header { padding: 0 3%; }
+    .header-wrapper { gap: 10px; }
+    #pcQuickNav { margin-left: 30px !important; gap: 5px !important; }
+    .pc-nav-btn { padding: 6px 10px !important; font-size: 11.5px !important; }
+}
+
+/* 1100px: quick nav বাটন ছোট */
+@media (max-width: 1100px) {
+    .site-header { padding: 0 2%; }
+    #pcQuickNav { margin-left: 16px !important; gap: 4px !important; flex-wrap: nowrap !important; overflow-x: auto !important; }
+    .pc-nav-btn { padding: 5px 9px !important; font-size: 11px !important; white-space: nowrap !important; }
+    .company-name { font-size: 18px !important; }
+    .company-slogan { font-size: 10px !important; }
+    .brand-logo { width: 42px !important; height: 42px !important; }
+}
+
+/* 960px: quick nav লুকানো, header compact */
+@media (max-width: 960px) {
+    #pcQuickNav { display: none !important; }
+    .site-header { padding: 0 2.5%; height: auto; min-height: 60px; }
+    .header-wrapper { flex-wrap: nowrap !important; gap: 8px !important; }
+    .company-name { font-size: 16px !important; }
+    .company-slogan { font-size: 9px !important; }
+    .brand-logo { width: 38px !important; height: 38px !important; }
+    /* লগইন/সাইন আপ বাটন ছোট */
+    .btn-login, .btn-register, .btn.btn-register {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+        gap: 4px !important;
+    }
+    /* প্রোফাইল ট্রিগার ছোট */
+    .profile-trigger { padding: 4px 10px !important; gap: 7px !important; }
+    #headerUserName { font-size: 12px !important; }
+    #headerUserImageWrapper { width: 30px !important; height: 30px !important; }
+    .search-icon-btn { width: 34px !important; height: 34px !important; font-size: 14px !important; }
+    .user-controls { gap: 8px !important; }
+}
+
+/* 768px: আরো compact */
+@media (max-width: 768px) {
+    .site-header { padding: 0 2%; min-height: 56px; }
+    .brand-section { gap: 8px !important; }
+    .brand-logo { width: 34px !important; height: 34px !important; }
+    .company-name { font-size: 14px !important; }
+    .company-slogan { display: none !important; }
+    /* auth buttons — icon only on very small */
+    .btn-login span.btn-text, .btn-register span.btn-text { display: none; }
+    .user-controls { gap: 6px !important; }
+    .auth-buttons { gap: 6px !important; }
+    .btn-login, .btn-register, .btn.btn-register {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        border-radius: 8px !important;
+    }
+}
+
+/* ── 2. NAVIGATION CATEGORIES ─────────────────────────────── */
+
+@media (max-width: 1100px) {
+    .nav-container { padding: 0 2%; gap: 8px; }
+    .nav-item { padding: 8px 14px; font-size: 12.5px; gap: 5px; }
+}
+
+@media (max-width: 960px) {
+    .main-navigation { padding: 10px 0; }
+    .nav-item { padding: 7px 12px; font-size: 12px; border-radius: 20px; }
+}
+
+@media (max-width: 768px) {
+    .nav-container { padding: 0 1.5%; gap: 6px; }
+    .nav-item { padding: 7px 10px; font-size: 11.5px; gap: 4px; }
+}
+
+/* ── 3. POPULAR BANNER (জনপ্রিয় পণ্যসমূহ section) ─────────── */
+
+@media (max-width: 1100px) {
+    .popular-banner-wrap { padding: 10px 24px; }
+    .pb-main { font-size: 15px !important; }
+    .pb-sub { font-size: 10px; }
+}
+
+@media (max-width: 960px) {
+    .popular-banner-wrap {
+        padding: 10px 16px;
+        gap: 8px;
+    }
+    .pb-main { font-size: 14px !important; }
+    .pb-label { font-size: 9px; letter-spacing: 1.5px; }
+    .pb-sub { font-size: 10px; }
+    .pb-badges-inline { gap: 5px; }
+    .pb-badge { padding: 4px 9px; font-size: 11px; }
+}
+
+@media (max-width: 768px) {
+    .popular-banner-wrap {
+        padding: 9px 12px;
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+    .pb-left { gap: 8px; flex-wrap: nowrap; align-items: center; }
+    .pb-icon { font-size: 22px !important; }
+    .pb-main { font-size: 13px !important; }
+    .pb-label { font-size: 8px; }
+    .pb-sub { font-size: 9.5px; }
+    /* ব্যাজ লুকানো — জায়গা কম */
+    .pb-badges-inline { display: none !important; }
+    .pb-filter-text { display: none; }
+    .pb-filter-btn { padding: 8px 11px; border-radius: 50%; }
+    .pb-filter-arrow { display: none; }
+}
+
+@media (max-width: 600px) {
+    .popular-banner-wrap { padding: 8px 10px; }
+    .pb-main { font-size: 12px !important; font-weight: 800 !important; }
+    .pb-label { display: none; }
+}
+
+/* ── 4. PRODUCT GRID ───────────────────────────────────────── */
+
+/* 4টা কলাম → 1280px */
+@media (max-width: 1280px) {
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)) !important;
+        gap: 12px !important;
+    }
+}
+
+/* 3টা কলাম → 960px */
+@media (max-width: 960px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 10px !important;
+    }
+    .main-content-area .container {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+}
+
+/* 2টা কলাম → 700px */
+@media (max-width: 700px) {
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+    .main-content-area .container {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+    .product-card { padding: 8px; border-radius: 12px; }
+    .product-card .product-slider,
+    .product-card .slide-img,
+    .product-card img { height: 160px !important; }
+    .product-title { font-size: 12px !important; }
+    .product-price { font-size: 14px !important; }
+    .btn-buy-now, .btn-details {
+        font-size: 11px !important;
+        padding: 7px 4px !important;
+    }
+}
+
+/* ── 5. ADMIN PANEL ────────────────────────────────────────── */
+
+/* Admin fullscreen modal — 960px এর নিচে */
+@media (max-width: 960px) {
+    /* Full screen লেআউট */
+    #adminPanelModal > div,
+    .fullscreen-modal {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+    }
+
+    /* Sidebar + content vertical stack */
+    .admin-layout-wrapper {
+        flex-direction: column !important;
+        height: 100vh !important;
+        overflow: hidden !important;
+    }
+
+    /* Sidebar horizontal scroll strip */
+    .admin-sidebar {
+        width: 100% !important;
+        max-height: none !important;
+        height: auto !important;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        padding: 10px 12px !important;
+        gap: 6px !important;
+        display: flex !important;
+        flex-shrink: 0 !important;
+        flex-wrap: nowrap !important;
+        background: #2b3040 !important;
+        scrollbar-width: none !important;
+    }
+    .admin-sidebar::-webkit-scrollbar { display: none !important; }
+
+    /* সাইডবারের প্রতিটি বাটন ছোট pill shape */
+    .admin-sidebar .menu-btn {
+        padding: 8px 14px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+        border-radius: 20px !important;
+        margin-bottom: 0 !important;
+        flex-shrink: 0 !important;
+        min-width: fit-content !important;
+        text-align: center !important;
+    }
+
+    /* Content area fills rest */
+    .admin-content-view {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        padding: 16px !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Top bar compact */
+    .admin-top-bar {
+        padding: 10px 16px !important;
+        font-size: 14px !important;
+    }
+    .admin-top-bar h2, .admin-top-bar span {
+        font-size: 14px !important;
+    }
+}
+
+/* 768px: admin content padding আরো কমানো */
+@media (max-width: 768px) {
+    .admin-content-view { padding: 12px !important; }
+
+    /* Table horizontal scroll */
+    .admin-table {
+        font-size: 12px !important;
+        display: block !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+    }
+    .admin-table th, .admin-table td {
+        padding: 10px 8px !important;
+        font-size: 12px !important;
+    }
+
+    /* Modal box full width */
+    .modal-box { padding: 20px 16px !important; border-radius: 12px !important; }
+    .small-modal { width: 96% !important; }
+    .medium-modal { width: 98% !important; }
+}
+
+/* 600px: admin sidebar বাটন আরো ছোট */
+@media (max-width: 600px) {
+    .admin-sidebar .menu-btn {
+        padding: 7px 10px !important;
+        font-size: 11px !important;
+    }
+    .admin-top-bar { padding: 8px 12px !important; }
+}
+
+/* ── 6. SIRONAM / SPECIAL CATEGORY GRID ───────────────────── */
+
+@media (max-width: 960px) {
+    .sironam-grid-container {
+        grid-auto-columns: calc((98vw - 6 * 12px) / 5.33) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .sironam-grid-container {
+        grid-auto-columns: calc((98vw - 5 * 10px) / 4.33) !important;
+        gap: 8px !important;
+    }
+    .sironam-card img { height: 100px !important; }
+    .sironam-overlay { font-size: 11px !important; padding: 6px 4px 8px !important; }
+}
+
+@media (max-width: 600px) {
+    .sironam-grid-container {
+        grid-auto-columns: calc((98vw - 4 * 8px) / 3.33) !important;
+        gap: 6px !important;
+    }
+    .sironam-card img { height: 85px !important; }
+    .sironam-overlay { font-size: 10px !important; }
+}
+
+/* ── 7. FILTER BUTTON & POPUP ──────────────────────────────── */
+
+@media (max-width: 960px) {
+    .pb-filter-btn { padding: 8px 14px; font-size: 13px; }
+}
+
+@media (max-width: 768px) {
+    #filterMenu {
+        width: 240px !important;
+        padding: 16px !important;
+        right: -10px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Bottom sheet — এর চেয়ে ছোট স্ক্রিনে */
+    #filterMenu {
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        top: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 24px 24px 0 0 !important;
+        padding: 24px 20px 40px !important;
+        z-index: 999999 !important;
+    }
+}
+
+/* ── 8. BELI BOARD ─────────────────────────────────────────── */
+
+@media (max-width: 960px) {
+    .load-more-section { gap: 12px; }
+    .beli-board {
+        width: min(480px, 44vw) !important;
+        height: 260px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .load-more-section {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+    .beli-board {
+        width: 96vw !important;
+        max-width: 100% !important;
+        height: 220px !important;
+    }
+}
+
+/* ── 9. SECTION TITLE (আমাদের জনপ্রিয় পণ্য) ──────────────── */
+
+@media (max-width: 960px) {
+    .section-title h2 { font-size: 20px !important; }
+}
+
+@media (max-width: 768px) {
+    .section-title h2 { font-size: 17px !important; }
+}
+
+@media (max-width: 600px) {
+    .section-title h2 { font-size: 15px !important; }
+    .section-title { margin-bottom: 16px !important; }
+}
+
+/* ── 10. MAIN CONTENT AREA PADDING ────────────────────────── */
+
+@media (max-width: 960px) {
+    .main-content-area { padding: 20px 2.5% 40px !important; }
+    .advertisement-section { padding: 12px 2.5% !important; }
+}
+
+@media (max-width: 768px) {
+    .main-content-area { padding: 16px 1.5% 30px !important; }
+    .advertisement-section { padding: 10px 1.5% !important; }
+    .ad-container { height: 90px !important; }
+}
+
+/* ── 11. SPECIAL / PMX SECTION ────────────────────────────── */
+
+@media (max-width: 960px) {
+    .special-category-container {
+        margin: 20px auto 25px !important;
+        padding: 3px !important;
+    }
+    .special-category-title { font-size: 18px !important; }
+}
+
+@media (max-width: 768px) {
+    .special-category-title { font-size: 15px !important; }
+}
+
+/* ── 12. GENERAL MODAL RESPONSIVE ─────────────────────────── */
+
+@media (max-width: 768px) {
+    .modal-overlay { padding: 10px !important; }
+    .modal-box { width: 98% !important; padding: 18px 14px !important; }
+    .modal-header h3 { font-size: 18px !important; }
+}
+
+@media (max-width: 600px) {
+    .modal-box { padding: 14px 10px !important; border-radius: 10px !important; }
+    input, textarea, select { padding: 10px 12px !important; font-size: 13px !important; }
+}
+
