@@ -378,8 +378,30 @@ function startListeners() {
 
   db.collection('deli_ads').onSnapshot(snap => {
     _pulling = true;
-    setLocal('deli_ads', snap.docs.map(d => d.data()));
+    const _deliArr = snap.docs.map(d => d.data());
+    setLocal('deli_ads', _deliArr);
     _pulling = false;
+    console.log('[FB] ↻ Deli ads updated:', _deliArr.length);
+    // ✅ app.js এর deliAds array রিফ্রেশ করো
+    if (typeof window._reloadDeliAds === 'function') {
+      window._reloadDeliAds();
+    }
+    // ✅ sironam shop খোলা থাকলে ডেলি বোর্ড রিফ্রেশ করো
+    const _deliBoard = document.getElementById('sironamDeliBoard');
+    if (_deliBoard && typeof window._currentSironamId !== 'undefined') {
+      const _sid = String(window._currentSironamId);
+      const _ads = _deliArr.filter(a => String(a.sironamId) === _sid);
+      if (_ads.length === 0) {
+        _deliBoard.innerHTML = '<p style="color:#4b5563; text-align:center; padding:20px;">এখানে ডেলি বিজ্ঞাপন প্রদর্শিত হবে</p>';
+      } else {
+        _deliBoard.innerHTML = '<img src="' + _ads[0].img + '" style="width:100%;height:100%;object-fit:cover;cursor:pointer;" onclick="window.open(\'' + _ads[0].link + '\',' + "'" + '_blank' + "'" + ')">';
+      }
+    }
+    // ✅ deliAdList panel খোলা থাকলে রিফ্রেশ করো
+    if (typeof renderDeliAds === 'function' && window._openDeliPanelId) {
+      const _listEl = document.getElementById('deliAdList');
+      if (_listEl) _listEl.innerHTML = renderDeliAds(window._openDeliPanelId);
+    }
   });
 
   // পণ্য লোড লিমিট listener

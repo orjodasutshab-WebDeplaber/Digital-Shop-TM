@@ -10408,6 +10408,8 @@ let deliAds = [];
 function _reloadDeliAds() {
     deliAds = JSON.parse(localStorage.getItem('deli_ads')) || [];
 }
+// ✅ firebase-sync.js থেকে call করার জন্য window এ expose করো
+window._reloadDeliAds = _reloadDeliAds;
 
 // ৫. ক্যাটাগরি নিয়ন্ত্রণ পপ-আপ (অপরিবর্তিত)
 function openCategoryControl() {
@@ -10433,6 +10435,9 @@ function openCategoryControl() {
 }
 // ডেলি বিজ্ঞাপন পাবলিশ প্যানেল
 function openDeliAdPanel(sironamId) {
+    // ✅ বর্তমান open panel এর sironamId ট্র্যাক করো (realtime refresh এর জন্য)
+    window._openDeliPanelId = String(sironamId);
+    _reloadDeliAds(); // সর্বশেষ data দিয়ে open করো
     const panelHTML = `
     <div id="deliPanel" class="modal-overlay" style="display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); justify-content:center; align-items:center; z-index: 2147483648;">
         <div style="background:#111827; padding:25px; border-radius:20px; width:90%; max-width:400px; border:1px solid #374151;">
@@ -10441,25 +10446,40 @@ function openDeliAdPanel(sironamId) {
             <input type="text" id="deliDetails" placeholder="বিস্তারিত লিংক" style="width:100%; padding:12px; margin-bottom:15px; border-radius:10px; background:#1f2937; color:white; border:1px solid #374151;">
             <button onclick="publishDeliAd('${sironamId}')" style="width:100%; background:#10b981; color:white; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">পাবলিশ</button>
             <div id="deliAdList" style="margin-top:20px; max-height:150px; overflow-y:auto;">${renderDeliAds(sironamId)}</div>
-            <button onclick="document.getElementById('deliPanel').remove()" style="width:100%; margin-top:10px; background:none; color:#9ca3af; border:none; cursor:pointer;">ফিরে যান</button>
+            <button onclick="document.getElementById('deliPanel').remove(); window._openDeliPanelId=null;" style="width:100%; margin-top:10px; background:none; color:#9ca3af; border:none; cursor:pointer;">ফিরে যান</button>
         </div>
     </div>`;
     document.body.insertAdjacentHTML('beforeend', panelHTML);
 }
 
 function publishDeliAd(id) {
-    const img = document.getElementById('deliImg').value;
-    const link = document.getElementById('deliDetails').value;
+    const img = document.getElementById('deliImg').value.trim();
+    const link = document.getElementById('deliDetails').value.trim();
     if(!img || !link) return alert("সব তথ্য দিন");
-    deliAds.push({ id: Date.now(), sironamId: id, img, link });
-    localStorage.setItem('deli_ads', JSON.stringify(deliAds));
-    if(typeof window.pushToCloud==='function') window.pushToCloud('deli_ads');
+    const newAd = { id: Date.now(), sironamId: String(id), img, link };
+    deliAds.push(newAd);
+    // ✅ localStorage ও IDB cache আপডেট
+    const str = JSON.stringify(deliAds);
+    localStorage.setItem('deli_ads', str);
+    if(window._TM_CACHE) window._TM_CACHE['deli_ads'] = str;
+    if(window._TMDB) window._TMDB.set('deli_ads', str).catch(()=>{});
+    // ✅ Firestore এ সরাসরি .set() — pushToCloud এর batch দরকার নেই
+    try {
+        const _db = (typeof db !== 'undefined' && db) || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+        if (_db) {
+            _db.collection('deli_ads').doc(String(newAd.id)).set(newAd)
+               .then(() => console.log('[DeliAd] ✅ Published to Firestore:', newAd.id))
+               .catch(e => console.warn('[DeliAd] Firestore set error:', e.message));
+        }
+    } catch(e) { console.warn('[DeliAd] publish error:', e); }
+    document.getElementById('deliImg').value = '';
+    document.getElementById('deliDetails').value = '';
     document.getElementById('deliAdList').innerHTML = renderDeliAds(id);
 }
 
 function renderDeliAds(id) {
     return deliAds.filter(a => String(a.sironamId) === String(id)).map(a => `
-        <div style="display:flex; justify-content:space-between; background:#1f2937; padding:8px; margin-bottom:5px; border-radius:5px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#1f2937; padding:8px; margin-bottom:5px; border-radius:5px;">
             <img src="${a.img}" style="width:40px; height:25px; object-fit:fill;">
             <button onclick="deleteDeliAd(${a.id}, '${id}')" style="background:#ef4444; color:white; border:none; padding:2px 8px; border-radius:4px; cursor:pointer;">ডিলিট</button>
         </div>
@@ -10467,9 +10487,21 @@ function renderDeliAds(id) {
 }
 
 function deleteDeliAd(adId, sironamId) {
-    deliAds = deliAds.filter(a => a.id !== adId);
-    localStorage.setItem('deli_ads', JSON.stringify(deliAds));
-    if(typeof window.pushToCloud==='function') window.pushToCloud('deli_ads');
+    deliAds = deliAds.filter(a => String(a.id) !== String(adId));
+    // ✅ localStorage ও IDB cache আপডেট
+    const str = JSON.stringify(deliAds);
+    localStorage.setItem('deli_ads', str);
+    if(window._TM_CACHE) window._TM_CACHE['deli_ads'] = str;
+    if(window._TMDB) window._TMDB.set('deli_ads', str).catch(()=>{});
+    // ✅ Firestore থেকে সরাসরি .delete() — pushToCloud দরকার নেই
+    try {
+        const _db = (typeof db !== 'undefined' && db) || (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+        if (_db) {
+            _db.collection('deli_ads').doc(String(adId)).delete()
+               .then(() => console.log('[DeliAd] ✅ Deleted from Firestore:', adId))
+               .catch(e => console.warn('[DeliAd] Firestore delete error:', e.message));
+        }
+    } catch(e) { console.warn('[DeliAd] delete error:', e); }
     document.getElementById('deliAdList').innerHTML = renderDeliAds(sironamId);
 }
 // About Us পপ-আপ ওপেন করার ফাংশন
