@@ -1,5 +1,5 @@
 // ============================================================
-// firebase-sync.js  v7.0 — Digital Shop TM
+// firebase-sync.js  v7.1 — Digital Shop TM
 // ── Multi-Firebase (সর্বোচ্চ ১০টি) ──────────────────────────
 //
 //  ✅ প্রতিটি Firebase আলাদা ডাটা ধরে:
@@ -328,13 +328,21 @@ function setLocal(key, val) {
   _pulling = true;
   try {
     const str = typeof val === 'string' ? val : JSON.stringify(val);
+    // সরাসরি TM_CACHE এ লেখো (idb-shim এর cache)
     if (window._TM_CACHE) window._TM_CACHE[key] = str;
+    // IDB তেও persist করো
     if (window._TMDB && typeof window._TMDB.set === 'function') {
       window._TMDB.set(key, str).catch(() => {});
     }
-    if (localStorage._fbOrigSet) {
-      localStorage._fbOrigSet(key, str);
-    }
+    // localStorage এ লেখো — _fbOrigSet থাকলে সেটা, না থাকলে সরাসরি tmStorage
+    try {
+      if (localStorage._fbOrigSet) {
+        localStorage._fbOrigSet(key, str);
+      } else {
+        // override হওয়ার আগে বা idb-shim এর setItem (loop নেই কারণ _pulling=true)
+        localStorage.setItem(key, str);
+      }
+    } catch(e2) {}
   } catch(e) {}
   finally { _pulling = false; }
 }
@@ -347,11 +355,13 @@ window.pushToCloud = async function(lsKey) {
   const db = getDB(col);
   if (!db) return;
 
-  // এই key গুলো push block — direct manage হয়
+  // এই key গুলো push block — direct manage হয় অথবা listener এ handle হয়
   const _blocked = [
     'TM_DB_PRODUCTS_V2','TM_DB_ORDERS_V2','TM_DB_ADS_V2',
+    'TM_DB_USERS_V2','TM_DB_RETURNS_V2','TM_DB_GIFT_CARDS_V2',
     'TM_LOCAL_BOARDS','TM_LOGIN_LEADERBOARDS','TM_SUB_ADMINS',
-    'pmx_headers','pmx_products','pmx_holders','sironam_list'
+    'pmx_headers','pmx_products','pmx_holders','sironam_list',
+    'night_boards','deli_ads','beli_left','beli_right'
   ];
   if (_blocked.includes(lsKey)) return;
 
@@ -435,11 +445,18 @@ async function syncAll() {
 
 // ── setItem override ──────────────────────────────────────
 function overrideSetItem() {
+  // ইতিমধ্যে override হয়েছে কিনা চেক
+  if (localStorage._fbOrigSet) {
+    console.log('[FB] setItem already overridden, skip');
+    return;
+  }
+
   const origSet = localStorage.setItem.bind(localStorage);
   localStorage._fbOrigSet = origSet;
 
   localStorage.setItem = function(key, value) {
     origSet(key, value);
+    // _pulling=true মানে firebase-sync নিজেই লিখছে — loop prevent
     if (_pulling) return;
 
     if (KEY_MAP[key]) {
@@ -751,7 +768,23 @@ window.saveUserToFirebase = async function(userObj) {
   try {
     if (!userObj || !userObj.id) { console.warn('[FB] saveUserToFirebase: invalid user'); return; }
     const db = getDB('users');
+    if (!db) { console.warn('[FB] saveUserToFirebase: db নেই'); return; }
     await db.collection('users').doc(String(userObj.id)).set(userObj);
+
+    // local cache ও update করো
+    try {
+      const raw = (window._TM_CACHE && window._TM_CACHE['TM_DB_USERS_V2'])
+                  || localStorage.getItem('TM_DB_USERS_V2');
+      if (raw) {
+        let arr = JSON.parse(raw);
+        const idx = arr.findIndex(u => String(u.id) === String(userObj.id));
+        if (idx >= 0) arr[idx] = userObj;
+        else arr.push(userObj);
+        setLocal('TM_DB_USERS_V2', arr);
+        if (window.appState) window.appState.users = arr;
+      }
+    } catch(e2) {}
+
     console.log('[FB] ✅ User saved:', userObj.id);
   } catch(e) {
     console.error('[FB] ❌ saveUserToFirebase error:', e.message);
