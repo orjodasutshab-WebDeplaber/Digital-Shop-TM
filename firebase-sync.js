@@ -355,15 +355,7 @@ window.pushToCloud = async function(lsKey) {
   const db = getDB(col);
   if (!db) return;
 
-  // এই key গুলো push block — direct manage হয় অথবা listener এ handle হয়
-  const _blocked = [
-    'TM_DB_PRODUCTS_V2','TM_DB_ORDERS_V2','TM_DB_ADS_V2',
-    'TM_DB_USERS_V2','TM_DB_RETURNS_V2','TM_DB_GIFT_CARDS_V2',
-    'TM_LOCAL_BOARDS','TM_LOGIN_LEADERBOARDS','TM_SUB_ADMINS',
-    'pmx_headers','pmx_products','pmx_holders','sironam_list',
-    'night_boards','deli_ads','beli_left','beli_right'
-  ];
-  if (_blocked.includes(lsKey)) return;
+  // ✅ blocked list সরানো হয়েছে — সব key এখন সঠিক Firebase এ push হবে
 
   const raw = (window._TM_CACHE && window._TM_CACHE[lsKey])
               || localStorage.getItem(lsKey);
@@ -747,6 +739,11 @@ function startListeners() {
   console.log('[FB] ✅ সব listener চালু');
 }
 
+// ── Expose internals for Smart Interceptor ────────────────
+window._TM_COLLECTION_ROUTING = COLLECTION_ROUTING;
+window._TM_FB_DBS   = _fbDBs;
+window._TM_FB_READY = _fbReady;
+
 // ── Start ─────────────────────────────────────────────────
 if (!initAllFB()) {
   console.error('[FB] কোনো Firebase চালু করা সম্ভব হয়নি!');
@@ -839,4 +836,106 @@ window._fbGuide = function() {
   console.groupEnd();
 };
 
+})();
+
+// ════════════════════════════════════════════════════════════
+// ██  SECTION E — FIRESTORE() SMART INTERCEPTOR  v1.0
+// ════════════════════════════════════════════════════════════
+//
+//  সমস্যা: app.js এ firebase.firestore().collection('products')
+//  সরাসরি FB1 (default) এ যায়, FB2 তে যায় না।
+//
+//  সমাধান: firebase.firestore() কে override করা হয়েছে।
+//  এখন .collection('products') → FB2, .collection('orders') → FB3
+//  স্বয়ংক্রিয়ভাবে সঠিক Firebase ব্যবহার করবে।
+//
+//  app.js এর কোনো কোড বদলাতে হবে না!
+// ════════════════════════════════════════════════════════════
+
+(function _installFirestoreInterceptor() {
+  // firebase SDK লোড হওয়ার পরে install করো
+  function _install() {
+    if (typeof firebase === 'undefined' || !firebase.firestore) return false;
+
+    // ইতিমধ্যে install হয়েছে কিনা
+    if (firebase._tmInterceptorInstalled) return true;
+    firebase._tmInterceptorInstalled = true;
+
+    const _origFirestore = firebase.firestore.bind(firebase);
+
+    // একটি Proxy তৈরি করা যেটা .collection() কে intercept করে
+    function _makeSmartDB(defaultDB) {
+      return new Proxy(defaultDB, {
+        get(target, prop) {
+          if (prop === 'collection') {
+            return function(colName) {
+              // সঠিক db খুঁজে বের করো
+              const correctDB = window._getDBForCollection
+                ? window._getDBForCollection(colName)
+                : null;
+
+              const useDB = (correctDB && correctDB !== defaultDB)
+                ? correctDB
+                : target;
+
+              // Debug log (শুধু mismatch হলে)
+              if (correctDB && correctDB !== defaultDB) {
+                console.log(`[FB Interceptor] .collection('${colName}') → correct Firebase`);
+              }
+
+              return useDB.collection(colName);
+            };
+          }
+          // অন্য সব method (batch, doc, etc.) এ কোনো পরিবর্তন নেই
+          const val = target[prop];
+          return typeof val === 'function' ? val.bind(target) : val;
+        }
+      });
+    }
+
+    // firebase.firestore() override
+    firebase.firestore = function(appArg) {
+      const originalDB = _origFirestore(appArg);
+      // শুধু default app (FB1) এর জন্য intercept করো
+      // নির্দিষ্ট app দিলে (যেমন firebase.firestore(fb2app)) সরাসরি দাও
+      if (!appArg) {
+        return _makeSmartDB(originalDB);
+      }
+      return originalDB;
+    };
+
+    // সব static method copy করো
+    Object.keys(_origFirestore).forEach(k => {
+      try { firebase.firestore[k] = _origFirestore[k]; } catch(e) {}
+    });
+
+    console.log('[FB] ✅ Smart Firestore Interceptor installed!');
+    console.log('[FB] এখন firebase.firestore().collection(name) সঠিক Firebase এ যাবে।');
+    return true;
+  }
+
+  // getDB helper expose করো যেটা interceptor ব্যবহার করবে
+  // (firebase-sync.js এর SECTION D এর getDB function এর মতো)
+  window._getDBForCollection = function(colName) {
+    // COLLECTION_ROUTING থেকে সঠিক Firebase খুঁজবে
+    // এই function firebase-sync.js এর IIFE এর ভেতরের getDB কে call করে
+    // কিন্তু সেটা বাইরে expose নেই, তাই _fbDBs এবং COLLECTION_ROUTING expose করা হয়েছে
+    const routing = window._TM_COLLECTION_ROUTING;
+    const dbs     = window._TM_FB_DBS;
+    const ready   = window._TM_FB_READY;
+    if (!routing || !dbs) return null;
+
+    const fbName = routing[colName] || 'fb1_users';
+    if (ready && ready[fbName] && dbs[fbName]) return dbs[fbName];
+    return dbs['fb1_users'] || null;
+  };
+
+  // SDK লোড হওয়ার পর install করো
+  if (!_install()) {
+    let _attempts = 0;
+    const _ti = setInterval(function() {
+      _attempts++;
+      if (_install() || _attempts > 30) clearInterval(_ti);
+    }, 200);
+  }
 })();
