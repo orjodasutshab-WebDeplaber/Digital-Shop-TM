@@ -7136,6 +7136,18 @@ function confirmFinalOrder(isCOD = false) {
     appState.orders.unshift(newOrder); 
     saveData(DB_KEYS.ORDERS, appState.orders);
 
+    // ✅ FIX: সরাসরি FB3 (orders Firebase) এ push — admin panel এ সাথে সাথে দেখা যাবে
+    try {
+        const _orderDB = window._getDBForCollection
+            ? window._getDBForCollection('orders')
+            : (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length ? firebase.firestore() : null);
+        if (_orderDB) {
+            _orderDB.collection('orders').doc(String(newOrder.id)).set(newOrder)
+                .then(() => console.log('[FB] ✅ Order pushed to FB3:', newOrder.id))
+                .catch(e => console.warn('[FB] order push error:', e.message));
+        }
+    } catch(_oe) { console.warn('[FB] order direct push failed:', _oe.message); }
+
     // অ্যাডমিন প্যানেল খোলা থাকলে যেন সাথে সাথে নতুন অর্ডার দেখা যায়
     if (typeof renderOrderList === 'function') {
         renderOrderList(appState.orders);
@@ -9949,14 +9961,14 @@ function publishSironam() {
     if (window._TM_CACHE) window._TM_CACHE['sironam_list'] = str;
     if (window._TMDB) window._TMDB.set('sironam_list', str).catch(() => {});
 
-    // ৩. Firebase Firestore এ সরাসরি push (deleteSironam এর মতো approach)
+    // ৩. Firebase Firestore এ সরাসরি push — ✅ FIX: FB7 (fb7_ads) এ push
     try {
-        if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firebase.firestore()
-                .collection('sironam')
+        const _sDB = window._getDBForCollection ? window._getDBForCollection('sironam') : (typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null);
+        if (_sDB) {
+            _sDB.collection('sironam')
                 .doc(String(newItem.id))
                 .set(newItem)
-                .then(() => console.log('[FB] ✅ Sironam published:', newItem.id))
+                .then(() => console.log('[FB] ✅ Sironam published to FB7:', newItem.id))
                 .catch(e => console.warn('[FB] sironam publish error:', e.message));
         }
     } catch(e) {
@@ -10010,14 +10022,18 @@ function deleteSironam(id) {
     }
 
     // ৩. Firestore থেকে sironam doc + products সরাসরি delete
+    // ✅ FIX: সঠিক Firebase db ব্যবহার (sironam→FB7, products→FB2)
     try {
-        if (typeof firebase !== 'undefined' && firebase.firestore) {
-            const db = firebase.firestore();
-            db.collection('sironam').doc(String(id)).delete()
-                .then(() => console.log('[FB] ✅ Sironam deleted:', id))
+        const _sironamDB  = window._getDBForCollection ? window._getDBForCollection('sironam')  : (firebase && firebase.firestore ? firebase.firestore() : null);
+        const _productDB  = window._getDBForCollection ? window._getDBForCollection('products') : _sironamDB;
+        if (_sironamDB) {
+            _sironamDB.collection('sironam').doc(String(id)).delete()
+                .then(() => console.log('[FB] ✅ Sironam deleted from FB7:', id))
                 .catch(e => console.warn('[FB] sironam delete error:', e.message));
+        }
+        if (_productDB) {
             deletedProductIds.forEach(pid => {
-                db.collection('products').doc(String(pid)).delete()
+                _productDB.collection('products').doc(String(pid)).delete()
                     .catch(e => console.warn('[FB] product delete error:', pid, e.message));
             });
         }

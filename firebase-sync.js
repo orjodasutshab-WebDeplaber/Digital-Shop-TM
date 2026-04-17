@@ -156,7 +156,7 @@ const COLLECTION_ROUTING = {
   'sub_admins':       'fb1_users',
   'leaderboards':     'fb1_users',
   'local_boards':     'fb1_users',
-  'sironam':          'fb1_users',
+  'sironam':          'fb7_ads',    // ✅ Fixed: fb1→fb7
 
   // ── FB2: Products ────────────────────────────────────────
   'products':         'fb2_products',
@@ -789,8 +789,24 @@ window.saveUserToFirebase = async function(userObj) {
 };
 
 // Chat এর জন্য Firebase db expose করা (chat.js ব্যবহার করে)
+// ✅ FIX: fb4_chat ready না হলে retry করে wait করে দেয়
 window._getChatDB = function() {
   return _fbDBs['fb4_chat'] || _fbDBs['fb1_users'] || null;
+};
+// Chat init যদি আগে call হয়ে থাকে (timing fix)
+window._getChatDBAsync = function() {
+  return new Promise(function(resolve) {
+    if (_fbDBs['fb4_chat']) { resolve(_fbDBs['fb4_chat']); return; }
+    let _tries = 0;
+    const _t = setInterval(function() {
+      _tries++;
+      if (_fbDBs['fb4_chat']) { clearInterval(_t); resolve(_fbDBs['fb4_chat']); return; }
+      if (_fbDBs['fb1_users'] || _tries > 20) {
+        clearInterval(_t);
+        resolve(_fbDBs['fb1_users'] || null);
+      }
+    }, 200);
+  });
 };
 
 // ── Debug: সব Firebase এর status দেখুন ──────────────────
