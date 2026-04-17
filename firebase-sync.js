@@ -76,8 +76,8 @@ const FB_CONFIGS = {
     appId:             "1:96811905608:web:9dbf9a3d27bdb6f5ec5e7d",
   },
 
-  // ── FB5: Ads (বিজ্ঞাপন) ──────────────────────────────────
-  fb5_ads: {
+  // ── FB5: ভবিষ্যৎ ─────────────────────────────────────────
+  fb5_future1: {
     apiKey:            "AIzaSyDVIQDaZ43M5lKXY5XI-zhzBYabMFUSSX0",
     authDomain:        "digital-shop-tm-96b5a.firebaseapp.com",
     projectId:         "digital-shop-tm-96b5a",
@@ -86,8 +86,8 @@ const FB_CONFIGS = {
     appId:             "1:426220965716:web:08d2801cdadae62fce02c1",
   },
 
-  // ── FB6: Extras (গিফট কার্ড, ডিসকাউন্ট, PMX) ────────────
-  fb6_extras: {
+  // ── FB6: ভবিষ্যৎ ─────────────────────────────────────────
+  fb6_future2: {
     apiKey:            "AIzaSyAfXiFmvRxkmyvstEDMfKmkPiKaVsESuXY",
     authDomain:        "digital-shop-tm-2fb5d.firebaseapp.com",
     projectId:         "digital-shop-tm-2fb5d",
@@ -96,8 +96,8 @@ const FB_CONFIGS = {
     appId:             "1:411502066413:web:2264ebf1dd5deb8efb2ae4",
   },
 
-  // ── FB7–FB10: ভবিষ্যতের জন্য ─────────────────────────────
-  fb7: {
+  // ── FB7: Ads (বিজ্ঞাপন) ──────────────────────────────────
+  fb7_ads: {
     apiKey:            "AIzaSyCJSY_SMUru5ja1M2WdBTNb_-rogNI-ds4",
     authDomain:        "digital-shop-tm-357f8.firebaseapp.com",
     projectId:         "digital-shop-tm-357f8",
@@ -105,7 +105,9 @@ const FB_CONFIGS = {
     messagingSenderId: "341824546744",
     appId:             "1:341824546744:web:18c78d697cf2a3c61a114d",
   },
-  fb8: {
+
+  // ── FB8: ভবিষ্যৎ ─────────────────────────────────────────
+  fb8_future3: {
     apiKey:            "AIzaSyB5zF3jXNRASRkdBX7Rq9PWY5T_bR_A_M0",
     authDomain:        "digital-shop-tm-19610.firebaseapp.com",
     projectId:         "digital-shop-tm-19610",
@@ -113,7 +115,9 @@ const FB_CONFIGS = {
     messagingSenderId: "440482978244",
     appId:             "1:440482978244:web:6c5665ec5da7473a152c91",
   },
-  fb9: {
+
+  // ── FB9: ভবিষ্যৎ ─────────────────────────────────────────
+  fb9_future4: {
     apiKey:            "AIzaSyC3e4KC-C1Bq93vi9T-0DBY2ZH1o7cxyYg",
     authDomain:        "digital-shop-tm-d9645.firebaseapp.com",
     projectId:         "digital-shop-tm-d9645",
@@ -121,7 +125,9 @@ const FB_CONFIGS = {
     messagingSenderId: "9355944351",
     appId:             "1:9355944351:web:0a3afcdc38ba67c1b85daa",
   },
-  fb10: {
+
+  // ── FB10: Extras (গিফট কার্ড, ডিসকাউন্ট, PMX) ───────────
+  fb10_extras: {
     apiKey:            "AIzaSyDvWN7GjUmgQo39KatIIePls6YWtHbggB0",
     authDomain:        "digital-shop-tm-e2c01.firebaseapp.com",
     projectId:         "digital-shop-tm-e2c01",
@@ -174,16 +180,16 @@ const COLLECTION_ROUTING = {
   'chat_personal':    'fb4_chat',
 
   // ── FB5: Ads ─────────────────────────────────────────────
-  'ads':              'fb5_ads',
-  'deli_ads':         'fb5_ads',
-  'notices':          'fb5_ads',
-  'beli_left':        'fb5_ads',
-  'beli_right':       'fb5_ads',
+  'ads':              'fb7_ads',
+  'deli_ads':         'fb7_ads',
+  'notices':          'fb7_ads',
+  'beli_left':        'fb7_ads',
+  'beli_right':       'fb7_ads',
 
   // ── FB6: Extras ──────────────────────────────────────────
-  'gift_cards':       'fb6_extras',
-  'all_discounts':    'fb6_extras',
-  'global_discounts': 'fb6_extras',
+  'gift_cards':       'fb10_extras',
+  'all_discounts':    'fb10_extras',
+  'global_discounts': 'fb10_extras',
 
 };
 
