@@ -89,20 +89,18 @@
             }
         });
 
+        _initFirebase();
         _injectCSS();
         _buildMainUI();
         _injectButtons();
         _bindHotkey();
-        // ✅ FIX: _initFirebase আগে call করো, async হলে সে নিজেই _loadChatList করবে
-        _initFirebase();
-        // sync db পেলে (non-async fallback) এখানেই চালাও
-        if (_currentUser && _db) {
+        if (_currentUser) {
             _loadChatList();
             _ensurePublicGroup();
         }
 
-        // ✅ ১৫ দিনের পুরনো message Firestore থেকে auto-delete (async db wait)
-        setTimeout(() => { if (_db) {
+        // ✅ ১৫ দিনের পুরনো message Firestore থেকে auto-delete
+        if (_db) {
             setTimeout(() => {
                 try {
                     const cutoff = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
@@ -122,7 +120,7 @@
                         .catch(e => console.warn('[TM] expire clean err:', e.message));
                 } catch(e) {}
             }, 5000); // 5s পরে চালাও — main load এ বাধা না দিতে
-        } }, 2000); // ✅ 2s wait: async db ready হওয়ার সুযোগ দাও
+        }
 
         // ✅ সেভ করা ব্যাকগ্রাউন্ড restore করো
         setTimeout(() => {
@@ -168,36 +166,15 @@
 
     function _initFirebase() {
         if (typeof firebase === 'undefined') return;
-
-        // ✅ FIX: async retry — FB4 ready না হলে wait করো
-        // _getChatDBAsync() firebase-sync.js v2 এ আছে
-        if (typeof window._getChatDBAsync === 'function') {
-            window._getChatDBAsync().then(function(db) {
-                _db = db;
-                console.log('[Chat] ✅ Firebase DB ready (async):', _db ? 'FB4/chat' : 'fallback');
-                // DB পাওয়ার পরে যদি user লগইন থাকে, group ensure করো
-                if (_currentUser && !_db._chatInitDone) {
-                    _db._chatInitDone = true;
-                    _loadChatList();
-                    _ensurePublicGroup();
-                }
-            }).catch(function(e) {
-                console.warn('[Chat] DB async error, using fallback:', e);
-                if (firebase.apps && firebase.apps.length) {
-                    _db = firebase.firestore();
-                }
-            });
-            return; // async শেষ হলে উপরের then() চলবে
-        }
-
-        // ✅ sync fallback (পুরনো পদ্ধতি)
+        // ✅ firebase-sync.js এর FB4 (chat Firebase) ব্যবহার করো
+        // FB4 config দেওয়া থাকলে সেটা, না হলে primary (fb1) তে fallback
         if (typeof window._getChatDB === 'function') {
             _db = window._getChatDB();
         }
+        // fallback: default firebase app
         if (!_db && firebase.apps && firebase.apps.length) {
             _db = firebase.firestore();
         }
-        console.log('[Chat] Firebase DB (sync):', _db ? 'ok' : 'null');
     }
 
     function _ensurePublicGroup() {
@@ -209,17 +186,21 @@
         _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).get().then(doc => {
             if (doc.exists) {
                 // গ্রুপ আছে — user কে member এ যোগ করো
-                const data = doc.data();
                 const updates = {
-                    members: firebase.firestore.FieldValue.arrayUnion(uid)
+                    members: firebase.firestore.FieldValue.arrayUnion(uid),
+                    isPublic: true
                 };
                 // মেইন এডমিন হলে adminId আপডেট করো
                 if (isMainAdmin) {
                     updates.adminId = uid;
                     updates.name = PUBLIC_GROUP_NAME;
-                    updates.isPublic = true;
                 }
                 _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update(updates).catch(()=>{});
+
+                // ✅ Admin হলে — tm_users থেকে সব ইউজার কে members এ যোগ করো (batch)
+                if (isMainAdmin) {
+                    _syncAllUsersToPublicGroup();
+                }
             } else {
                 // গ্রুপ নেই — তৈরি করো
                 const groupData = {
@@ -233,7 +214,12 @@
                     lastMsg: 'Digital Shop TM সাবজনীন গ্রুপে স্বাগতম! 🎉',
                     lastMsgTs: firebase.firestore.FieldValue.serverTimestamp()
                 };
-                _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set(groupData, { merge: true }).catch(()=>{});
+                _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set(groupData, { merge: true })
+                    .then(() => {
+                        // তৈরি করার পরে সব ইউজার যোগ করো
+                        if (isMainAdmin) _syncAllUsersToPublicGroup();
+                    })
+                    .catch(()=>{});
             }
         }).catch(() => {
             // Error হলেও try করো
@@ -247,6 +233,55 @@
                 members: firebase.firestore.FieldValue.arrayUnion(uid)
             }, { merge: true }).catch(()=>{});
         });
+    }
+
+    // ✅ tm_users collection থেকে সব ইউজার id নিয়ে public group এ batch update করো
+    function _syncAllUsersToPublicGroup() {
+        if (!_db) return;
+
+        // FB1 (users Firebase) থেকে users নাও
+        let usersDb = _db;
+        if (typeof window._getDB === 'function') {
+            usersDb = window._getDB('tm_users') || _db;
+        }
+
+        // localStorage থেকে users list (fast path)
+        let localUsers = [];
+        try {
+            const raw = localStorage.getItem('TM_USERS');
+            if (raw) localUsers = JSON.parse(raw);
+        } catch(e) {}
+
+        const memberIds = localUsers.map(u => String(u.id)).filter(Boolean);
+
+        // Firestore arrayUnion একসাথে max 500 elements নেয়
+        // আমরা chunks এ করবো
+        function chunkArray(arr, size) {
+            const chunks = [];
+            for (let i = 0; i < arr.length; i += size) chunks.push(arr.slice(i, i + size));
+            return chunks;
+        }
+
+        const chunks = chunkArray(memberIds, 400);
+        chunks.forEach(chunk => {
+            if (!chunk.length) return;
+            _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
+                members: firebase.firestore.FieldValue.arrayUnion(...chunk)
+            }).catch(()=>{});
+        });
+
+        // Firebase tm_users থেকেও নাও (যারা localStorage এ নেই)
+        _db.collection('tm_users').get().then(snap => {
+            const fbIds = [];
+            snap.forEach(doc => fbIds.push(doc.id));
+            if (!fbIds.length) return;
+            const fbChunks = chunkArray(fbIds, 400);
+            fbChunks.forEach(chunk => {
+                _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
+                    members: firebase.firestore.FieldValue.arrayUnion(...chunk)
+                }).catch(()=>{});
+            });
+        }).catch(()=>{});
     }
 
     /* ══════════════════════════════════════════════════════════
@@ -1784,6 +1819,7 @@
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
         if (!_isMobile && window._tmChatViewport) window._tmChatViewport.open();
         document.getElementById('tmv3-overlay').classList.add('open');
+        // Mobile এ open হওয়ার সাথে সাথে height fix করো
         if (_isMobile && typeof window._tmFixMobileHeight === 'function') {
             window._tmFixMobileHeight();
             setTimeout(window._tmFixMobileHeight, 100);
@@ -1791,27 +1827,7 @@
         }
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) closeBtn.style.display = _isMobile ? 'none' : 'flex';
-
-        // ✅ FIX: _db ready কিনা চেক করো — না হলে async wait করে load করো
-        if (_db) {
-            _ensurePublicGroup();
-            _loadChatList();
-        } else if (typeof window._getChatDBAsync === 'function') {
-            // loading indicator দেখাও
-            const listEl = document.getElementById('tmv3-chat-list');
-            if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#8696a0;"><i class="fa fa-spinner fa-spin" style="font-size:24px;"></i><br><br>চ্যাট লোড হচ্ছে...</div>';
-
-            window._getChatDBAsync().then(function(db) {
-                if (db) {
-                    _db = db;
-                    _ensurePublicGroup();
-                    _loadChatList();
-                    console.log('[Chat] ✅ DB ready, chat list loaded');
-                } else {
-                    if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">⚠️ সংযোগ সমস্যা! পেজ রিফ্রেশ করুন।</div>';
-                }
-            });
-        }
+        _loadChatList();
     }
 
     function _closeApp() {
@@ -1831,72 +1847,102 @@
        CHAT LIST
     ══════════════════════════════════════════════════════════ */
     function _loadChatList() {
-        if (!_currentUser) return;
-        // ✅ FIX: _db না থাকলে retry
-        if (!_db) {
-            if (typeof window._getChatDBAsync === 'function') {
-                window._getChatDBAsync().then(function(db) {
-                    if (db) { _db = db; _loadChatList(); }
+        if (!_db || !_currentUser) return;
+        const uid = String(_currentUser.id);
+
+        // ✅ internal merge helper — groups + personals combine করে render করে
+        let _latestGroups = null;
+        let _latestPersonals = null;
+
+        function _mergeAndRender() {
+            if (_latestGroups === null || _latestPersonals === null) return;
+
+            // ✅ সাবজনীন গ্রুপ যদি groups এ না থাকে — আলাদা fetch করে যোগ করো
+            const hasPublic = _latestGroups.some(g => g.id === PUBLIC_GROUP_ID);
+            if (!hasPublic) {
+                _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).get().then(doc => {
+                    let groups = _latestGroups;
+                    if (doc.exists) {
+                        const pubGroup = { id: doc.id, type: 'group', ...doc.data() };
+                        // background এ members এ uid যোগ করো
+                        _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
+                            members: firebase.firestore.FieldValue.arrayUnion(uid)
+                        }).catch(()=>{});
+                        groups = [pubGroup, ..._latestGroups];
+                    }
+                    _doRender(groups, _latestPersonals);
+                }).catch(() => _doRender(_latestGroups, _latestPersonals));
+                return;
+            }
+            _doRender(_latestGroups, _latestPersonals);
+        }
+
+        function _doRender(groups, personals) {
+            const combined = [...groups, ...personals];
+            combined.sort((a, b) => {
+                const ta = a.lastMsgTs ? (a.lastMsgTs.toDate ? a.lastMsgTs.toDate() : new Date(a.lastMsgTs)) : new Date(0);
+                const tb = b.lastMsgTs ? (b.lastMsgTs.toDate ? b.lastMsgTs.toDate() : new Date(b.lastMsgTs)) : new Date(0);
+                return tb - ta;
+            });
+
+            // ✅ সাবজনীন গ্রুপ সবসময় সবার উপরে
+            const publicIdx = combined.findIndex(c => c.id === PUBLIC_GROUP_ID);
+            if (publicIdx > 0) {
+                const [pub] = combined.splice(publicIdx, 1);
+                combined.unshift(pub);
+            }
+
+            if (!_chatListReady) {
+                /* প্রথমবার লোড — সব চ্যাটের lastMsgTs মনে রাখো, count বাড়িও না */
+                combined.forEach(chat => {
+                    const ts = chat.lastMsgTs ? (chat.lastMsgTs.toDate ? chat.lastMsgTs.toDate().getTime() : new Date(chat.lastMsgTs).getTime()) : 0;
+                    if (_lastMsgTsMap[chat.id] === undefined) {
+                        _lastMsgTsMap[chat.id] = ts;
+                    }
+                });
+                _chatListReady = true;
+            } else {
+                /* পরবর্তী আপডেট — lastMsgTs বাড়লে unread count বাড়াও */
+                combined.forEach(chat => {
+                    const ts = chat.lastMsgTs ? (chat.lastMsgTs.toDate ? chat.lastMsgTs.toDate().getTime() : new Date(chat.lastMsgTs).getTime()) : 0;
+                    const prevTs = _lastMsgTsMap[chat.id] || 0;
+                    if (ts > prevTs) {
+                        _lastMsgTsMap[chat.id] = ts;
+                        /* active chat হলে count বাড়াবো না — সে নিজে দেখছে */
+                        if (!_activeChat || _activeChat.id !== chat.id) {
+                            _unreadMap[chat.id] = (_unreadMap[chat.id] || 0) + 1;
+                        }
+                    }
                 });
             }
-            return;
+
+            _chatList = combined;
+            _renderChatList();
         }
-        const uid = String(_currentUser.id);
 
         /* Load groups where user is member */
         _db.collection('tm_groups')
             .where('members', 'array-contains', uid)
             .onSnapshot(function (snap) {
-                const groups = snap.docs.map(doc => ({
+                _latestGroups = snap.docs.map(doc => ({
                     id: doc.id,
                     type: 'group',
                     ...doc.data()
                 }));
+                _mergeAndRender();
+            }, () => { if (_latestGroups === null) { _latestGroups = []; _mergeAndRender(); } });
 
-                /* Load personal chats */
-                _db.collection('tm_personal_chats')
-                    .where('members', 'array-contains', uid)
-                    .onSnapshot(function (psnap) {
-                        const personals = psnap.docs.map(doc => ({
-                            id: doc.id,
-                            type: 'personal',
-                            ...doc.data()
-                        }));
-                        const combined = [...groups, ...personals];
-                        combined.sort((a, b) => {
-                            const ta = a.lastMsgTs ? (a.lastMsgTs.toDate ? a.lastMsgTs.toDate() : new Date(a.lastMsgTs)) : new Date(0);
-                            const tb = b.lastMsgTs ? (b.lastMsgTs.toDate ? b.lastMsgTs.toDate() : new Date(b.lastMsgTs)) : new Date(0);
-                            return tb - ta;
-                        });
-
-                        if (!_chatListReady) {
-                            /* প্রথমবার লোড — সব চ্যাটের lastMsgTs মনে রাখো, count বাড়িও না */
-                            combined.forEach(chat => {
-                                const ts = chat.lastMsgTs ? (chat.lastMsgTs.toDate ? chat.lastMsgTs.toDate().getTime() : new Date(chat.lastMsgTs).getTime()) : 0;
-                                if (_lastMsgTsMap[chat.id] === undefined) {
-                                    _lastMsgTsMap[chat.id] = ts;
-                                }
-                            });
-                            _chatListReady = true;
-                        } else {
-                            /* পরবর্তী আপডেট — lastMsgTs বাড়লে unread count বাড়াও */
-                            combined.forEach(chat => {
-                                const ts = chat.lastMsgTs ? (chat.lastMsgTs.toDate ? chat.lastMsgTs.toDate().getTime() : new Date(chat.lastMsgTs).getTime()) : 0;
-                                const prevTs = _lastMsgTsMap[chat.id] || 0;
-                                if (ts > prevTs) {
-                                    _lastMsgTsMap[chat.id] = ts;
-                                    /* active chat হলে count বাড়াবো না — সে নিজে দেখছে */
-                                    if (!_activeChat || _activeChat.id !== chat.id) {
-                                        _unreadMap[chat.id] = (_unreadMap[chat.id] || 0) + 1;
-                                    }
-                                }
-                            });
-                        }
-
-                        _chatList = combined;
-                        _renderChatList();
-                    }, () => {});
-            }, () => {});
+        /* Load personal chats */
+        _db.collection('tm_personal_chats')
+            .where('members', 'array-contains', uid)
+            .onSnapshot(function (psnap) {
+                _latestPersonals = psnap.docs.map(doc => ({
+                    id: doc.id,
+                    type: 'personal',
+                    ...doc.data()
+                }));
+                _mergeAndRender();
+            }, () => { if (_latestPersonals === null) { _latestPersonals = []; _mergeAndRender(); } });
     }
 
 
