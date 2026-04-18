@@ -6247,10 +6247,23 @@ window.deleteReportRecord = function(reportId, prodId) {
         // ২. আপডেট করা ডাটা সেভ করা
         localStorage.setItem('tm_reports', JSON.stringify(reports));
         appState.reports = reports;
+
+        // ৩. Firebase (fb3_orders/reports) থেকেও ডিলিট — নইলে onSnapshot এ ফিরে আসবে
+        try {
+            const _rDB = (window._getDBForCollection && window._getDBForCollection('reports'))
+                || (window._TM_FB_DBS && window._TM_FB_DBS['fb3_orders']);
+            if (_rDB) {
+                _rDB.collection('reports').doc(String(reportId)).delete()
+                    .then(() => console.log('[Reports] ✅ Firebase মুছে গেছে:', reportId))
+                    .catch(e => console.warn('[Reports] delete err:', e.message));
+            } else {
+                console.warn('[Reports] Firebase DB পাওয়া যায়নি — শুধু local মুছা হয়েছে');
+            }
+        } catch(e) { console.warn('[Reports] Firebase delete error:', e); }
         
         alert("✅ রিপোর্টটি সফলভাবে মুছে ফেলা হয়েছে।");
         
-        // ৩. মোডাল রি-রেন্ডার করা
+        // ৪. মোডাল রি-রেন্ডার করা
         openProductDetails(prodId);
     }
 };
@@ -6468,9 +6481,10 @@ window.deleteReport = function(reportId) {
     appState.reports = appState.reports.filter(r => r.id !== reportId);
     localStorage.setItem('tm_reports', JSON.stringify(appState.reports));
 
-    // Firebase (fb3_orders/reports) থেকেও ডিলিট — নইলে sync এ ফিরে আসবে
+    // Firebase (fb3_orders/reports) থেকেও ডিলিট — নইলে onSnapshot এ ফিরে আসবে
     try {
-        const _rDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb3_orders'])
+        const _rDB = (window._getDBForCollection && window._getDBForCollection('reports'))
+            || (window._TM_FB_DBS && window._TM_FB_DBS['fb3_orders'])
             || (typeof firebase !== 'undefined' && firebase.apps &&
                 firebase.apps.find(a => a.options && a.options.projectId === 'digitalshoptm-3') &&
                 firebase.firestore(firebase.apps.find(a => a.options.projectId === 'digitalshoptm-3')));
@@ -6478,8 +6492,10 @@ window.deleteReport = function(reportId) {
             _rDB.collection('reports').doc(String(reportId)).delete()
                 .then(() => console.log('[Reports] ✅ Firebase মুছে গেছে:', reportId))
                 .catch(e => console.warn('[Reports] delete err:', e.message));
+        } else {
+            console.warn('[Reports] Firebase DB পাওয়া যায়নি!');
         }
-    } catch(e) {}
+    } catch(e) { console.warn('[Reports] delete exception:', e); }
     alert("রিপোর্ট ডিলিট করা হয়েছে।");
 };
 
