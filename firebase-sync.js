@@ -162,15 +162,15 @@ const COLLECTION_ROUTING = {
   'products':         'fb2_products',
   'product_limits':   'fb2_products',
   'night_boards':     'fb2_products',
-  'pmx_products':     'fb2_products',
-  'pmx_headers':      'fb2_products',
-  'pmx_holders':      'fb2_products',
+  'pmx_products':     'fb10_extras',   // digital-shop-tm-e2c01
+  'pmx_headers':      'fb10_extras',   // digital-shop-tm-e2c01
+  'pmx_holders':      'fb10_extras',   // digital-shop-tm-e2c01
 
   // ── FB3: Orders ──────────────────────────────────────────
   'orders':           'fb3_orders',
   'returns':          'fb3_orders',
   'special_requests': 'fb3_orders',
-  'pmx_orders':       'fb3_orders',
+  'pmx_orders':       'fb10_extras',   // digital-shop-tm-e2c01
   'reports':          'fb3_orders',
 
   // ── FB4: Chat ────────────────────────────────────────────
