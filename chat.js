@@ -164,6 +164,20 @@
         } catch (e) { return null; }
     }
 
+    /* ── ইউজার DB (FB1) পাওয়ার helper ── */
+    function _getUsersDb() {
+        try {
+            if (typeof window._getDBForCollection === 'function') {
+                return window._getDBForCollection('users');
+            }
+        } catch(e) {}
+        try {
+            const a = firebase.apps.find(ap => ap.options && ap.options.projectId === 'digitalshoptm-2008');
+            if (a) return firebase.firestore(a);
+        } catch(e) {}
+        return _db; // last fallback
+    }
+
     function _initFirebase() {
         if (typeof firebase === 'undefined') return;
         // ✅ firebase-sync.js এর FB4 (chat Firebase) ব্যবহার করো
@@ -3151,7 +3165,8 @@
         if (!members.length) { list.innerHTML = '<div class="tmv3-empty-msg">সদস্য নেই</div>'; return; }
 
         /* সব member-এর user data একসাথে লোড */
-        const promises = members.map(mid => _db.collection('users').doc(String(mid)).get().catch(() => null));
+        const usersDb2 = _getUsersDb();
+        const promises = members.map(mid => usersDb2.collection('users').doc(String(mid)).get().catch(() => null));
         Promise.all(promises).then(docs => {
             list.innerHTML = '';
             docs.forEach((doc, i) => {
@@ -3233,7 +3248,7 @@
 
         /* Load other user data */
         if (otherId && _db) {
-            _db.collection('users').doc(String(otherId)).get().then(doc => {
+            _getUsersDb().collection('users').doc(String(otherId)).get().then(doc => {
                 if (!doc || !doc.exists) return;
                 const d = doc.data();
                 const n = d.name || d.email || String(otherId);
@@ -3321,7 +3336,7 @@
             syncBtn.addEventListener('click', () => {
                 syncBtn.textContent = 'Syncing...';
                 syncBtn.disabled = true;
-                _db.collection('users').get().then(snap => {
+                _getUsersDb().collection('users').get().then(snap => {
                     const allUids = snap.docs.map(d => d.id);
                     return _db.collection('tm_groups').doc(chat.id).update({
                         members: allUids
@@ -3369,7 +3384,8 @@
         document.getElementById('tmv3-modal-overlay').classList.add('open');
 
         const listEl = document.getElementById('ca-list');
-        const promises = members.map(mid => _db.collection('users').doc(String(mid)).get().catch(() => null));
+        const usersDb2 = _getUsersDb();
+        const promises = members.map(mid => usersDb2.collection('users').doc(String(mid)).get().catch(() => null));
         Promise.all(promises).then(docs => {
             listEl.innerHTML = '';
             docs.forEach((doc, i) => {
@@ -3474,7 +3490,8 @@
                         const mems = doc.data().members || [];
                         mems.forEach(m => { if (String(m) !== uid && !otherIds.includes(String(m))) otherIds.push(String(m)); });
                     });
-                    return Promise.all(otherIds.map(id => _db.collection('users').doc(id).get().catch(() => null)));
+                    const udb = _getUsersDb();
+                    return Promise.all(otherIds.map(id => udb.collection('users').doc(id).get().catch(() => null)));
                 }).then(docs => {
                     currentUsers = docs.filter(Boolean).filter(d => d.exists).map(d => ({ id: d.id, ...d.data() }));
                     renderList(currentUsers);
@@ -3484,7 +3501,7 @@
         /* Load all users */
         function loadAllUsers(q) {
             if (!_db) return;
-            _db.collection('users').limit(50).get().then(snap => {
+            _getUsersDb().collection('users').limit(50).get().then(snap => {
                 const uid = String(_currentUser.id);
                 let users = snap.docs.filter(d => d.id !== uid).map(d => ({ id: d.id, ...d.data() }));
                 if (q) {
@@ -3524,7 +3541,7 @@
                 } else {
                     /* Firebase এ search করো — personal accounts ও আসবে */
                     if (_db && _currentUser) {
-                        _db.collection('users').limit(100).get().then(snap => {
+                        _getUsersDb().collection('users').limit(100).get().then(snap => {
                             const uid = String(_currentUser.id);
                             let fbUsers = snap.docs.filter(d => d.id !== uid).map(d => ({ id: d.id, ...d.data() }));
                             fbUsers = fbUsers.filter(u => {
@@ -3899,7 +3916,7 @@
 
             /* Update in Firestore */
             if (_db) {
-                _db.collection('users').doc(String(_currentUser.id)).update({
+                _getUsersDb().collection('users').doc(String(_currentUser.id)).update({
                     name: _currentUser.name || '',
                     bio: _currentUser.bio || '',
                     avatar: _currentUser.avatar || '',
