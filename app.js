@@ -2874,93 +2874,108 @@ function updateCurrentUserRecord() {
 
 // Order Tracking View - Digital Shop TM (ছবি সহ আপডেট করা)
 // openOrderTracking: মোবাইল mob-sheet-item থেকেও call হয়
+// openOrderTracking: মোবাইল mob-sheet-item থেকেও call হয়
 function openOrderTracking() {
     openModal('orderTrackingModal');
 
-    // modal display হতে সময় লাগে — setTimeout দিয়ে নিশ্চিত করা
+    // ✅ আগের listener বন্ধ করো
+    if (window._orderTrackingUnsub) {
+        try { window._orderTrackingUnsub(); } catch(e) {}
+        window._orderTrackingUnsub = null;
+    }
+
     setTimeout(function() {
-    var list = document.getElementById('userOrderHistoryList');
-    if(!list) return;
+        var list = document.getElementById('userOrderHistoryList');
+        if (!list) return;
+        var isMob = document.documentElement.classList.contains('is-mobile');
+        list.style.maxHeight = isMob ? "72vh" : "450px";
+        list.style.overflowY = "auto";
+        list.style.paddingRight = "5px";
+        list.style.scrollBehavior = "smooth";
 
-    var isMob = document.documentElement.classList.contains('is-mobile');
-    list.style.maxHeight = isMob ? "72vh" : "450px";
-    list.style.overflowY = "auto";
-    list.style.paddingRight = "5px";
-    list.style.scrollBehavior = "smooth";
-
-    list.innerHTML = '<div style="text-align:center; padding:20px; color: #888;">অর্ডার চেক করা হচ্ছে...</div>';
-
-    if (!appState.currentUser || !appState.orders) {
-        list.innerHTML = '<p style="text-align:center; padding:20px; color: #e74c3c;">লগইন সমস্যা! আবার লগইন করুন।</p>';
-        return;
-    }
-
-    var myOrders = appState.orders.filter(function(order) {
-        return order.userId === appState.currentUser.id;
-    });
-
-    if(myOrders.length === 0) {
-        list.innerHTML = '<p style="color: #888; text-align:center; padding:30px; font-size: 14px;">আপনার বর্তমানে কোনো অর্ডার নেই।</p>';
-        return;
-    }
-
-    var finalHtml = "";
-    myOrders.forEach(function(o) {
-        var statusColor = (o.status === 'Confirmed') ? '#2ecc71' : (o.status === 'Rejected' ? '#e74c3c' : '#f39c12');
-        var paymentStatusColor = (o.paymentStatus === 'পেইড') ? '#2ecc71' : '#ff4757';
-        
-        // ছবি রিকভারি লজিক
-        var item = appState.products.find(p => p.id == o.productId);
-        var pImage = "";
-        if(item) {
-            var images = Array.isArray(item.images) ? item.images : [item.images || item.image];
-            pImage = images[0];
-        } else {
-            pImage = o.productImage || o.image || (o.sku ? `images/products/${o.sku}.jpg` : 'https://placehold.co/100x100?text=No+Img');
+        if (!appState.currentUser || !appState.orders) {
+            list.innerHTML = '<p style="text-align:center; padding:20px; color: #e74c3c;">লগইন সমস্যা! আবার লগইন করুন।</p>';
+            return;
         }
 
-        // ডিলিট বাটন লজিক
-        var deleteBtnHtml = "";
-        if (o.status === 'Pending') {
-            deleteBtnHtml = '<button onclick="cancelUserOrder(\'' + o.id + '\')" style="background: #ff4757; color: #fff; border: none; padding: 5px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top:5px;">' +
-                            '<i class="fa fa-trash"></i> ডিলিট</button>';
-        }
-
-        var adminNoteHtml = "";
-        if (o.adminNote) {
-            adminNoteHtml = '<div style="margin-top: 12px; padding: 12px; background: rgba(52, 152, 219, 0.15); border-left: 4px solid #3498db; border-radius: 8px; font-size: 13px; color: #fff;">' +
-                            '<b style="color: #5dade2;">📢 শপ থেকে বার্তা:</b> ' + o.adminNote + 
-                            '</div>';
-        }
-
-        finalHtml += '<div style="background: #1e1e1e; border: 1px solid #333; padding: 18px; margin-bottom: 15px; border-radius: 12px; color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">' +
-                        '<div style="display: flex; justify-content: space-between; align-items: start;">' +
-                            '<div>' +
-                                '<strong style="font-size: 15px; display:block; margin-bottom: 4px; color: #ffffff;">' + o.productName + ' <span style="color:#3498db; font-size:12px;">(' + (o.sku || 'N/A') + ')</span></strong>' +
-                                '<small style="color: #bbbbbb; font-size: 12px; display: block;">পরিমাণ: ' + (o.orderQty || 1) + ' পিস</small>' +
-                                '<small style="color: #bbbbbb; font-size: 11px; display: block; margin-top:2px;">Trx ID: ' + o.trxId + '</small>' +
-                                '<small style="color: #ffffff; font-size: 12px; display: block; margin-top: 5px;">পেমেন্ট: <b style="color:' + paymentStatusColor + ';">' + (o.paymentStatus || 'পেইড হয় নাই') + '</b></small>' +
-                            '</div>' +
-                            '<div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">' +
-                                '<div style="font-weight: bold; color: #2ecc71; font-size: 16px; margin-bottom: 8px;">' + o.price + ' ৳</div>' +
-                                // --- ছবি যোগ করা হয়েছে এখানে ---
-                                '<img src="' + pImage + '" onerror="this.src=\'https://placehold.co/100x100?text=Error\'" style="width: 50px; height: 50px; border-radius: 8px; object-fit: fill; border: 1px solid #444; background: #2a2a2a; margin-bottom: 5px;">' +
-                                // ----------------------------
-                                deleteBtnHtml + 
-                            '</div>' +
+        // ── render helper ──
+        function _renderTrackingList(orders) {
+            var myOrders = orders.filter(function(o) {
+                return String(o.userId) === String(appState.currentUser.id) ||
+                       (appState.currentUser.mobile && String(o.customerPhone) === String(appState.currentUser.mobile));
+            });
+            if (myOrders.length === 0) {
+                return '<p style="color:#888;text-align:center;padding:30px;font-size:14px;">আপনার বর্তমানে কোনো অর্ডার নেই।</p>';
+            }
+            var html = '<div style="font-size:11px;color:#4ade80;text-align:right;margin-bottom:8px;">🔴 লাইভ আপডেট</div>';
+            myOrders.slice().reverse().forEach(function(o) {
+                var statusColor = (o.status === 'Confirmed' || o.status === 'কনফার্ম') ? '#2ecc71' : (o.status === 'Rejected' ? '#e74c3c' : '#f39c12');
+                var paymentStatusColor = (o.paymentStatus === 'পেইড') ? '#2ecc71' : '#ff4757';
+                var item = appState.products.find(function(p) { return p.id == o.productId; });
+                var pImage = "";
+                if (item) {
+                    var images = Array.isArray(item.images) ? item.images : [item.images || item.image];
+                    pImage = images[0];
+                } else {
+                    pImage = o.productImage || o.image || (o.sku ? 'images/products/' + o.sku + '.jpg' : 'https://placehold.co/100x100?text=No+Img');
+                }
+                var deleteBtnHtml = "";
+                if (o.status === 'Pending') {
+                    deleteBtnHtml = '<button onclick="cancelUserOrder(\'' + o.id + '\')" style="background:#ff4757;color:#fff;border:none;padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-weight:bold;margin-top:5px;"><i class="fa fa-trash"></i> ডিলিট</button>';
+                }
+                var adminNoteHtml = "";
+                if (o.adminNote) {
+                    adminNoteHtml = '<div style="margin-top:12px;padding:12px;background:rgba(52,152,219,0.15);border-left:4px solid #3498db;border-radius:8px;font-size:13px;color:#fff;"><b style="color:#5dade2;">📢 শপ থেকে বার্তা:</b> ' + o.adminNote + '</div>';
+                }
+                html += '<div style="background:#1e1e1e;border:1px solid #333;padding:18px;margin-bottom:15px;border-radius:12px;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.3);">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:start;">' +
+                        '<div>' +
+                            '<strong style="font-size:15px;display:block;margin-bottom:4px;color:#fff;">' + o.productName + ' <span style="color:#3498db;font-size:12px;">(' + (o.sku || 'N/A') + ')</span></strong>' +
+                            '<small style="color:#bbb;font-size:12px;display:block;">পরিমাণ: ' + (o.orderQty || 1) + ' পিস</small>' +
+                            '<small style="color:#bbb;font-size:11px;display:block;margin-top:2px;">Trx ID: ' + o.trxId + '</small>' +
+                            '<small style="color:#fff;font-size:12px;display:block;margin-top:5px;">পেমেন্ট: <b style="color:' + paymentStatusColor + ';">' + (o.paymentStatus || 'পেইড হয় নাই') + '</b></small>' +
                         '</div>' +
-                        '<div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #333; padding-top: 10px;">' +
-                            '<span style="font-size: 13px; color: #eeeeee;">অবস্থা: <b style="color:' + statusColor + ';">' + o.status + '</b></span>' +
-                            '<small style="font-size: 10px; color: #666;">' + (o.date || '') + '</small>' +
+                        '<div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;">' +
+                            '<div style="font-weight:bold;color:#2ecc71;font-size:16px;margin-bottom:8px;">' + o.price + ' ৳</div>' +
+                            '<img src="' + pImage + '" onerror="this.src=\'https://placehold.co/100x100?text=Error\'" style="width:50px;height:50px;border-radius:8px;object-fit:fill;border:1px solid #444;background:#2a2a2a;margin-bottom:5px;">' +
+                            deleteBtnHtml +
                         '</div>' +
-                        adminNoteHtml + 
-                      '</div>';
-    });
+                    '</div>' +
+                    '<div style="margin-top:15px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #333;padding-top:10px;">' +
+                        '<span style="font-size:13px;color:#eee;">অবস্থা: <b style="color:' + statusColor + ';">' + o.status + '</b></span>' +
+                        '<small style="font-size:10px;color:#666;">' + (o.date || '') + '</small>' +
+                    '</div>' +
+                    adminNoteHtml +
+                '</div>';
+            });
+            return html;
+        }
 
-    list.innerHTML = finalHtml;
-    }, 50); // setTimeout শেষ
+        // প্রথমে local দিয়ে render
+        list.innerHTML = _renderTrackingList(appState.orders);
+
+        // ✅ Realtime Firestore listener
+        var _cu = appState.currentUser;
+        try {
+            var _orderDB = window._getDBForCollection ? window._getDBForCollection('orders') : null;
+            if (_orderDB && _cu && _cu.id && String(_cu.id) !== 'Guest') {
+                var _q = _orderDB.collection('orders').where('userId', '==', String(_cu.id));
+                window._orderTrackingUnsub = _q.onSnapshot(function(snap) {
+                    var fbOrders = snap.docs.map(function(d) { return d.data(); });
+                    fbOrders.forEach(function(fo) {
+                        var idx = appState.orders.findIndex(function(o) { return String(o.id) === String(fo.id); });
+                        if (idx >= 0) appState.orders[idx] = fo;
+                        else appState.orders.push(fo);
+                    });
+                    var lst = document.getElementById('userOrderHistoryList');
+                    if (lst) lst.innerHTML = _renderTrackingList(appState.orders);
+                }, function(err) { console.warn('[FB] tracking listener err:', err.message); });
+                console.log('[FB] ✅ Order tracking realtime listener started');
+            }
+        } catch(_e) { console.warn('[FB] tracking listener setup err:', _e.message); }
+
+    }, 50);
 }
-
 // PC li এ bind করা
 document.querySelector("li[onclick=\"openModal('orderTrackingModal')\"]").onclick = openOrderTracking;
 
@@ -4163,35 +4178,26 @@ function openUserOrders() {
         </div>
     `;
 
-    window.closeOrderModal = function() { orderModal.innerHTML = ''; };
+    window.closeOrderModal = function() {
+        if (window._userOrdersUnsub) { try { window._userOrdersUnsub(); } catch(e){} window._userOrdersUnsub = null; }
+        orderModal.innerHTML = '';
+    };
 
-    setTimeout(() => {
-        const dataArea = document.getElementById('orderDataArea');
-        if (!appState.currentUser) {
-            dataArea.innerHTML = `<div style="text-align:center; color:#fff; padding:30px;"><h3>আগে লগইন করুন</h3></div>`;
-            return;
-        }
-
-        const myOrders = appState.orders.filter(o => (appState.currentUser.mobile && String(o.customerPhone) === String(appState.currentUser.mobile)) || (appState.currentUser.id && String(o.userId) === String(appState.currentUser.id)));
-
-        if (myOrders.length === 0) {
-            dataArea.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:30px;"><h3>কোনো অর্ডার পাওয়া যায়নি!</h3></div>`;
-            return;
-        }
-
-        // রিটার্ন ডাটা লোড করা (চেক করার জন্য যে কোন অর্ডারে রিটার্ন করা হয়েছে)
-        const RETURN_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.RETURNS) ? DB_KEYS.RETURNS : 'returns';
-        const allReturns = JSON.parse(localStorage.getItem(RETURN_KEY)) || [];
-
+    function _renderUserOrdersHTML(myOrders) {
         const mob = document.documentElement.classList.contains('is-mobile');
         const f = (pc, mo) => mob ? mo : pc;
-
-        let html = `<h3 style="color:#fff; margin-bottom:20px; font-size:${f('18px','34px')};"><i class="fa fa-shopping-bag" style="color:#6366f1"></i> আমার অর্ডারসমূহ (${myOrders.length})</h3>`;
-
-        myOrders.reverse().forEach(order => {
+        const RETURN_KEY = (typeof DB_KEYS !== 'undefined' && DB_KEYS.RETURNS) ? DB_KEYS.RETURNS : 'returns';
+        const allReturns = JSON.parse(localStorage.getItem(RETURN_KEY)) || [];
+        if (myOrders.length === 0) {
+            return `<div style="text-align:center; color:#94a3b8; padding:30px;"><i class="fa fa-box-open" style="font-size:48px;display:block;margin-bottom:16px;color:#334155;"></i><h3>কোনো অর্ডার পাওয়া যায়নি!</h3></div>`;
+        }
+        let html = `<h3 style="color:#fff; margin-bottom:20px; font-size:${f('18px','34px')};"><i class="fa fa-shopping-bag" style="color:#6366f1"></i> আমার অর্ডারসমূহ (${myOrders.length}) <span style="font-size:${f('10px','18px')};color:#4ade80;margin-left:8px;">🔴 লাইভ</span></h3>`;
+        [...myOrders].reverse().forEach(order => {
             const isDelivered = (order.status === 'Delivered' || order.status === 'ডেলিভারি সম্পন্ন');
+            const isConfirmed = (order.status === 'Confirmed' || order.status === 'কনফার্ম');
             const hasRequestedReturn = allReturns.some(ret => String(ret.orderId) === String(order.id));
-
+            const statusColor = isDelivered ? '#2ecc71' : isConfirmed ? '#3b82f6' : '#f39c12';
+            const statusBg = isDelivered ? 'rgba(39,174,96,0.2)' : isConfirmed ? 'rgba(59,130,246,0.2)' : 'rgba(243,156,18,0.2)';
             html += `
                 <div class="user-order-card" style="background:#1e293b; border:1px solid #334155; border-radius:${f('15px','20px')}; padding:${f('18px','26px')}; margin-bottom:${f('15px','18px')}; color:#fff;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; gap:8px;">
@@ -4199,31 +4205,64 @@ function openUserOrders() {
                             <span style="font-size:${f('10px','22px')}; color:#94a3b8; font-weight:bold;">ID: #${order.id}</span>
                             <h4 style="margin:5px 0; color:#f8fafc; font-size:${f('15px','30px')}; word-break:break-word;">${order.productName}</h4>
                         </div>
-                        <span style="background:${isDelivered ? 'rgba(39,174,96,0.2)' : 'rgba(243,156,18,0.2)'}; color:${isDelivered ? '#2ecc71' : '#f39c12'}; padding:${f('4px 10px','8px 16px')}; border-radius:20px; font-size:${f('10px','22px')}; font-weight:bold; white-space:nowrap; flex-shrink:0;">
+                        <span style="background:${statusBg}; color:${statusColor}; padding:${f('4px 10px','8px 16px')}; border-radius:20px; font-size:${f('10px','22px')}; font-weight:bold; white-space:nowrap; flex-shrink:0;">
                             ${order.status}
                         </span>
                     </div>
-
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; flex-wrap:wrap; gap:10px;">
                         <span style="color:#2ecc71; font-weight:800; font-size:${f('18px','36px')};">${order.price} ৳</span>
-                        
                         <div style="display:flex; gap:${f('6px','10px')}; flex-wrap:wrap;">
                             <button onclick="generateInvoice('${order.id}')" style="background:#0f172a; color:#3498db; border:1px solid #3498db; padding:${f('6px 10px','14px 22px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; cursor:pointer;">রশিদ</button>
-                            
-                            ${(isDelivered && !hasRequestedReturn) ? `
-                            <button onclick="openReturnModal('${order.id}')" style="background:#450a0a; color:#f87171; border:1px solid #f87171; padding:${f('6px 10px','14px 22px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; font-weight:bold; cursor:pointer;">রিটার্ন</button>
-                            ` : (hasRequestedReturn ? '<span style="color:#94a3b8; font-size:'+f('11px','24px')+'; font-style:italic;">রিটার্ন করা হয়েছে</span>' : '')}
-
+                            ${(isDelivered && !hasRequestedReturn) ? `<button onclick="openReturnModal('${order.id}')" style="background:#450a0a; color:#f87171; border:1px solid #f87171; padding:${f('6px 10px','14px 22px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; font-weight:bold; cursor:pointer;">রিটার্ন</button>` : (hasRequestedReturn ? `<span style="color:#94a3b8; font-size:${f('11px','24px')}; font-style:italic;">রিটার্ন করা হয়েছে</span>` : '')}
                             <button onclick="viewUserOrderDetails('${order.id}')" style="background:#3498db; color:white; border:none; padding:${f('7px 14px','14px 26px')}; border-radius:${f('8px','12px')}; font-size:${f('11px','26px')}; cursor:pointer;">বিস্তারিত</button>
                         </div>
                     </div>
-                </div>
-            `;
+                </div>`;
         });
+        return html;
+    }
 
-        dataArea.innerHTML = html;
-    }, 500);
+    setTimeout(() => {
+        const dataArea = document.getElementById('orderDataArea');
+        if (!dataArea) return;
+        if (!appState.currentUser) {
+            dataArea.innerHTML = `<div style="text-align:center; color:#fff; padding:30px;"><h3>আগে লগইন করুন</h3></div>`;
+            return;
+        }
+        const _cu = appState.currentUser;
+        // প্রথমে local data দিয়ে তাৎক্ষণিক render
+        let myOrders = appState.orders.filter(o =>
+            (_cu.mobile && String(o.customerPhone) === String(_cu.mobile)) ||
+            (_cu.id && String(o.userId) === String(_cu.id))
+        );
+        dataArea.innerHTML = _renderUserOrdersHTML(myOrders);
+
+        // ✅ Realtime Firestore listener
+        try {
+            const _orderDB = window._getDBForCollection ? window._getDBForCollection('orders') : null;
+            if (_orderDB && _cu.id && String(_cu.id) !== 'Guest') {
+                const _query = _orderDB.collection('orders').where('userId', '==', String(_cu.id));
+                window._userOrdersUnsub = _query.onSnapshot(snap => {
+                    const fbOrders = snap.docs.map(d => d.data());
+                    const phoneOrders = appState.orders.filter(o =>
+                        _cu.mobile && String(o.customerPhone) === String(_cu.mobile) &&
+                        !fbOrders.some(fo => String(fo.id) === String(o.id))
+                    );
+                    const allMyOrders = [...fbOrders, ...phoneOrders];
+                    fbOrders.forEach(fo => {
+                        const idx = appState.orders.findIndex(o => String(o.id) === String(fo.id));
+                        if (idx >= 0) appState.orders[idx] = fo;
+                        else appState.orders.push(fo);
+                    });
+                    const area = document.getElementById('orderDataArea');
+                    if (area) area.innerHTML = _renderUserOrdersHTML(allMyOrders);
+                }, err => console.warn('[FB] user orders listener err:', err.message));
+                console.log('[FB] ✅ User orders realtime listener started');
+            }
+        } catch(_le) { console.warn('[FB] user orders listener err:', _le.message); }
+    }, 400);
 }
+
 
 
 
@@ -11167,6 +11206,22 @@ function createSubAdmin() {
 
     list.push(newSA);
     saveSubAdmins(list);
+
+    // ✅ FIX: Firebase এ push — users (FB1) ও sub_admins (FB1) উভয়তে
+    try {
+        const _userDB = window._getDBForCollection ? window._getDBForCollection('users') : (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length ? firebase.firestore() : null);
+        const _saDB   = window._getDBForCollection ? window._getDBForCollection('sub_admins') : _userDB;
+        if (_userDB) {
+            _userDB.collection('users').doc(String(newSA.id)).set(newSA)
+                .then(() => console.log('[FB] ✅ SubAdmin pushed to users:', newSA.id))
+                .catch(e => console.warn('[FB] subadmin users push err:', e.message));
+        }
+        if (_saDB) {
+            _saDB.collection('sub_admins').doc(String(newSA.id)).set(newSA)
+                .then(() => console.log('[FB] ✅ SubAdmin pushed to sub_admins:', newSA.id))
+                .catch(e => console.warn('[FB] sub_admins push err:', e.message));
+        }
+    } catch(_se) { console.warn('[FB] createSubAdmin firebase err:', _se.message); }
 
     showToast(`✅ ${name} সহকারী এডমিন হিসেবে তৈরি হয়েছে!`);
     const c = document.getElementById('adminMainContainer');

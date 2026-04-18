@@ -14,15 +14,12 @@
 (function () {
     'use strict';
 
-    /* ── Firebase Config ─────────────────────────────────────── */
-    const FB_CFG = {
-        apiKey: "AIzaSyCRJ6kN1nvr1RxKdIiBnxWVJGXm6U2kRr0",
-        authDomain: "digitalshoptm-2008.firebaseapp.com",
-        projectId: "digitalshoptm-2008",
-        storageBucket: "digitalshoptm-2008.firebasestorage.app",
-        messagingSenderId: "627378095856",
-        appId: "1:627378095856:web:b705f4f75e0512646ca435"
-    };
+    /* ── Firebase Config ─────────────────────────────────────────
+       chat.js নিজে Firebase initialize করে না।
+       firebase-sync.js এর FB4 (fb4_chat) ব্যবহার করে।
+       FB4 ready না থাকলে FB1 (fb1_users / primary) তে fallback।
+       ──────────────────────────────────────────────────────── */
+    // (config এখানে আর দরকার নেই — firebase-sync.js manage করে)
 
     const PUBLIC_GROUP_ID   = 'digital_shop_tm_main';
     const PUBLIC_GROUP_NAME = 'Digital Shop TM সাবজনীন';
@@ -92,12 +89,14 @@
             }
         });
 
-        _initFirebase();
         _injectCSS();
         _buildMainUI();
         _injectButtons();
         _bindHotkey();
-        if (_currentUser) {
+        // ✅ FIX: _initFirebase আগে call করো, async হলে সে নিজেই _loadChatList করবে
+        _initFirebase();
+        // sync db পেলে (non-async fallback) এখানেই চালাও
+        if (_currentUser && _db) {
             _loadChatList();
             _ensurePublicGroup();
         }
@@ -169,12 +168,36 @@
 
     function _initFirebase() {
         if (typeof firebase === 'undefined') return;
-        if (firebase.apps && firebase.apps.length) {
-            _db = firebase.firestore();
-        } else {
-            firebase.initializeApp(FB_CFG);
+
+        // ✅ FIX: async retry — FB4 ready না হলে wait করো
+        // _getChatDBAsync() firebase-sync.js v2 এ আছে
+        if (typeof window._getChatDBAsync === 'function') {
+            window._getChatDBAsync().then(function(db) {
+                _db = db;
+                console.log('[Chat] ✅ Firebase DB ready (async):', _db ? 'FB4/chat' : 'fallback');
+                // DB পাওয়ার পরে যদি user লগইন থাকে, group ensure করো
+                if (_currentUser && !_db._chatInitDone) {
+                    _db._chatInitDone = true;
+                    _loadChatList();
+                    _ensurePublicGroup();
+                }
+            }).catch(function(e) {
+                console.warn('[Chat] DB async error, using fallback:', e);
+                if (firebase.apps && firebase.apps.length) {
+                    _db = firebase.firestore();
+                }
+            });
+            return; // async শেষ হলে উপরের then() চলবে
+        }
+
+        // ✅ sync fallback (পুরনো পদ্ধতি)
+        if (typeof window._getChatDB === 'function') {
+            _db = window._getChatDB();
+        }
+        if (!_db && firebase.apps && firebase.apps.length) {
             _db = firebase.firestore();
         }
+        console.log('[Chat] Firebase DB (sync):', _db ? 'ok' : 'null');
     }
 
     function _ensurePublicGroup() {
