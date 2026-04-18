@@ -101,8 +101,8 @@
             _ensurePublicGroup();
         }
 
-        // ✅ ১৫ দিনের পুরনো message Firestore থেকে auto-delete
-        if (_db) {
+        // ✅ ১৫ দিনের পুরনো message Firestore থেকে auto-delete (async db wait)
+        setTimeout(() => { if (_db) {
             setTimeout(() => {
                 try {
                     const cutoff = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
@@ -122,7 +122,7 @@
                         .catch(e => console.warn('[TM] expire clean err:', e.message));
                 } catch(e) {}
             }, 5000); // 5s পরে চালাও — main load এ বাধা না দিতে
-        }
+        } }, 2000); // ✅ 2s wait: async db ready হওয়ার সুযোগ দাও
 
         // ✅ সেভ করা ব্যাকগ্রাউন্ড restore করো
         setTimeout(() => {
@@ -1784,7 +1784,6 @@
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
         if (!_isMobile && window._tmChatViewport) window._tmChatViewport.open();
         document.getElementById('tmv3-overlay').classList.add('open');
-        // Mobile এ open হওয়ার সাথে সাথে height fix করো
         if (_isMobile && typeof window._tmFixMobileHeight === 'function') {
             window._tmFixMobileHeight();
             setTimeout(window._tmFixMobileHeight, 100);
@@ -1792,7 +1791,27 @@
         }
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) closeBtn.style.display = _isMobile ? 'none' : 'flex';
-        _loadChatList();
+
+        // ✅ FIX: _db ready কিনা চেক করো — না হলে async wait করে load করো
+        if (_db) {
+            _ensurePublicGroup();
+            _loadChatList();
+        } else if (typeof window._getChatDBAsync === 'function') {
+            // loading indicator দেখাও
+            const listEl = document.getElementById('tmv3-chat-list');
+            if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#8696a0;"><i class="fa fa-spinner fa-spin" style="font-size:24px;"></i><br><br>চ্যাট লোড হচ্ছে...</div>';
+
+            window._getChatDBAsync().then(function(db) {
+                if (db) {
+                    _db = db;
+                    _ensurePublicGroup();
+                    _loadChatList();
+                    console.log('[Chat] ✅ DB ready, chat list loaded');
+                } else {
+                    if (listEl) listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">⚠️ সংযোগ সমস্যা! পেজ রিফ্রেশ করুন।</div>';
+                }
+            });
+        }
     }
 
     function _closeApp() {
@@ -1812,7 +1831,16 @@
        CHAT LIST
     ══════════════════════════════════════════════════════════ */
     function _loadChatList() {
-        if (!_db || !_currentUser) return;
+        if (!_currentUser) return;
+        // ✅ FIX: _db না থাকলে retry
+        if (!_db) {
+            if (typeof window._getChatDBAsync === 'function') {
+                window._getChatDBAsync().then(function(db) {
+                    if (db) { _db = db; _loadChatList(); }
+                });
+            }
+            return;
+        }
         const uid = String(_currentUser.id);
 
         /* Load groups where user is member */

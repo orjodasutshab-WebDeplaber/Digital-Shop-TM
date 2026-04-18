@@ -2853,6 +2853,11 @@ function loadSavedAddressToCheckout() {
 // মোডাল বন্ধ করার ফাংশন (যদি আগে না থাকে)
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
+    // ✅ Modal বন্ধ হলে realtime listener ও বন্ধ করো
+    if (modalId === 'orderTrackingModal' && window._orderTrackingUnsub) {
+        try { window._orderTrackingUnsub(); } catch(e) {}
+        window._orderTrackingUnsub = null;
+    }
 }
 
 function callHelpline() {
@@ -11105,6 +11110,9 @@ function getSubAdmins() {
 }
 function saveSubAdmins(list) {
     localStorage.setItem(SUB_ADMINS_KEY, JSON.stringify(list));
+    // ✅ FIX: TM_SUB_ADMINS key টিও IDB তে persist করো
+    if (window._TM_CACHE) window._TM_CACHE[SUB_ADMINS_KEY] = JSON.stringify(list);
+    if (window._TMDB) window._TMDB.set(SUB_ADMINS_KEY, JSON.stringify(list)).catch(()=>{});
 }
 
 // ---- Main Sub-Admin Manager UI ----
@@ -11245,10 +11253,11 @@ function deleteSubAdmin(idx) {
         else localStorage.setItem(DB_KEYS.USERS, _uStr);
         // Firestore users collection থেকেও delete
         try {
-            if (sa.id && typeof firebase !== 'undefined' && firebase.firestore)
-                firebase.firestore().collection('users').doc(String(sa.id)).delete()
-                    .then(()=>console.log('[FB] ✅ SubAdmin user deleted:',sa.id))
-                    .catch(e=>console.warn('[FB] subadmin user delete err:',e.message));
+            const _delUserDB = window._getDBForCollection ? window._getDBForCollection('users') : (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length ? firebase.firestore() : null);
+        if (sa.id && _delUserDB)
+            _delUserDB.collection('users').doc(String(sa.id)).delete()
+                .then(()=>console.log('[FB] ✅ SubAdmin user deleted:',sa.id))
+                .catch(e=>console.warn('[FB] subadmin user delete err:',e.message));
         } catch(e) {}
     }
 
@@ -11258,8 +11267,9 @@ function deleteSubAdmin(idx) {
 
     // ৩. Firestore sub_admins collection থেকে delete
     try {
-        if (sa.id && typeof firebase !== 'undefined' && firebase.firestore)
-            firebase.firestore().collection('sub_admins').doc(String(sa.id)).delete()
+        const _delSADB = window._getDBForCollection ? window._getDBForCollection('sub_admins') : (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length ? firebase.firestore() : null);
+        if (sa.id && _delSADB)
+            _delSADB.collection('sub_admins').doc(String(sa.id)).delete()
                 .then(()=>console.log('[FB] ✅ SubAdmin deleted from sub_admins:',sa.id))
                 .catch(e=>console.warn('[FB] sub_admins delete err:',e.message));
     } catch(e) {}
@@ -11402,14 +11412,21 @@ function _syncSubAdminToUsers(sa) {
     } catch(e) {}
     // Firebase এ সরাসরি sub-admin document update করি
     // যাতে sub-admin এর browser real-time listener থেকে live পায়
+    // ✅ FIX: সঠিক Firebase db দিয়ে users ও sub_admins উভয় update
     try {
-        if (typeof firebase !== 'undefined' && firebase.firestore) {
-            firebase.firestore().collection('users').doc(sa.id).update({
-                permissions: sa.permissions,
-                role: 'sub_admin'
+        const _uDB = window._getDBForCollection ? window._getDBForCollection('users') : (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length ? firebase.firestore() : null);
+        const _sDB = window._getDBForCollection ? window._getDBForCollection('sub_admins') : _uDB;
+        if (_uDB) {
+            _uDB.collection('users').doc(String(sa.id)).update({
+                permissions: sa.permissions, role: 'sub_admin'
             }).catch(()=>{});
         }
-    } catch(e) {}
+        if (_sDB) {
+            _sDB.collection('sub_admins').doc(String(sa.id)).set({
+                permissions: sa.permissions, role: 'sub_admin'
+            }, { merge: true }).catch(()=>{});
+        }
+    } catch(e) { console.warn('[FB] _syncSubAdminToUsers err:', e.message); }
 }
 
 // Sub-admin sidebar apply
