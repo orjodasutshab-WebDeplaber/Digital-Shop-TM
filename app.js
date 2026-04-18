@@ -6510,7 +6510,6 @@ function autoCleanReports() {
         } catch(e) {}
     }
 }
-}
 
 function openProductBySKU(skuCode, fallbackId) {
     // ১. যদি SKU কোড থাকে, তবে সেটা দিয়ে খোঁজা
