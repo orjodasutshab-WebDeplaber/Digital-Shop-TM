@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat Migration — FB1 → FB4</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f172a; color: #f8fafc; font-family: 'Segoe UI', sans-serif; padding: 30px 20px; min-height: 100vh; }
+  h1 { color: #38bdf8; font-size: 22px; margin-bottom: 6px; }
+  .subtitle { color: #64748b; font-size: 13px; margin-bottom: 30px; }
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+  .card h2 { font-size: 15px; color: #94a3b8; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; font-size: 13px; }
+  .info-row .label { color: #64748b; }
+  .info-row .value { color: #f8fafc; font-family: monospace; font-size: 12px; }
+  .btn { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: none; padding: 14px 32px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; transition: 0.2s; }
+  .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; transform: none; }
+  .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+  .btn-success { background: linear-gradient(135deg, #22c55e, #16a34a); }
+  #log { background: #020617; border: 1px solid #1e293b; border-radius: 10px; padding: 16px; height: 320px; overflow-y: auto; font-family: monospace; font-size: 12px; margin-top: 16px; }
+  .log-ok   { color: #4ade80; }
+  .log-err  { color: #f87171; }
+  .log-info { color: #38bdf8; }
+  .log-warn { color: #fbbf24; }
+  .progress-bar { background: #0f172a; border-radius: 8px; height: 8px; margin: 12px 0; overflow: hidden; }
+  .progress-fill { background: linear-gradient(90deg, #3b82f6, #22c55e); height: 100%; width: 0%; transition: width 0.3s; border-radius: 8px; }
+  .stat { display: inline-flex; align-items: center; gap: 6px; background: #0f172a; border-radius: 8px; padding: 8px 14px; font-size: 13px; margin-right: 8px; margin-bottom: 8px; }
+  .stat .num { color: #38bdf8; font-weight: 700; font-size: 18px; }
+  .warning-box { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 10px; padding: 14px; margin-bottom: 16px; font-size: 13px; color: #fbbf24; }
+</style>
+</head>
+<body>
+
+<h1>🔄 Chat Data Migration</h1>
+<p class="subtitle">FB1 (digitalshoptm-2008) → FB4 (digital-shop-tm-9d4dd) এ chat data migrate করুন</p>
+
+<div class="card">
+  <h2>⚙️ Firebase Config</h2>
+  <div class="info-row"><span class="label">FB1 (Source)</span><span class="value">digitalshoptm-2008</span></div>
+  <div class="info-row"><span class="label">FB4 (Destination)</span><span class="value">digital-shop-tm-9d4dd</span></div>
+  <div class="info-row"><span class="label">Collections to migrate</span><span class="value">tm_groups, tm_personal_chats</span></div>
+  <div class="info-row"><span class="label">Sub-collections</span><span class="value">messages (প্রতিটি chat এর ভেতরে)</span></div>
+</div>
+
+<div class="card">
+  <h2>📊 Migration Stats</h2>
+  <div>
+    <span class="stat"><span class="num" id="stat-groups">-</span> Groups</span>
+    <span class="stat"><span class="num" id="stat-personal">-</span> Personal Chats</span>
+    <span class="stat"><span class="num" id="stat-messages">-</span> Messages</span>
+    <span class="stat"><span class="num" id="stat-done">0</span> Done</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <p id="status-text" style="font-size:13px;color:#64748b;">Migration শুরু হয়নি</p>
+</div>
+
+<div class="card">
+  <h2>🚀 Migration</h2>
+  <div class="warning-box">
+    ⚠️ <strong>মনে রাখুন:</strong> Migration এর পরে firebase-sync.js এ <code>_getChatDB</code> আবার <code>fb4_chat</code> এ ফিরিয়ে দিন (আগের ফাইল দিন)।
+    Migration শেষে FB1 এর tm_groups ও tm_personal_chats manually delete করুন।
+  </div>
+  <button class="btn" id="btnScan" onclick="scanData()">🔍 Step 1: FB1 থেকে Data স্ক্যান করুন</button>
+  <button class="btn btn-success" id="btnMigrate" onclick="migrateData()" disabled>🚀 Step 2: FB4 এ Migrate করুন</button>
+  <button class="btn btn-danger" id="btnCleanup" onclick="cleanupFB1()" disabled style="margin-top:8px;">🗑️ Step 3: FB1 থেকে Chat Data Delete করুন (migration নিশ্চিত হলে)</button>
+
+  <div id="log"><span class="log-info">📋 Log এখানে দেখাবে...</span></div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+// ── Firebase Configs ──────────────────────────────────────
+const FB1_CONFIG = {
+  apiKey:            "AIzaSyCRJ6kN1nvr1RxKdIiBnxWVJGXm6U2kRr0",
+  authDomain:        "digitalshoptm-2008.firebaseapp.com",
+  projectId:         "digitalshoptm-2008",
+  storageBucket:     "digitalshoptm-2008.firebasestorage.app",
+  messagingSenderId: "627378095856",
+  appId:             "1:627378095856:web:b705f4f75e0512646ca435"
+};
+
+const FB4_CONFIG = {
+  apiKey:            "AIzaSyAxMHT3fRUZfMz2FWa3r_SAgPSuuvf8ZPw",
+  authDomain:        "digital-shop-tm-9d4dd.firebaseapp.com",
+  projectId:         "digital-shop-tm-9d4dd",
+  storageBucket:     "digital-shop-tm-9d4dd.firebasestorage.app",
+  messagingSenderId: "96811905608",
+  appId:             "1:96811905608:web:9dbf9a3d27bdb6f5ec5e7d"
+};
+
+// ── Init ─────────────────────────────────────────────────
+const fb1App = firebase.initializeApp(FB1_CONFIG, 'fb1_source');
+const fb4App = firebase.initializeApp(FB4_CONFIG, 'fb4_dest');
+const db1 = firebase.firestore(fb1App);
+const db4 = firebase.firestore(fb4App);
+
+let _scannedGroups = [];
+let _scannedPersonal = [];
+let _totalMessages = 0;
+let _doneCount = 0;
+let _totalOps = 0;
+
+// ── Log helper ────────────────────────────────────────────
+function log(msg, type = 'info') {
+  const el = document.getElementById('log');
+  const line = document.createElement('div');
+  line.className = 'log-' + type;
+  line.textContent = new Date().toLocaleTimeString() + ' — ' + msg;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+
+function setProgress(done, total) {
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progress').style.width = pct + '%';
+  document.getElementById('stat-done').textContent = done;
+  document.getElementById('status-text').textContent = `${done} / ${total} (${pct}%)`;
+}
+
+// ── Step 1: Scan FB1 ──────────────────────────────────────
+async function scanData() {
+  document.getElementById('btnScan').disabled = true;
+  log('🔍 FB1 স্ক্যান শুরু...', 'info');
+
+  try {
+    // Scan tm_groups
+    const groupsSnap = await db1.collection('tm_groups').get();
+    _scannedGroups = groupsSnap.docs.map(d => ({ id: d.id, data: d.data() }));
+    document.getElementById('stat-groups').textContent = _scannedGroups.length;
+    log(`✅ tm_groups: ${_scannedGroups.length} টি গ্রুপ পাওয়া গেছে`, 'ok');
+
+    // Scan tm_personal_chats
+    const personalSnap = await db1.collection('tm_personal_chats').get();
+    _scannedPersonal = personalSnap.docs.map(d => ({ id: d.id, data: d.data() }));
+    document.getElementById('stat-personal').textContent = _scannedPersonal.length;
+    log(`✅ tm_personal_chats: ${_scannedPersonal.length} টি personal chat পাওয়া গেছে`, 'ok');
+
+    // Scan messages count
+    _totalMessages = 0;
+    log('📨 Messages গণনা করা হচ্ছে...', 'info');
+
+    for (const g of _scannedGroups) {
+      const msgs = await db1.collection('tm_groups').doc(g.id).collection('messages').get();
+      g.messages = msgs.docs.map(d => ({ id: d.id, data: d.data() }));
+      _totalMessages += g.messages.length;
+      log(`  📁 Group "${g.data.name || g.id}": ${g.messages.length} messages`, 'info');
+    }
+
+    for (const p of _scannedPersonal) {
+      const msgs = await db1.collection('tm_personal_chats').doc(p.id).collection('messages').get();
+      p.messages = msgs.docs.map(d => ({ id: d.id, data: d.data() }));
+      _totalMessages += p.messages.length;
+      log(`  💬 Personal chat "${p.id}": ${p.messages.length} messages`, 'info');
+    }
+
+    document.getElementById('stat-messages').textContent = _totalMessages;
+    _totalOps = _scannedGroups.length + _scannedPersonal.length + _totalMessages;
+
+    log(`\n📊 সারসংক্ষেপ: ${_scannedGroups.length} groups, ${_scannedPersonal.length} personal chats, ${_totalMessages} messages`, 'ok');
+    log('✅ স্ক্যান সম্পন্ন! এখন "Migrate" বাটনে ক্লিক করুন।', 'ok');
+
+    document.getElementById('btnMigrate').disabled = false;
+
+  } catch(e) {
+    log('❌ স্ক্যান Error: ' + e.message, 'err');
+    document.getElementById('btnScan').disabled = false;
+  }
+}
+
+// ── Step 2: Migrate to FB4 ────────────────────────────────
+async function migrateData() {
+  if (_scannedGroups.length === 0 && _scannedPersonal.length === 0) {
+    log('⚠️ আগে স্ক্যান করুন!', 'warn');
+    return;
+  }
+
+  document.getElementById('btnMigrate').disabled = true;
+  log('\n🚀 FB4 এ Migration শুরু...', 'info');
+  _doneCount = 0;
+
+  try {
+    // Migrate tm_groups
+    log('📁 tm_groups migrate করা হচ্ছে...', 'info');
+    for (const g of _scannedGroups) {
+      // Group doc
+      await db4.collection('tm_groups').doc(g.id).set(g.data);
+      _doneCount++;
+      setProgress(_doneCount, _totalOps);
+      log(`  ✅ Group: ${g.data.name || g.id}`, 'ok');
+
+      // Messages sub-collection
+      if (g.messages && g.messages.length > 0) {
+        const CHUNK = 400;
+        for (let i = 0; i < g.messages.length; i += CHUNK) {
+          const batch = db4.batch();
+          g.messages.slice(i, i + CHUNK).forEach(msg => {
+            const ref = db4.collection('tm_groups').doc(g.id).collection('messages').doc(msg.id);
+            batch.set(ref, msg.data);
+          });
+          await batch.commit();
+          _doneCount += Math.min(CHUNK, g.messages.length - i);
+          setProgress(_doneCount, _totalOps);
+        }
+        log(`    📨 ${g.messages.length} messages migrated`, 'ok');
+      }
+    }
+
+    // Migrate tm_personal_chats
+    log('💬 tm_personal_chats migrate করা হচ্ছে...', 'info');
+    for (const p of _scannedPersonal) {
+      await db4.collection('tm_personal_chats').doc(p.id).set(p.data);
+      _doneCount++;
+      setProgress(_doneCount, _totalOps);
+      log(`  ✅ Personal: ${p.id}`, 'ok');
+
+      if (p.messages && p.messages.length > 0) {
+        const CHUNK = 400;
+        for (let i = 0; i < p.messages.length; i += CHUNK) {
+          const batch = db4.batch();
+          p.messages.slice(i, i + CHUNK).forEach(msg => {
+            const ref = db4.collection('tm_personal_chats').doc(p.id).collection('messages').doc(msg.id);
+            batch.set(ref, msg.data);
+          });
+          await batch.commit();
+          _doneCount += Math.min(CHUNK, p.messages.length - i);
+          setProgress(_doneCount, _totalOps);
+        }
+        log(`    📨 ${p.messages.length} messages migrated`, 'ok');
+      }
+    }
+
+    log('\n🎉 Migration সম্পন্ন! FB4 এ সব data চলে গেছে।', 'ok');
+    log('👉 এখন firebase-sync.js এর আগের version দিন (FB4 chat ব্যবহার করে)।', 'warn');
+    log('👉 সব ঠিক হলে "Step 3" দিয়ে FB1 থেকে chat data মুছুন।', 'warn');
+    document.getElementById('btnCleanup').disabled = false;
+
+  } catch(e) {
+    log('❌ Migration Error: ' + e.message, 'err');
+    document.getElementById('btnMigrate').disabled = false;
+  }
+}
+
+// ── Step 3: Cleanup FB1 ───────────────────────────────────
+async function cleanupFB1() {
+  if (!confirm('⚠️ সাবধান! FB1 থেকে tm_groups ও tm_personal_chats সম্পূর্ণ delete হবে। FB4 তে ঠিকমতো data গেছে কিনা নিশ্চিত করে তারপর ক্লিক করুন।')) return;
+
+  document.getElementById('btnCleanup').disabled = true;
+  log('\n🗑️ FB1 থেকে chat data cleanup শুরু...', 'warn');
+
+  try {
+    let deleted = 0;
+
+    // Delete tm_groups messages first, then docs
+    for (const g of _scannedGroups) {
+      if (g.messages) {
+        const CHUNK = 400;
+        for (let i = 0; i < g.messages.length; i += CHUNK) {
+          const batch = db1.batch();
+          g.messages.slice(i, i + CHUNK).forEach(msg => {
+            batch.delete(db1.collection('tm_groups').doc(g.id).collection('messages').doc(msg.id));
+          });
+          await batch.commit();
+        }
+      }
+      await db1.collection('tm_groups').doc(g.id).delete();
+      deleted++;
+      log(`  🗑️ Deleted group: ${g.data.name || g.id}`, 'warn');
+    }
+
+    // Delete tm_personal_chats
+    for (const p of _scannedPersonal) {
+      if (p.messages) {
+        const CHUNK = 400;
+        for (let i = 0; i < p.messages.length; i += CHUNK) {
+          const batch = db1.batch();
+          p.messages.slice(i, i + CHUNK).forEach(msg => {
+            batch.delete(db1.collection('tm_personal_chats').doc(p.id).collection('messages').doc(msg.id));
+          });
+          await batch.commit();
+        }
+      }
+      await db1.collection('tm_personal_chats').doc(p.id).delete();
+      deleted++;
+      log(`  🗑️ Deleted personal: ${p.id}`, 'warn');
+    }
+
+    log(`\n✅ FB1 cleanup সম্পন্ন! ${deleted} টি document delete হয়েছে।`, 'ok');
+    log('🎉 Migration সম্পূর্ণ। Chat এখন FB4 থেকে কাজ করবে।', 'ok');
+
+  } catch(e) {
+    log('❌ Cleanup Error: ' + e.message, 'err');
+    document.getElementById('btnCleanup').disabled = false;
+  }
+}
+</script>
+</body>
+</html>
