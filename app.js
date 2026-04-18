@@ -6247,23 +6247,10 @@ window.deleteReportRecord = function(reportId, prodId) {
         // ২. আপডেট করা ডাটা সেভ করা
         localStorage.setItem('tm_reports', JSON.stringify(reports));
         appState.reports = reports;
-
-        // ৩. Firebase (fb3_orders/reports) থেকেও ডিলিট — নইলে onSnapshot এ ফিরে আসবে
-        try {
-            const _rDB = (window._getDBForCollection && window._getDBForCollection('reports'))
-                || (window._TM_FB_DBS && window._TM_FB_DBS['fb3_orders']);
-            if (_rDB) {
-                _rDB.collection('reports').doc(String(reportId)).delete()
-                    .then(() => console.log('[Reports] ✅ Firebase মুছে গেছে:', reportId))
-                    .catch(e => console.warn('[Reports] delete err:', e.message));
-            } else {
-                console.warn('[Reports] Firebase DB পাওয়া যায়নি — শুধু local মুছা হয়েছে');
-            }
-        } catch(e) { console.warn('[Reports] Firebase delete error:', e); }
         
         alert("✅ রিপোর্টটি সফলভাবে মুছে ফেলা হয়েছে।");
         
-        // ৪. মোডাল রি-রেন্ডার করা
+        // ৩. মোডাল রি-রেন্ডার করা
         openProductDetails(prodId);
     }
 };
@@ -6481,10 +6468,9 @@ window.deleteReport = function(reportId) {
     appState.reports = appState.reports.filter(r => r.id !== reportId);
     localStorage.setItem('tm_reports', JSON.stringify(appState.reports));
 
-    // Firebase (fb3_orders/reports) থেকেও ডিলিট — নইলে onSnapshot এ ফিরে আসবে
+    // Firebase (fb3_orders/reports) থেকেও ডিলিট — নইলে sync এ ফিরে আসবে
     try {
-        const _rDB = (window._getDBForCollection && window._getDBForCollection('reports'))
-            || (window._TM_FB_DBS && window._TM_FB_DBS['fb3_orders'])
+        const _rDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb3_orders'])
             || (typeof firebase !== 'undefined' && firebase.apps &&
                 firebase.apps.find(a => a.options && a.options.projectId === 'digitalshoptm-3') &&
                 firebase.firestore(firebase.apps.find(a => a.options.projectId === 'digitalshoptm-3')));
@@ -6492,10 +6478,8 @@ window.deleteReport = function(reportId) {
             _rDB.collection('reports').doc(String(reportId)).delete()
                 .then(() => console.log('[Reports] ✅ Firebase মুছে গেছে:', reportId))
                 .catch(e => console.warn('[Reports] delete err:', e.message));
-        } else {
-            console.warn('[Reports] Firebase DB পাওয়া যায়নি!');
         }
-    } catch(e) { console.warn('[Reports] delete exception:', e); }
+    } catch(e) {}
     alert("রিপোর্ট ডিলিট করা হয়েছে।");
 };
 
@@ -10123,14 +10107,20 @@ function deleteSironam(id) {
     }
 
     // ৩. Firestore থেকে sironam doc + products সরাসরি delete
-    // ✅ FIX: সঠিক Firebase db ব্যবহার (sironam→FB7, products→FB2)
+    // fb7_ads (digital-shop-tm-357f8) এ sironam, fb2_products এ products
     try {
-        const _sironamDB  = window._getDBForCollection ? window._getDBForCollection('sironam')  : (firebase && firebase.firestore ? firebase.firestore() : null);
-        const _productDB  = window._getDBForCollection ? window._getDBForCollection('products') : _sironamDB;
+        // fb7_ads সরাসরি নাও — _getDBForCollection fallback এড়াতে
+        const _sironamDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb7_ads'])
+            || (window._getDBForCollection ? window._getDBForCollection('sironam') : null);
+        const _productDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb2_products'])
+            || (window._getDBForCollection ? window._getDBForCollection('products') : null);
+
         if (_sironamDB) {
             _sironamDB.collection('sironam').doc(String(id)).delete()
-                .then(() => console.log('[FB] ✅ Sironam deleted from FB7:', id))
+                .then(() => console.log('[FB] ✅ Sironam deleted from fb7_ads (357f8):', id))
                 .catch(e => console.warn('[FB] sironam delete error:', e.message));
+        } else {
+            console.warn('[FB] ❌ fb7_ads DB পাওয়া যায়নি — sironam delete হয়নি!');
         }
         if (_productDB) {
             deletedProductIds.forEach(pid => {

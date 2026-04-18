@@ -164,7 +164,7 @@ const COLLECTION_ROUTING = {
   'night_boards':     'fb2_products',
   'pmx_products':     'fb10_extras',   // digital-shop-tm-e2c01
   'pmx_headers':      'fb10_extras',   // digital-shop-tm-e2c01
-  'pmx_holders':      'fb10_extras',   // digital-shop-tm-e2c01
+  'pmx_holders':      'fb10_extras',   // digital-shop-tm-e2c01,
 
   // ── FB3: Orders ──────────────────────────────────────────
   'orders':           'fb3_orders',
@@ -717,7 +717,6 @@ function startListeners() {
     _pulling = true;
     setLocal('night_boards', snap.docs.map(d => d.data()));
     _pulling = false;
-    // landing.html এ renderNightBoard, app.js এ renderNightBoardLanding
     if (typeof window.renderNightBoard === 'function') window.renderNightBoard();
     if (typeof window.renderNightBoardLanding === 'function') window.renderNightBoardLanding();
   });
@@ -789,9 +788,7 @@ function startListeners() {
     const arr = snap.docs.map(d => d.data());
     setLocal('TM_LOGIN_LEADERBOARDS', arr);
     _pulling = false;
-    // landing.html
     if (typeof window.renderLB === 'function') window.renderLB();
-    // app.js
     if (typeof window.renderLeaderboard === 'function') window.renderLeaderboard();
   });
 
@@ -801,9 +798,7 @@ function startListeners() {
     const arr = snap.docs.map(d => d.data());
     setLocal('TM_LOCAL_BOARDS', arr);
     _pulling = false;
-    // landing.html
     if (typeof window.renderLocalBoards === 'function') window.renderLocalBoards();
-    // app.js
     if (typeof window.renderLocalBoardsAdmin === 'function') window.renderLocalBoardsAdmin();
   });
 
