@@ -328,15 +328,20 @@
                     return;
                 }
 
-                // গ্রুপ আছে — এই ইউজার কে member এ যোগ করো
+                // গ্রুপ আছে — leftMembers চেক করো, আগে বের হয়নি তাহলেই যোগ করো
+                const leftMembers = doc.data().leftMembers || [];
+                const hasLeft = leftMembers.includes(uid);
                 const fv = _fv();
                 const updates = {
                     isPublic: true
                 };
-                if (fv && fv.arrayUnion) {
-                    updates.members = fv.arrayUnion(uid);
-                } else if (!existingMembers.includes(uid)) {
-                    updates.members = [...existingMembers, uid];
+                // যে ইউজার আগে leave করেছে তাকে জোর করে add করবো না
+                if (!hasLeft) {
+                    if (fv && fv.arrayUnion) {
+                        updates.members = fv.arrayUnion(uid);
+                    } else if (!existingMembers.includes(uid)) {
+                        updates.members = [...existingMembers, uid];
+                    }
                 }
                 if (isMainAdmin) {
                     updates.adminId = uid;
@@ -393,14 +398,21 @@
             return out;
         }
 
-        function pushIds(ids) {
-            if (!ids || !ids.length) return;
-            chunkArray(ids, 400).forEach(chunk => {
-                _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
-                    members: _sfv().arrayUnion(...chunk)
-                }).catch(()=>{});
-            });
-        }
+        // leftMembers list পড়ে নাও, তারপর sync করো
+        _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).get().then(doc => {
+            const leftMembers = (doc.exists ? doc.data().leftMembers : null) || [];
+
+            function pushIds(ids) {
+                if (!ids || !ids.length) return;
+                // leftMembers বাদ দিয়ে add করো
+                const toAdd = ids.filter(id => !leftMembers.includes(String(id)));
+                if (!toAdd.length) return;
+                chunkArray(toAdd, 400).forEach(chunk => {
+                    _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
+                        members: _sfv().arrayUnion(...chunk)
+                    }).catch(()=>{});
+                });
+            }
 
         // ── Step 1: localStorage TM_DB_USERS_V2 → তাৎক্ষণিক push ──
         let localIds = [];
@@ -448,7 +460,7 @@
 
         if (!usersDb) {
             console.warn('[TM Chat] ⚠️ FB1 users db পাওয়া যায়নি — শুধু localStorage দিয়ে sync হয়েছে।');
-            return;
+            return; // .then(doc=>) এর ভেতরে return
         }
 
         usersDb.collection('users').get().then(snap => {
@@ -466,6 +478,8 @@
         }).catch(e => {
             console.warn('[TM Chat] ⚠️ FB1 users fetch error:', e.message);
         });
+
+        }).catch(() => {}); // end of outer .then(doc =>) block
     }
 
     /* ══════════════════════════════════════════════════════════
@@ -2400,7 +2414,20 @@
         document.getElementById('tmv3-header-name').textContent = name;
 
         if (isGroup) {
-            const members = chat.members ? chat.members.length : 0;
+            // Firestore থেকে live member count নাও
+            if (_db && chat.id) {
+                _db.collection('tm_groups').doc(chat.id).get().then(d => {
+                    if (!d.exists) return;
+                    const liveMembers = (d.data().members || []).length;
+                    const subEl = document.getElementById('tmv3-header-sub');
+                    if (subEl) subEl.textContent = liveMembers + ' জন সদস্য';
+                    // activeChat কেও update করো
+                    if (_activeChat && _activeChat.id === chat.id) {
+                        _activeChat.members = d.data().members || [];
+                    }
+                }).catch(()=>{});
+            }
+            const members = Array.isArray(chat.members) ? chat.members.length : 0;
             document.getElementById('tmv3-header-sub').textContent = members + ' জন সদস্য';
         } else {
             document.getElementById('tmv3-header-sub').textContent = 'online';
@@ -2744,9 +2771,20 @@
         /* remove user from members or delete personal */
         if (chat.type === 'group') {
             const uid = String(_currentUser.id);
-            _db.collection('tm_groups').doc(chat.id).update({
-                members: _sfv().arrayRemove(uid)
-            }).then(() => { _closeActiveChat(); _toast('গ্রুপ থেকে বের হয়েছেন'); }).catch(()=>{});
+            const fv2 = _fv();
+            const delUpdate = { members: _sfv().arrayRemove(uid) };
+            // leftMembers এ যোগ করো — auto-sync তাকে ফিরিয়ে দেবে না
+            if (fv2 && fv2.arrayUnion) {
+                delUpdate.leftMembers = fv2.arrayUnion(uid);
+            }
+            _db.collection('tm_groups').doc(chat.id).update(delUpdate).then(() => {
+                _closeActiveChat(); _toast('গ্রুপ থেকে বের হয়েছেন');
+                // সব member চলে গেলে group delete করো
+                _db.collection('tm_groups').doc(chat.id).get().then(d => {
+                    if (!d.exists) return;
+                    if (!(d.data().members || []).length) d.ref.delete().catch(()=>{});
+                }).catch(()=>{});
+            }).catch(()=>{});
         } else {
             _db.collection('tm_personal_chats').doc(chat.id).delete()
                 .then(() => { _closeActiveChat(); _toast('চ্যাট ডিলিট হয়েছে'); }).catch(()=>{});
@@ -3221,7 +3259,27 @@
         const isPublicGroup = chat.isPublic === true;
         const name = chat.name || 'Group';
         const avatar = chat.avatarData || '';
-        const members = chat.members || [];
+        // members সবসময় array হিসেবে নাও, undefined হলে []
+        const members = Array.isArray(chat.members) ? chat.members : [];
+
+        // Firestore থেকে latest group data নিয়ে panel refresh করো
+        if (_db && chat.id && isPublicGroup) {
+            _db.collection('tm_groups').doc(chat.id).get().then(d => {
+                if (!d.exists) return;
+                const freshData = d.data();
+                const freshMembers = Array.isArray(freshData.members) ? freshData.members : [];
+                // সংখ্যা update করো
+                const subEl = panel.querySelector('.tmv3-sp-sub');
+                           if (subEl) subEl.innerHTML = '🌐 সাবজনীন গ্রুপ · <span style="color:#25d366;">' + freshMembers.length + ' members</span>';
+     const cntEl = panel.querySelector('[data-member-count]');
+                if (cntEl) cntEl.textContent = freshMembers.length + ' MEMBERS';
+                // header subtitle ও update করো
+                const headerSub = document.getElementById('tmv3-header-sub');
+                if (headerSub) headerSub.textContent = freshMembers.length + ' জন সদস্য';
+                // activeChat update করো
+                if (_activeChat && _activeChat.id === chat.id) _activeChat.members = freshMembers;
+            }).catch(()=>{});
+        }
 
         panel.innerHTML = `
             <div class="tmv3-sp-header">
@@ -3251,7 +3309,7 @@
                 </div>` : ''}
 
                 <div class="tmv3-sp-section">
-                    <div style="color:#8696a0;font-size:13px;padding:16px 0 10px;font-weight:600;">${members.length} MEMBERS</div>
+                    <div style="color:#8696a0;font-size:13px;padding:16px 0 10px;font-weight:600;" data-member-count>${members.length} MEMBERS</div>
                     ${isAdmin ? `
                     <div class="tmv3-member-item" id="sp-add-member-btn" style="cursor:pointer;">
                         <div class="tmv3-member-av" style="background:#25d366;"><i class="fa fa-user-plus" style="color:#fff;"></i></div>
@@ -3286,9 +3344,23 @@
         const leaveBtn = panel.querySelector('#sp-leave-group');
         if (leaveBtn) leaveBtn.addEventListener('click', () => {
             if (!confirm('গ্রুপ থেকে বের হবেন?')) return;
-            _db.collection('tm_groups').doc(chat.id).update({
-                members: _sfv().arrayRemove(uid)
-            }).then(() => { _closeActiveChat(); _closeSidePanel(); _toast('গ্রুপ থেকে বের হয়েছেন।'); }).catch(()=>{});
+            const fv = _fv();
+            const leaveUpdate = { members: _sfv().arrayRemove(uid) };
+            // leftMembers এ যোগ করো যাতে পরে auto-sync তাকে ফিরিয়ে না দেয়
+            if (fv && fv.arrayUnion) {
+                leaveUpdate.leftMembers = fv.arrayUnion(uid);
+            }
+            _db.collection('tm_groups').doc(chat.id).update(leaveUpdate).then(() => {
+                _closeActiveChat(); _closeSidePanel(); _toast('গ্রুপ থেকে বের হয়েছেন।');
+                // সব member চলে গেলে group delete করো
+                _db.collection('tm_groups').doc(chat.id).get().then(d => {
+                    if (!d.exists) return;
+                    const remaining = (d.data().members || []);
+                    if (!remaining.length) {
+                        d.ref.delete().catch(()=>{});
+                    }
+                }).catch(()=>{});
+            }).catch(()=>{});
         });
 
         /* Delete group (admin) */
@@ -3346,12 +3418,23 @@
                     e.stopPropagation();
                     const mid2 = delBtn.dataset.mid;
                     if (!confirm('এই সদস্যকে গ্রুপ থেকে বের করবেন?')) return;
-                    _db.collection('tm_groups').doc(chat.id).update({
-                        members: _sfv().arrayRemove(mid2)
-                    }).then(() => {
+                    const fvKick = _fv();
+                    const kickUpdate = { members: _sfv().arrayRemove(mid2) };
+                    // leftMembers এ যোগ করো — auto-sync তাকে ফিরিয়ে দেবে না
+                    if (fvKick && fvKick.arrayUnion) {
+                        kickUpdate.leftMembers = fvKick.arrayUnion(mid2);
+                    }
+                    _db.collection('tm_groups').doc(chat.id).update(kickUpdate).then(() => {
                         chat.members = chat.members.filter(m => String(m) !== mid2);
-                        _loadGroupMembers(chat, isAdmin);
-                        _toast('সদস্য সরানো হয়েছে।');
+                        // সব member চলে গেলে group delete করো (non-public group)
+                        if (!chat.isPublic && !chat.members.length) {
+                            _db.collection('tm_groups').doc(chat.id).delete()
+                                .then(() => { _closeActiveChat(); _closeSidePanel(); _toast('গ্রুপ ডিলিট হয়েছে।'); })
+                                .catch(()=>{});
+                        } else {
+                            _loadGroupMembers(chat, isAdmin);
+                            _toast('সদস্য সরানো হয়েছে।');
+                        }
                     }).catch(()=>{});
                 });
 
