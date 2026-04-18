@@ -717,6 +717,8 @@ function startListeners() {
     _pulling = true;
     setLocal('night_boards', snap.docs.map(d => d.data()));
     _pulling = false;
+    // landing.html এ renderNightBoard, app.js এ renderNightBoardLanding
+    if (typeof window.renderNightBoard === 'function') window.renderNightBoard();
     if (typeof window.renderNightBoardLanding === 'function') window.renderNightBoardLanding();
   });
 
@@ -780,6 +782,30 @@ function startListeners() {
       _pulling = false;
     });
   })();
+
+  // Login Leaderboards — real-time listener
+  _listen('leaderboards', snap => {
+    _pulling = true;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('TM_LOGIN_LEADERBOARDS', arr);
+    _pulling = false;
+    // landing.html
+    if (typeof window.renderLB === 'function') window.renderLB();
+    // app.js
+    if (typeof window.renderLeaderboard === 'function') window.renderLeaderboard();
+  });
+
+  // Local Boards — real-time listener
+  _listen('local_boards', snap => {
+    _pulling = true;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('TM_LOCAL_BOARDS', arr);
+    _pulling = false;
+    // landing.html
+    if (typeof window.renderLocalBoards === 'function') window.renderLocalBoards();
+    // app.js
+    if (typeof window.renderLocalBoardsAdmin === 'function') window.renderLocalBoardsAdmin();
+  });
 
   console.log('[FB] ✅ সব listener চালু');
 }
