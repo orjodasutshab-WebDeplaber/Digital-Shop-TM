@@ -789,11 +789,11 @@ window.saveUserToFirebase = async function(userObj) {
 };
 
 // Chat এর জন্য Firebase db expose করা (chat.js ব্যবহার করে)
-// Chat এর জন্য Firebase db expose করা (chat.js ব্যবহার করে)
-// ✅ FB4 (digital-shop-tm-9d4dd) ব্যবহার করে — migrate-chat-to-fb4.html দিয়ে data এনে দিন
+// ✅ FIX: fb4_chat ready না হলে retry করে wait করে দেয়
 window._getChatDB = function() {
   return _fbDBs['fb4_chat'] || _fbDBs['fb1_users'] || null;
 };
+// Chat init যদি আগে call হয়ে থাকে (timing fix)
 window._getChatDBAsync = function() {
   return new Promise(function(resolve) {
     if (_fbDBs['fb4_chat']) { resolve(_fbDBs['fb4_chat']); return; }
@@ -801,9 +801,9 @@ window._getChatDBAsync = function() {
     const _t = setInterval(function() {
       _tries++;
       if (_fbDBs['fb4_chat']) { clearInterval(_t); resolve(_fbDBs['fb4_chat']); return; }
-      if (_fbDBs['fb1_users'] || _tries > 25) {
+      if (_fbDBs['fb1_users'] || _tries > 20) {
         clearInterval(_t);
-        resolve(_fbDBs['fb4_chat'] || _fbDBs['fb1_users'] || null);
+        resolve(_fbDBs['fb1_users'] || null);
       }
     }, 200);
   });
