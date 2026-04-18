@@ -367,6 +367,13 @@ window.pushToCloud = async function(lsKey) {
       const payload = Array.isArray(data) ? {_arr: data}
                     : (typeof data === 'object' ? data : {value: data});
       await db.collection(col).doc('data').set(payload);
+    } else if (lsKey === 'tm_reports' && Array.isArray(data)) {
+      // tm_reports: প্রতিটা report আলাদা doc — id দিয়ে set করো
+      const b = db.batch();
+      data.filter(r => r && r.id && String(r.id).startsWith('REP-')).forEach(item => {
+        b.set(db.collection(col).doc(String(item.id)), item);
+      });
+      await b.commit();
     } else if (Array.isArray(data)) {
       const CHUNK = 400;
       for (let i = 0; i < data.length; i += CHUNK) {
@@ -412,6 +419,16 @@ async function pullOne(lsKey) {
           const valid = arr.filter(u => u.id && u.name);
           if (!valid.length) { console.warn('[FB] Users: Firebase খালি, local রাখা হলো'); return; }
           arr = valid;
+        }
+        // tm_reports: শুধু REP- prefix এর valid docs নাও, garbage numbered docs বাদ দাও
+        if (lsKey === 'tm_reports') {
+          arr = arr.filter(r => r && r.id && String(r.id).startsWith('REP-'));
+          // garbage docs (numbered / _arr) cleanup
+          snap.docs.forEach(d => {
+            if (!d.data().id || !String(d.data().id).startsWith('REP-')) {
+              d.ref.delete().catch(()=>{});
+            }
+          });
         }
         setLocal(lsKey, arr);
       }
@@ -743,7 +760,21 @@ function startListeners() {
     db.collection('reports').onSnapshot(snap => {
       _pulling = true;
       const now = Date.now();
-      const arr = snap.docs.map(d => d.data()).filter(r => !r.expiryTimestamp || r.expiryTimestamp > now);
+
+      // garbage docs (numbered/0,1,2.._arr) cleanup — একবার মুছে দাও
+      snap.docs.forEach(d => {
+        const data = d.data();
+        if (!data.id || !String(data.id).startsWith('REP-')) {
+          d.ref.delete().catch(()=>{});
+        }
+      });
+
+      // শুধু valid REP- docs নাও, expired বাদ দাও
+      const arr = snap.docs
+        .map(d => d.data())
+        .filter(r => r && r.id && String(r.id).startsWith('REP-'))
+        .filter(r => !r.expiryTimestamp || r.expiryTimestamp > now);
+
       setLocal('tm_reports', arr);
       if (window.appState) window.appState.reports = arr;
       _pulling = false;
