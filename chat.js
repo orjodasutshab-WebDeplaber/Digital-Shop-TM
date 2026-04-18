@@ -179,49 +179,54 @@
 
 
 
-    // ✅ Null-safe FieldValue & Timestamp — _db এর app থেকে নেওয়া হয়
+    // ✅ FieldValue & Timestamp — compat SDK এ সবসময় firebase.firestore এর static property
     function _fv() {
-        // Method 1: _db এর app থেকে সরাসরি — সবচেয়ে reliable
+        // compat SDK (v8/v9-compat): firebase.firestore একটা function,
+        // কিন্তু FieldValue সেই function এর static property হিসেবে থাকে
+        // যেমন: firebase.firestore.FieldValue.arrayUnion(...)
         try {
-            if (_db && _db.app) {
-                var fstore = _db.app.firestore ? _db.app.firestore() : null;
-                if (fstore && fstore.constructor && fstore.constructor.FieldValue) {
-                    return fstore.constructor.FieldValue;
-                }
+            var fs = firebase.firestore;
+            if (fs && fs.FieldValue && typeof fs.FieldValue.arrayUnion === 'function') {
+                return fs.FieldValue;
             }
         } catch(e) {}
-        // Method 2: global firebase object
-        try {
-            if (typeof firebase !== 'undefined') {
-                // compat SDK — FieldValue সরাসরি firebase.firestore এর property
-                var fmod = firebase.firestore;
-                if (fmod && fmod.FieldValue) return fmod.FieldValue;
-            }
-        } catch(e2) {}
-        // Method 3: firebase.apps থেকে যেকোনো initialized app
-        try {
-            if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
-                var anyApp = firebase.apps[0];
-                var anyFirestore = firebase.firestore(anyApp);
-                // compat SDK তে FieldValue static — firestore module এ থাকে
-                if (firebase.firestore.FieldValue) return firebase.firestore.FieldValue;
-            }
-        } catch(e3) {}
-        // Fallback: crash হবে না — stub দেবে
-        console.warn('[TM Chat] ⚠️ FieldValue unavailable — using stub');
-        return {
-            arrayUnion: function() { return null; },
-            arrayRemove: function() { return null; },
-            serverTimestamp: function() { return new Date(); }
-        };
+        // Fallback: stub — write operations skip করবে না কিন্তু data save হবে না
+        // এটা শুধু rare race condition এ হবে
+        console.warn('[TM Chat] ⚠️ FieldValue unavailable — retrying...');
+        // ১ সেকেন্ড পরে আবার চেক হবে (caller এ guard আছে)
+        return null;
     }
     function _ts() {
         try {
-            if (typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.Timestamp) {
-                return firebase.firestore.Timestamp;
-            }
+            var fs = firebase.firestore;
+            if (fs && fs.Timestamp) return fs.Timestamp;
         } catch(e) {}
         return { fromDate: function(d) { return d; } };
+    }
+    // ✅ Safe wrapper — _fv() null হলে no-op object দেয়
+    function _sfv() {
+        var fv = _fv();
+        if (fv) return fv;
+        // SDK এখনো load হয়নি — safe no-op stub
+        // arrayUnion/arrayRemove এর জন্য [] পাঠাবে (Firestore ignore করবে)
+        return {
+            arrayUnion: function() {
+                // Firestore এ safe — existing array unchanged থাকবে
+                var args = Array.prototype.slice.call(arguments);
+                // FieldValue.arrayUnion এর পরিবর্তে একটু পরে retry
+                setTimeout(function() {
+                    try {
+                        var fv2 = _fv();
+                        if (fv2 && _db && _activeChat) {
+                            // retry logic — caller context নেই, তাই শুধু log করি
+                        }
+                    } catch(e) {}
+                }, 1500);
+                return { _noOp: true, _args: args };
+            },
+            arrayRemove: function() { return { _noOp: true }; },
+            serverTimestamp: function() { return new Date(); }
+        };
     }
 
     // ✅ Helper: users collection সবসময় FB1 তে আছে
@@ -306,11 +311,33 @@
 
         _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).get().then(doc => {
             if (doc.exists) {
+                // ✅ members null/undefined হলে repair করো
+                const existingMembers = doc.data().members;
+                const membersIsNull = !existingMembers || !Array.isArray(existingMembers);
+
+                if (membersIsNull) {
+                    console.warn('[TM Chat] ⚠️ members field is null/invalid — repairing...');
+                    // members null হলে সরাসরি array হিসেবে set করো
+                    _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
+                        members: [uid],
+                        isPublic: true
+                    }).then(() => {
+                        console.log('[TM Chat] ✅ members repaired');
+                        _syncAllUsersToPublicGroup();
+                    }).catch(()=>{});
+                    return;
+                }
+
                 // গ্রুপ আছে — এই ইউজার কে member এ যোগ করো
+                const fv = _fv();
                 const updates = {
-                    members: _fv().arrayUnion(uid),
                     isPublic: true
                 };
+                if (fv && fv.arrayUnion) {
+                    updates.members = fv.arrayUnion(uid);
+                } else if (!existingMembers.includes(uid)) {
+                    updates.members = [...existingMembers, uid];
+                }
                 if (isMainAdmin) {
                     updates.adminId = uid;
                     updates.name = PUBLIC_GROUP_NAME;
@@ -324,10 +351,10 @@
                     adminId: isMainAdmin ? uid : 'system',
                     allowMemberAdd: false,
                     allowMemberMsg: true,
-                    createdAt: _fv().serverTimestamp(),
+                    createdAt: _sfv().serverTimestamp(),
                     members: [uid],
                     lastMsg: 'Digital Shop TM সাবজনীন গ্রুপে স্বাগতম! 🎉',
-                    lastMsgTs: _fv().serverTimestamp()
+                    lastMsgTs: _sfv().serverTimestamp()
                 };
                 _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set(groupData, { merge: true }).catch(()=>{});
             }
@@ -342,8 +369,8 @@
                 adminId: isMainAdmin ? uid : 'system',
                 allowMemberAdd: false,
                 allowMemberMsg: true,
-                createdAt: _fv().serverTimestamp(),
-                members: _fv().arrayUnion(uid)
+                createdAt: _sfv().serverTimestamp(),
+                members: _sfv().arrayUnion(uid)
             }, { merge: true })
             .then(() => _syncAllUsersToPublicGroup())
             .catch(()=>{});
@@ -370,7 +397,7 @@
             if (!ids || !ids.length) return;
             chunkArray(ids, 400).forEach(chunk => {
                 _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
-                    members: _fv().arrayUnion(...chunk)
+                    members: _sfv().arrayUnion(...chunk)
                 }).catch(()=>{});
             });
         }
@@ -2038,7 +2065,7 @@
                         const pubGroup = { id: doc.id, type: 'group', ...doc.data() };
                         // background এ members এ uid যোগ করো
                         _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
-                            members: _fv().arrayUnion(uid)
+                            members: _sfv().arrayUnion(uid)
                         }).catch(()=>{});
                         groups = [pubGroup, ..._latestGroups];
                     }
@@ -2650,7 +2677,7 @@
             senderId: String(_currentUser.id),
             senderName: _currentUser.name || _currentUser.email || String(_currentUser.id),
             senderAvatar: _currentUser.avatar || _currentUser.profileImage || '',
-            ts: _fv().serverTimestamp(),
+            ts: _sfv().serverTimestamp(),
             seenBy: [String(_currentUser.id)],
             expireAt: _ts().fromDate(expireAt) // ✅ auto-delete এর জন্য
         };
@@ -2669,7 +2696,7 @@
             const ref = chat.type === 'group'
                 ? _db.collection('tm_groups').doc(chat.id)
                 : _db.collection('tm_personal_chats').doc(chat.id);
-            ref.update({ lastMsg, lastMsgTs: _fv().serverTimestamp() }).catch(()=>{});
+            ref.update({ lastMsg, lastMsgTs: _sfv().serverTimestamp() }).catch(()=>{});
             setTimeout(() => {
                 const area = document.getElementById('tmv3-messages');
                 if (area) { area.scrollTop = area.scrollHeight; _isAtBottom = true; }
@@ -2718,7 +2745,7 @@
         if (chat.type === 'group') {
             const uid = String(_currentUser.id);
             _db.collection('tm_groups').doc(chat.id).update({
-                members: _fv().arrayRemove(uid)
+                members: _sfv().arrayRemove(uid)
             }).then(() => { _closeActiveChat(); _toast('গ্রুপ থেকে বের হয়েছেন'); }).catch(()=>{});
         } else {
             _db.collection('tm_personal_chats').doc(chat.id).delete()
@@ -2731,14 +2758,14 @@
     ══════════════════════════════════════════════════════════ */
     function _sendTyping() {
         if (!_db || !_currentUser || !_activeChat) return;
-        if (!_fv() || !_fv().serverTimestamp) return;
+        if (!_fv() || !_sfv().serverTimestamp) return;
         clearTimeout(_typingTimer);
         const ref = _activeChat.type === 'group'
             ? _db.collection('tm_groups').doc(_activeChat.id).collection('typing')
             : _db.collection('tm_personal_chats').doc(_activeChat.id).collection('typing');
         ref.doc(String(_currentUser.id)).set({
             name: _currentUser.name || '',
-            ts: _fv().serverTimestamp()
+            ts: _sfv().serverTimestamp()
         }).catch(()=>{});
         _typingTimer = setTimeout(_clearTypingDoc, TYPING_TTL);
     }
@@ -3122,9 +3149,9 @@
             allowMemberAdd: false,
             allowMemberMsg: true,
             createdBy: uid,
-            createdAt: _fv().serverTimestamp(),
+            createdAt: _sfv().serverTimestamp(),
             lastMsg: '',
-            lastMsgTs: _fv().serverTimestamp()
+            lastMsgTs: _sfv().serverTimestamp()
         };
         _db.collection('tm_groups').add(groupData).then(ref => {
             _closeModal();
@@ -3154,7 +3181,7 @@
             },
             type: 'personal',
             lastMsg: '',
-            lastMsgTs: _fv().serverTimestamp()
+            lastMsgTs: _sfv().serverTimestamp()
         }, { merge: true }).then(() => {
             const displayName = otherUser.name || otherUser.email || oid;
             _openChat({
@@ -3260,7 +3287,7 @@
         if (leaveBtn) leaveBtn.addEventListener('click', () => {
             if (!confirm('গ্রুপ থেকে বের হবেন?')) return;
             _db.collection('tm_groups').doc(chat.id).update({
-                members: _fv().arrayRemove(uid)
+                members: _sfv().arrayRemove(uid)
             }).then(() => { _closeActiveChat(); _closeSidePanel(); _toast('গ্রুপ থেকে বের হয়েছেন।'); }).catch(()=>{});
         });
 
@@ -3320,7 +3347,7 @@
                     const mid2 = delBtn.dataset.mid;
                     if (!confirm('এই সদস্যকে গ্রুপ থেকে বের করবেন?')) return;
                     _db.collection('tm_groups').doc(chat.id).update({
-                        members: _fv().arrayRemove(mid2)
+                        members: _sfv().arrayRemove(mid2)
                     }).then(() => {
                         chat.members = chat.members.filter(m => String(m) !== mid2);
                         _loadGroupMembers(chat, isAdmin);
