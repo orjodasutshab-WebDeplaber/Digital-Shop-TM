@@ -107,7 +107,7 @@
             setTimeout(() => {
                 try {
                     const cutoff = new Date(Date.now() - 15 * 24 * 60 * 60 * 1000);
-                    const cutoffTs = firebase.firestore.Timestamp.fromDate(cutoff);
+                    const cutoffTs = _ts().fromDate(cutoff);
                     // group messages
                     _db.collectionGroup('messages')
                         .where('expireAt', '<', cutoffTs)
@@ -178,6 +178,29 @@
     }
 
 
+
+    // ✅ Null-safe FieldValue & Timestamp helpers
+    function _fv() {
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.FieldValue) {
+                return firebase.firestore.FieldValue;
+            }
+        } catch(e) {}
+        return {
+            arrayUnion: function() { return { toJSON: function(){ return null; } }; },
+            arrayRemove: function() { return { toJSON: function(){ return null; } }; },
+            serverTimestamp: function() { return new Date(); }
+        };
+    }
+    function _ts() {
+        try {
+            if (typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.Timestamp) {
+                return firebase.firestore.Timestamp;
+            }
+        } catch(e) {}
+        return { fromDate: function(d) { return d; } };
+    }
+
     // ✅ Helper: users collection সবসময় FB1 তে আছে
     function _getUsersDB() {
         if (typeof window._getDBForCollection === 'function') {
@@ -240,7 +263,7 @@
             if (doc.exists) {
                 // গ্রুপ আছে — এই ইউজার কে member এ যোগ করো
                 const updates = {
-                    members: firebase.firestore.FieldValue.arrayUnion(uid),
+                    members: _fv().arrayUnion(uid),
                     isPublic: true
                 };
                 if (isMainAdmin) {
@@ -256,10 +279,10 @@
                     adminId: isMainAdmin ? uid : 'system',
                     allowMemberAdd: false,
                     allowMemberMsg: true,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdAt: _fv().serverTimestamp(),
                     members: [uid],
                     lastMsg: 'Digital Shop TM সাবজনীন গ্রুপে স্বাগতম! 🎉',
-                    lastMsgTs: firebase.firestore.FieldValue.serverTimestamp()
+                    lastMsgTs: _fv().serverTimestamp()
                 };
                 _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set(groupData, { merge: true }).catch(()=>{});
             }
@@ -274,8 +297,8 @@
                 adminId: isMainAdmin ? uid : 'system',
                 allowMemberAdd: false,
                 allowMemberMsg: true,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                members: firebase.firestore.FieldValue.arrayUnion(uid)
+                createdAt: _fv().serverTimestamp(),
+                members: _fv().arrayUnion(uid)
             }, { merge: true })
             .then(() => _syncAllUsersToPublicGroup())
             .catch(()=>{});
@@ -302,7 +325,7 @@
             if (!ids || !ids.length) return;
             chunkArray(ids, 400).forEach(chunk => {
                 _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
-                    members: firebase.firestore.FieldValue.arrayUnion(...chunk)
+                    members: _fv().arrayUnion(...chunk)
                 }).catch(()=>{});
             });
         }
@@ -1970,7 +1993,7 @@
                         const pubGroup = { id: doc.id, type: 'group', ...doc.data() };
                         // background এ members এ uid যোগ করো
                         _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
-                            members: firebase.firestore.FieldValue.arrayUnion(uid)
+                            members: _fv().arrayUnion(uid)
                         }).catch(()=>{});
                         groups = [pubGroup, ..._latestGroups];
                     }
@@ -2582,9 +2605,9 @@
             senderId: String(_currentUser.id),
             senderName: _currentUser.name || _currentUser.email || String(_currentUser.id),
             senderAvatar: _currentUser.avatar || _currentUser.profileImage || '',
-            ts: firebase.firestore.FieldValue.serverTimestamp(),
+            ts: _fv().serverTimestamp(),
             seenBy: [String(_currentUser.id)],
-            expireAt: firebase.firestore.Timestamp.fromDate(expireAt) // ✅ auto-delete এর জন্য
+            expireAt: _ts().fromDate(expireAt) // ✅ auto-delete এর জন্য
         };
 
         if (_replyTarget) {
@@ -2601,7 +2624,7 @@
             const ref = chat.type === 'group'
                 ? _db.collection('tm_groups').doc(chat.id)
                 : _db.collection('tm_personal_chats').doc(chat.id);
-            ref.update({ lastMsg, lastMsgTs: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
+            ref.update({ lastMsg, lastMsgTs: _fv().serverTimestamp() }).catch(()=>{});
             setTimeout(() => {
                 const area = document.getElementById('tmv3-messages');
                 if (area) { area.scrollTop = area.scrollHeight; _isAtBottom = true; }
@@ -2624,7 +2647,7 @@
         docs.forEach(doc => {
             const d = doc.data();
             if (d.senderId !== uid && (!d.seenBy || !d.seenBy.includes(uid))) {
-                doc.ref.update({ seenBy: firebase.firestore.FieldValue.arrayUnion(uid) }).catch(()=>{});
+                doc.ref.update({ seenBy: _fv().arrayUnion(uid) }).catch(()=>{});
             }
         });
     }
@@ -2648,7 +2671,7 @@
         if (chat.type === 'group') {
             const uid = String(_currentUser.id);
             _db.collection('tm_groups').doc(chat.id).update({
-                members: firebase.firestore.FieldValue.arrayRemove(uid)
+                members: _fv().arrayRemove(uid)
             }).then(() => { _closeActiveChat(); _toast('গ্রুপ থেকে বের হয়েছেন'); }).catch(()=>{});
         } else {
             _db.collection('tm_personal_chats').doc(chat.id).delete()
@@ -2667,7 +2690,7 @@
             : _db.collection('tm_personal_chats').doc(_activeChat.id).collection('typing');
         ref.doc(String(_currentUser.id)).set({
             name: _currentUser.name || '',
-            ts: firebase.firestore.FieldValue.serverTimestamp()
+            ts: _fv().serverTimestamp()
         }).catch(()=>{});
         _typingTimer = setTimeout(_clearTypingDoc, TYPING_TTL);
     }
@@ -3051,9 +3074,9 @@
             allowMemberAdd: false,
             allowMemberMsg: true,
             createdBy: uid,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAt: _fv().serverTimestamp(),
             lastMsg: '',
-            lastMsgTs: firebase.firestore.FieldValue.serverTimestamp()
+            lastMsgTs: _fv().serverTimestamp()
         };
         _db.collection('tm_groups').add(groupData).then(ref => {
             _closeModal();
@@ -3083,7 +3106,7 @@
             },
             type: 'personal',
             lastMsg: '',
-            lastMsgTs: firebase.firestore.FieldValue.serverTimestamp()
+            lastMsgTs: _fv().serverTimestamp()
         }, { merge: true }).then(() => {
             const displayName = otherUser.name || otherUser.email || oid;
             _openChat({
@@ -3189,7 +3212,7 @@
         if (leaveBtn) leaveBtn.addEventListener('click', () => {
             if (!confirm('গ্রুপ থেকে বের হবেন?')) return;
             _db.collection('tm_groups').doc(chat.id).update({
-                members: firebase.firestore.FieldValue.arrayRemove(uid)
+                members: _fv().arrayRemove(uid)
             }).then(() => { _closeActiveChat(); _closeSidePanel(); _toast('গ্রুপ থেকে বের হয়েছেন।'); }).catch(()=>{});
         });
 
@@ -3249,7 +3272,7 @@
                     const mid2 = delBtn.dataset.mid;
                     if (!confirm('এই সদস্যকে গ্রুপ থেকে বের করবেন?')) return;
                     _db.collection('tm_groups').doc(chat.id).update({
-                        members: firebase.firestore.FieldValue.arrayRemove(mid2)
+                        members: _fv().arrayRemove(mid2)
                     }).then(() => {
                         chat.members = chat.members.filter(m => String(m) !== mid2);
                         _loadGroupMembers(chat, isAdmin);
