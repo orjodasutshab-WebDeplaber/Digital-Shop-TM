@@ -89,15 +89,18 @@
             }
         });
 
-        _initFirebase();
         _injectCSS();
         _buildMainUI();
         _injectButtons();
         _bindHotkey();
-        if (_currentUser) {
-            _loadChatList();
-            _ensurePublicGroup();
-        }
+
+        // ✅ FIX: Firebase async init — FB4 ready হওয়ার পরে chat চালু করো
+        _initFirebaseAsync().then(function() {
+            if (_currentUser) {
+                _loadChatList();
+                _ensurePublicGroup();
+            }
+        });
 
         // ✅ ১৫ দিনের পুরনো message Firestore থেকে auto-delete
         if (_db) {
@@ -166,15 +169,66 @@
 
     function _initFirebase() {
         if (typeof firebase === 'undefined') return;
-        // ✅ firebase-sync.js এর FB4 (chat Firebase) ব্যবহার করো
-        // FB4 config দেওয়া থাকলে সেটা, না হলে primary (fb1) তে fallback
         if (typeof window._getChatDB === 'function') {
             _db = window._getChatDB();
         }
-        // fallback: default firebase app
         if (!_db && firebase.apps && firebase.apps.length) {
             _db = firebase.firestore();
         }
+    }
+
+
+    // ✅ Helper: users collection সবসময় FB1 তে আছে
+    function _getUsersDB() {
+        if (typeof window._getDBForCollection === 'function') {
+            var db = window._getDBForCollection('users');
+            if (db) return db;
+        }
+        try {
+            var fb1App = firebase.apps.find(function(a) {
+                return a.options && a.options.projectId === 'digitalshoptm-2008';
+            });
+            if (fb1App) return firebase.firestore(fb1App);
+        } catch(e) {}
+        return _db; // last fallback
+    }
+
+    // ✅ NEW: async version — FB4 ready না হলে wait করে
+    function _initFirebaseAsync() {
+        return new Promise(function(resolve) {
+            if (typeof firebase === 'undefined') { resolve(); return; }
+
+            // _getChatDBAsync আছে কিনা চেক করো (firebase-sync.js v7+)
+            if (typeof window._getChatDBAsync === 'function') {
+                window._getChatDBAsync().then(function(db) {
+                    if (db) _db = db;
+                    // fallback
+                    if (!_db && firebase.apps && firebase.apps.length) {
+                        _db = firebase.firestore();
+                    }
+                    console.log('[TM Chat] ✅ Firebase DB ready:', _db ? 'yes' : 'no');
+                    resolve();
+                });
+            } else {
+                // _getChatDBAsync নেই — sync তে try করো, তারপর retry
+                var _tries = 0;
+                var _tryInit = function() {
+                    _tries++;
+                    if (typeof window._getChatDB === 'function') {
+                        _db = window._getChatDB();
+                    }
+                    if (!_db && firebase.apps && firebase.apps.length) {
+                        _db = firebase.firestore();
+                    }
+                    if (_db || _tries > 15) {
+                        resolve();
+                    } else {
+                        setTimeout(_tryInit, 300);
+                    }
+                };
+                _tryInit();
+            }
+        });
     }
 
     function _ensurePublicGroup() {
@@ -1861,7 +1915,6 @@
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
         if (!_isMobile && window._tmChatViewport) window._tmChatViewport.open();
         document.getElementById('tmv3-overlay').classList.add('open');
-        // Mobile এ open হওয়ার সাথে সাথে height fix করো
         if (_isMobile && typeof window._tmFixMobileHeight === 'function') {
             window._tmFixMobileHeight();
             setTimeout(window._tmFixMobileHeight, 100);
@@ -1869,7 +1922,16 @@
         }
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) closeBtn.style.display = _isMobile ? 'none' : 'flex';
-        _loadChatList();
+        // FIX: _db null হলে আগে init করো
+        if (!_db) {
+            var listEl = document.getElementById('tmv3-chat-list');
+            if (listEl) listEl.innerHTML = '<div class="tmv3-spinner"><i class="fa fa-circle-notch"></i></div>';
+            _initFirebaseAsync().then(function() {
+                if (_currentUser) { _loadChatList(); _ensurePublicGroup(); }
+            });
+        } else {
+            _loadChatList();
+        }
     }
 
     function _closeApp() {
@@ -3151,7 +3213,7 @@
         if (!members.length) { list.innerHTML = '<div class="tmv3-empty-msg">সদস্য নেই</div>'; return; }
 
         /* সব member-এর user data একসাথে লোড */
-        const promises = members.map(mid => _db.collection('users').doc(String(mid)).get().catch(() => null));
+        const promises = members.map(mid => _getUsersDB().collection('users').doc(String(mid)).get().catch(() => null));
         Promise.all(promises).then(docs => {
             list.innerHTML = '';
             docs.forEach((doc, i) => {
@@ -3233,7 +3295,7 @@
 
         /* Load other user data */
         if (otherId && _db) {
-            _db.collection('users').doc(String(otherId)).get().then(doc => {
+            _getUsersDB().collection('users').doc(String(otherId)).get().then(doc => {
                 if (!doc || !doc.exists) return;
                 const d = doc.data();
                 const n = d.name || d.email || String(otherId);
@@ -3321,7 +3383,7 @@
             syncBtn.addEventListener('click', () => {
                 syncBtn.textContent = 'Syncing...';
                 syncBtn.disabled = true;
-                _db.collection('users').get().then(snap => {
+                _getUsersDB().collection('users').get().then(snap => {
                     const allUids = snap.docs.map(d => d.id);
                     return _db.collection('tm_groups').doc(chat.id).update({
                         members: allUids
@@ -3369,7 +3431,7 @@
         document.getElementById('tmv3-modal-overlay').classList.add('open');
 
         const listEl = document.getElementById('ca-list');
-        const promises = members.map(mid => _db.collection('users').doc(String(mid)).get().catch(() => null));
+        const promises = members.map(mid => _getUsersDB().collection('users').doc(String(mid)).get().catch(() => null));
         Promise.all(promises).then(docs => {
             listEl.innerHTML = '';
             docs.forEach((doc, i) => {
@@ -3474,7 +3536,7 @@
                         const mems = doc.data().members || [];
                         mems.forEach(m => { if (String(m) !== uid && !otherIds.includes(String(m))) otherIds.push(String(m)); });
                     });
-                    return Promise.all(otherIds.map(id => _db.collection('users').doc(id).get().catch(() => null)));
+                    return Promise.all(otherIds.map(id => _getUsersDB().collection('users').doc(id).get().catch(() => null)));
                 }).then(docs => {
                     currentUsers = docs.filter(Boolean).filter(d => d.exists).map(d => ({ id: d.id, ...d.data() }));
                     renderList(currentUsers);
@@ -3484,7 +3546,7 @@
         /* Load all users */
         function loadAllUsers(q) {
             if (!_db) return;
-            _db.collection('users').limit(50).get().then(snap => {
+            _getUsersDB().collection('users').limit(50).get().then(snap => {
                 const uid = String(_currentUser.id);
                 let users = snap.docs.filter(d => d.id !== uid).map(d => ({ id: d.id, ...d.data() }));
                 if (q) {
@@ -3524,7 +3586,7 @@
                 } else {
                     /* Firebase এ search করো — personal accounts ও আসবে */
                     if (_db && _currentUser) {
-                        _db.collection('users').limit(100).get().then(snap => {
+                        _getUsersDB().collection('users').limit(100).get().then(snap => {
                             const uid = String(_currentUser.id);
                             let fbUsers = snap.docs.filter(d => d.id !== uid).map(d => ({ id: d.id, ...d.data() }));
                             fbUsers = fbUsers.filter(u => {
@@ -3899,7 +3961,7 @@
 
             /* Update in Firestore */
             if (_db) {
-                _db.collection('users').doc(String(_currentUser.id)).update({
+                _getUsersDB().collection('users').doc(String(_currentUser.id)).update({
                     name: _currentUser.name || '',
                     bio: _currentUser.bio || '',
                     avatar: _currentUser.avatar || '',
