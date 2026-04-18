@@ -203,28 +203,16 @@
         } catch(e) {}
         return { fromDate: function(d) { return d; } };
     }
-    // ✅ Safe wrapper — _fv() null হলে no-op object দেয়
+    // ✅ Safe wrapper — _fv() null হলে null দেয় (caller নিজে handle করবে)
+    // ⚠️ IMPORTANT: কখনো {_noOp:true} return করবে না — এটা Firestore data corrupt করে!
     function _sfv() {
         var fv = _fv();
         if (fv) return fv;
-        // SDK এখনো load হয়নি — safe no-op stub
-        // arrayUnion/arrayRemove এর জন্য [] পাঠাবে (Firestore ignore করবে)
+        // SDK ready না — null return করো। Caller নিজে check করবে।
+        // serverTimestamp শুধু safe fallback হিসেবে রাখলাম
         return {
-            arrayUnion: function() {
-                // Firestore এ safe — existing array unchanged থাকবে
-                var args = Array.prototype.slice.call(arguments);
-                // FieldValue.arrayUnion এর পরিবর্তে একটু পরে retry
-                setTimeout(function() {
-                    try {
-                        var fv2 = _fv();
-                        if (fv2 && _db && _activeChat) {
-                            // retry logic — caller context নেই, তাই শুধু log করি
-                        }
-                    } catch(e) {}
-                }, 1500);
-                return { _noOp: true, _args: args };
-            },
-            arrayRemove: function() { return { _noOp: true }; },
+            arrayUnion: function() { return null; }, // caller null check করবে
+            arrayRemove: function() { return null; }, // caller null check করবে
             serverTimestamp: function() { return new Date(); }
         };
     }
@@ -367,15 +355,20 @@
             _syncAllUsersToPublicGroup();
 
         }).catch(() => {
-            _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set({
-                name: PUBLIC_GROUP_NAME,
-                isPublic: true,
-                adminId: isMainAdmin ? uid : 'system',
-                allowMemberAdd: false,
-                allowMemberMsg: true,
-                createdAt: _sfv().serverTimestamp(),
-                members: _sfv().arrayUnion(uid)
-            }, { merge: true })
+            // manual safe set — arrayUnion ছাড়া
+            _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).get().then(d => {
+                const existingM = d.exists && Array.isArray(d.data().members) ? d.data().members : [];
+                if (!existingM.includes(uid)) existingM.push(uid);
+                return _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set({
+                    name: PUBLIC_GROUP_NAME,
+                    isPublic: true,
+                    adminId: isMainAdmin ? uid : 'system',
+                    allowMemberAdd: false,
+                    allowMemberMsg: true,
+                    createdAt: new Date(),
+                    members: existingM
+                }, { merge: true });
+            })
             .then(() => _syncAllUsersToPublicGroup())
             .catch(()=>{});
         });
@@ -406,10 +399,26 @@
                 // leftMembers বাদ দিয়ে add করো
                 const toAdd = ids.filter(id => !leftMembers.includes(String(id)));
                 if (!toAdd.length) return;
+                const fvNow = _fv();
                 chunkArray(toAdd, 400).forEach(chunk => {
-                    _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
-                        members: _sfv().arrayUnion(...chunk)
-                    }).catch(()=>{});
+                    if (fvNow && fvNow.arrayUnion) {
+                        // FieldValue আছে — efficient atomic update
+                        _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
+                            members: fvNow.arrayUnion(...chunk)
+                        }).catch(()=>{});
+                    } else {
+                        // FieldValue নেই — manual read-merge-write
+                        _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).get().then(d => {
+                            if (!d.exists) return;
+                            const cur = Array.isArray(d.data().members) ? d.data().members : [];
+                            const lft = Array.isArray(d.data().leftMembers) ? d.data().leftMembers : [];
+                            const merged = [...cur];
+                            chunk.forEach(id => {
+                                if (!merged.includes(id) && !lft.includes(id)) merged.push(id);
+                            });
+                            return d.ref.update({ members: merged });
+                        }).catch(()=>{});
+                    }
                 });
             }
 
@@ -2076,10 +2085,23 @@
                     let groups = _latestGroups;
                     if (doc.exists) {
                         const pubGroup = { id: doc.id, type: 'group', ...doc.data() };
-                        // background এ members এ uid যোগ করো
-                        _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
-                            members: _sfv().arrayUnion(uid)
-                        }).catch(()=>{});
+                        // background এ members এ uid যোগ করো — FieldValue-safe
+                        (function() {
+                            var fvLocal = _fv();
+                            if (fvLocal && fvLocal.arrayUnion) {
+                                _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
+                                    members: fvLocal.arrayUnion(uid)
+                                }).catch(()=>{});
+                            } else {
+                                _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).get().then(function(dg) {
+                                    if (!dg.exists) return;
+                                    var lft = Array.isArray(dg.data().leftMembers) ? dg.data().leftMembers : [];
+                                    if (lft.includes(uid)) return; // আগে leave করেছে
+                                    var cur = Array.isArray(dg.data().members) ? dg.data().members : [];
+                                    if (!cur.includes(uid)) { cur.push(uid); return dg.ref.update({ members: cur }); }
+                                }).catch(()=>{});
+                            }
+                        })();
                         groups = [pubGroup, ..._latestGroups];
                     }
                     _doRender(groups, _latestPersonals);
@@ -2767,52 +2789,28 @@
        তারপর arrayRemove করে। _noOp দিয়ে data corrupt হবে না।
     ══════════════════════════════════════════════════════════ */
     function _safeArrayRemoveFromGroup(groupId, uid, extraFields, onSuccess, onError) {
-        // FieldValue ready না থাকলে সরাসরি Firestore transaction দিয়ে করো
+        // সবসময় manual read→filter→write — FieldValue race condition এড়ানো যায়
+        // এটাই সবচেয়ে নিরাপদ পদ্ধতি — members কখনো corrupt হবে না
         function doRemove() {
-            var fv = _fv();
-            if (fv && fv.arrayRemove && fv.arrayUnion) {
-                // ✅ FieldValue আছে — safe
-                var updateData = { members: fv.arrayRemove(uid) };
+            _db.collection('tm_groups').doc(groupId).get().then(function(d) {
+                if (!d.exists) { if (onSuccess) onSuccess(); return; }
+                var data = d.data();
+                var currentMembers = Array.isArray(data.members) ? data.members : [];
+                var currentLeft    = Array.isArray(data.leftMembers) ? data.leftMembers : [];
+                // members থেকে শুধু এই uid বাদ দাও
+                var newMembers = currentMembers.filter(function(m) { return String(m) !== String(uid); });
+                // leftMembers এ যোগ করো — auto-sync তাকে ফিরিয়ে দেবে না
+                if (!currentLeft.includes(String(uid))) currentLeft.push(String(uid));
+                var writeData = { members: newMembers, leftMembers: currentLeft };
                 if (extraFields) {
-                    Object.keys(extraFields).forEach(function(k) { updateData[k] = extraFields[k]; });
+                    Object.keys(extraFields).forEach(function(k) { writeData[k] = extraFields[k]; });
                 }
-                _db.collection('tm_groups').doc(groupId).update(updateData)
-                    .then(onSuccess).catch(onError || function(){});
-            } else {
-                // ✅ FieldValue নেই — manual read → filter → write (transaction-like)
-                _db.collection('tm_groups').doc(groupId).get().then(function(d) {
-                    if (!d.exists) return;
-                    var data = d.data();
-                    var currentMembers = Array.isArray(data.members) ? data.members : [];
-                    var currentLeft = Array.isArray(data.leftMembers) ? data.leftMembers : [];
-                    // members থেকে বাদ দাও
-                    var newMembers = currentMembers.filter(function(m) { return String(m) !== String(uid); });
-                    // leftMembers এ যোগ করো (duplicate এড়াতে)
-                    if (!currentLeft.includes(String(uid))) currentLeft.push(String(uid));
-                    var writeData = { members: newMembers, leftMembers: currentLeft };
-                    if (extraFields) {
-                        Object.keys(extraFields).forEach(function(k) { writeData[k] = extraFields[k]; });
-                    }
-                    return d.ref.update(writeData);
-                }).then(onSuccess).catch(onError || function(){});
-            }
+                return d.ref.update(writeData);
+            }).then(function() { if (onSuccess) onSuccess(); })
+              .catch(onError || function(){});
         }
 
-        // FieldValue ready কিনা চেক করো, না হলে 500ms wait করে retry (max 3x)
-        var _tries = 0;
-        function _tryRemove() {
-            _tries++;
-            var fv = _fv();
-            if (fv && fv.arrayRemove) {
-                doRemove();
-            } else if (_tries < 4) {
-                setTimeout(_tryRemove, 500);
-            } else {
-                // 1.5s পরেও না হলে manual fallback
-                doRemove();
-            }
-        }
-        _tryRemove();
+        doRemove(); // সরাসরি manual path — কোনো retry দরকার নেই
     }
 
     /* Same but for kicking a member (uid = member being kicked) */
