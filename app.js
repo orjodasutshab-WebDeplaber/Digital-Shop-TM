@@ -6437,18 +6437,22 @@ function reportProduct(id) {
             expiryTimestamp: expiry,
             userName: (appState.currentUser && appState.currentUser.name) ? appState.currentUser.name : "Guest"
         };
+
         // ২. localStorage + appState আপডেট
         savedReports.push(newReport);
         appState.reports = savedReports;
         localStorage.setItem('tm_reports', JSON.stringify(savedReports));
 
-        // ৩. Firebase এ directly write — সব ইউজার real-time দেখবে
+        // ৩. Firebase (fb3_orders/reports) এ directly write — সব ইউজার real-time দেখবে
         try {
-            const _repDB = window._TM_FB_DBS && (window._TM_FB_DBS['fb3_orders'] || Object.values(window._TM_FB_DBS)[0]);
-            if (_repDB) {
-                _repDB.collection('reports').doc(newReport.id).set(newReport)
-                    .then(() => console.log('[Reports] ✅ Firebase এ সেভ:', newReport.id))
-                    .catch(e => console.warn('[Reports] Firebase write err:', e.message));
+            const _rDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb3_orders'])
+                || (typeof firebase !== 'undefined' && firebase.apps &&
+                    firebase.apps.find(a => a.options && a.options.projectId === 'digitalshoptm-3') &&
+                    firebase.firestore(firebase.apps.find(a => a.options.projectId === 'digitalshoptm-3')));
+            if (_rDB) {
+                _rDB.collection('reports').doc(newReport.id).set(newReport)
+                    .then(() => console.log('[Reports] ✅ Firebase সেভ:', newReport.id))
+                    .catch(e => console.warn('[Reports] write err:', e.message));
             }
         } catch(e) { console.warn('[Reports] push err:', e); }
 
@@ -6464,16 +6468,18 @@ window.deleteReport = function(reportId) {
     appState.reports = appState.reports.filter(r => r.id !== reportId);
     localStorage.setItem('tm_reports', JSON.stringify(appState.reports));
 
-    // Firebase থেকেও ডিলিট — নইলে পরে আবার ফিরে আসবে
+    // Firebase (fb3_orders/reports) থেকেও ডিলিট — নইলে sync এ ফিরে আসবে
     try {
-        const _repDB = window._TM_FB_DBS && (window._TM_FB_DBS['fb3_orders'] || Object.values(window._TM_FB_DBS)[0]);
-        if (_repDB) {
-            _repDB.collection('reports').doc(String(reportId)).delete()
-                .then(() => console.log('[Reports] ✅ Firebase থেকে মুছে গেছে:', reportId))
-                .catch(e => console.warn('[Reports] Firebase delete err:', e.message));
+        const _rDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb3_orders'])
+            || (typeof firebase !== 'undefined' && firebase.apps &&
+                firebase.apps.find(a => a.options && a.options.projectId === 'digitalshoptm-3') &&
+                firebase.firestore(firebase.apps.find(a => a.options.projectId === 'digitalshoptm-3')));
+        if (_rDB) {
+            _rDB.collection('reports').doc(String(reportId)).delete()
+                .then(() => console.log('[Reports] ✅ Firebase মুছে গেছে:', reportId))
+                .catch(e => console.warn('[Reports] delete err:', e.message));
         }
     } catch(e) {}
-
     alert("রিপোর্ট ডিলিট করা হয়েছে।");
 };
 
@@ -6482,24 +6488,28 @@ function autoCleanReports() {
     if (!appState.reports) return;
     const now = new Date().getTime();
     const expiredReports = appState.reports.filter(r => r.expiryTimestamp && r.expiryTimestamp <= now);
-    const activeReports = appState.reports.filter(r => !r.expiryTimestamp || r.expiryTimestamp > now);
+    const activeReports  = appState.reports.filter(r => !r.expiryTimestamp || r.expiryTimestamp > now);
 
     if (expiredReports.length > 0) {
         appState.reports = activeReports;
         localStorage.setItem('tm_reports', JSON.stringify(appState.reports));
 
-        // Firebase থেকেও expired reports মুছে দাও — নইলে ফিরে আসবে
+        // Firebase (fb3_orders/reports) থেকেও expired মুছো — নইলে sync এ ফিরে আসবে
         try {
-            const _repDB = window._TM_FB_DBS && (window._TM_FB_DBS['fb3_orders'] || Object.values(window._TM_FB_DBS)[0]);
-            if (_repDB) {
+            const _rDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb3_orders'])
+                || (typeof firebase !== 'undefined' && firebase.apps &&
+                    firebase.apps.find(a => a.options && a.options.projectId === 'digitalshoptm-3') &&
+                    firebase.firestore(firebase.apps.find(a => a.options.projectId === 'digitalshoptm-3')));
+            if (_rDB) {
                 expiredReports.forEach(r => {
-                    _repDB.collection('reports').doc(String(r.id)).delete()
+                    _rDB.collection('reports').doc(String(r.id)).delete()
                         .catch(e => console.warn('[Reports] expire delete err:', e.message));
                 });
-                console.log('[Reports] ✅ Firebase থেকে', expiredReports.length, 'টি মেয়াদোত্তীর্ণ রিপোর্ট মুছে গেছে');
+                console.log('[Reports] ✅', expiredReports.length, 'টি মেয়াদোত্তীর্ণ রিপোর্ট Firebase থেকে মুছে গেছে');
             }
         } catch(e) {}
     }
+}
 }
 
 function openProductBySKU(skuCode, fallbackId) {
