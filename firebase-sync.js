@@ -736,6 +736,17 @@ function startListeners() {
     if (typeof window.displaySironamOnPortal === 'function') window.displaySironamOnPortal();
   });
 
+  // Reports — real-time listener (সব ইউজার দেখতে পাবে)
+  _listen('reports', snap => {
+    _pulling = true;
+    const now = Date.now();
+    // ৭ দিন পার হয়নি এমন reports মাত্র রাখো
+    const arr = snap.docs.map(d => d.data()).filter(r => !r.expiryTimestamp || r.expiryTimestamp > now);
+    setLocal('tm_reports', arr);
+    if (window.appState) window.appState.reports = arr;
+    _pulling = false;
+  });
+
   console.log('[FB] ✅ সব listener চালু');
 }
 

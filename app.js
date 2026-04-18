@@ -6437,15 +6437,24 @@ function reportProduct(id) {
             expiryTimestamp: expiry,
             userName: (appState.currentUser && appState.currentUser.name) ? appState.currentUser.name : "Guest"
         };
-
-        // ২. ডাটা সেভ করা
+        // ২. localStorage + appState আপডেট
         savedReports.push(newReport);
-        appState.reports = savedReports; 
-        localStorage.setItem('tm_reports', JSON.stringify(savedReports)); 
-        
-        alert("✅ রিপোর্ট জমা হয়েছে!");
+        appState.reports = savedReports;
+        localStorage.setItem('tm_reports', JSON.stringify(savedReports));
 
-        // ৩. সঙ্গে সঙ্গে আপলোড দেখানোর জন্য মোডাল রি-রেন্ডার করা
+        // ৩. Firebase এ directly write — সব ইউজার real-time দেখবে
+        try {
+            const _repDB = window._TM_FB_DBS && (window._TM_FB_DBS['fb3_orders'] || Object.values(window._TM_FB_DBS)[0]);
+            if (_repDB) {
+                _repDB.collection('reports').doc(newReport.id).set(newReport)
+                    .then(() => console.log('[Reports] ✅ Firebase এ সেভ:', newReport.id))
+                    .catch(e => console.warn('[Reports] Firebase write err:', e.message));
+            }
+        } catch(e) { console.warn('[Reports] push err:', e); }
+
+        alert("✅ রিপোর্ট জমা হয়েছে!");
+
+        // ৪. মোডাল রি-রেন্ডার
         openProductDetails(id); 
     }
 }
@@ -6454,19 +6463,42 @@ window.deleteReport = function(reportId) {
     if (!confirm("আপনি কি এই রিপোর্টটি ডিলিট করতে চান?")) return;
     appState.reports = appState.reports.filter(r => r.id !== reportId);
     localStorage.setItem('tm_reports', JSON.stringify(appState.reports));
-    alert("রিপোর্ট ডিলিট করা হয়েছে।");
-    // পেজ রিফ্রেশ বা রি-রেন্ডার করার প্রয়োজন হলে এখানে ফাংশন কল করুন
+
+    // Firebase থেকেও ডিলিট — নইলে পরে আবার ফিরে আসবে
+    try {
+        const _repDB = window._TM_FB_DBS && (window._TM_FB_DBS['fb3_orders'] || Object.values(window._TM_FB_DBS)[0]);
+        if (_repDB) {
+            _repDB.collection('reports').doc(String(reportId)).delete()
+                .then(() => console.log('[Reports] ✅ Firebase থেকে মুছে গেছে:', reportId))
+                .catch(e => console.warn('[Reports] Firebase delete err:', e.message));
+        }
+    } catch(e) {}
+
+    alert("রিপোর্ট ডিলিট করা হয়েছে।");
 };
 
 // ৭ দিনের পুরনো রিপোর্ট অটো ডিলিট করার চেক
 function autoCleanReports() {
     if (!appState.reports) return;
     const now = new Date().getTime();
-    const activeReports = appState.reports.filter(r => r.expiryTimestamp > now);
-    
-    if (activeReports.length !== appState.reports.length) {
+    const expiredReports = appState.reports.filter(r => r.expiryTimestamp && r.expiryTimestamp <= now);
+    const activeReports = appState.reports.filter(r => !r.expiryTimestamp || r.expiryTimestamp > now);
+
+    if (expiredReports.length > 0) {
         appState.reports = activeReports;
         localStorage.setItem('tm_reports', JSON.stringify(appState.reports));
+
+        // Firebase থেকেও expired reports মুছে দাও — নইলে ফিরে আসবে
+        try {
+            const _repDB = window._TM_FB_DBS && (window._TM_FB_DBS['fb3_orders'] || Object.values(window._TM_FB_DBS)[0]);
+            if (_repDB) {
+                expiredReports.forEach(r => {
+                    _repDB.collection('reports').doc(String(r.id)).delete()
+                        .catch(e => console.warn('[Reports] expire delete err:', e.message));
+                });
+                console.log('[Reports] ✅ Firebase থেকে', expiredReports.length, 'টি মেয়াদোত্তীর্ণ রিপোর্ট মুছে গেছে');
+            }
+        } catch(e) {}
     }
 }
 
