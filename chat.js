@@ -182,23 +182,18 @@
         const uid = String(_currentUser.id);
         const isMainAdmin = _currentUser.role === 'admin';
 
-        // সব ইউজার সাবজনীন গ্রুপে থাকবে
         _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).get().then(doc => {
             if (doc.exists) {
-                // গ্রুপ আছে — user কে member এ যোগ করো
+                // গ্রুপ আছে — এই ইউজার কে member এ যোগ করো
                 const updates = {
                     members: firebase.firestore.FieldValue.arrayUnion(uid),
                     isPublic: true
                 };
-                // মেইন এডমিন হলে adminId আপডেট করো
                 if (isMainAdmin) {
                     updates.adminId = uid;
                     updates.name = PUBLIC_GROUP_NAME;
                 }
                 _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update(updates).catch(()=>{});
-
-                // ✅ সবসময় — tm_users থেকে সব ইউজার কে members এ যোগ করো (batch)
-                _syncAllUsersToPublicGroup();
             } else {
                 // গ্রুপ নেই — তৈরি করো
                 const groupData = {
@@ -212,15 +207,13 @@
                     lastMsg: 'Digital Shop TM সাবজনীন গ্রুপে স্বাগতম! 🎉',
                     lastMsgTs: firebase.firestore.FieldValue.serverTimestamp()
                 };
-                _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set(groupData, { merge: true })
-                    .then(() => {
-                        // তৈরি করার পরে সব ইউজার যোগ করো
-                        _syncAllUsersToPublicGroup();
-                    })
-                    .catch(()=>{});
+                _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set(groupData, { merge: true }).catch(()=>{});
             }
+
+            // ✅ প্রতিটি ইউজার লগইন করলেই — FB1 থেকে সব ইউজার sync করো
+            _syncAllUsersToPublicGroup();
+
         }).catch(() => {
-            // Error হলেও try করো
             _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set({
                 name: PUBLIC_GROUP_NAME,
                 isPublic: true,
@@ -229,57 +222,101 @@
                 allowMemberMsg: true,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 members: firebase.firestore.FieldValue.arrayUnion(uid)
-            }, { merge: true }).catch(()=>{});
+            }, { merge: true })
+            .then(() => _syncAllUsersToPublicGroup())
+            .catch(()=>{});
         });
     }
 
-    // ✅ tm_users collection থেকে সব ইউজার id নিয়ে public group এ batch update করো
+    /* ══════════════════════════════════════════════════════════
+       SYNC ALL USERS → PUBLIC GROUP
+       ✅ FB1 (users collection) থেকে সব ইউজার id নিয়ে
+          FB4 (chat) এর public group এ batch update করে।
+       ✅ localStorage TM_DB_USERS_V2 → fast path
+       ✅ firebase-sync এর window._getDBForCollection দিয়ে FB1 db পায়
+    ══════════════════════════════════════════════════════════ */
     function _syncAllUsersToPublicGroup() {
         if (!_db) return;
 
-        // FB1 (users Firebase) থেকে users নাও
-        let usersDb = _db;
-        if (typeof window._getDB === 'function') {
-            usersDb = window._getDB('tm_users') || _db;
-        }
-
-        // localStorage থেকে users list (fast path)
-        let localUsers = [];
-        try {
-            const raw = localStorage.getItem('TM_USERS');
-            if (raw) localUsers = JSON.parse(raw);
-        } catch(e) {}
-
-        const memberIds = localUsers.map(u => String(u.id)).filter(Boolean);
-
-        // Firestore arrayUnion একসাথে max 500 elements নেয়
-        // আমরা chunks এ করবো
         function chunkArray(arr, size) {
-            const chunks = [];
-            for (let i = 0; i < arr.length; i += size) chunks.push(arr.slice(i, i + size));
-            return chunks;
+            const out = [];
+            for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+            return out;
         }
 
-        const chunks = chunkArray(memberIds, 400);
-        chunks.forEach(chunk => {
-            if (!chunk.length) return;
-            _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
-                members: firebase.firestore.FieldValue.arrayUnion(...chunk)
-            }).catch(()=>{});
-        });
-
-        // Firebase tm_users থেকেও নাও (যারা localStorage এ নেই)
-        _db.collection('tm_users').get().then(snap => {
-            const fbIds = [];
-            snap.forEach(doc => fbIds.push(doc.id));
-            if (!fbIds.length) return;
-            const fbChunks = chunkArray(fbIds, 400);
-            fbChunks.forEach(chunk => {
+        function pushIds(ids) {
+            if (!ids || !ids.length) return;
+            chunkArray(ids, 400).forEach(chunk => {
                 _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update({
                     members: firebase.firestore.FieldValue.arrayUnion(...chunk)
                 }).catch(()=>{});
             });
-        }).catch(()=>{});
+        }
+
+        // ── Step 1: localStorage TM_DB_USERS_V2 → তাৎক্ষণিক push ──
+        let localIds = [];
+        try {
+            // TM_DB_USERS_V2 হলো firebase-sync এর users localStorage key
+            const raw = localStorage.getItem('TM_DB_USERS_V2');
+            if (raw) {
+                const arr = JSON.parse(raw);
+                localIds = arr.map(u => String(u.id || u.uid || '')).filter(Boolean);
+            }
+        } catch(e) {}
+        // fallback: TM_USERS (পুরনো key)
+        if (!localIds.length) {
+            try {
+                const raw2 = localStorage.getItem('TM_USERS');
+                if (raw2) {
+                    const arr2 = JSON.parse(raw2);
+                    localIds = arr2.map(u => String(u.id || u.uid || '')).filter(Boolean);
+                }
+            } catch(e) {}
+        }
+        if (localIds.length) {
+            console.log('[TM Chat] 📋 localStorage থেকে', localIds.length, 'ইউজার public group এ sync করা হচ্ছে...');
+            pushIds(localIds);
+        }
+
+        // ── Step 2: FB1 এর 'users' collection থেকে সম্পূর্ণ লিস্ট ──
+        // firebase-sync window._getDBForCollection দিয়ে FB1 db পাওয়া যায়
+        let usersDb = null;
+        try {
+            if (typeof window._getDBForCollection === 'function') {
+                usersDb = window._getDBForCollection('users');
+            }
+        } catch(e) {}
+
+        // fallback: firebase.apps থেকে FB1 খোঁজো (projectId দিয়ে)
+        if (!usersDb) {
+            try {
+                const fb1App = firebase.apps.find(a =>
+                    a.options && a.options.projectId === 'digitalshoptm-2008'
+                );
+                if (fb1App) usersDb = firebase.firestore(fb1App);
+            } catch(e) {}
+        }
+
+        if (!usersDb) {
+            console.warn('[TM Chat] ⚠️ FB1 users db পাওয়া যায়নি — শুধু localStorage দিয়ে sync হয়েছে।');
+            return;
+        }
+
+        usersDb.collection('users').get().then(snap => {
+            const fbIds = [];
+            snap.forEach(doc => {
+                const id = String(doc.id);
+                if (id && !localIds.includes(id)) fbIds.push(id);
+            });
+            if (fbIds.length) {
+                console.log('[TM Chat] 🔥 FB1 থেকে আরো', fbIds.length, 'ইউজার sync হচ্ছে...');
+                pushIds(fbIds);
+            }
+            const total = localIds.length + fbIds.length;
+            console.log('[TM Chat] ✅ Public group sync সম্পন্ন। মোট:', total, 'ইউজার।');
+        }).catch(e => {
+            console.warn('[TM Chat] ⚠️ FB1 users fetch error:', e.message);
+        });
     }
 
     /* ══════════════════════════════════════════════════════════
@@ -1653,13 +1690,13 @@
             document.getElementById('tmv3-left-menu').classList.toggle('open');
         });
 
+        /* New group */
         /* Find Users */
         document.getElementById('tmv3-btn-find-users').addEventListener('click', function () {
             document.getElementById('tmv3-left-menu').classList.remove('open');
             _showFindUsersModal();
         });
 
-        /* New group */
         document.getElementById('tmv3-btn-new-group').addEventListener('click', function () {
             document.getElementById('tmv3-left-menu').classList.remove('open');
             _showCreateGroupModal();
@@ -1982,8 +2019,18 @@
                 return name.includes(ql) || email.includes(ql) || phone.includes(ql) || id.includes(ql);
             });
 
-            // Firebase থেকেও খুঁজি
-            _db.collection('tm_users').get().then(function(snap) {
+            // FB1 থেকেও খুঁজি — 'users' collection FB1 (digitalshoptm-2008) এ আছে
+            const _usersSearchDb = (function() {
+                try {
+                    if (typeof window._getDBForCollection === 'function') return window._getDBForCollection('users');
+                } catch(e) {}
+                try {
+                    const a = firebase.apps.find(a => a.options && a.options.projectId === 'digitalshoptm-2008');
+                    if (a) return firebase.firestore(a);
+                } catch(e) {}
+                return _db;
+            })();
+            _usersSearchDb.collection('users').get().then(function(snap) {
                 var fbUsers = [];
                 snap.forEach(function(doc) {
                     var d = doc.data();
@@ -2589,7 +2636,10 @@
        CREATE GROUP
     ══════════════════════════════════════════════════════════ */
     /* ══════════════════════════════════════════════════════════
-       FIND USERS MODAL
+       FIND USERS MODAL — PC & Mobile
+       ✅ FB1 এর 'users' collection থেকে সব ইউজার দেখায়
+       ✅ নাম/ইমেইল/ফোন দিয়ে সার্চ
+       ✅ ক্লিক করলে personal chat খোলে
     ══════════════════════════════════════════════════════════ */
     function _showFindUsersModal() {
         const modal = document.getElementById('tmv3-modal');
@@ -2599,29 +2649,31 @@
         modal.innerHTML = `
 <style>
 #fu-wrap {
-    width: 100%; max-width: 520px; margin: 0 auto;
-    background: #111b21; border-radius: 18px; overflow: hidden;
-    display: flex; flex-direction: column; max-height: 80vh;
+    width:100%; max-width:520px; margin:0 auto;
+    background:#111b21; border-radius:18px; overflow:hidden;
+    display:flex; flex-direction:column; max-height:82vh;
+    box-shadow:0 20px 60px rgba(0,0,0,.7);
 }
-.is-mobile #fu-wrap { max-width:100%; border-radius:0; max-height:100%; height:100%; }
+.is-mobile #fu-wrap {
+    max-width:100%; border-radius:0; max-height:100dvh; height:100%;
+}
 #fu-header {
-    background: linear-gradient(135deg,#1a2d36,#0d1f26);
-    padding: 18px 20px 14px;
-    display: flex; align-items: center; gap: 14px;
-    border-bottom: 1px solid rgba(42,57,66,.7); flex-shrink:0;
+    background:linear-gradient(135deg,#1a2d36,#0d1f26);
+    padding:18px 20px 14px;
+    display:flex; align-items:center; gap:12px;
+    border-bottom:1px solid rgba(42,57,66,.7); flex-shrink:0;
 }
-#fu-header .fu-title { color:#e9edef; font-size:18px; font-weight:700; flex:1; }
-.is-mobile #fu-header .fu-title { font-size:26px; }
+.fu-title { color:#e9edef; font-size:18px; font-weight:700; flex:1; }
+.is-mobile .fu-title { font-size:26px; }
 #fu-close-btn {
     background:rgba(239,68,68,.15); border:none; color:#ef4444;
     width:36px; height:36px; border-radius:50%; cursor:pointer;
-    display:flex; align-items:center; justify-content:center; font-size:16px;
-    transition:.15s; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; transition:.15s; flex-shrink:0;
 }
 #fu-close-btn:hover { background:rgba(239,68,68,.3); }
 .is-mobile #fu-close-btn { width:52px; height:52px; font-size:22px; }
-
-#fu-search-wrap { padding:14px 16px 10px; flex-shrink:0; }
+#fu-search-wrap { padding:12px 16px 8px; flex-shrink:0; }
 #fu-search-box {
     background:#202c33; border:1.5px solid rgba(42,57,66,.8);
     border-radius:30px; display:flex; align-items:center;
@@ -2638,210 +2690,234 @@
     color:#e9edef; font-size:15px; font-family:inherit;
 }
 #fu-search-input::placeholder { color:#8696a0; }
+#fu-search-clear {
+    background:none; border:none; color:#8696a0; cursor:pointer;
+    font-size:14px; padding:0; display:none; flex-shrink:0;
+}
+#fu-search-clear.show { display:block; }
 .is-mobile #fu-search-box { padding:14px 20px; border-radius:14px; gap:14px; }
 .is-mobile #fu-search-input { font-size:22px; }
 .is-mobile #fu-search-box i { font-size:22px; }
-
-#fu-count { padding:4px 20px 8px; color:#8696a0; font-size:12px; flex-shrink:0; }
-.is-mobile #fu-count { font-size:18px; padding:6px 22px 10px; }
-
+.is-mobile #fu-search-clear { font-size:20px; }
+#fu-count { padding:4px 20px 6px; color:#8696a0; font-size:12px; flex-shrink:0; }
+.is-mobile #fu-count { font-size:17px; padding:6px 22px 8px; }
 #fu-list {
     flex:1; overflow-y:auto; scrollbar-width:thin;
     scrollbar-color:#2a3942 transparent;
-    padding:4px 0 8px;
+    padding:4px 0 10px;
 }
 #fu-list::-webkit-scrollbar { width:4px; }
 #fu-list::-webkit-scrollbar-thumb { background:#2a3942; border-radius:4px; }
-
 .fu-item {
     display:flex; align-items:center; gap:14px;
     padding:12px 20px; cursor:pointer;
     border-bottom:1px solid rgba(42,57,66,.2);
-    transition:background .15s; position:relative;
+    transition:background .15s;
 }
 .fu-item:last-child { border-bottom:none; }
 .fu-item:hover, .fu-item:active { background:rgba(37,211,102,.07); }
 .is-mobile .fu-item { padding:16px 22px; gap:18px; }
-
-.fu-avatar {
+.fu-av {
     width:48px; height:48px; border-radius:50%;
     background:linear-gradient(135deg,#2a3942,#1a2d36);
     display:flex; align-items:center; justify-content:center;
     font-size:20px; overflow:hidden; flex-shrink:0;
     border:2px solid rgba(37,211,102,.15);
 }
-.fu-avatar img { width:100%; height:100%; object-fit:cover; }
-.is-mobile .fu-avatar { width:62px; height:62px; font-size:28px; }
-
+.fu-av img { width:100%; height:100%; object-fit:cover; }
+.is-mobile .fu-av { width:62px; height:62px; font-size:28px; }
 .fu-info { flex:1; min-width:0; }
-.fu-name { color:#e9edef; font-size:15px; font-weight:600;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.fu-sub { color:#8696a0; font-size:12.5px; margin-top:2px;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fu-name {
+    color:#e9edef; font-size:15px; font-weight:600;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.fu-sub {
+    color:#8696a0; font-size:12.5px; margin-top:2px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
 .is-mobile .fu-name { font-size:22px; }
-.is-mobile .fu-sub { font-size:18px; margin-top:4px; }
-
-.fu-chat-btn {
+.is-mobile .fu-sub { font-size:17px; margin-top:4px; }
+.fu-btn {
     background:rgba(37,211,102,.12); color:#25d366;
-    border:1.5px solid rgba(37,211,102,.3);
-    border-radius:20px; padding:7px 16px;
-    font-size:12.5px; font-weight:600; cursor:pointer;
-    transition:.15s; white-space:nowrap; flex-shrink:0;
-    font-family:inherit;
+    border:1.5px solid rgba(37,211,102,.3); border-radius:20px;
+    padding:7px 16px; font-size:12.5px; font-weight:600;
+    cursor:pointer; transition:.15s; white-space:nowrap;
+    flex-shrink:0; font-family:inherit;
 }
-.fu-chat-btn:hover { background:rgba(37,211,102,.25); }
-.is-mobile .fu-chat-btn { font-size:18px; padding:10px 22px; border-radius:25px; }
-
+.fu-btn:hover { background:rgba(37,211,102,.25); border-color:rgba(37,211,102,.55); }
+.is-mobile .fu-btn { font-size:18px; padding:10px 22px; border-radius:25px; }
 .fu-empty {
-    padding:40px 20px; text-align:center;
-    color:#8696a0; font-size:14px; line-height:1.8;
+    padding:48px 20px; text-align:center;
+    color:#8696a0; font-size:14px; line-height:1.9;
 }
-.fu-empty i { font-size:36px; margin-bottom:12px; display:block; opacity:.4; }
+.fu-empty i { font-size:38px; margin-bottom:14px; display:block; opacity:.35; }
 .is-mobile .fu-empty { font-size:20px; }
-.is-mobile .fu-empty i { font-size:52px; }
-
-.fu-loading {
-    padding:30px; text-align:center; color:#8696a0; font-size:14px;
-}
+.is-mobile .fu-empty i { font-size:54px; }
+.fu-loading { padding:32px; text-align:center; color:#8696a0; font-size:14px; }
 .is-mobile .fu-loading { font-size:20px; }
 </style>
-
 <div id="fu-wrap">
   <div id="fu-header">
     <div class="fu-title"><i class="fa fa-users" style="color:#25d366;margin-right:8px;"></i>Find Users</div>
-    <button id="fu-close-btn" onclick="window._tmv3._closeModal()"><i class="fa fa-times"></i></button>
+    <button id="fu-close-btn"><i class="fa fa-times"></i></button>
   </div>
   <div id="fu-search-wrap">
     <div id="fu-search-box">
       <i class="fa fa-search"></i>
       <input id="fu-search-input" placeholder="নাম, ইমেইল বা ফোন দিয়ে খুঁজুন..." autocomplete="off">
+      <button id="fu-search-clear"><i class="fa fa-times-circle"></i></button>
     </div>
   </div>
   <div id="fu-count"></div>
-  <div id="fu-list"><div class="fu-loading"><i class="fa fa-spinner fa-spin"></i> লোড হচ্ছে...</div></div>
+  <div id="fu-list"><div class="fu-loading"><i class="fa fa-spinner fa-spin"></i> ইউজার লোড হচ্ছে...</div></div>
 </div>`;
 
         overlay.classList.add('open');
 
-        // Mobile viewport fix
+        // close btn
+        document.getElementById('fu-close-btn').addEventListener('click', _closeModal);
+
+        // Mobile height fix
         if (_isMobile && window.visualViewport) {
-            modal.closest('#tmv3-modal-overlay').style.height = window.visualViewport.height + 'px';
+            const ov = overlay;
+            ov.style.height = window.visualViewport.height + 'px';
+            ov.style.top = window.visualViewport.offsetTop + 'px';
         }
 
-        // সব ইউজার লোড করো
-        let _allFuUsers = [];
+        const selfId = _currentUser ? String(_currentUser.id) : '';
+        let _allUsers = [];
         let _fuQuery = '';
 
-        function _fuRender(users) {
-            const list = document.getElementById('fu-list');
-            const countEl = document.getElementById('fu-count');
-            if (!list) return;
-            if (!users.length) {
-                list.innerHTML = '<div class="fu-empty"><i class="fa fa-search"></i>' +
+        function _fuRender(list) {
+            const el = document.getElementById('fu-list');
+            const cnt = document.getElementById('fu-count');
+            if (!el) return;
+            if (!list.length) {
+                el.innerHTML = '<div class="fu-empty"><i class="fa fa-search"></i>' +
                     (_fuQuery ? 'কোনো ইউজার পাওয়া যায়নি।' : 'কোনো ইউজার নেই।') + '</div>';
-                if (countEl) countEl.textContent = '';
+                if (cnt) cnt.textContent = '';
                 return;
             }
-            if (countEl) countEl.textContent = users.length + ' জন ইউজার পাওয়া গেছে';
-            list.innerHTML = users.slice(0, 100).map(u => {
+            if (cnt) cnt.textContent = list.length + ' জন ইউজার';
+            el.innerHTML = list.slice(0, 120).map(u => {
                 const av = u.avatar
                     ? '<img src="' + _esc(u.avatar) + '" alt="">'
                     : '👤';
                 const sub = u.email || u.phone || '';
-                return '<div class="fu-item" data-uid="' + _esc(String(u.id)) + '" data-name="' + _esc(u.name) + '" data-avatar="' + _esc(u.avatar || '') + '">' +
-                    '<div class="fu-avatar">' + av + '</div>' +
+                return '<div class="fu-item" data-uid="' + _esc(String(u.id)) +
+                    '" data-name="' + _esc(u.name) + '" data-av="' + _esc(u.avatar || '') + '">' +
+                    '<div class="fu-av">' + av + '</div>' +
                     '<div class="fu-info">' +
                         '<div class="fu-name">' + _esc(u.name) + '</div>' +
                         (sub ? '<div class="fu-sub">' + _esc(sub) + '</div>' : '') +
                     '</div>' +
-                    '<button class="fu-chat-btn"><i class="fa fa-comment" style="margin-right:5px;"></i>চ্যাট</button>' +
+                    '<button class="fu-btn"><i class="fa fa-comment" style="margin-right:5px;"></i>চ্যাট</button>' +
                 '</div>';
             }).join('');
 
-            list.querySelectorAll('.fu-item').forEach(function(item) {
+            el.querySelectorAll('.fu-item').forEach(function(item) {
                 item.addEventListener('click', function() {
-                    const uid2 = this.dataset.uid;
-                    const uname = this.dataset.name;
-                    const uavatar = this.dataset.avatar;
                     _closeModal();
-                    _openPersonalChat({ id: uid2, name: uname, avatar: uavatar });
+                    _openPersonalChat({
+                        id: this.dataset.uid,
+                        name: this.dataset.name,
+                        avatar: this.dataset.av
+                    });
                 });
             });
         }
 
         function _fuFilter() {
             const q = _fuQuery.toLowerCase().trim();
-            if (!q) return _allFuUsers;
-            return _allFuUsers.filter(u => {
-                return (u.name || '').toLowerCase().includes(q) ||
-                       (u.email || '').toLowerCase().includes(q) ||
-                       (u.phone || '').toLowerCase().includes(q) ||
-                       String(u.id).includes(q);
-            });
+            if (!q) return _allUsers;
+            return _allUsers.filter(u =>
+                (u.name||'').toLowerCase().includes(q) ||
+                (u.email||'').toLowerCase().includes(q) ||
+                (u.phone||'').toLowerCase().includes(q) ||
+                String(u.id).includes(q)
+            );
         }
 
-        // Search input
+        // Search input listener
         setTimeout(() => {
             const inp = document.getElementById('fu-search-input');
+            const clr = document.getElementById('fu-search-clear');
             if (!inp) return;
             inp.addEventListener('input', function() {
                 _fuQuery = this.value;
+                if (clr) clr.classList.toggle('show', !!this.value);
                 _fuRender(_fuFilter());
             });
+            if (clr) {
+                clr.addEventListener('click', function() {
+                    inp.value = ''; _fuQuery = '';
+                    clr.classList.remove('show');
+                    _fuRender(_fuFilter());
+                    inp.focus();
+                });
+            }
             inp.focus();
         }, 100);
 
-        // ইউজার লোড — localStorage (fast) + Firestore (complete)
-        const selfId = _currentUser ? String(_currentUser.id) : '';
-        let localUsers = [];
+        // ── Step 1: localStorage TM_DB_USERS_V2 → তাৎক্ষণিক দেখাও ──
         try {
-            const raw = localStorage.getItem('TM_USERS');
-            if (raw) localUsers = JSON.parse(raw);
+            const raw = localStorage.getItem('TM_DB_USERS_V2') || localStorage.getItem('TM_USERS');
+            if (raw) {
+                const arr = JSON.parse(raw);
+                _allUsers = arr
+                    .filter(u => u && String(u.id || u.uid || '') !== selfId)
+                    .map(u => ({
+                        id: String(u.id || u.uid || ''),
+                        name: u.name || u.fullName || String(u.id || ''),
+                        email: u.email || '',
+                        phone: u.phone || u.mobile || '',
+                        avatar: u.avatarData || u.avatar || ''
+                    }))
+                    .filter(u => u.id);
+                if (_allUsers.length) _fuRender(_fuFilter());
+            }
         } catch(e) {}
 
-        // localStorage থেকে প্রথমে দেখাও
-        _allFuUsers = localUsers
-            .filter(u => u && String(u.id) !== selfId)
-            .map(u => ({
-                id: String(u.id),
-                name: u.name || u.fullName || String(u.id),
-                email: u.email || '',
-                phone: u.phone || u.mobile || '',
-                avatar: u.avatarData || u.avatar || ''
-            }));
-        if (_allFuUsers.length) _fuRender(_fuFilter());
+        // ── Step 2: FB1 'users' collection থেকে পূর্ণ লিস্ট ──
+        let usersDb = null;
+        try {
+            if (typeof window._getDBForCollection === 'function') {
+                usersDb = window._getDBForCollection('users');
+            }
+        } catch(e) {}
+        if (!usersDb) {
+            try {
+                const a = firebase.apps.find(ap => ap.options && ap.options.projectId === 'digitalshoptm-2008');
+                if (a) usersDb = firebase.firestore(a);
+            } catch(e) {}
+        }
 
-        // Firestore থেকে পূর্ণ লিস্ট নাও
-        if (_db) {
-            _db.collection('tm_users').get().then(snap => {
-                const fbMap = {};
+        if (usersDb) {
+            usersDb.collection('users').get().then(snap => {
+                const seen = new Set(_allUsers.map(u => u.id));
+                const extra = [];
                 snap.forEach(doc => {
+                    if (doc.id === selfId || seen.has(doc.id)) return;
                     const d = doc.data();
-                    if (doc.id === selfId) return;
-                    fbMap[doc.id] = {
+                    extra.push({
                         id: doc.id,
                         name: d.name || d.fullName || doc.id,
                         email: d.email || '',
                         phone: d.phone || d.mobile || '',
                         avatar: d.avatarData || d.avatar || ''
-                    };
+                    });
                 });
-                // merge: localStorage ইউজার আগে, Firestore-only ইউজার পরে
-                const merged = [];
-                const seen = new Set();
-                _allFuUsers.forEach(u => { if (!seen.has(u.id)) { seen.add(u.id); merged.push(u); } });
-                Object.values(fbMap).forEach(u => { if (!seen.has(u.id)) { seen.add(u.id); merged.push(u); } });
-                _allFuUsers = merged;
+                _allUsers = [..._allUsers, ...extra];
                 _fuRender(_fuFilter());
             }).catch(() => {
-                if (!_allFuUsers.length) {
-                    const list = document.getElementById('fu-list');
-                    if (list) list.innerHTML = '<div class="fu-empty"><i class="fa fa-exclamation-circle"></i>ইউজার লোড করা যায়নি।</div>';
+                if (!_allUsers.length) {
+                    const el = document.getElementById('fu-list');
+                    if (el) el.innerHTML = '<div class="fu-empty"><i class="fa fa-exclamation-circle"></i>ইউজার লোড করা যায়নি।</div>';
                 }
             });
-        } else if (!_allFuUsers.length) {
-            const list = document.getElementById('fu-list');
-            if (list) list.innerHTML = '<div class="fu-empty"><i class="fa fa-exclamation-circle"></i>ডেটাবেজ সংযুক্ত নেই।</div>';
+        } else if (!_allUsers.length) {
+            const el = document.getElementById('fu-list');
+            if (el) el.innerHTML = '<div class="fu-empty"><i class="fa fa-exclamation-circle"></i>ডেটাবেজ সংযুক্ত নেই।</div>';
         }
     }
 
