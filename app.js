@@ -10458,7 +10458,7 @@ function renderTaggedProducts(sironamId) {
         // ──────────────────────────────────────────────────────────
 
         return `
-        <div class="shop-product-item" data-name="${p.title || p.name}" data-tags="${p.tags || p.sironamTag || ''}"
+        <div class="shop-product-item" data-name="${p.title || p.name}" data-tags="${Array.isArray(p.tags)?p.tags.join(','):(p.tags || p.sironamTag || '')}"
              style="background:${_cardBg}; border-radius:12px; padding:10px; border:1px solid ${_cardBdr}; text-align:center; display:flex; flex-direction:column; justify-content:space-between; height:100%; position:relative; cursor:pointer;"
              onclick="openProductDetails('${pId}')">
 
@@ -12451,7 +12451,7 @@ function pmxOpenHeaderShop(headerId, headerName, headerImg) {
                                 </div>` : '';
                             return `<div class="pmx-prod-card"
                                  data-name="${(p.name||'').replace(/"/g,'&quot;')}"
-                                 data-tags="${(p.tags||'').replace(/"/g,'&quot;')}"
+                                 data-tags="${(Array.isArray(p.tags)?p.tags.join(','):(p.tags||'')).replace(/"/g,'&quot;')}"
                                  onclick="pmxOpenBuyModal('${p.id}')"
                                  style="background:${cardBg};border-radius:14px;overflow:hidden;border:1.5px solid ${cardBdr};cursor:pointer;transition:transform 0.22s,box-shadow 0.22s,border-color 0.22s;box-shadow:0 2px 8px rgba(0,0,0,0.10);position:relative;"
                                  onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 10px 28px rgba(0,0,0,0.18)';this.style.borderColor='${hoverBdr}'"
@@ -12631,7 +12631,7 @@ window.pmxEditProduct = function(productId) {
                 <!-- #ট্যাগ -->
                 <div style="margin-bottom:14px;">
                     <label style="display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:5px;">#ট্যাগ (space দিয়ে আলাদা করুন)</label>
-                    <input id="pmxEditTags" type="text" value="${p.tags||''}" placeholder="#shirt #new #sale"
+                    <input id="pmxEditTags" type="text" value="${Array.isArray(p.tags)?p.tags.join(' '):(p.tags||'')}" placeholder="#shirt #new #sale"
                         style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;box-sizing:border-box;font-family:'Hind Siliguri',sans-serif;">
                 </div>
                 <!-- ছবি URL -->
