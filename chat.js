@@ -197,10 +197,8 @@
                 }
                 _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update(updates).catch(()=>{});
 
-                // ✅ Admin হলে — tm_users থেকে সব ইউজার কে members এ যোগ করো (batch)
-                if (isMainAdmin) {
-                    _syncAllUsersToPublicGroup();
-                }
+                // ✅ সবসময় — tm_users থেকে সব ইউজার কে members এ যোগ করো (batch)
+                _syncAllUsersToPublicGroup();
             } else {
                 // গ্রুপ নেই — তৈরি করো
                 const groupData = {
@@ -217,7 +215,7 @@
                 _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).set(groupData, { merge: true })
                     .then(() => {
                         // তৈরি করার পরে সব ইউজার যোগ করো
-                        if (isMainAdmin) _syncAllUsersToPublicGroup();
+                        _syncAllUsersToPublicGroup();
                     })
                     .catch(()=>{});
             }
@@ -1443,6 +1441,7 @@
         <div class="tmv3-dropdown" id="tmv3-left-menu-wrap">
           <button class="tmv3-icon-btn" id="tmv3-left-3dot" title="মেনু"><i class="fa fa-ellipsis-v"></i></button>
           <div class="tmv3-dropdown-menu" id="tmv3-left-menu">
+            <div class="tmv3-dropdown-item" id="tmv3-btn-find-users"><i class="fa fa-search"></i> Find Users</div>
             <div class="tmv3-dropdown-item" id="tmv3-btn-new-group"><i class="fa fa-users"></i> নতুন গ্রুপ</div>
             <div class="tmv3-dropdown-item" id="tmv3-btn-profile"><i class="fa fa-user-circle"></i> প্রোফাইল</div>
           </div>
@@ -1652,6 +1651,12 @@
         document.getElementById('tmv3-left-3dot').addEventListener('click', function (e) {
             e.stopPropagation();
             document.getElementById('tmv3-left-menu').classList.toggle('open');
+        });
+
+        /* Find Users */
+        document.getElementById('tmv3-btn-find-users').addEventListener('click', function () {
+            document.getElementById('tmv3-left-menu').classList.remove('open');
+            _showFindUsersModal();
         });
 
         /* New group */
@@ -2583,6 +2588,263 @@
     /* ══════════════════════════════════════════════════════════
        CREATE GROUP
     ══════════════════════════════════════════════════════════ */
+    /* ══════════════════════════════════════════════════════════
+       FIND USERS MODAL
+    ══════════════════════════════════════════════════════════ */
+    function _showFindUsersModal() {
+        const modal = document.getElementById('tmv3-modal');
+        const overlay = document.getElementById('tmv3-modal-overlay');
+        if (!modal || !overlay) return;
+
+        modal.innerHTML = `
+<style>
+#fu-wrap {
+    width: 100%; max-width: 520px; margin: 0 auto;
+    background: #111b21; border-radius: 18px; overflow: hidden;
+    display: flex; flex-direction: column; max-height: 80vh;
+}
+.is-mobile #fu-wrap { max-width:100%; border-radius:0; max-height:100%; height:100%; }
+#fu-header {
+    background: linear-gradient(135deg,#1a2d36,#0d1f26);
+    padding: 18px 20px 14px;
+    display: flex; align-items: center; gap: 14px;
+    border-bottom: 1px solid rgba(42,57,66,.7); flex-shrink:0;
+}
+#fu-header .fu-title { color:#e9edef; font-size:18px; font-weight:700; flex:1; }
+.is-mobile #fu-header .fu-title { font-size:26px; }
+#fu-close-btn {
+    background:rgba(239,68,68,.15); border:none; color:#ef4444;
+    width:36px; height:36px; border-radius:50%; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:16px;
+    transition:.15s; flex-shrink:0;
+}
+#fu-close-btn:hover { background:rgba(239,68,68,.3); }
+.is-mobile #fu-close-btn { width:52px; height:52px; font-size:22px; }
+
+#fu-search-wrap { padding:14px 16px 10px; flex-shrink:0; }
+#fu-search-box {
+    background:#202c33; border:1.5px solid rgba(42,57,66,.8);
+    border-radius:30px; display:flex; align-items:center;
+    gap:10px; padding:11px 18px;
+    transition:border-color .2s, box-shadow .2s;
+}
+#fu-search-box:focus-within {
+    border-color:rgba(37,211,102,.5);
+    box-shadow:0 0 0 3px rgba(37,211,102,.12);
+}
+#fu-search-box i { color:#25d366; font-size:15px; flex-shrink:0; }
+#fu-search-input {
+    flex:1; background:none; border:none; outline:none;
+    color:#e9edef; font-size:15px; font-family:inherit;
+}
+#fu-search-input::placeholder { color:#8696a0; }
+.is-mobile #fu-search-box { padding:14px 20px; border-radius:14px; gap:14px; }
+.is-mobile #fu-search-input { font-size:22px; }
+.is-mobile #fu-search-box i { font-size:22px; }
+
+#fu-count { padding:4px 20px 8px; color:#8696a0; font-size:12px; flex-shrink:0; }
+.is-mobile #fu-count { font-size:18px; padding:6px 22px 10px; }
+
+#fu-list {
+    flex:1; overflow-y:auto; scrollbar-width:thin;
+    scrollbar-color:#2a3942 transparent;
+    padding:4px 0 8px;
+}
+#fu-list::-webkit-scrollbar { width:4px; }
+#fu-list::-webkit-scrollbar-thumb { background:#2a3942; border-radius:4px; }
+
+.fu-item {
+    display:flex; align-items:center; gap:14px;
+    padding:12px 20px; cursor:pointer;
+    border-bottom:1px solid rgba(42,57,66,.2);
+    transition:background .15s; position:relative;
+}
+.fu-item:last-child { border-bottom:none; }
+.fu-item:hover, .fu-item:active { background:rgba(37,211,102,.07); }
+.is-mobile .fu-item { padding:16px 22px; gap:18px; }
+
+.fu-avatar {
+    width:48px; height:48px; border-radius:50%;
+    background:linear-gradient(135deg,#2a3942,#1a2d36);
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; overflow:hidden; flex-shrink:0;
+    border:2px solid rgba(37,211,102,.15);
+}
+.fu-avatar img { width:100%; height:100%; object-fit:cover; }
+.is-mobile .fu-avatar { width:62px; height:62px; font-size:28px; }
+
+.fu-info { flex:1; min-width:0; }
+.fu-name { color:#e9edef; font-size:15px; font-weight:600;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fu-sub { color:#8696a0; font-size:12.5px; margin-top:2px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.is-mobile .fu-name { font-size:22px; }
+.is-mobile .fu-sub { font-size:18px; margin-top:4px; }
+
+.fu-chat-btn {
+    background:rgba(37,211,102,.12); color:#25d366;
+    border:1.5px solid rgba(37,211,102,.3);
+    border-radius:20px; padding:7px 16px;
+    font-size:12.5px; font-weight:600; cursor:pointer;
+    transition:.15s; white-space:nowrap; flex-shrink:0;
+    font-family:inherit;
+}
+.fu-chat-btn:hover { background:rgba(37,211,102,.25); }
+.is-mobile .fu-chat-btn { font-size:18px; padding:10px 22px; border-radius:25px; }
+
+.fu-empty {
+    padding:40px 20px; text-align:center;
+    color:#8696a0; font-size:14px; line-height:1.8;
+}
+.fu-empty i { font-size:36px; margin-bottom:12px; display:block; opacity:.4; }
+.is-mobile .fu-empty { font-size:20px; }
+.is-mobile .fu-empty i { font-size:52px; }
+
+.fu-loading {
+    padding:30px; text-align:center; color:#8696a0; font-size:14px;
+}
+.is-mobile .fu-loading { font-size:20px; }
+</style>
+
+<div id="fu-wrap">
+  <div id="fu-header">
+    <div class="fu-title"><i class="fa fa-users" style="color:#25d366;margin-right:8px;"></i>Find Users</div>
+    <button id="fu-close-btn" onclick="window._tmv3._closeModal()"><i class="fa fa-times"></i></button>
+  </div>
+  <div id="fu-search-wrap">
+    <div id="fu-search-box">
+      <i class="fa fa-search"></i>
+      <input id="fu-search-input" placeholder="নাম, ইমেইল বা ফোন দিয়ে খুঁজুন..." autocomplete="off">
+    </div>
+  </div>
+  <div id="fu-count"></div>
+  <div id="fu-list"><div class="fu-loading"><i class="fa fa-spinner fa-spin"></i> লোড হচ্ছে...</div></div>
+</div>`;
+
+        overlay.classList.add('open');
+
+        // Mobile viewport fix
+        if (_isMobile && window.visualViewport) {
+            modal.closest('#tmv3-modal-overlay').style.height = window.visualViewport.height + 'px';
+        }
+
+        // সব ইউজার লোড করো
+        let _allFuUsers = [];
+        let _fuQuery = '';
+
+        function _fuRender(users) {
+            const list = document.getElementById('fu-list');
+            const countEl = document.getElementById('fu-count');
+            if (!list) return;
+            if (!users.length) {
+                list.innerHTML = '<div class="fu-empty"><i class="fa fa-search"></i>' +
+                    (_fuQuery ? 'কোনো ইউজার পাওয়া যায়নি।' : 'কোনো ইউজার নেই।') + '</div>';
+                if (countEl) countEl.textContent = '';
+                return;
+            }
+            if (countEl) countEl.textContent = users.length + ' জন ইউজার পাওয়া গেছে';
+            list.innerHTML = users.slice(0, 100).map(u => {
+                const av = u.avatar
+                    ? '<img src="' + _esc(u.avatar) + '" alt="">'
+                    : '👤';
+                const sub = u.email || u.phone || '';
+                return '<div class="fu-item" data-uid="' + _esc(String(u.id)) + '" data-name="' + _esc(u.name) + '" data-avatar="' + _esc(u.avatar || '') + '">' +
+                    '<div class="fu-avatar">' + av + '</div>' +
+                    '<div class="fu-info">' +
+                        '<div class="fu-name">' + _esc(u.name) + '</div>' +
+                        (sub ? '<div class="fu-sub">' + _esc(sub) + '</div>' : '') +
+                    '</div>' +
+                    '<button class="fu-chat-btn"><i class="fa fa-comment" style="margin-right:5px;"></i>চ্যাট</button>' +
+                '</div>';
+            }).join('');
+
+            list.querySelectorAll('.fu-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    const uid2 = this.dataset.uid;
+                    const uname = this.dataset.name;
+                    const uavatar = this.dataset.avatar;
+                    _closeModal();
+                    _openPersonalChat({ id: uid2, name: uname, avatar: uavatar });
+                });
+            });
+        }
+
+        function _fuFilter() {
+            const q = _fuQuery.toLowerCase().trim();
+            if (!q) return _allFuUsers;
+            return _allFuUsers.filter(u => {
+                return (u.name || '').toLowerCase().includes(q) ||
+                       (u.email || '').toLowerCase().includes(q) ||
+                       (u.phone || '').toLowerCase().includes(q) ||
+                       String(u.id).includes(q);
+            });
+        }
+
+        // Search input
+        setTimeout(() => {
+            const inp = document.getElementById('fu-search-input');
+            if (!inp) return;
+            inp.addEventListener('input', function() {
+                _fuQuery = this.value;
+                _fuRender(_fuFilter());
+            });
+            inp.focus();
+        }, 100);
+
+        // ইউজার লোড — localStorage (fast) + Firestore (complete)
+        const selfId = _currentUser ? String(_currentUser.id) : '';
+        let localUsers = [];
+        try {
+            const raw = localStorage.getItem('TM_USERS');
+            if (raw) localUsers = JSON.parse(raw);
+        } catch(e) {}
+
+        // localStorage থেকে প্রথমে দেখাও
+        _allFuUsers = localUsers
+            .filter(u => u && String(u.id) !== selfId)
+            .map(u => ({
+                id: String(u.id),
+                name: u.name || u.fullName || String(u.id),
+                email: u.email || '',
+                phone: u.phone || u.mobile || '',
+                avatar: u.avatarData || u.avatar || ''
+            }));
+        if (_allFuUsers.length) _fuRender(_fuFilter());
+
+        // Firestore থেকে পূর্ণ লিস্ট নাও
+        if (_db) {
+            _db.collection('tm_users').get().then(snap => {
+                const fbMap = {};
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (doc.id === selfId) return;
+                    fbMap[doc.id] = {
+                        id: doc.id,
+                        name: d.name || d.fullName || doc.id,
+                        email: d.email || '',
+                        phone: d.phone || d.mobile || '',
+                        avatar: d.avatarData || d.avatar || ''
+                    };
+                });
+                // merge: localStorage ইউজার আগে, Firestore-only ইউজার পরে
+                const merged = [];
+                const seen = new Set();
+                _allFuUsers.forEach(u => { if (!seen.has(u.id)) { seen.add(u.id); merged.push(u); } });
+                Object.values(fbMap).forEach(u => { if (!seen.has(u.id)) { seen.add(u.id); merged.push(u); } });
+                _allFuUsers = merged;
+                _fuRender(_fuFilter());
+            }).catch(() => {
+                if (!_allFuUsers.length) {
+                    const list = document.getElementById('fu-list');
+                    if (list) list.innerHTML = '<div class="fu-empty"><i class="fa fa-exclamation-circle"></i>ইউজার লোড করা যায়নি।</div>';
+                }
+            });
+        } else if (!_allFuUsers.length) {
+            const list = document.getElementById('fu-list');
+            if (list) list.innerHTML = '<div class="fu-empty"><i class="fa fa-exclamation-circle"></i>ডেটাবেজ সংযুক্ত নেই।</div>';
+        }
+    }
+
     function _showCreateGroupModal() {
         if (!_currentUser) { _toast('লগইন করুন।'); return; }
         const modal = document.getElementById('tmv3-modal');
