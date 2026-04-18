@@ -10048,7 +10048,7 @@ function publishSironam() {
 
     // ৩. Firebase Firestore এ সরাসরি push — FB7 (digital-shop-tm-357f8)
     try {
-        // _TM_FB_DBS থেকে fb7_ads সরাসরি নাও — fallback এড়াতে
+        // _TM_FB_DBS থেকে fb7_ads সরাসরি নাও — fallback/ready-check এড়াতে
         const _sDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb7_ads'])
             || (window._getDBForCollection ? window._getDBForCollection('sironam') : null);
         if (_sDB) {
@@ -10058,7 +10058,7 @@ function publishSironam() {
                 .then(() => console.log('[FB] ✅ Sironam published to fb7_ads (357f8):', newItem.id))
                 .catch(e => console.warn('[FB] sironam publish error:', e.message));
         } else {
-            console.warn('[FB] ❌ fb7_ads DB পাওয়া যায়নি!');
+            console.warn('[FB] ❌ fb7_ads DB পাওয়া যায়নি — sironam save হয়নি!');
         }
     } catch(e) {
         console.warn('[FB] publishSironam firebase error:', e.message);
@@ -10113,7 +10113,7 @@ function deleteSironam(id) {
     // ৩. Firestore থেকে sironam doc + products সরাসরি delete
     // fb7_ads (digital-shop-tm-357f8) এ sironam, fb2_products এ products
     try {
-        // _TM_FB_DBS থেকে সরাসরি নাও — fallback এড়াতে
+        // _TM_FB_DBS থেকে সরাসরি নাও — fallback/ready-check এড়াতে
         const _sironamDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb7_ads'])
             || (window._getDBForCollection ? window._getDBForCollection('sironam') : null);
         const _productDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb2_products'])
@@ -10123,7 +10123,7 @@ function deleteSironam(id) {
                 .then(() => console.log('[FB] ✅ Sironam deleted from fb7_ads (357f8):', id))
                 .catch(e => console.warn('[FB] sironam delete error:', e.message));
         } else {
-            console.warn('[FB] ❌ fb7_ads DB পাওয়া যায়নি — sironam delete হয়নি!');
+            console.warn('[FB] ❌ fb7_ads DB পাওয়া যায়নি!');
         }
         if (_productDB) {
             deletedProductIds.forEach(pid => {

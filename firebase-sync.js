@@ -162,15 +162,15 @@ const COLLECTION_ROUTING = {
   'products':         'fb2_products',
   'product_limits':   'fb2_products',
   'night_boards':     'fb2_products',
-  'pmx_products':     'fb10_extras',   // digital-shop-tm-e2c01
-  'pmx_headers':      'fb10_extras',   // digital-shop-tm-e2c01
-  'pmx_holders':      'fb10_extras',   // digital-shop-tm-e2c01
+  'pmx_products':     'fb10_extras',
+  'pmx_headers':      'fb10_extras',
+  'pmx_holders':      'fb10_extras',
 
   // ── FB3: Orders ──────────────────────────────────────────
   'orders':           'fb3_orders',
   'returns':          'fb3_orders',
   'special_requests': 'fb3_orders',
-  'pmx_orders':       'fb10_extras',   // digital-shop-tm-e2c01
+  'pmx_orders':       'fb10_extras',
   'reports':          'fb3_orders',
 
   // ── FB4: Chat ────────────────────────────────────────────
@@ -300,21 +300,19 @@ function initAllFB() {
 function getDB(collection) {
   const fbName = COLLECTION_ROUTING[collection] || 'fb1_users';
 
-  // assigned Firebase টি ready আছে?
+  // assigned Firebase ready ও db আছে — সেরা পথ
   if (_fbReady[fbName] && _fbDBs[fbName]) {
     return _fbDBs[fbName];
   }
 
-  // DB instance আছে কিন্তু ready flag নেই — তবুও ব্যবহার করো (timing issue এড়াতে)
+  // db instance আছে কিন্তু ready flag এখনো true হয়নি (timing issue) — তবুও ব্যবহার করো
   if (_fbDBs[fbName]) {
     return _fbDBs[fbName];
   }
 
-  // না থাকলে fb1_users (primary) তে fallback
+  // সত্যিই নেই — তখনই fb1_users এ fallback
   if (_fbDBs['fb1_users']) {
-    if (_fbReady[fbName] !== undefined) {
-      console.warn(`[FB] '${collection}' → '${fbName}' ready নয়, fb1_users এ fallback`);
-    }
+    console.warn(`[FB] '${collection}' → '${fbName}' DB নেই, fb1_users এ fallback`);
     return _fbDBs['fb1_users'];
   }
 
@@ -785,26 +783,6 @@ function startListeners() {
       _pulling = false;
     });
   })();
-
-  // Login Leaderboards — real-time listener
-  _listen('leaderboards', snap => {
-    _pulling = true;
-    const arr = snap.docs.map(d => d.data());
-    setLocal('TM_LOGIN_LEADERBOARDS', arr);
-    _pulling = false;
-    if (typeof window.renderLB === 'function') window.renderLB();
-    if (typeof window.renderLeaderboard === 'function') window.renderLeaderboard();
-  });
-
-  // Local Boards — real-time listener
-  _listen('local_boards', snap => {
-    _pulling = true;
-    const arr = snap.docs.map(d => d.data());
-    setLocal('TM_LOCAL_BOARDS', arr);
-    _pulling = false;
-    if (typeof window.renderLocalBoards === 'function') window.renderLocalBoards();
-    if (typeof window.renderLocalBoardsAdmin === 'function') window.renderLocalBoardsAdmin();
-  });
 
   // Login Leaderboards — real-time listener
   _listen('leaderboards', snap => {
