@@ -95,8 +95,20 @@
         _injectButtons();
         _bindHotkey();
         if (_currentUser) {
-            _loadChatList();
-            _ensurePublicGroup();
+            if (_db) {
+                _loadChatList();
+                _ensurePublicGroup();
+            }
+            // _db না পেলে async wait করো
+            if (!_db && typeof window._getChatDBAsync === 'function') {
+                window._getChatDBAsync().then(function(db) {
+                    if (db) {
+                        _db = db;
+                        _loadChatList();
+                        _ensurePublicGroup();
+                    }
+                });
+            }
         }
 
         // ✅ ১৫ দিনের পুরনো message Firestore থেকে auto-delete
@@ -164,28 +176,49 @@
         } catch (e) { return null; }
     }
 
-    /* ── ইউজার DB (FB1) পাওয়ার helper ── */
+    /* ── Users DB (FB1) getter ── */
     function _getUsersDb() {
+        // window._TM_FB_DBS সরাসরি ব্যবহার করো (firebase-sync expose করে)
+        try {
+            if (window._TM_FB_DBS && window._TM_FB_DBS['fb1_users']) {
+                return window._TM_FB_DBS['fb1_users'];
+            }
+        } catch(e) {}
         try {
             if (typeof window._getDBForCollection === 'function') {
-                return window._getDBForCollection('users');
+                const db = window._getDBForCollection('users');
+                if (db) return db;
             }
         } catch(e) {}
         try {
             const a = firebase.apps.find(ap => ap.options && ap.options.projectId === 'digitalshoptm-2008');
             if (a) return firebase.firestore(a);
         } catch(e) {}
-        return _db; // last fallback
+        return _db; // last resort fallback
     }
 
     function _initFirebase() {
         if (typeof firebase === 'undefined') return;
-        // ✅ firebase-sync.js এর FB4 (chat Firebase) ব্যবহার করো
-        // FB4 config দেওয়া থাকলে সেটা, না হলে primary (fb1) তে fallback
+
+        // ✅ _getChatDBAsync দিয়ে wait করে FB4 নাও
+        if (typeof window._getChatDBAsync === 'function') {
+            window._getChatDBAsync().then(function(db) {
+                if (db && !_db) {
+                    _db = db;
+                    // DB পাওয়ার পরে chat list ও public group load করো
+                    if (_currentUser) {
+                        _loadChatList();
+                        _ensurePublicGroup();
+                    }
+                }
+            });
+        }
+
+        // sync fallback — হয়তো এখনই ready আছে
         if (typeof window._getChatDB === 'function') {
             _db = window._getChatDB();
         }
-        // fallback: default firebase app
+        // final fallback
         if (!_db && firebase.apps && firebase.apps.length) {
             _db = firebase.firestore();
         }
@@ -293,15 +326,20 @@
         }
 
         // ── Step 2: FB1 এর 'users' collection থেকে সম্পূর্ণ লিস্ট ──
-        // firebase-sync window._getDBForCollection দিয়ে FB1 db পাওয়া যায়
         let usersDb = null;
+        // সরাসরি window._TM_FB_DBS['fb1_users'] ব্যবহার করো
         try {
-            if (typeof window._getDBForCollection === 'function') {
-                usersDb = window._getDBForCollection('users');
+            if (window._TM_FB_DBS && window._TM_FB_DBS['fb1_users']) {
+                usersDb = window._TM_FB_DBS['fb1_users'];
             }
         } catch(e) {}
-
-        // fallback: firebase.apps থেকে FB1 খোঁজো (projectId দিয়ে)
+        if (!usersDb) {
+            try {
+                if (typeof window._getDBForCollection === 'function') {
+                    usersDb = window._getDBForCollection('users');
+                }
+            } catch(e) {}
+        }
         if (!usersDb) {
             try {
                 const fb1App = firebase.apps.find(a =>
@@ -1875,7 +1913,6 @@
         if (!_currentUser) { _toast('চ্যাট করতে লগইন করুন।'); return; }
         if (!_isMobile && window._tmChatViewport) window._tmChatViewport.open();
         document.getElementById('tmv3-overlay').classList.add('open');
-        // Mobile এ open হওয়ার সাথে সাথে height fix করো
         if (_isMobile && typeof window._tmFixMobileHeight === 'function') {
             window._tmFixMobileHeight();
             setTimeout(window._tmFixMobileHeight, 100);
@@ -1883,7 +1920,19 @@
         }
         const closeBtn = document.getElementById('tmv3-close-btn');
         if (closeBtn) closeBtn.style.display = _isMobile ? 'none' : 'flex';
-        _loadChatList();
+
+        // _db নিশ্চিত করো তারপর load করো
+        if (!_db && typeof window._getChatDBAsync === 'function') {
+            window._getChatDBAsync().then(function(db) {
+                if (db) { _db = db; }
+                _loadChatList();
+                _ensurePublicGroup();
+            });
+        } else {
+            // sync try
+            if (!_db && typeof window._getChatDB === 'function') _db = window._getChatDB();
+            _loadChatList();
+        }
     }
 
     function _closeApp() {
@@ -2033,10 +2082,16 @@
                 return name.includes(ql) || email.includes(ql) || phone.includes(ql) || id.includes(ql);
             });
 
-            // FB1 থেকেও খুঁজি — 'users' collection FB1 (digitalshoptm-2008) এ আছে
+            // FB1 থেকেও খুঁজি — window._TM_FB_DBS['fb1_users'] সরাসরি
             const _usersSearchDb = (function() {
                 try {
-                    if (typeof window._getDBForCollection === 'function') return window._getDBForCollection('users');
+                    if (window._TM_FB_DBS && window._TM_FB_DBS['fb1_users']) return window._TM_FB_DBS['fb1_users'];
+                } catch(e) {}
+                try {
+                    if (typeof window._getDBForCollection === 'function') {
+                        const db = window._getDBForCollection('users');
+                        if (db) return db;
+                    }
                 } catch(e) {}
                 try {
                     const a = firebase.apps.find(a => a.options && a.options.projectId === 'digitalshoptm-2008');
@@ -2895,10 +2950,17 @@
         // ── Step 2: FB1 'users' collection থেকে পূর্ণ লিস্ট ──
         let usersDb = null;
         try {
-            if (typeof window._getDBForCollection === 'function') {
-                usersDb = window._getDBForCollection('users');
+            if (window._TM_FB_DBS && window._TM_FB_DBS['fb1_users']) {
+                usersDb = window._TM_FB_DBS['fb1_users'];
             }
         } catch(e) {}
+        if (!usersDb) {
+            try {
+                if (typeof window._getDBForCollection === 'function') {
+                    usersDb = window._getDBForCollection('users');
+                }
+            } catch(e) {}
+        }
         if (!usersDb) {
             try {
                 const a = firebase.apps.find(ap => ap.options && ap.options.projectId === 'digitalshoptm-2008');
@@ -3165,8 +3227,7 @@
         if (!members.length) { list.innerHTML = '<div class="tmv3-empty-msg">সদস্য নেই</div>'; return; }
 
         /* সব member-এর user data একসাথে লোড */
-        const usersDb2 = _getUsersDb();
-        const promises = members.map(mid => usersDb2.collection('users').doc(String(mid)).get().catch(() => null));
+        const promises = members.map(mid => _getUsersDb().collection('users').doc(String(mid)).get().catch(() => null));
         Promise.all(promises).then(docs => {
             list.innerHTML = '';
             docs.forEach((doc, i) => {
@@ -3384,8 +3445,7 @@
         document.getElementById('tmv3-modal-overlay').classList.add('open');
 
         const listEl = document.getElementById('ca-list');
-        const usersDb2 = _getUsersDb();
-        const promises = members.map(mid => usersDb2.collection('users').doc(String(mid)).get().catch(() => null));
+        const promises = members.map(mid => _getUsersDb().collection('users').doc(String(mid)).get().catch(() => null));
         Promise.all(promises).then(docs => {
             listEl.innerHTML = '';
             docs.forEach((doc, i) => {
@@ -3490,8 +3550,7 @@
                         const mems = doc.data().members || [];
                         mems.forEach(m => { if (String(m) !== uid && !otherIds.includes(String(m))) otherIds.push(String(m)); });
                     });
-                    const udb = _getUsersDb();
-                    return Promise.all(otherIds.map(id => udb.collection('users').doc(id).get().catch(() => null)));
+                    return Promise.all(otherIds.map(id => _getUsersDb().collection('users').doc(id).get().catch(() => null)));
                 }).then(docs => {
                     currentUsers = docs.filter(Boolean).filter(d => d.exists).map(d => ({ id: d.id, ...d.data() }));
                     renderList(currentUsers);
