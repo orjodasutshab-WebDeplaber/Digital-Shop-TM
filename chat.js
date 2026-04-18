@@ -179,16 +179,39 @@
 
 
 
-    // ✅ Null-safe FieldValue & Timestamp helpers
+    // ✅ Null-safe FieldValue & Timestamp — _db এর app থেকে নেওয়া হয়
     function _fv() {
+        // Method 1: _db এর app থেকে সরাসরি — সবচেয়ে reliable
         try {
-            if (typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.FieldValue) {
-                return firebase.firestore.FieldValue;
+            if (_db && _db.app) {
+                var fstore = _db.app.firestore ? _db.app.firestore() : null;
+                if (fstore && fstore.constructor && fstore.constructor.FieldValue) {
+                    return fstore.constructor.FieldValue;
+                }
             }
         } catch(e) {}
+        // Method 2: global firebase object
+        try {
+            if (typeof firebase !== 'undefined') {
+                // compat SDK — FieldValue সরাসরি firebase.firestore এর property
+                var fmod = firebase.firestore;
+                if (fmod && fmod.FieldValue) return fmod.FieldValue;
+            }
+        } catch(e2) {}
+        // Method 3: firebase.apps থেকে যেকোনো initialized app
+        try {
+            if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) {
+                var anyApp = firebase.apps[0];
+                var anyFirestore = firebase.firestore(anyApp);
+                // compat SDK তে FieldValue static — firestore module এ থাকে
+                if (firebase.firestore.FieldValue) return firebase.firestore.FieldValue;
+            }
+        } catch(e3) {}
+        // Fallback: crash হবে না — stub দেবে
+        console.warn('[TM Chat] ⚠️ FieldValue unavailable — using stub');
         return {
-            arrayUnion: function() { return { toJSON: function(){ return null; } }; },
-            arrayRemove: function() { return { toJSON: function(){ return null; } }; },
+            arrayUnion: function() { return null; },
+            arrayRemove: function() { return null; },
             serverTimestamp: function() { return new Date(); }
         };
     }
@@ -221,19 +244,41 @@
         return new Promise(function(resolve) {
             if (typeof firebase === 'undefined') { resolve(); return; }
 
+            function _afterDBReady() {
+                // ✅ FieldValue ও Timestamp ready কিনা verify করো
+                var _fvReady = 0;
+                var _fvCheck = setInterval(function() {
+                    _fvReady++;
+                    try {
+                        if (typeof firebase !== 'undefined' &&
+                            firebase.firestore &&
+                            firebase.firestore.FieldValue &&
+                            typeof firebase.firestore.FieldValue.arrayUnion === 'function') {
+                            clearInterval(_fvCheck);
+                            console.log('[TM Chat] ✅ FieldValue ready');
+                            resolve();
+                            return;
+                        }
+                    } catch(e) {}
+                    if (_fvReady > 20) { // 4s পরেও না হলে proceed
+                        clearInterval(_fvCheck);
+                        console.warn('[TM Chat] ⚠️ FieldValue not ready — proceeding anyway');
+                        resolve();
+                    }
+                }, 200);
+            }
+
             // _getChatDBAsync আছে কিনা চেক করো (firebase-sync.js v7+)
             if (typeof window._getChatDBAsync === 'function') {
                 window._getChatDBAsync().then(function(db) {
                     if (db) _db = db;
-                    // fallback
                     if (!_db && firebase.apps && firebase.apps.length) {
                         _db = firebase.firestore();
                     }
                     console.log('[TM Chat] ✅ Firebase DB ready:', _db ? 'yes' : 'no');
-                    resolve();
+                    _afterDBReady();
                 });
             } else {
-                // _getChatDBAsync নেই — sync তে try করো, তারপর retry
                 var _tries = 0;
                 var _tryInit = function() {
                     _tries++;
@@ -244,7 +289,7 @@
                         _db = firebase.firestore();
                     }
                     if (_db || _tries > 15) {
-                        resolve();
+                        _afterDBReady();
                     } else {
                         setTimeout(_tryInit, 300);
                     }
@@ -2644,10 +2689,12 @@
     function _markSeen(docs, chat) {
         if (!_db || !_currentUser) return;
         const uid = String(_currentUser.id);
+        const fv = _fv();
+        if (!fv || !fv.arrayUnion) return; // FieldValue ready না থাকলে skip
         docs.forEach(doc => {
             const d = doc.data();
             if (d.senderId !== uid && (!d.seenBy || !d.seenBy.includes(uid))) {
-                doc.ref.update({ seenBy: _fv().arrayUnion(uid) }).catch(()=>{});
+                doc.ref.update({ seenBy: fv.arrayUnion(uid) }).catch(()=>{});
             }
         });
     }
@@ -2684,6 +2731,7 @@
     ══════════════════════════════════════════════════════════ */
     function _sendTyping() {
         if (!_db || !_currentUser || !_activeChat) return;
+        if (!_fv() || !_fv().serverTimestamp) return;
         clearTimeout(_typingTimer);
         const ref = _activeChat.type === 'group'
             ? _db.collection('tm_groups').doc(_activeChat.id).collection('typing')
