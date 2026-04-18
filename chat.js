@@ -2789,18 +2789,36 @@
        তারপর arrayRemove করে। _noOp দিয়ে data corrupt হবে না।
     ══════════════════════════════════════════════════════════ */
     function _safeArrayRemoveFromGroup(groupId, uid, extraFields, onSuccess, onError) {
-        // সবসময় manual read→filter→write — FieldValue race condition এড়ানো যায়
-        // এটাই সবচেয়ে নিরাপদ পদ্ধতি — members কখনো corrupt হবে না
         function doRemove() {
             _db.collection('tm_groups').doc(groupId).get().then(function(d) {
                 if (!d.exists) { if (onSuccess) onSuccess(); return; }
                 var data = d.data();
-                var currentMembers = Array.isArray(data.members) ? data.members : [];
-                var currentLeft    = Array.isArray(data.leftMembers) ? data.leftMembers : [];
-                // members থেকে শুধু এই uid বাদ দাও
-                var newMembers = currentMembers.filter(function(m) { return String(m) !== String(uid); });
-                // leftMembers এ যোগ করো — auto-sync তাকে ফিরিয়ে দেবে না
-                if (!currentLeft.includes(String(uid))) currentLeft.push(String(uid));
+
+                // CRITICAL FIX: members যদি array না হয় (corrupt / _noOp object)
+                // তাহলে write বন্ধ করো — নইলে সব member মুছে যাবে
+                if (!Array.isArray(data.members)) {
+                    console.error('[TM Chat] members field corrupt — exit aborted. value:', data.members);
+                    if (onError) onError(new Error('members field is not an array'));
+                    return;
+                }
+
+                var uidStr = String(uid);
+                var currentMembers = data.members;
+                var currentLeft = Array.isArray(data.leftMembers) ? data.leftMembers : [];
+
+                // uid না থাকলে কিছু করার নেই
+                if (!currentMembers.map(String).includes(uidStr)) {
+                    console.warn('[TM Chat] uid not in members, skipping');
+                    if (onSuccess) onSuccess();
+                    return;
+                }
+
+                // শুধু এই একজনকে বাদ দাও
+                var newMembers = currentMembers.filter(function(m) { return String(m) !== uidStr; });
+
+                // leftMembers এ যোগ করো
+                if (!currentLeft.map(String).includes(uidStr)) currentLeft.push(uidStr);
+
                 var writeData = { members: newMembers, leftMembers: currentLeft };
                 if (extraFields) {
                     Object.keys(extraFields).forEach(function(k) { writeData[k] = extraFields[k]; });
@@ -2810,7 +2828,7 @@
               .catch(onError || function(){});
         }
 
-        doRemove(); // সরাসরি manual path — কোনো retry দরকার নেই
+        doRemove();
     }
 
     /* Same but for kicking a member (uid = member being kicked) */
@@ -2826,13 +2844,19 @@
         /* remove user from members or delete personal */
         if (chat.type === 'group') {
             const uid = String(_currentUser.id);
-            // ✅ Safe remove — FieldValue wait করে, noOp দিয়ে data corrupt হবে না
             _safeArrayRemoveFromGroup(chat.id, uid, null, function() {
-                _closeActiveChat(); _toast('গ্রুপ থেকে বের হয়েছেন');
+                _closeActiveChat();
+                _toast('গ্রুপ থেকে বের হয়েছেন');
+                // ✅ Chat list refresh
+                _chatList = _chatList.filter(c => c.id !== chat.id);
+                _renderChatList();
                 _db.collection('tm_groups').doc(chat.id).get().then(d => {
                     if (!d.exists) return;
                     if (!(d.data().members || []).length) d.ref.delete().catch(()=>{});
                 }).catch(()=>{});
+            }, function(err) {
+                console.error('[TM Chat] Delete/exit group error:', err);
+                _toast('বের হতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
             });
         } else {
             _db.collection('tm_personal_chats').doc(chat.id).delete()
@@ -3393,14 +3417,22 @@
         const leaveBtn = panel.querySelector('#sp-leave-group');
         if (leaveBtn) leaveBtn.addEventListener('click', () => {
             if (!confirm('গ্রুপ থেকে বের হবেন?')) return;
-            // ✅ Safe remove — FieldValue wait করে, noOp দিয়ে data corrupt হবে না
+            if (!_db) { _toast('সংযোগ সমস্যা। আবার চেষ্টা করুন।'); return; }
             _safeArrayRemoveFromGroup(chat.id, uid, null, function() {
-                _closeActiveChat(); _closeSidePanel(); _toast('গ্রুপ থেকে বের হয়েছেন।');
+                _closeActiveChat();
+                _closeSidePanel();
+                _toast('গ্রুপ থেকে বের হয়েছেন।');
+                // ✅ Chat list refresh — group এখনই সরে যাবে
+                _chatList = _chatList.filter(c => c.id !== chat.id);
+                _renderChatList();
                 // সব member চলে গেলে group delete করো
                 _db.collection('tm_groups').doc(chat.id).get().then(d => {
                     if (!d.exists) return;
                     if (!(d.data().members || []).length) d.ref.delete().catch(()=>{});
                 }).catch(()=>{});
+            }, function(err) {
+                console.error('[TM Chat] Exit group error:', err);
+                _toast('বের হতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
             });
         });
 
