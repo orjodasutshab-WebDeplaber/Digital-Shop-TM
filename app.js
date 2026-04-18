@@ -10107,20 +10107,14 @@ function deleteSironam(id) {
     }
 
     // ৩. Firestore থেকে sironam doc + products সরাসরি delete
-    // fb7_ads (digital-shop-tm-357f8) এ sironam, fb2_products এ products
+    // ✅ FIX: সঠিক Firebase db ব্যবহার (sironam→FB7, products→FB2)
     try {
-        // fb7_ads সরাসরি নাও — _getDBForCollection fallback এড়াতে
-        const _sironamDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb7_ads'])
-            || (window._getDBForCollection ? window._getDBForCollection('sironam') : null);
-        const _productDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb2_products'])
-            || (window._getDBForCollection ? window._getDBForCollection('products') : null);
-
+        const _sironamDB  = window._getDBForCollection ? window._getDBForCollection('sironam')  : (firebase && firebase.firestore ? firebase.firestore() : null);
+        const _productDB  = window._getDBForCollection ? window._getDBForCollection('products') : _sironamDB;
         if (_sironamDB) {
             _sironamDB.collection('sironam').doc(String(id)).delete()
-                .then(() => console.log('[FB] ✅ Sironam deleted from fb7_ads (357f8):', id))
+                .then(() => console.log('[FB] ✅ Sironam deleted from FB7:', id))
                 .catch(e => console.warn('[FB] sironam delete error:', e.message));
-        } else {
-            console.warn('[FB] ❌ fb7_ads DB পাওয়া যায়নি — sironam delete হয়নি!');
         }
         if (_productDB) {
             deletedProductIds.forEach(pid => {
@@ -11613,7 +11607,19 @@ const PMX_KEYS = {
 
 // ── Firebase helper ──────────────────────────────────────────────
 function pmxDb() {
-    try { return (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length) ? firebase.firestore() : null; } catch(e) { return null; }
+    // fb10_extras (digital-shop-tm-e2c01) এ PMX data save হবে
+    try {
+        // firebase-sync.js এর _TM_FB_DBS থেকে fb10_extras সরাসরি নাও
+        if (window._TM_FB_DBS && window._TM_FB_DBS['fb10_extras']) {
+            return window._TM_FB_DBS['fb10_extras'];
+        }
+        // fallback: named app 'fb10_extras'
+        if (typeof firebase !== 'undefined' && firebase.apps) {
+            const app = firebase.apps.find(a => a.name === 'fb10_extras');
+            if (app) return firebase.firestore(app);
+        }
+        return null;
+    } catch(e) { return null; }
 }
 function pmxSave(col, id, data) {
     localStorage.setItem(PMX_KEYS[col] || col, JSON.stringify(pmxGetAll(col)));

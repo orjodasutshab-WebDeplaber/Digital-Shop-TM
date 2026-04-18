@@ -164,7 +164,7 @@ const COLLECTION_ROUTING = {
   'night_boards':     'fb2_products',
   'pmx_products':     'fb10_extras',   // digital-shop-tm-e2c01
   'pmx_headers':      'fb10_extras',   // digital-shop-tm-e2c01
-  'pmx_holders':      'fb10_extras',   // digital-shop-tm-e2c01,
+  'pmx_holders':      'fb10_extras',   // digital-shop-tm-e2c01
 
   // ── FB3: Orders ──────────────────────────────────────────
   'orders':           'fb3_orders',
@@ -305,10 +305,14 @@ function getDB(collection) {
     return _fbDBs[fbName];
   }
 
+  // DB instance আছে কিন্তু ready flag নেই — তবুও ব্যবহার করো (timing issue এড়াতে)
+  if (_fbDBs[fbName]) {
+    return _fbDBs[fbName];
+  }
+
   // না থাকলে fb1_users (primary) তে fallback
   if (_fbDBs['fb1_users']) {
     if (_fbReady[fbName] !== undefined) {
-      // assigned ছিল কিন্তু ready না — শুধু একবার log
       console.warn(`[FB] '${collection}' → '${fbName}' ready নয়, fb1_users এ fallback`);
     }
     return _fbDBs['fb1_users'];
@@ -781,6 +785,26 @@ function startListeners() {
       _pulling = false;
     });
   })();
+
+  // Login Leaderboards — real-time listener
+  _listen('leaderboards', snap => {
+    _pulling = true;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('TM_LOGIN_LEADERBOARDS', arr);
+    _pulling = false;
+    if (typeof window.renderLB === 'function') window.renderLB();
+    if (typeof window.renderLeaderboard === 'function') window.renderLeaderboard();
+  });
+
+  // Local Boards — real-time listener
+  _listen('local_boards', snap => {
+    _pulling = true;
+    const arr = snap.docs.map(d => d.data());
+    setLocal('TM_LOCAL_BOARDS', arr);
+    _pulling = false;
+    if (typeof window.renderLocalBoards === 'function') window.renderLocalBoards();
+    if (typeof window.renderLocalBoardsAdmin === 'function') window.renderLocalBoardsAdmin();
+  });
 
   // Login Leaderboards — real-time listener
   _listen('leaderboards', snap => {
