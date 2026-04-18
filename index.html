@@ -3311,3 +3311,83 @@ html.is-mobile body > div[style*="position: fixed"] > div input {
 }
 </style>
 </body>
+<!-- ══ 3D Cursor ══════════════════════════════════════════════ -->
+<style>
+* { cursor: none !important; }
+#tm-cursor { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 2147483647; transform: translate(-50%,-50%); will-change: transform, left, top; }
+#tm-trail-wrap { position: fixed; inset: 0; pointer-events: none; z-index: 2147483646; }
+.tm-trail { position: absolute; border-radius: 50%; pointer-events: none; transform: translate(-50%,-50%); will-change: left, top; }
+</style>
+<div id="tm-trail-wrap"></div>
+<svg id="tm-cursor" width="36" height="44" viewBox="0 0 36 44" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tmcg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="tmcg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6d28d9"/>
+      <stop offset="100%" stop-color="#4c1d95"/>
+    </linearGradient>
+    <filter id="tmcshadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="2" dy="3" stdDeviation="2.5" flood-color="#7c3aed" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+  <g filter="url(#tmcshadow)">
+    <polygon points="2,2 2,32 10,24 16,38 20,36 14,22 26,22" fill="url(#tmcg1)" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+    <polygon points="2,2 2,32 10,24 16,38 20,36 14,22 26,22" fill="url(#tmcg2)" opacity="0.3"/>
+    <polygon points="2,2 14,8 2,18" fill="white" opacity="0.22"/>
+  </g>
+  <ellipse id="tm-cur-shadow" cx="12" cy="42" rx="10" ry="2.5" fill="#7c3aed" opacity="0.22"/>
+</svg>
+<script>
+(function(){
+  'use strict';
+  var cur   = document.getElementById('tm-cursor');
+  var tWrap = document.getElementById('tm-trail-wrap');
+  var fds   = document.querySelector('#tmcshadow feDropShadow');
+  var ell   = document.getElementById('tm-cur-shadow');
+  if(!cur) return;
+  var mx=200,my=200,cx=200,cy=200,tiltX=0,tiltY=0,ttX=0,ttY=0;
+  var TRAIL=16, trailEls=[], trailPos=[], trailHistory=[];
+  for(var i=0;i<TRAIL;i++){
+    var d=document.createElement('div');
+    d.className='tm-trail';
+    var sz=2+i*0.75, op=0.06+i*0.038;
+    d.style.cssText='width:'+sz+'px;height:'+sz+'px;background:rgba(167,139,250,'+op.toFixed(3)+');';
+    tWrap.appendChild(d);
+    trailEls.push(d);
+    trailPos.push({x:200,y:200});
+    trailHistory.push({x:200,y:200});
+  }
+  document.addEventListener('mousemove',function(e){
+    mx=e.clientX; my=e.clientY;
+    ttX=((my-innerHeight/2)/(innerHeight/2))*16;
+    ttY=-((mx-innerWidth/2)/(innerWidth/2))*16;
+  },{passive:true});
+  function lerp(a,b,t){return a+(b-a)*t;}
+  function tick(){
+    requestAnimationFrame(tick);
+    cx=lerp(cx,mx,0.17); cy=lerp(cy,my,0.17);
+    tiltX=lerp(tiltX,ttX,0.08); tiltY=lerp(tiltY,ttY,0.08);
+    var speed=Math.sqrt((mx-cx)*(mx-cx)+(my-cy)*(my-cy));
+    var sq=Math.min(1.28,Math.max(0.82,1+(mx-cx)*0.007));
+    var sqY=1/Math.sqrt(sq);
+    cur.style.left=mx+'px'; cur.style.top=my+'px';
+    cur.style.transform='translate(-50%,-50%) perspective(400px) rotateX('+tiltX.toFixed(2)+'deg) rotateY('+tiltY.toFixed(2)+'deg) scaleX('+sq.toFixed(3)+') scaleY('+sqY.toFixed(3)+')';
+    if(fds) fds.setAttribute('stdDeviation',Math.min(5,2+speed*0.07).toFixed(1));
+    if(ell){ell.setAttribute('ry',Math.max(1.2,2.5-speed*0.025).toFixed(2));ell.setAttribute('opacity',Math.max(0.05,0.22-speed*0.003).toFixed(3));}
+    trailHistory.unshift({x:mx,y:my});
+    if(trailHistory.length>TRAIL) trailHistory.length=TRAIL;
+    for(var k=0;k<TRAIL;k++){
+      var tp=trailHistory[Math.min(k+1,trailHistory.length-1)];
+      trailPos[k].x=lerp(trailPos[k].x,tp.x,0.22);
+      trailPos[k].y=lerp(trailPos[k].y,tp.y,0.22);
+      trailEls[k].style.left=trailPos[k].x+'px';
+      trailEls[k].style.top=trailPos[k].y+'px';
+    }
+  }
+  tick();
+})();
+</script>
+<!-- ══ /3D Cursor ═══════════════════════════════════════════ -->
