@@ -10085,12 +10085,15 @@ function renderAdminSironamList() {
 }
 
 // শিরোনাম এবং তার আওতাধীন সকল পণ্য স্থায়ীভাবে ডিলিট করা
-function deleteSironam(id) {
+async function deleteSironam(id) {
     if (!confirm("সাবধান! এই শিরোনামটি ডিলিট করলে এর ভেতরের সব পণ্য চিরতরে মুছে যাবে। আপনি কি নিশ্চিত?")) {
         return;
     }
 
-    // ১. sironamData local থেকে সরানো (pushToCloud ছাড়া)
+    // ── listener কে block করো যাতে delete এর পর ফিরে না আনে ──
+    window._sironamDeleteInProgress = true;
+
+    // ১. sironamData local থেকে সরানো
     if (typeof sironamData !== 'undefined') {
         sironamData = sironamData.filter(item => String(item.id) !== String(id));
         const str = JSON.stringify(sironamData);
@@ -10098,7 +10101,7 @@ function deleteSironam(id) {
         if (window._TMDB) window._TMDB.set('sironam_list', str).catch(()=>{});
     }
 
-    // ২. ঐ শিরোনামের সকল পণ্য local থেকে সরানো (pushToCloud ছাড়া)
+    // ২. ঐ শিরোনামের সকল পণ্য local থেকে সরানো
     let deletedProductIds = [];
     if (typeof appState !== 'undefined' && appState.products) {
         deletedProductIds = appState.products
@@ -10110,29 +10113,39 @@ function deleteSironam(id) {
         if (window._TMDB) window._TMDB.set(DB_KEYS.PRODUCTS, str).catch(()=>{});
     }
 
-    // ৩. Firestore থেকে sironam doc + products সরাসরি delete
-    // fb7_ads (digital-shop-tm-357f8) এ sironam, fb2_products এ products
+    // ৩. Firestore থেকে sironam doc + products delete — await করো
     try {
-        // _TM_FB_DBS থেকে সরাসরি নাও — fallback/ready-check এড়াতে
+        // FB ready না হলে wait করো (সর্বোচ্চ ৫ সেকেন্ড)
+        if (window.FB_READY) {
+            await Promise.race([
+                window.FB_READY,
+                new Promise(r => setTimeout(r, 5000))
+            ]);
+        }
+
         const _sironamDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb7_ads'])
             || (window._getDBForCollection ? window._getDBForCollection('sironam') : null);
         const _productDB = (window._TM_FB_DBS && window._TM_FB_DBS['fb2_products'])
             || (window._getDBForCollection ? window._getDBForCollection('products') : null);
+
         if (_sironamDB) {
-            _sironamDB.collection('sironam').doc(String(id)).delete()
-                .then(() => console.log('[FB] ✅ Sironam deleted from fb7_ads (357f8):', id))
-                .catch(e => console.warn('[FB] sironam delete error:', e.message));
+            await _sironamDB.collection('sironam').doc(String(id)).delete();
+            console.log('[FB] ✅ Sironam deleted from fb7_ads:', id);
         } else {
             console.warn('[FB] ❌ fb7_ads DB পাওয়া যায়নি!');
         }
-        if (_productDB) {
-            deletedProductIds.forEach(pid => {
-                _productDB.collection('products').doc(String(pid)).delete()
-                    .catch(e => console.warn('[FB] product delete error:', pid, e.message));
-            });
+
+        if (_productDB && deletedProductIds.length > 0) {
+            await Promise.all(
+                deletedProductIds.map(pid =>
+                    _productDB.collection('products').doc(String(pid)).delete()
+                        .catch(e => console.warn('[FB] product delete error:', pid, e.message))
+                )
+            );
+            console.log('[FB] ✅ Products deleted:', deletedProductIds.length);
         }
     } catch(e) {
-        console.warn('[FB] deleteSironam error:', e.message);
+        console.warn('[FB] deleteSironam Firebase error:', e.message);
     }
 
     // ৪. UI রিফ্রেশ
@@ -10145,6 +10158,9 @@ function deleteSironam(id) {
     }
 
     alert("শিরোনাম এবং এর ভেতরের সকল পণ্য সফলভাবে ডিলিট হয়েছে।");
+
+    // reload এর আগে ১ সেকেন্ড অপেক্ষা — Firebase propagation নিশ্চিত করতে
+    await new Promise(r => setTimeout(r, 1000));
     location.reload();
 }
 

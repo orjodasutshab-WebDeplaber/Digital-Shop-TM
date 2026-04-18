@@ -749,6 +749,11 @@ function startListeners() {
 
   // Sironam
   _listen('sironam', snap => {
+    // delete চলাকালীন listener কে block করো — ডাটা ফিরে আসবে না
+    if (window._sironamDeleteInProgress) {
+      console.log('[FB] sironam listener skipped — delete in progress');
+      return;
+    }
     _pulling = true;
     setLocal('sironam_list', snap.docs.map(d => d.data()));
     _pulling = false;
