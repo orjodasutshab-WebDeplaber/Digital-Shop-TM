@@ -331,21 +331,20 @@
                 // গ্রুপ আছে — leftMembers চেক করো, আগে বের হয়নি তাহলেই যোগ করো
                 const leftMembers = doc.data().leftMembers || [];
                 const hasLeft = leftMembers.includes(uid);
-                const fv = _fv();
-                const updates = {
-                    isPublic: true
-                };
-                // যে ইউজার আগে leave করেছে তাকে জোর করে add করবো না
-                if (!hasLeft) {
-                    if (fv && fv.arrayUnion) {
-                        updates.members = fv.arrayUnion(uid);
-                    } else if (!existingMembers.includes(uid)) {
-                        updates.members = [...existingMembers, uid];
-                    }
-                }
+                const updates = { isPublic: true };
                 if (isMainAdmin) {
                     updates.adminId = uid;
                     updates.name = PUBLIC_GROUP_NAME;
+                }
+                // যে ইউজার আগে leave করেছে তাকে জোর করে add করবো না
+                if (!hasLeft && !existingMembers.includes(uid)) {
+                    // FieldValue ছাড়াই manual array update — noOp নিরাপদ
+                    updates.members = [...existingMembers, uid];
+                }
+                // FieldValue আছে কিনা চেক করি
+                const fv = _fv();
+                if (fv && fv.arrayUnion && !hasLeft) {
+                    updates.members = fv.arrayUnion(uid);
                 }
                 _db.collection('tm_groups').doc(PUBLIC_GROUP_ID).update(updates).catch(()=>{});
             } else {
@@ -2763,7 +2762,65 @@
         }).then(() => _toast('চ্যাট ক্লিয়ার হয়েছে')).catch(()=>{});
     }
 
-    function _deleteChat() {
+    /* ══════════════════════════════════════════════════════════
+       SAFE ARRAY REMOVE — FieldValue ready না থাকলে wait করে
+       তারপর arrayRemove করে। _noOp দিয়ে data corrupt হবে না।
+    ══════════════════════════════════════════════════════════ */
+    function _safeArrayRemoveFromGroup(groupId, uid, extraFields, onSuccess, onError) {
+        // FieldValue ready না থাকলে সরাসরি Firestore transaction দিয়ে করো
+        function doRemove() {
+            var fv = _fv();
+            if (fv && fv.arrayRemove && fv.arrayUnion) {
+                // ✅ FieldValue আছে — safe
+                var updateData = { members: fv.arrayRemove(uid) };
+                if (extraFields) {
+                    Object.keys(extraFields).forEach(function(k) { updateData[k] = extraFields[k]; });
+                }
+                _db.collection('tm_groups').doc(groupId).update(updateData)
+                    .then(onSuccess).catch(onError || function(){});
+            } else {
+                // ✅ FieldValue নেই — manual read → filter → write (transaction-like)
+                _db.collection('tm_groups').doc(groupId).get().then(function(d) {
+                    if (!d.exists) return;
+                    var data = d.data();
+                    var currentMembers = Array.isArray(data.members) ? data.members : [];
+                    var currentLeft = Array.isArray(data.leftMembers) ? data.leftMembers : [];
+                    // members থেকে বাদ দাও
+                    var newMembers = currentMembers.filter(function(m) { return String(m) !== String(uid); });
+                    // leftMembers এ যোগ করো (duplicate এড়াতে)
+                    if (!currentLeft.includes(String(uid))) currentLeft.push(String(uid));
+                    var writeData = { members: newMembers, leftMembers: currentLeft };
+                    if (extraFields) {
+                        Object.keys(extraFields).forEach(function(k) { writeData[k] = extraFields[k]; });
+                    }
+                    return d.ref.update(writeData);
+                }).then(onSuccess).catch(onError || function(){});
+            }
+        }
+
+        // FieldValue ready কিনা চেক করো, না হলে 500ms wait করে retry (max 3x)
+        var _tries = 0;
+        function _tryRemove() {
+            _tries++;
+            var fv = _fv();
+            if (fv && fv.arrayRemove) {
+                doRemove();
+            } else if (_tries < 4) {
+                setTimeout(_tryRemove, 500);
+            } else {
+                // 1.5s পরেও না হলে manual fallback
+                doRemove();
+            }
+        }
+        _tryRemove();
+    }
+
+    /* Same but for kicking a member (uid = member being kicked) */
+    function _safeKickFromGroup(groupId, kickUid, onSuccess, onError) {
+        _safeArrayRemoveFromGroup(groupId, kickUid, null, onSuccess, onError);
+    }
+
+        function _deleteChat() {
         if (!_db || !_activeChat) return;
         const chat = _activeChat;
         if (chat.type === 'group' && chat.isPublic) { _toast('সাবজনীন গ্রুপ মুছতে পারবেন না।'); return; }
@@ -2771,20 +2828,14 @@
         /* remove user from members or delete personal */
         if (chat.type === 'group') {
             const uid = String(_currentUser.id);
-            const fv2 = _fv();
-            const delUpdate = { members: _sfv().arrayRemove(uid) };
-            // leftMembers এ যোগ করো — auto-sync তাকে ফিরিয়ে দেবে না
-            if (fv2 && fv2.arrayUnion) {
-                delUpdate.leftMembers = fv2.arrayUnion(uid);
-            }
-            _db.collection('tm_groups').doc(chat.id).update(delUpdate).then(() => {
+            // ✅ Safe remove — FieldValue wait করে, noOp দিয়ে data corrupt হবে না
+            _safeArrayRemoveFromGroup(chat.id, uid, null, function() {
                 _closeActiveChat(); _toast('গ্রুপ থেকে বের হয়েছেন');
-                // সব member চলে গেলে group delete করো
                 _db.collection('tm_groups').doc(chat.id).get().then(d => {
                     if (!d.exists) return;
                     if (!(d.data().members || []).length) d.ref.delete().catch(()=>{});
                 }).catch(()=>{});
-            }).catch(()=>{});
+            });
         } else {
             _db.collection('tm_personal_chats').doc(chat.id).delete()
                 .then(() => { _closeActiveChat(); _toast('চ্যাট ডিলিট হয়েছে'); }).catch(()=>{});
@@ -3344,23 +3395,15 @@
         const leaveBtn = panel.querySelector('#sp-leave-group');
         if (leaveBtn) leaveBtn.addEventListener('click', () => {
             if (!confirm('গ্রুপ থেকে বের হবেন?')) return;
-            const fv = _fv();
-            const leaveUpdate = { members: _sfv().arrayRemove(uid) };
-            // leftMembers এ যোগ করো যাতে পরে auto-sync তাকে ফিরিয়ে না দেয়
-            if (fv && fv.arrayUnion) {
-                leaveUpdate.leftMembers = fv.arrayUnion(uid);
-            }
-            _db.collection('tm_groups').doc(chat.id).update(leaveUpdate).then(() => {
+            // ✅ Safe remove — FieldValue wait করে, noOp দিয়ে data corrupt হবে না
+            _safeArrayRemoveFromGroup(chat.id, uid, null, function() {
                 _closeActiveChat(); _closeSidePanel(); _toast('গ্রুপ থেকে বের হয়েছেন।');
                 // সব member চলে গেলে group delete করো
                 _db.collection('tm_groups').doc(chat.id).get().then(d => {
                     if (!d.exists) return;
-                    const remaining = (d.data().members || []);
-                    if (!remaining.length) {
-                        d.ref.delete().catch(()=>{});
-                    }
+                    if (!(d.data().members || []).length) d.ref.delete().catch(()=>{});
                 }).catch(()=>{});
-            }).catch(()=>{});
+            });
         });
 
         /* Delete group (admin) */
@@ -3418,15 +3461,9 @@
                     e.stopPropagation();
                     const mid2 = delBtn.dataset.mid;
                     if (!confirm('এই সদস্যকে গ্রুপ থেকে বের করবেন?')) return;
-                    const fvKick = _fv();
-                    const kickUpdate = { members: _sfv().arrayRemove(mid2) };
-                    // leftMembers এ যোগ করো — auto-sync তাকে ফিরিয়ে দেবে না
-                    if (fvKick && fvKick.arrayUnion) {
-                        kickUpdate.leftMembers = fvKick.arrayUnion(mid2);
-                    }
-                    _db.collection('tm_groups').doc(chat.id).update(kickUpdate).then(() => {
+                    // ✅ Safe kick — FieldValue wait করে, noOp দিয়ে data corrupt হবে না
+                    _safeKickFromGroup(chat.id, mid2, function() {
                         chat.members = chat.members.filter(m => String(m) !== mid2);
-                        // সব member চলে গেলে group delete করো (non-public group)
                         if (!chat.isPublic && !chat.members.length) {
                             _db.collection('tm_groups').doc(chat.id).delete()
                                 .then(() => { _closeActiveChat(); _closeSidePanel(); _toast('গ্রুপ ডিলিট হয়েছে।'); })
@@ -3435,7 +3472,7 @@
                             _loadGroupMembers(chat, isAdmin);
                             _toast('সদস্য সরানো হয়েছে।');
                         }
-                    }).catch(()=>{});
+                    });
                 });
 
                 list.appendChild(item);
