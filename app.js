@@ -1011,8 +1011,7 @@ function renderAdminPublish(container) {
                             <option value="Furniture">Furniture</option>
                             <option value="Book">Book</option>
                             <option value="Sport">Sport</option>
-                            <option value="Gift Card">Gift Card</option>
-                            <option value="Game Topup">Game Topup</option>
+                            
                             <option value="Medicine">Medicine</option>
                             <option value="Watches">Watches</option>
                             <option value="Musical Instruments">Musical Instruments</option>
