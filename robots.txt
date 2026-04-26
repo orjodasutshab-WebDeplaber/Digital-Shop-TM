@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://digitashoptm.xo.je/sitemap.xml
+Sitemap: https://digital-shop-tm.vercel.app/sitemap.xml
+Sitemap: https://digitalshoptm77-droid.github.io/marcent-app/sitemap.xml
