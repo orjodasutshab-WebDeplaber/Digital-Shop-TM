@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://digital-shop-tm.vercel.app/sitemap.xml
-Sitemap: https://digitalshoptm77-droid.github.io/marcent-app/sitemap.xml
+Sitemap: https://orjodasutshab-webdeplaber.github.io/Digital-Shop-TM/sitemap.xml
