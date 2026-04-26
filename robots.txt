@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://digital-shop-tm.vercel.app/sitemap.xml
-Sitemap: https://orjodasutshab-webdeplaber.github.io/Digital-Shop-TM/sitemap.xml
+# Sitemap location
+Sitemap: https://digitashoptm.xo.je/sitemap.xml
